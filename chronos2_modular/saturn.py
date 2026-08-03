@@ -408,10 +408,10 @@ def history_to_vintage_frame(
     series_name: str,
     timezone: str,
     *,
-    retrieved_at_utc: pd.Timestamp | None = None,
+    downloaded_at_utc: pd.Timestamp | None = None,
 ) -> pd.DataFrame:
-    retrieved_at = _as_utc(
-        retrieved_at_utc or pd.Timestamp.now(tz="UTC")
+    downloaded_at = _as_utc(
+        downloaded_at_utc or pd.Timestamp.now(tz="UTC")
     )
     frames: list[pd.DataFrame] = []
 
@@ -429,11 +429,11 @@ def history_to_vintage_frame(
 
         frame = pd.DataFrame(
             {
-                "delivery_utc": series.index.tz_convert("UTC"),
-                "availability_utc": revision_utc,
-                "revision_utc": revision_utc,
+                "value_time_utc": series.index.tz_convert("UTC"),
+                "snapshot_time_utc": revision_utc,
+                "revision_time_utc": revision_utc,
                 "value": series.to_numpy(dtype=float),
-                "retrieved_at_utc": retrieved_at,
+                "downloaded_at_utc": downloaded_at,
             }
         )
         frames.append(frame)
@@ -448,9 +448,9 @@ def history_to_vintage_frame(
 
 def normalize_vintage_frame(frame: pd.DataFrame) -> pd.DataFrame:
     required = {
-        "delivery_utc",
-        "availability_utc",
-        "revision_utc",
+        "value_time_utc",
+        "snapshot_time_utc",
+        "revision_time_utc",
         "value",
     }
     missing = sorted(required - set(frame.columns))
@@ -461,14 +461,14 @@ def normalize_vintage_frame(frame: pd.DataFrame) -> pd.DataFrame:
         )
 
     normalized = frame.copy()
-    if "retrieved_at_utc" not in normalized:
-        normalized["retrieved_at_utc"] = pd.NaT
+    if "downloaded_at_utc" not in normalized:
+        normalized["downloaded_at_utc"] = pd.NaT
 
     for column in (
-        "delivery_utc",
-        "availability_utc",
-        "revision_utc",
-        "retrieved_at_utc",
+        "value_time_utc",
+        "snapshot_time_utc",
+        "revision_time_utc",
+        "downloaded_at_utc",
     ):
         normalized[column] = pd.to_datetime(
             normalized[column],
@@ -482,22 +482,22 @@ def normalize_vintage_frame(frame: pd.DataFrame) -> pd.DataFrame:
     )
     normalized = normalized.dropna(
         subset=[
-            "delivery_utc",
-            "availability_utc",
-            "revision_utc",
+            "value_time_utc",
+            "snapshot_time_utc",
+            "revision_time_utc",
         ]
     )
     normalized = normalized.sort_values(
         [
-            "revision_utc",
-            "delivery_utc",
-            "availability_utc",
-            "retrieved_at_utc",
+            "revision_time_utc",
+            "value_time_utc",
+            "snapshot_time_utc",
+            "downloaded_at_utc",
         ],
         na_position="first",
     )
     normalized = normalized.drop_duplicates(
-        subset=["revision_utc", "delivery_utc"],
+        subset=["revision_time_utc", "value_time_utc"],
         keep="last",
     )
     return normalized.loc[:, VINTAGE_COLUMNS].reset_index(
@@ -521,7 +521,7 @@ def _atomic_write_parquet(
     )
     try:
         frame.to_parquet(temporary, index=False)
-        pd.read_parquet(temporary, columns=["delivery_utc"]).head(1)
+        pd.read_parquet(temporary, columns=["value_time_utc"]).head(1)
         os.replace(temporary, path)
     finally:
         if temporary.exists():
@@ -679,7 +679,7 @@ def sync_vintage_series(
     fetch_end = _as_utc(revision_end)
 
     if not existing.empty:
-        last_revision = existing["revision_utc"].max()
+        last_revision = existing["revision_time_utc"].max()
         incremental_start = last_revision - pd.Timedelta(
             days=max(0, overlap_days)
         )
@@ -697,19 +697,19 @@ def sync_vintage_series(
             rows_downloaded=0,
             rows_after=rows_before,
             first_revision_utc=(
-                str(existing["revision_utc"].min())
+                str(existing["revision_time_utc"].min())
                 if not existing.empty
                 else None
             ),
             last_revision_utc=(
-                str(existing["revision_utc"].max())
+                str(existing["revision_time_utc"].max())
                 if not existing.empty
                 else None
             ),
             sync_as_of_utc=str(fetch_end),
         )
 
-    retrieved_at = pd.Timestamp.now(tz="UTC")
+    downloaded_at = pd.Timestamp.now(tz="UTC")
     frames: list[pd.DataFrame] = []
     current = fetch_start
     chunk_delta = pd.Timedelta(days=max(1, chunk_days))
@@ -745,7 +745,7 @@ def sync_vintage_series(
             history or {},
             series_name,
             timezone,
-            retrieved_at_utc=retrieved_at,
+            downloaded_at_utc=downloaded_at,
         )
         if not frame.empty:
             frames.append(frame)
@@ -799,12 +799,12 @@ def sync_vintage_series(
         rows_downloaded=int(len(downloaded)),
         rows_after=int(len(merged)),
         first_revision_utc=(
-            str(merged["revision_utc"].min())
+            str(merged["revision_time_utc"].min())
             if not merged.empty
             else None
         ),
         last_revision_utc=(
-            str(merged["revision_utc"].max())
+            str(merged["revision_time_utc"].max())
             if not merged.empty
             else None
         ),
