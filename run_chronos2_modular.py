@@ -1,0 +1,449 @@
+#!/usr/bin/env python
+from __future__ import annotations
+
+import argparse
+import json
+import logging
+import math
+import sys
+import warnings
+from pathlib import Path
+from typing import Any
+
+import pandas as pd
+
+from chronos2_modular.common import (
+    LOGGER,
+    SCRIPT_VERSION,
+    ZoneRunResult,
+    build_zone_configs,
+    deep_get,
+    load_yaml,
+    resolve_path,
+    set_reproducibility,
+)
+from chronos2_modular.data import prepare_zone_data
+from chronos2_modular.forecasting import (
+    load_model,
+    run_backtest_variant,
+    run_live_forecast_variant,
+    select_origins,
+)
+from chronos2_modular.metrics import (
+    add_comparison_fields,
+    compute_metrics,
+    metric_breakdowns,
+)
+from chronos2_modular.report import write_html_report
+from chronos2_modular.saturn import sync_saturn_data
+
+warnings.filterwarnings("ignore", message="XPU device count is zero.*")
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description=(
+            "Chronos-2 modulaire avec covariables natives, "
+            "backtest et rapport HTML Plotly."
+        )
+    )
+    parser.add_argument(
+        "--config",
+        default="chronos2_inputs_asof_jplus1.yaml",
+    )
+    parser.add_argument("--zones", nargs="+", default=None)
+    parser.add_argument(
+        "--include-covariates",
+        nargs="+",
+        default=None,
+        help="N’utilise que ces alias sans modifier le YAML.",
+    )
+    parser.add_argument(
+        "--exclude-covariates",
+        nargs="+",
+        default=None,
+        help="Désactive temporairement ces alias.",
+    )
+    parser.add_argument("--output-dir", default=None)
+    parser.add_argument("--refresh-data", action="store_true")
+    parser.add_argument(
+        "--full-data-refresh",
+        action="store_true",
+        help="Reconstruit entièrement les caches et vintages Saturn.",
+    )
+    parser.add_argument(
+        "--data-as-of",
+        default=None,
+        help=(
+            "Plafond ISO-8601 des révisions Saturn visibles pendant "
+            "l'actualisation."
+        ),
+    )
+    parser.add_argument("--local-files-only", action="store_true")
+    parser.add_argument(
+        "--device",
+        choices=("auto", "cpu", "cuda"),
+        default=None,
+    )
+    parser.add_argument("--context-length", type=int, default=None)
+    parser.add_argument("--backtest-windows", type=int, default=None)
+    parser.add_argument(
+        "--log-level",
+        choices=("DEBUG", "INFO", "WARNING", "ERROR"),
+        default="INFO",
+    )
+    return parser.parse_args()
+
+
+def run_zone(
+    zone_config,
+    config,
+    config_dir: Path,
+    args: argparse.Namespace,
+    runtime,
+    root_output: Path,
+    data_refresh: bool,
+) -> ZoneRunResult:
+    zone_output = root_output / zone_config.zone.lower()
+    zone_output.mkdir(parents=True, exist_ok=True)
+    data = prepare_zone_data(
+        zone_config,
+        config,
+        config_dir,
+        data_refresh,
+        zone_output,
+    )
+
+    context_length = int(
+        args.context_length
+        or deep_get(config, "model.context_length", 512)
+    )
+    horizon = int(deep_get(config, "model.horizon", 24))
+    windows = int(
+        args.backtest_windows
+        or deep_get(config, "backtest.windows", 60)
+    )
+    origin_hour_value = int(
+        deep_get(config, "backtest.origin_hour", 0)
+    )
+    origin_hour = None if origin_hour_value == -1 else origin_hour_value
+    origins = select_origins(
+        data.target,
+        context_length,
+        horizon,
+        windows,
+        origin_hour,
+        bool(
+            deep_get(
+                config,
+                "backtest.skip_irregular_local_days",
+                True,
+            )
+        ),
+    )
+    origin_batch_size = int(
+        deep_get(config, "model.origin_batch_size", 4)
+    )
+    model_batch_size = int(
+        deep_get(config, "model.model_batch_size", 128)
+    )
+    baseline_enabled = bool(
+        deep_get(config, "backtest.price_only_baseline", True)
+    )
+    extreme_threshold = float(
+        deep_get(config, "metrics.extreme_threshold", 150.0)
+    )
+
+    native = run_backtest_variant(
+        data,
+        runtime,
+        origins,
+        context_length,
+        horizon,
+        origin_batch_size,
+        model_batch_size,
+        True,
+        "native_covariates",
+    )
+    baseline = (
+        run_backtest_variant(
+            data,
+            runtime,
+            origins,
+            context_length,
+            horizon,
+            origin_batch_size,
+            model_batch_size,
+            False,
+            "price_only",
+        )
+        if baseline_enabled
+        else None
+    )
+    forecast_native = run_live_forecast_variant(
+        data,
+        runtime,
+        context_length,
+        horizon,
+        model_batch_size,
+        True,
+        "native_covariates",
+    )
+    forecast_baseline = (
+        run_live_forecast_variant(
+            data,
+            runtime,
+            context_length,
+            horizon,
+            model_batch_size,
+            False,
+            "price_only",
+        )
+        if baseline_enabled
+        else None
+    )
+
+    metrics_native = compute_metrics(native, extreme_threshold)
+    metrics_baseline = (
+        compute_metrics(baseline, extreme_threshold)
+        if baseline is not None
+        else None
+    )
+    combined = add_comparison_fields(
+        metrics_native,
+        metrics_baseline,
+    )
+    by_horizon, by_hour = metric_breakdowns(
+        native,
+        baseline,
+        extreme_threshold,
+    )
+
+    native.to_csv(
+        zone_output / "backtest_native_covariates.csv",
+        index=False,
+    )
+    if baseline is not None:
+        baseline.to_csv(
+            zone_output / "backtest_price_only.csv",
+            index=False,
+        )
+    forecast_native.to_csv(
+        zone_output / "day_ahead_forecast_native.csv",
+        index=False,
+    )
+    if forecast_baseline is not None:
+        forecast_baseline.to_csv(
+            zone_output / "day_ahead_forecast_price_only.csv",
+            index=False,
+        )
+    by_horizon.to_csv(
+        zone_output / "metrics_by_horizon.csv",
+        index=False,
+    )
+    by_hour.to_csv(
+        zone_output / "metrics_by_hour.csv",
+        index=False,
+    )
+    with (zone_output / "metrics.json").open(
+        "w",
+        encoding="utf-8",
+    ) as handle:
+        json.dump(
+            combined,
+            handle,
+            indent=2,
+            ensure_ascii=False,
+            allow_nan=True,
+        )
+    with (zone_output / "run_manifest.json").open(
+        "w",
+        encoding="utf-8",
+    ) as handle:
+        json.dump(
+            {
+                "script_version": SCRIPT_VERSION,
+                "model_id": runtime.model_id,
+                "zone": zone_config.zone,
+                "timezone": zone_config.timezone,
+                "context_length": context_length,
+                "horizon": horizon,
+                "backtest_windows": len(origins),
+                "active_covariates": list(data.covariates.columns),
+                "known_future_columns": data.known_future_columns,
+                "diagnostics": data.diagnostics,
+            },
+            handle,
+            indent=2,
+            ensure_ascii=False,
+            default=str,
+        )
+
+    return ZoneRunResult(
+        zone=zone_config.zone,
+        metrics_native=metrics_native,
+        metrics_baseline=metrics_baseline,
+        backtest_native=native,
+        backtest_baseline=baseline,
+        metrics_by_horizon=by_horizon,
+        metrics_by_hour=by_hour,
+        forecast_native=forecast_native,
+        forecast_baseline=forecast_baseline,
+        zone_data=data,
+        output_dir=zone_output,
+    )
+
+
+def main() -> int:
+    args = parse_args()
+    logging.basicConfig(
+        level=getattr(logging, args.log_level),
+        format="%(asctime)s | %(levelname)s | %(message)s",
+    )
+    config_path = Path(args.config).expanduser().resolve()
+    config = load_yaml(config_path)
+    config_dir = config_path.parent
+    if args.data_as_of is not None:
+        data_config = config.setdefault("data", {})
+        if not isinstance(data_config, dict):
+            raise ValueError("data doit être un mapping YAML.")
+        data_config["runtime_as_of"] = args.data_as_of
+    set_reproducibility(int(deep_get(config, "model.seed", 42)))
+
+    zone_configs = build_zone_configs(
+        config,
+        args.zones,
+        args.include_covariates,
+        args.exclude_covariates,
+    )
+    if not zone_configs:
+        raise ValueError("Aucune zone sélectionnée.")
+
+    project_root = resolve_path(
+        deep_get(config, "data.project_root", "."),
+        config_dir,
+    )
+    output_root = (
+        resolve_path(args.output_dir, Path.cwd())
+        if args.output_dir
+        else resolve_path(
+            deep_get(
+                config,
+                "output.directory",
+                "runs/chronos2_modular",
+            ),
+            project_root,
+        )
+    )
+    output_root.mkdir(parents=True, exist_ok=True)
+
+    refresh_requested = bool(
+        args.refresh_data
+        or args.full_data_refresh
+        or args.data_as_of is not None
+    )
+    if refresh_requested:
+        LOGGER.info(
+            "Actualisation Saturn avant le chargement du modèle..."
+        )
+        saturn_manifest = sync_saturn_data(
+            zone_configs,
+            config,
+            config_dir,
+            full=args.full_data_refresh,
+            as_of=args.data_as_of,
+        )
+        saturn_manifest.to_csv(
+            output_root / "saturn_sync_manifest.csv",
+            index=False,
+        )
+
+    runtime = load_model(
+        config,
+        args.device,
+        args.local_files_only,
+    )
+
+    results: list[ZoneRunResult] = []
+    failures: list[dict[str, str]] = []
+    for zone_config in zone_configs:
+        try:
+            LOGGER.info("=" * 80)
+            LOGGER.info(
+                "Zone %s | %d covariables actives : %s",
+                zone_config.zone,
+                len(zone_config.covariates),
+                ", ".join(zone_config.covariates) or "aucune",
+            )
+            results.append(
+                run_zone(
+                    zone_config,
+                    config,
+                    config_dir,
+                    args,
+                    runtime,
+                    output_root,
+                    data_refresh=False,
+                )
+            )
+        except Exception as exc:
+            LOGGER.exception(
+                "Échec %s : %s",
+                zone_config.zone,
+                exc,
+            )
+            failures.append(
+                {
+                    "zone": zone_config.zone,
+                    "error_type": type(exc).__name__,
+                    "error": str(exc),
+                }
+            )
+
+    if failures:
+        pd.DataFrame(failures).to_csv(
+            output_root / "zone_failures.csv",
+            index=False,
+        )
+    if not results:
+        raise RuntimeError("Toutes les zones ont échoué.")
+
+    summary_rows = []
+    for result in results:
+        summary_rows.append(
+            {
+                "zone": result.zone,
+                **add_comparison_fields(
+                    result.metrics_native,
+                    result.metrics_baseline,
+                ),
+            }
+        )
+    pd.DataFrame(summary_rows).to_csv(
+        output_root / "metrics_all_zones.csv",
+        index=False,
+    )
+
+    report_filename = str(
+        deep_get(
+            config,
+            "report.filename",
+            "chronos2_report.html",
+        )
+    )
+    report_path = output_root / report_filename
+    write_html_report(results, config, report_path)
+    LOGGER.info("Rapport HTML : %s", report_path.resolve())
+    print(f"\nRapport HTML : {report_path.resolve()}")
+    return 1 if failures else 0
+
+
+if __name__ == "__main__":
+    try:
+        raise SystemExit(main())
+    except KeyboardInterrupt:
+        LOGGER.error("Exécution interrompue.")
+        raise SystemExit(130)
+    except Exception as exc:
+        LOGGER.exception("Échec du programme : %s", exc)
+        raise SystemExit(1)
