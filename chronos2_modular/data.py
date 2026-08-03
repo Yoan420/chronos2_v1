@@ -25,7 +25,7 @@ from .saturn import (
 
 
 PIT_DELIVERY_ALIASES = (
-    "delivery_utc",
+    "value_time_utc",
     "delivery_timestamp",
     "delivery_time",
     "delivery_datetime",
@@ -40,7 +40,7 @@ PIT_DELIVERY_ALIASES = (
 )
 
 PIT_AVAILABILITY_ALIASES = (
-    "availability_utc",
+    "snapshot_time_utc",
     "as_of",
     "asof",
     "snapshot_as_of",
@@ -54,7 +54,7 @@ PIT_AVAILABILITY_ALIASES = (
 )
 
 PIT_REVISION_ALIASES = (
-    "revision_utc",
+    "revision_time_utc",
     "revision",
     "revision_date",
     "revision_time",
@@ -469,7 +469,7 @@ def read_pit_vintage_series(
 
     normalized = pd.DataFrame(
         {
-            "delivery_utc": _parse_utc(frame[delivery_col]),
+            "value_time_utc": _parse_utc(frame[delivery_col]),
             "value": pd.to_numeric(
                 frame[value_col],
                 errors="coerce",
@@ -478,33 +478,33 @@ def read_pit_vintage_series(
     )
 
     if availability_col is not None:
-        normalized["availability_utc"] = _parse_utc(
+        normalized["snapshot_time_utc"] = _parse_utc(
             frame[availability_col]
         )
     else:
-        normalized["availability_utc"] = _parse_utc(
+        normalized["snapshot_time_utc"] = _parse_utc(
             frame[revision_col]
         )
 
     if revision_col is not None:
-        normalized["revision_utc"] = _parse_utc(
+        normalized["revision_time_utc"] = _parse_utc(
             frame[revision_col]
         )
     else:
-        normalized["revision_utc"] = normalized[
-            "availability_utc"
+        normalized["revision_time_utc"] = normalized[
+            "snapshot_time_utc"
         ]
 
     normalized = normalized.dropna(
         subset=[
-            "delivery_utc",
-            "availability_utc",
-            "revision_utc",
+            "value_time_utc",
+            "snapshot_time_utc",
+            "revision_time_utc",
         ]
     )
 
     delivery_local = normalized[
-        "delivery_utc"
+        "value_time_utc"
     ].dt.tz_convert(timezone)
 
     hour, minute = _origin_clock(config)
@@ -519,27 +519,27 @@ def read_pit_vintage_series(
     )
 
     eligible = normalized.loc[
-        normalized["availability_utc"]
+        normalized["snapshot_time_utc"]
         <= normalized["cutoff_utc"]
     ].copy()
 
     selected = (
         eligible.sort_values(
             [
-                "delivery_utc",
-                "availability_utc",
-                "revision_utc",
+                "value_time_utc",
+                "snapshot_time_utc",
+                "revision_time_utc",
             ]
         )
         .drop_duplicates(
-            subset=["delivery_utc"],
+            subset=["value_time_utc"],
             keep="last",
         )
     )
 
     cutoff_violations = int(
         (
-            selected["availability_utc"]
+            selected["snapshot_time_utc"]
             > selected["cutoff_utc"]
         ).sum()
     )
@@ -550,7 +550,7 @@ def read_pit_vintage_series(
         )
 
     index = pd.DatetimeIndex(
-        selected["delivery_utc"]
+        selected["value_time_utc"]
     ).tz_convert(timezone)
 
     series = pd.Series(
@@ -578,12 +578,12 @@ def read_pit_vintage_series(
         "selected_null_values": int(selected["value"].isna().sum()),
         "cutoff_violations": cutoff_violations,
         "first_selected_revision": (
-            str(selected["revision_utc"].min())
+            str(selected["revision_time_utc"].min())
             if not selected.empty
             else None
         ),
         "last_selected_revision": (
-            str(selected["revision_utc"].max())
+            str(selected["revision_time_utc"].max())
             if not selected.empty
             else None
         ),

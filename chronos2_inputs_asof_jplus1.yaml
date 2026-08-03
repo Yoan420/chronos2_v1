@@ -1,44 +1,18 @@
-# =============================================================================
-# CHRONOS-2 — BACKTEST POINT-IN-TIME ET FORECAST J+1 COMPLET
-# =============================================================================
-#
-# Pour chaque journée de livraison D :
-# - seules les prévisions disponibles avant D-1 à 08:00 sont utilisées ;
-# - la dernière révision éligible est sélectionnée ;
-# - aucune prévision révisée a posteriori n'entre dans le backtest.
-#
-# Pour le forecast live :
-# - le contexte cible se termine à J 23:00 ;
-# - Chronos-2 prévoit J+1 de 00:00 à 23:00 ;
-# - le programme échoue si la journée J n'est pas complète.
-# =============================================================================
+# Chronos-2 — backtest point-in-time non biaisé et forecast J+1 complet
 
 model:
   model_id: amazon/chronos-2
-
-  # auto utilise CUDA si disponible, sinon CPU.
   device: auto
-
-  # true : le modèle doit déjà être disponible dans le cache Hugging Face.
-  # Passe à false si tu veux autoriser son téléchargement.
   local_files_only: true
-
   attn_implementation: auto
-
   context_length: 2048
   horizon: 24
-
   origin_batch_size: 20
   model_batch_size: 128
-
   seed: 42
 
-
 data:
-  # Le fichier YAML étant placé à la racine du projet.
   project_root: .
-
-  # La cible est lue depuis Saturn ou depuis le cache local s'il existe.
   source: auto
   cache_dir: data/cache
 
@@ -50,62 +24,40 @@ data:
 
   target_interpolation_limit: 3
   default_fill_limit: 0
-
-  # Le run échoue si une covariable activée ne peut pas être chargée.
   require_all_covariates: true
 
-  # Heure à laquelle le forecast aurait réellement été lancé en J-1.
   forecast_origin_local_time: "08:00"
-
-  # Utilise la dernière révision disponible avant le cutoff as-of.
   revision_policy: latest_before_asof
-
-  # Le contexte live doit se terminer à J 23:00.
   target_end_policy: current_day_end
-
-  # Empêche la production d'un forecast décalé si les 24 prix de J
-  # ne sont pas encore disponibles.
   require_complete_target_day: true
 
-  # Dossier contenant les fichiers de vintages parquet.
-  pit_vintage_dir: C:\Users\BQ6757\saturn_pit_data_pipeline\data\pit_store\raw\vintages\_shared
+  pit_vintage_dir: data/pit/vintages
 
-  # Association entre les alias YAML et les fichiers PIT.
+  # Seulement les véritables séries prévisionnelles point-in-time.
   pit_files:
     fr_residual_load_fcst: fr_residual_load_fcst.parquet
+    fr_nuclear_generation_fcst: fr_nuclear_generation_fcst.parquet
     de_residual_load_fcst: de_residual_load_fcst.parquet
     be_residual_load_fcst: be_residual_load_fcst.parquet
     nl_residual_load_fcst: nl_residual_load_fcst.parquet
     es_residual_load_fcst: es_residual_load_fcst.parquet
 
-
 backtest:
-  # Nombre maximal de journées de backtest.
   windows: 365
-
-  # Chaque origine correspond au début de la journée de livraison.
   origin_hour: 0
-
-  # Ignore les journées locales de 23 ou 25 heures pendant les changements DST.
   skip_irregular_local_days: true
-
-  # Compare le modèle avec covariables au modèle prix seul.
   price_only_baseline: true
-
 
 metrics:
   extreme_threshold: 150.0
 
-
 output:
   directory: runs/chronos2_asof_jplus1_fr
-
 
 report:
   filename: chronos2_asof_jplus1_fr.html
   title: Chronos-2 — backtest as-of et forecast J+1
   forecast_history_hours: 168
-
 
 zones:
   FR:
@@ -114,152 +66,100 @@ zones:
     include_calendar: true
 
     target:
-      enabled: true
-      source: auto
       series: power.price.everyday.fr.hourly.eurmwh
       description: Prix Day-Ahead France
-      fill_method: none
 
     covariates:
-
-      # -----------------------------------------------------------------------
-      # FRANCE
-      # -----------------------------------------------------------------------
       fr_residual_load_fcst:
         enabled: true
         source: pit_parquet
-
         series: power.fr.residual.load.hourly.gw.fcst
         description: Forecast de charge résiduelle France
-
-        # Colonnes exactes du fichier parquet.
-        timestamp_col: value_time_utc
-        availability_col: snapshot_time_utc
-        revision_col: revision_time_utc
-        value_col: value
-
         fill_method: none
-        fill_limit: 0
         minimum_coverage: 0.50
-
         future:
-          # La valeur est connue sur J+1 parce qu'elle provient d'un forecast
-          # matérialisé avec le cutoff as-of, et non d'une observation future.
           known_future: true
           strategies:
             - oracle
 
-      # -----------------------------------------------------------------------
-      # ALLEMAGNE
-      # -----------------------------------------------------------------------
+      fr_nuclear_generation_fcst:
+        enabled: true
+        source: pit_parquet
+        series: power.fr.generation.nuclear.remit.mw.fcst
+        description: Forecast REMIT de génération nucléaire France
+        fill_method: none
+        minimum_coverage: 0.00
+        future:
+          known_future: true
+          strategies:
+            - oracle
+
       de_residual_load_fcst:
         enabled: true
         source: pit_parquet
-
         series: power.de.residual.load.hourly.gw.fcst
         description: Forecast de charge résiduelle Allemagne
-
-        timestamp_col: value_time_utc
-        availability_col: snapshot_time_utc
-        revision_col: revision_time_utc
-        value_col: value
-
         fill_method: none
-        fill_limit: 0
         minimum_coverage: 0.50
-
         future:
           known_future: true
           strategies:
             - oracle
 
-      # -----------------------------------------------------------------------
-      # BELGIQUE
-      # -----------------------------------------------------------------------
       be_residual_load_fcst:
         enabled: true
         source: pit_parquet
-
         series: power.be.residual.load.hourly.gw.fcst
         description: Forecast de charge résiduelle Belgique
-
-        timestamp_col: value_time_utc
-        availability_col: snapshot_time_utc
-        revision_col: revision_time_utc
-        value_col: value
-
         fill_method: none
-        fill_limit: 0
         minimum_coverage: 0.50
-
         future:
           known_future: true
           strategies:
             - oracle
 
-      # -----------------------------------------------------------------------
-      # PAYS-BAS
-      # -----------------------------------------------------------------------
       nl_residual_load_fcst:
         enabled: true
         source: pit_parquet
-
         series: power.nl.residual.load.hourly.gw.fcst
         description: Forecast de charge résiduelle Pays-Bas
-
-        timestamp_col: value_time_utc
-        availability_col: snapshot_time_utc
-        revision_col: revision_time_utc
-        value_col: value
-
         fill_method: none
-        fill_limit: 0
         minimum_coverage: 0.50
-
         future:
           known_future: true
           strategies:
             - oracle
 
-      # -----------------------------------------------------------------------
-      # ESPAGNE
-      # -----------------------------------------------------------------------
       es_residual_load_fcst:
         enabled: true
         source: pit_parquet
-
         series: power.es.residual.load.hourly.gw.fcst
         description: Forecast de charge résiduelle Espagne
-
-        timestamp_col: value_time_utc
-        availability_col: snapshot_time_utc
-        revision_col: revision_time_utc
-        value_col: value
-
         fill_method: none
-        fill_limit: 0
         minimum_coverage: 0.50
-
         future:
           known_future: true
           strategies:
             - oracle
 
-      # -----------------------------------------------------------------------
-      # EXPORTATIONS NETTES
-      # -----------------------------------------------------------------------
-      net_exports:
+      fr_net_exports:
         enabled: true
-        source: auto
-        series: power.net.fr.exports.core.entsoe.hourly.gw.obs
-        description: Exportations nettes observées de la France
 
-        include_base_context: false
+        # Série observée chargée depuis Saturn/cache standard,
+        # et non depuis les vintages point-in-time.
+        source: saturn
+        series: power.net.fr.exports.core.entsoe.hourly.gw.obs
+
+        # La série est en GW, conformément au nom Saturn.
+        description: Exportations nettes de la France (GW)
 
         fill_method: none
-        fill_limit: 0
         minimum_coverage: 0.95
 
+        # Les exports du jour à prévoir ne sont pas connus à 08:00.
+        # Chronos teste donc des approximations disponibles à l'origine.
         future:
           known_future: false
-          strategies: [lag168]
+          strategies:
+            - lag24
+            - lag168
