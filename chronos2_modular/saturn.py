@@ -21,11 +21,11 @@ from .common import (
 
 
 VINTAGE_COLUMNS = (
-    "delivery_utc",
-    "availability_utc",
-    "revision_utc",
+    "value_time_utc",
+    "snapshot_time_utc",
+    "revision_time_utc",
     "value",
-    "retrieved_at_utc",
+    "downloaded_at_utc",
 )
 
 
