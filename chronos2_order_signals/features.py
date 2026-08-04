@@ -121,6 +121,7 @@ def _add_path_features(frame: pd.DataFrame) -> pd.DataFrame:
         "known_dow_",
         "known_doy_",
         "known_is_weekend",
+        "known_cal_",
     )
     base_columns = [
         column

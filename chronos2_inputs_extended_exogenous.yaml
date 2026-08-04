@@ -1,0 +1,442 @@
+model:
+  model_id: amazon/chronos-2
+  device: auto
+  local_files_only: true
+  attn_implementation: auto
+  context_length: 2048
+  horizon: 24
+  origin_batch_size: 20
+  model_batch_size: 128
+  seed: 42
+data:
+  project_root: .
+  source: auto
+  cache_dir: data/cache
+  saturn_url: https://saturn-energyscan.gem.myengie.com//api
+  saturn_author: BQ6757
+  historical_years: 4
+  frequency: h
+  target_interpolation_limit: 3
+  default_fill_limit: 0
+  require_all_covariates: true
+  forecast_origin_local_time: 08:00
+  revision_policy: latest_before_asof
+  target_end_policy: current_day_end
+  require_complete_target_day: true
+  pit_vintage_dir: data/pit/vintages
+  pit_files:
+    fr_residual_load_fcst: fr_residual_load_fcst.parquet
+    fr_nuclear_generation_fcst: fr_nuclear_generation_fcst.parquet
+    de_residual_load_fcst: de_residual_load_fcst.parquet
+    be_residual_load_fcst: be_residual_load_fcst.parquet
+    nl_residual_load_fcst: nl_residual_load_fcst.parquet
+    es_residual_load_fcst: es_residual_load_fcst.parquet
+    fr_order_ramp_pressure_fcst: fr_order_ramp_pressure_fcst.parquet
+    fr_order_plateau_pressure_fcst: fr_order_plateau_pressure_fcst.parquet
+    fr_order_jump_probability_fcst: fr_order_jump_probability_fcst.parquet
+    fr_order_block_pressure_fcst: fr_order_block_pressure_fcst.parquet
+    fr_order_gradient_binding_probability_fcst: fr_order_gradient_binding_probability_fcst.parquet
+    fr_residual_load_revision_std: fr_residual_load_revision_std.parquet
+    fr_residual_load_revision_abs_delta: fr_residual_load_revision_abs_delta.parquet
+    fr_residual_load_revision_age_hours: fr_residual_load_revision_age_hours.parquet
+    fr_nuclear_revision_std: fr_nuclear_revision_std.parquet
+    fr_nuclear_revision_abs_delta: fr_nuclear_revision_abs_delta.parquet
+    neighbour_residual_revision_std_mean: neighbour_residual_revision_std_mean.parquet
+    neighbour_residual_revision_std_max: neighbour_residual_revision_std_max.parquet
+    neighbour_residual_revision_abs_delta_mean: neighbour_residual_revision_abs_delta_mean.parquet
+backtest:
+  windows: 365
+  origin_hour: 0
+  skip_irregular_local_days: true
+  price_only_baseline: true
+metrics:
+  extreme_threshold: 150.0
+output:
+  directory: runs/chronos2_asof_jplus1_fr_regime_order_signals_without_market_regime_and_nuc_extended
+report:
+  filename: chronos2_asof_jplus1_fr_regime_order_signals.html
+  title: Chronos-2 — J+1, régimes et scores OOF de structure
+  forecast_history_hours: 168
+market_regime:
+  enabled: true 
+  short_window_hours: 168
+  long_window_hours: 720
+  short_min_periods: 72
+  long_min_periods: 168
+  negative_threshold: 0.0
+  spike_threshold: 150.0
+order_signals:
+  output_dir: runs/order_signals
+  labels:
+    jump_threshold: 30.0
+    jump_softness: 12.0
+    plateau_scale: 5.0
+    ramp_min_slope: 7.5
+    ramp_softness: 3.0
+    block_boundary_threshold: 20.0
+    block_boundary_softness: 8.0
+    gradient_min_slope: 5.0
+    gradient_softness: 2.5
+    min_segment_hours: 3
+    max_segment_hours: 6
+  model:
+    iterations: 350
+    depth: 7
+    learning_rate: 0.05
+    l2_leaf_reg: 8.0
+    random_strength: 0.5
+    validation_days: 60
+    early_stopping_rounds: 50
+    random_seed: 42
+    thread_count: -1
+  backfill:
+    min_train_days: 365
+    train_window_days: 730
+    retrain_every_days: 7
+    label_availability_lag_days: 1
+zones:
+  FR:
+    enabled: true
+    timezone: Europe/Paris
+    include_calendar: true
+    target:
+      series: power.price.everyday.fr.hourly.eurmwh
+      description: Prix Day-Ahead France
+    covariates:
+      fr_residual_load_fcst:
+        enabled: true
+        source: pit_parquet
+        series: power.fr.residual.load.hourly.gw.fcst
+        description: Forecast de charge résiduelle France
+        fill_method: none
+        minimum_coverage: 0.5
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      fr_nuclear_generation_fcst:
+        enabled: true
+        source: pit_parquet
+        series: power.fr.generation.nuclear.remit.mw.fcst
+        description: Forecast REMIT de génération nucléaire France (MW)
+        fill_method: none
+        minimum_coverage: 0.0
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      de_residual_load_fcst:
+        enabled: true
+        source: pit_parquet
+        series: power.de.residual.load.hourly.gw.fcst
+        description: Forecast de charge résiduelle Allemagne
+        fill_method: none
+        minimum_coverage: 0.5
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      be_residual_load_fcst:
+        enabled: true
+        source: pit_parquet
+        series: power.be.residual.load.hourly.gw.fcst
+        description: Forecast de charge résiduelle Belgique
+        fill_method: none
+        minimum_coverage: 0.5
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      nl_residual_load_fcst:
+        enabled: true
+        source: pit_parquet
+        series: power.nl.residual.load.hourly.gw.fcst
+        description: Forecast de charge résiduelle Pays-Bas
+        fill_method: none
+        minimum_coverage: 0.5
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      es_residual_load_fcst:
+        enabled: true
+        source: pit_parquet
+        series: power.es.residual.load.hourly.gw.fcst
+        description: Forecast de charge résiduelle Espagne
+        fill_method: none
+        minimum_coverage: 0.5
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      fr_net_exports:
+        enabled: true
+        source: saturn
+        series: power.net.fr.exports.core.entsoe.hourly.gw.obs
+        description: Exportations nettes de la France (GW)
+        fill_method: none
+        minimum_coverage: 0.95
+        future:
+          known_future: false
+          strategies:
+          - lag24
+          - lag168
+      fr_order_ramp_pressure_fcst:
+        enabled: true
+        source: pit_parquet
+        description: Score OOF de pression de rampe
+        fill_method: none
+        minimum_coverage: 0.2
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      fr_order_plateau_pressure_fcst:
+        enabled: true
+        source: pit_parquet
+        description: Score OOF de pression de plateau
+        fill_method: none
+        minimum_coverage: 0.2
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      fr_order_jump_probability_fcst:
+        enabled: true
+        source: pit_parquet
+        description: Probabilité OOF de changement brusque
+        fill_method: none
+        minimum_coverage: 0.2
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      fr_order_block_pressure_fcst:
+        enabled: true
+        source: pit_parquet
+        description: Score OOF de structure de type block order
+        fill_method: none
+        minimum_coverage: 0.2
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      fr_order_gradient_binding_probability_fcst:
+        enabled: true
+        source: pit_parquet
+        description: Probabilité OOF de contrainte de gradient active
+        fill_method: none
+        minimum_coverage: 0.2
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      de_price_da:
+        enabled: true
+        source: file
+        file: data/derived/neighbour_prices/de_price_da.csv.gz
+        timestamp_col: timestamp
+        value_col: value
+        description: Prix Day-Ahead DE
+        fill_method: none
+        minimum_coverage: 0.95
+        future:
+          known_future: false
+          strategies:
+          - lag24
+          - lag168
+      be_price_da:
+        enabled: true
+        source: file
+        file: data/derived/neighbour_prices/be_price_da.csv.gz
+        timestamp_col: timestamp
+        value_col: value
+        description: Prix Day-Ahead BE
+        fill_method: none
+        minimum_coverage: 0.95
+        future:
+          known_future: false
+          strategies:
+          - lag24
+          - lag168
+      nl_price_da:
+        enabled: true
+        source: file
+        file: data/derived/neighbour_prices/nl_price_da.csv.gz
+        timestamp_col: timestamp
+        value_col: value
+        description: Prix Day-Ahead NL
+        fill_method: none
+        minimum_coverage: 0.95
+        future:
+          known_future: false
+          strategies:
+          - lag24
+          - lag168
+      es_price_da:
+        enabled: true
+        source: file
+        file: data/derived/neighbour_prices/es_price_da.csv.gz
+        timestamp_col: timestamp
+        value_col: value
+        description: Prix Day-Ahead ES
+        fill_method: none
+        minimum_coverage: 0.95
+        future:
+          known_future: false
+          strategies:
+          - lag24
+          - lag168
+      fr_residual_load_revision_std:
+        enabled: true
+        source: pit_parquet
+        description: Dispersion des dernières révisions de charge résiduelle FR
+        fill_method: none
+        minimum_coverage: 0.2
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      fr_residual_load_revision_abs_delta:
+        enabled: true
+        source: pit_parquet
+        description: Amplitude de la dernière révision de charge résiduelle FR
+        fill_method: none
+        minimum_coverage: 0.2
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      fr_residual_load_revision_age_hours:
+        enabled: true
+        source: pit_parquet
+        description: Ancienneté du dernier forecast de charge résiduelle FR
+        fill_method: none
+        minimum_coverage: 0.2
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      fr_nuclear_revision_std:
+        enabled: true
+        source: pit_parquet
+        description: Dispersion des révisions du forecast nucléaire FR
+        fill_method: none
+        minimum_coverage: 0.00
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      fr_nuclear_revision_abs_delta:
+        enabled: true
+        source: pit_parquet
+        description: Amplitude de la dernière révision nucléaire FR
+        fill_method: none
+        minimum_coverage: 0.00
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      neighbour_residual_revision_std_mean:
+        enabled: true
+        source: pit_parquet
+        description: Incertitude moyenne des charges résiduelles voisines
+        fill_method: none
+        minimum_coverage: 0.2
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      neighbour_residual_revision_std_max:
+        enabled: true
+        source: pit_parquet
+        description: Incertitude maximale des charges résiduelles voisines
+        fill_method: none
+        minimum_coverage: 0.2
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      neighbour_residual_revision_abs_delta_mean:
+        enabled: true
+        source: pit_parquet
+        description: Révision absolue moyenne des fondamentaux voisins
+        fill_method: none
+        minimum_coverage: 0.2
+        future:
+          known_future: true
+          strategies:
+          - oracle
+exogenous_extensions:
+  enabled: true
+  neighbour_price_sources:
+    enabled: true
+    output_dir: data/derived/neighbour_prices
+    countries:
+      DE:
+        alias: de_price_da
+        series: power.price.everyday.de.hourly.eurmwh
+      BE:
+        alias: be_price_da
+        series: power.price.everyday.be.hourly.eurmwh
+      NL:
+        alias: nl_price_da
+        series: power.price.everyday.nl.hourly.eurmwh
+      ES:
+        alias: es_price_da
+        series: power.price.everyday.es.hourly.eurmwh
+  neighbour_prices:
+    enabled: true
+    aliases:
+      DE: de_price_da
+      BE: be_price_da
+      NL: nl_price_da
+      ES: es_price_da
+    include_aggregates: true
+  rich_calendar:
+    enabled: true
+    primary_country: FR
+    countries:
+    - FR
+    - DE
+    - BE
+    - NL
+    - ES
+  forecast_uncertainty:
+    enabled: true
+    max_revisions: 6
+    metrics:
+    - revision_std
+    - revision_abs_delta
+    - revision_age_hours
+    sources:
+      fr_residual_load_fcst:
+        output_prefix: fr_residual_load
+        metrics:
+        - revision_std
+        - revision_abs_delta
+        - revision_age_hours
+      fr_nuclear_generation_fcst:
+        output_prefix: fr_nuclear
+        metrics:
+        - revision_std
+        - revision_abs_delta
+      de_residual_load_fcst:
+        output_prefix: de_residual_load
+      be_residual_load_fcst:
+        output_prefix: be_residual_load
+      nl_residual_load_fcst:
+        output_prefix: nl_residual_load
+      es_residual_load_fcst:
+        output_prefix: es_residual_load
+    aggregate_groups:
+      neighbour_residual:
+        sources:
+        - de_residual_load_fcst
+        - be_residual_load_fcst
+        - nl_residual_load_fcst
+        - es_residual_load_fcst
+        metrics:
+        - revision_std_mean
+        - revision_std_max
+        - revision_abs_delta_mean

@@ -50,7 +50,7 @@ metrics:
   extreme_threshold: 150.0
 
 output:
-  directory: runs/chronos2_asof_jplus1_fr_regime_order_signals
+  directory: runs/chronos2_asof_jplus1_fr_regime_order_signals_without_market_regime
 
 report:
   filename: chronos2_asof_jplus1_fr_regime_order_signals.html
@@ -58,7 +58,7 @@ report:
   forecast_history_hours: 168
 
 market_regime:
-  enabled: true
+  enabled: false
   short_window_hours: 168
   long_window_hours: 720
   short_min_periods: 72
