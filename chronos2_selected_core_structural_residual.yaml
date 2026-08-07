@@ -1,0 +1,737 @@
+model:
+  model_id: amazon/chronos-2
+  device: auto
+  local_files_only: true
+  attn_implementation: auto
+  context_length: 2048
+  horizon: 24
+  origin_batch_size: 20
+  model_batch_size: 128
+  seed: 42
+data:
+  project_root: .
+  source: auto
+  cache_dir: data/cache
+  saturn_url: https://saturn-energyscan.gem.myengie.com//api
+  saturn_author: BQ6757
+  historical_years: 4
+  frequency: h
+  target_interpolation_limit: 3
+  default_fill_limit: 0
+  require_all_covariates: true
+  forecast_origin_local_time: 08:00
+  revision_policy: latest_before_asof
+  target_end_policy: current_day_end
+  require_complete_target_day: true
+  pit_vintage_dir: data/pit/vintages
+  pit_files:
+    fr_residual_load_fcst: fr_residual_load_fcst.parquet
+    fr_nuclear_generation_fcst: fr_nuclear_generation_fcst.parquet
+    de_residual_load_fcst: de_residual_load_fcst.parquet
+    be_residual_load_fcst: be_residual_load_fcst.parquet
+    nl_residual_load_fcst: nl_residual_load_fcst.parquet
+    es_residual_load_fcst: es_residual_load_fcst.parquet
+    fr_order_ramp_pressure_fcst: fr_order_ramp_pressure_fcst.parquet
+    fr_order_plateau_pressure_fcst: fr_order_plateau_pressure_fcst.parquet
+    fr_order_jump_probability_fcst: fr_order_jump_probability_fcst.parquet
+    fr_order_block_pressure_fcst: fr_order_block_pressure_fcst.parquet
+    fr_order_gradient_binding_probability_fcst: fr_order_gradient_binding_probability_fcst.parquet
+    fr_residual_load_revision_std: fr_residual_load_revision_std.parquet
+    fr_residual_load_revision_abs_delta: fr_residual_load_revision_abs_delta.parquet
+    fr_residual_load_revision_age_hours: fr_residual_load_revision_age_hours.parquet
+    fr_nuclear_revision_std: fr_nuclear_revision_std.parquet
+    fr_nuclear_revision_abs_delta: fr_nuclear_revision_abs_delta.parquet
+    neighbour_residual_revision_std_mean: neighbour_residual_revision_std_mean.parquet
+    neighbour_residual_revision_std_max: neighbour_residual_revision_std_max.parquet
+    neighbour_residual_revision_abs_delta_mean: neighbour_residual_revision_abs_delta_mean.parquet
+backtest:
+  windows: 365
+  origin_hour: 0
+  skip_irregular_local_days: true
+  price_only_baseline: true
+metrics:
+  extreme_threshold: 150.0
+output:
+  directory: runs/selected_calendar_fr_neighbours_order_signals_structural_residual
+report:
+  filename: chronos2_structural_residual.html
+  title: Chronos-2 — prix structurel MILP + prévision résiduelle
+  forecast_history_hours: 168
+market_regime:
+  enabled: false
+  short_window_hours: 168
+  long_window_hours: 720
+  short_min_periods: 72
+  long_min_periods: 168
+  negative_threshold: 0.0
+  spike_threshold: 150.0
+order_signals:
+  output_dir: runs/order_signals
+  labels:
+    jump_threshold: 30.0
+    jump_softness: 12.0
+    plateau_scale: 5.0
+    ramp_min_slope: 7.5
+    ramp_softness: 3.0
+    block_boundary_threshold: 20.0
+    block_boundary_softness: 8.0
+    gradient_min_slope: 5.0
+    gradient_softness: 2.5
+    min_segment_hours: 3
+    max_segment_hours: 6
+  model:
+    iterations: 350
+    depth: 7
+    learning_rate: 0.05
+    l2_leaf_reg: 8.0
+    random_strength: 0.5
+    validation_days: 60
+    early_stopping_rounds: 50
+    random_seed: 42
+    thread_count: -1
+  backfill:
+    min_train_days: 365
+    train_window_days: 730
+    retrain_every_days: 7
+    label_availability_lag_days: 1
+zones:
+  FR:
+    enabled: true
+    timezone: Europe/Paris
+    include_calendar: true
+    target:
+      series: power.price.everyday.fr.hourly.eurmwh
+      description: Prix Day-Ahead France
+    covariates:
+      fr_residual_load_fcst:
+        enabled: true
+        source: pit_parquet
+        series: power.fr.residual.load.hourly.gw.fcst
+        description: Forecast de charge résiduelle France
+        fill_method: none
+        minimum_coverage: 0.5
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      fr_nuclear_generation_fcst:
+        enabled: true
+        source: pit_parquet
+        series: power.fr.generation.nuclear.remit.mw.fcst
+        description: Forecast REMIT de génération nucléaire France (MW)
+        fill_method: none
+        minimum_coverage: 0.0
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      de_residual_load_fcst:
+        enabled: true
+        source: pit_parquet
+        series: power.de.residual.load.hourly.gw.fcst
+        description: Forecast de charge résiduelle Allemagne
+        fill_method: none
+        minimum_coverage: 0.5
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      be_residual_load_fcst:
+        enabled: true
+        source: pit_parquet
+        series: power.be.residual.load.hourly.gw.fcst
+        description: Forecast de charge résiduelle Belgique
+        fill_method: none
+        minimum_coverage: 0.5
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      nl_residual_load_fcst:
+        enabled: true
+        source: pit_parquet
+        series: power.nl.residual.load.hourly.gw.fcst
+        description: Forecast de charge résiduelle Pays-Bas
+        fill_method: none
+        minimum_coverage: 0.5
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      es_residual_load_fcst:
+        enabled: true
+        source: pit_parquet
+        series: power.es.residual.load.hourly.gw.fcst
+        description: Forecast de charge résiduelle Espagne
+        fill_method: none
+        minimum_coverage: 0.5
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      fr_net_exports:
+        enabled: false
+        source: saturn
+        series: power.net.fr.exports.core.entsoe.hourly.gw.obs
+        description: Exportations nettes de la France (GW)
+        fill_method: none
+        minimum_coverage: 0.95
+        future:
+          known_future: false
+          strategies:
+          - lag24
+          - lag168
+      fr_order_ramp_pressure_fcst:
+        enabled: true
+        source: pit_parquet
+        description: Score OOF de pression de rampe
+        fill_method: none
+        minimum_coverage: 0.2
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      fr_order_plateau_pressure_fcst:
+        enabled: true
+        source: pit_parquet
+        description: Score OOF de pression de plateau
+        fill_method: none
+        minimum_coverage: 0.2
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      fr_order_jump_probability_fcst:
+        enabled: true
+        source: pit_parquet
+        description: Probabilité OOF de changement brusque
+        fill_method: none
+        minimum_coverage: 0.2
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      fr_order_block_pressure_fcst:
+        enabled: true
+        source: pit_parquet
+        description: Score OOF de structure de type block order
+        fill_method: none
+        minimum_coverage: 0.2
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      fr_order_gradient_binding_probability_fcst:
+        enabled: true
+        source: pit_parquet
+        description: Probabilité OOF de contrainte de gradient active
+        fill_method: none
+        minimum_coverage: 0.2
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      de_price_da:
+        enabled: false
+        source: file
+        file: data/derived/neighbour_prices/de_price_da.csv.gz
+        timestamp_col: timestamp
+        value_col: value
+        description: Prix Day-Ahead DE
+        fill_method: none
+        minimum_coverage: 0.95
+        future:
+          known_future: false
+          strategies:
+          - lag24
+          - lag168
+      be_price_da:
+        enabled: false
+        source: file
+        file: data/derived/neighbour_prices/be_price_da.csv.gz
+        timestamp_col: timestamp
+        value_col: value
+        description: Prix Day-Ahead BE
+        fill_method: none
+        minimum_coverage: 0.95
+        future:
+          known_future: false
+          strategies:
+          - lag24
+          - lag168
+      nl_price_da:
+        enabled: false
+        source: file
+        file: data/derived/neighbour_prices/nl_price_da.csv.gz
+        timestamp_col: timestamp
+        value_col: value
+        description: Prix Day-Ahead NL
+        fill_method: none
+        minimum_coverage: 0.95
+        future:
+          known_future: false
+          strategies:
+          - lag24
+          - lag168
+      es_price_da:
+        enabled: false
+        source: file
+        file: data/derived/neighbour_prices/es_price_da.csv.gz
+        timestamp_col: timestamp
+        value_col: value
+        description: Prix Day-Ahead ES
+        fill_method: none
+        minimum_coverage: 0.95
+        future:
+          known_future: false
+          strategies:
+          - lag24
+          - lag168
+      fr_residual_load_revision_std:
+        enabled: false
+        source: pit_parquet
+        description: Dispersion des dernières révisions de charge résiduelle FR
+        fill_method: none
+        minimum_coverage: 0.2
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      fr_residual_load_revision_abs_delta:
+        enabled: false
+        source: pit_parquet
+        description: Amplitude de la dernière révision de charge résiduelle FR
+        fill_method: none
+        minimum_coverage: 0.2
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      fr_residual_load_revision_age_hours:
+        enabled: false
+        source: pit_parquet
+        description: Ancienneté du dernier forecast de charge résiduelle FR
+        fill_method: none
+        minimum_coverage: 0.2
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      fr_nuclear_revision_std:
+        enabled: false
+        source: pit_parquet
+        description: Dispersion des révisions du forecast nucléaire FR
+        fill_method: none
+        minimum_coverage: 0.0
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      fr_nuclear_revision_abs_delta:
+        enabled: false
+        source: pit_parquet
+        description: Amplitude de la dernière révision nucléaire FR
+        fill_method: none
+        minimum_coverage: 0.0
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      neighbour_residual_revision_std_mean:
+        enabled: false
+        source: pit_parquet
+        description: Incertitude moyenne des charges résiduelles voisines
+        fill_method: none
+        minimum_coverage: 0.2
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      neighbour_residual_revision_std_max:
+        enabled: false
+        source: pit_parquet
+        description: Incertitude maximale des charges résiduelles voisines
+        fill_method: none
+        minimum_coverage: 0.2
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      neighbour_residual_revision_abs_delta_mean:
+        enabled: false
+        source: pit_parquet
+        description: Révision absolue moyenne des fondamentaux voisins
+        fill_method: none
+        minimum_coverage: 0.2
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      milp_structural_price:
+        enabled: true
+        source: file
+        file: data/derived/structural_market_features.csv.gz
+        timestamp_col: timestamp
+        value_col: milp_structural_price
+        description: Prix structurel €/MWh issu du LP après fixation du commitment MILP.
+        fill_method: none
+        minimum_coverage: 0.0
+        include_base_context: true
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      milp_marginal_technology_code:
+        enabled: true
+        source: file
+        file: data/derived/structural_market_features.csv.gz
+        timestamp_col: timestamp
+        value_col: milp_marginal_technology_code
+        description: Code numérique de la technologie marginale du modèle structurel.
+        fill_method: none
+        minimum_coverage: 0.0
+        include_base_context: true
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      milp_reserve_margin_gw:
+        enabled: true
+        source: file
+        file: data/derived/structural_market_features.csv.gz
+        timestamp_col: timestamp
+        value_col: milp_reserve_margin_gw
+        description: Marge de capacité disponible du MILP en GW.
+        fill_method: none
+        minimum_coverage: 0.0
+        include_base_context: true
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      milp_committed_thermal_gw:
+        enabled: true
+        source: file
+        file: data/derived/structural_market_features.csv.gz
+        timestamp_col: timestamp
+        value_col: milp_committed_thermal_gw
+        description: Capacité thermique engagée par le MILP en GW.
+        fill_method: none
+        minimum_coverage: 0.0
+        include_base_context: true
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      milp_online_units:
+        enabled: true
+        source: file
+        file: data/derived/structural_market_features.csv.gz
+        timestamp_col: timestamp
+        value_col: milp_online_units
+        description: Nombre agrégé d'unités thermiques en ligne.
+        fill_method: none
+        minimum_coverage: 0.0
+        include_base_context: true
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      milp_startups:
+        enabled: true
+        source: file
+        file: data/derived/structural_market_features.csv.gz
+        timestamp_col: timestamp
+        value_col: milp_startups
+        description: Nombre agrégé de démarrages sur l'heure.
+        fill_method: none
+        minimum_coverage: 0.0
+        include_base_context: true
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      milp_startup_cost_eur:
+        enabled: true
+        source: file
+        file: data/derived/structural_market_features.csv.gz
+        timestamp_col: timestamp
+        value_col: milp_startup_cost_eur
+        description: Coût de démarrage engagé sur l'heure en euros.
+        fill_method: none
+        minimum_coverage: 0.0
+        include_base_context: true
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      milp_scarcity_gw:
+        enabled: true
+        source: file
+        file: data/derived/structural_market_features.csv.gz
+        timestamp_col: timestamp
+        value_col: milp_scarcity_gw
+        description: Variable de pénurie / load shedding du MILP en GW.
+        fill_method: none
+        minimum_coverage: 0.0
+        include_base_context: true
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      milp_ramp_shadow_eur_mwh:
+        enabled: true
+        source: file
+        file: data/derived/structural_market_features.csv.gz
+        timestamp_col: timestamp
+        value_col: milp_ramp_shadow_eur_mwh
+        description: Valeur duale maximale des contraintes de rampe.
+        fill_method: none
+        minimum_coverage: 0.0
+        include_base_context: true
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      milp_reserve_shadow_eur_mwh:
+        enabled: true
+        source: file
+        file: data/derived/structural_market_features.csv.gz
+        timestamp_col: timestamp
+        value_col: milp_reserve_shadow_eur_mwh
+        description: Valeur duale de la contrainte de réserve.
+        fill_method: none
+        minimum_coverage: 0.0
+        include_base_context: true
+        future:
+          known_future: true
+          strategies:
+          - oracle
+exogenous_extensions:
+  enabled: true
+  neighbour_price_sources:
+    enabled: false
+    output_dir: data/derived/neighbour_prices
+    countries:
+      DE:
+        alias: de_price_da
+        series: power.price.everyday.de.hourly.eurmwh
+      BE:
+        alias: be_price_da
+        series: power.price.everyday.be.hourly.eurmwh
+      NL:
+        alias: nl_price_da
+        series: power.price.everyday.nl.hourly.eurmwh
+      ES:
+        alias: es_price_da
+        series: power.price.everyday.es.hourly.eurmwh
+  neighbour_prices:
+    enabled: false
+    aliases:
+      DE: de_price_da
+      BE: be_price_da
+      NL: nl_price_da
+      ES: es_price_da
+    include_aggregates: false
+  rich_calendar:
+    enabled: true
+    primary_country: FR
+    countries:
+    - FR
+    - DE
+    - BE
+    - NL
+    - ES
+  forecast_uncertainty:
+    enabled: false
+    max_revisions: 6
+    metrics:
+    - revision_std
+    - revision_abs_delta
+    - revision_age_hours
+    sources:
+      fr_residual_load_fcst:
+        output_prefix: fr_residual_load
+        metrics:
+        - revision_std
+        - revision_abs_delta
+        - revision_age_hours
+      fr_nuclear_generation_fcst:
+        output_prefix: fr_nuclear
+        metrics:
+        - revision_std
+        - revision_abs_delta
+      de_residual_load_fcst:
+        output_prefix: de_residual_load
+      be_residual_load_fcst:
+        output_prefix: be_residual_load
+      nl_residual_load_fcst:
+        output_prefix: nl_residual_load
+      es_residual_load_fcst:
+        output_prefix: es_residual_load
+    aggregate_groups:
+      neighbour_residual:
+        sources:
+        - de_residual_load_fcst
+        - be_residual_load_fcst
+        - nl_residual_load_fcst
+        - es_residual_load_fcst
+        metrics:
+        - revision_std_mean
+        - revision_std_max
+        - revision_abs_delta_mean
+  interconnection_capacities:
+    enabled: false
+  calendar_interactions:
+    enabled: false
+structural_model:
+  enabled: true
+  inputs:
+    residual_load_gw:
+      alias: fr_residual_load_fcst
+      scale: 1.0
+    nuclear_capacity_gw:
+      alias: fr_nuclear_generation_fcst
+      scale: 0.001
+      default: 45.0
+    fixed_net_exports_gw:
+      alias: null
+      scale: 1.0
+      default: 0.0
+    gas_price_eur_mwhth:
+      alias: null
+      scale: 1.0
+      default: null
+    coal_price_eur_mwhth:
+      alias: null
+      scale: 1.0
+      default: null
+    eua_price_eur_t:
+      alias: null
+      scale: 1.0
+      default: null
+  reserve_fraction: 0.08
+  reserve_floor_gw: 2.0
+  voll_eur_mwh: 3000.0
+  spill_cost_eur_mwh: 5.0
+  reserve_shortfall_cost_eur_mwh: 1000.0
+  initial_online_fraction: 0.5
+  solver:
+    mip_rel_gap: 0.001
+    time_limit_seconds: 30.0
+    node_limit: null
+    presolve: true
+  technologies:
+  - name: nuclear
+    commitment: false
+    n_units: 1
+    unit_size_gw: 45.0
+    min_output_fraction: 0.0
+    fixed_variable_cost_eur_mwh: 10.0
+    variable_om_eur_mwh: 0.0
+    startup_cost_eur: 0.0
+    no_load_cost_eur_h: 0.0
+    ramp_up_gw_h_per_unit: 6.0
+    ramp_down_gw_h_per_unit: 6.0
+    availability_input: nuclear_capacity_gw
+    availability_fallback_gw: 45.0
+  - name: hydro
+    commitment: false
+    n_units: 1
+    unit_size_gw: 11.0
+    min_output_fraction: 0.0
+    fixed_variable_cost_eur_mwh: 25.0
+    variable_om_eur_mwh: 0.0
+    startup_cost_eur: 0.0
+    no_load_cost_eur_h: 0.0
+    ramp_up_gw_h_per_unit: 5.0
+    ramp_down_gw_h_per_unit: 5.0
+    availability_fallback_gw: 11.0
+    energy_budget_fraction: 0.45
+  - name: coal
+    commitment: true
+    n_units: 4
+    unit_size_gw: 0.6
+    min_output_fraction: 0.4
+    fixed_variable_cost_eur_mwh: 90.0
+    variable_om_eur_mwh: 5.0
+    startup_cost_eur: 35000.0
+    no_load_cost_eur_h: 1400.0
+    ramp_up_gw_h_per_unit: 0.25
+    ramp_down_gw_h_per_unit: 0.25
+    fuel_input: coal_price_eur_mwhth
+    efficiency: 0.38
+    emission_factor_t_mwh: 0.9
+  - name: ccgt
+    commitment: true
+    n_units: 20
+    unit_size_gw: 0.6
+    min_output_fraction: 0.35
+    fixed_variable_cost_eur_mwh: 95.0
+    variable_om_eur_mwh: 3.0
+    startup_cost_eur: 18000.0
+    no_load_cost_eur_h: 700.0
+    ramp_up_gw_h_per_unit: 0.4
+    ramp_down_gw_h_per_unit: 0.4
+    fuel_input: gas_price_eur_mwhth
+    efficiency: 0.57
+    emission_factor_t_mwh: 0.35
+  - name: ocgt
+    commitment: true
+    n_units: 20
+    unit_size_gw: 0.25
+    min_output_fraction: 0.2
+    fixed_variable_cost_eur_mwh: 150.0
+    variable_om_eur_mwh: 5.0
+    startup_cost_eur: 8000.0
+    no_load_cost_eur_h: 250.0
+    ramp_up_gw_h_per_unit: 0.25
+    ramp_down_gw_h_per_unit: 0.25
+    fuel_input: gas_price_eur_mwhth
+    efficiency: 0.38
+    emission_factor_t_mwh: 0.55
+  - name: oil
+    commitment: true
+    n_units: 8
+    unit_size_gw: 0.25
+    min_output_fraction: 0.2
+    fixed_variable_cost_eur_mwh: 230.0
+    variable_om_eur_mwh: 8.0
+    startup_cost_eur: 12000.0
+    no_load_cost_eur_h: 350.0
+    ramp_up_gw_h_per_unit: 0.25
+    ramp_down_gw_h_per_unit: 0.25
+    efficiency: 0.35
+    emission_factor_t_mwh: 0.75
+  output_file: data/derived/structural_market_features.csv.gz
+  diagnostics_file: data/derived/structural_market_daily_diagnostics.csv
+  residual_price_alias: milp_structural_price
+  feature_aliases:
+  - milp_structural_price
+  - milp_marginal_technology_code
+  - milp_reserve_margin_gw
+  - milp_committed_thermal_gw
+  - milp_online_units
+  - milp_startups
+  - milp_startup_cost_eur
+  - milp_scarcity_gw
+  - milp_ramp_shadow_eur_mwh
+  - milp_reserve_shadow_eur_mwh
+  residual_mode:
+    enabled: true
+  input_repair:
+    impute_residual_load: true
+    max_residual_load_missing_hours_per_day: 2
+  alignment:
+    enabled: true
+    required_aliases:
+    - milp_structural_price
+    - milp_marginal_technology_code
+    - milp_reserve_margin_gw
+    - milp_committed_thermal_gw
+    - milp_online_units
+    - milp_startups
+    - milp_startup_cost_eur
+    - milp_scarcity_gw
+    - milp_ramp_shadow_eur_mwh
+    - milp_reserve_shadow_eur_mwh

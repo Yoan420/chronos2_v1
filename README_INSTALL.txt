@@ -1,54 +1,28 @@
-CHRONOS-2 — INTERACTIONS CALENDAIRES PIT
-=========================================
+CHRONOS-2 — CUTOFF PERSISTENCE
 
-Variables ajoutées
-------------------
-1. residual_load × morning_peak
-2. residual_load × evening_peak
-3. residual_load × public_holiday
-4. residual_load × weekend
-5. residual_load × bridge_day
-6. residual_load × neighbour_holiday_count
-7. residual_load_after_nuclear
-8. residual_load_after_nuclear × morning_peak
-9. residual_load_after_nuclear × evening_peak
-10. residual_load_after_nuclear × public_holiday
+Principe
+--------
+Pour prévoir la journée D, la variable future vaut la dernière valeur de
+da_cap_system_asymmetry dont le timestamp est inférieur ou égal à D-1 08:00.
+Cette valeur est répétée sur les 24 heures de D.
 
-Causalité
+Deux colonnes sont ajoutées :
+- known_da_cap_system_asymmetry_cutoff_persistence
+- known_da_cap_system_asymmetry_cutoff_age_hours
+
+Important
 ---------
-Les variables continues utilisent :
-- known_fr_residual_load_fcst_oracle
-- known_fr_nuclear_generation_fcst_oracle
-
-Dans ce pipeline, "oracle" signifie une prévision explicitement déclarée
-connue à l'origine et matérialisée selon les vintages point-in-time. Les
-interactions n'utilisent jamais la charge résiduelle ou le nucléaire réalisés
-à J+1.
-
-Le nombre de jours fériés voisins est calculé comme la somme des indicateurs
-DE, BE, NL et ES. Le jour férié français est exclu de ce compteur.
+L'historique Saturn ne conserve pas les vraies dates de publication anciennes.
+Cette implémentation est donc pseudo-causale : elle respecte strictement le
+timestamp de livraison et le cutoff, mais utilise la valeur historique finale
+associée à ce timestamp.
 
 Installation
 ------------
-Copier tous les fichiers du ZIP à la racine du projet en conservant le
-sous-dossier chronos2_modular.
+Copier tous les fichiers à leur emplacement relatif dans chronos2_v1.
 
-Lancement
----------
-powershell.exe `
-    -NoProfile `
-    -ExecutionPolicy Bypass `
-    -File .\run_calendar_interactions_ablation.ps1 `
-    -ProjectRoot "C:\Users\BQ6757\chronos2_v1" `
-    -PythonExe (Get-Command python).Source `
-    -StartDay "2024-01-01" `
-    -BaseConfig "chronos2_m1_calendar.yaml"
+Test :
+python -m pytest .\tests\test_cutoff_persistence.py -q
 
-Sortie
-------
-runs/ablation_m1_calendar_interactions/
-    chronos2_m1_calendar_interactions.html
-
-Tests
------
-python -m pytest .\tests\test_calendar_interactions.py -q
+Run complet :
+.\run_da_cap_cutoff_persistence.ps1
