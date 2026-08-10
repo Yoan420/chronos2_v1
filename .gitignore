@@ -10,10 +10,10 @@ huggingface/
 models/
 data/
 runs/
-*.parquet
-*.csv
-*.csv.gz
-*.html
+.parquet
+.csv
+.csv.gz
+.html
 .vscode/
 .idea/
 .DS_Store
