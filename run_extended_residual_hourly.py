@@ -44,7 +44,7 @@ EXTENDED_DAYS = 223
 EXTENDED_HOURS = 5351
 EXTENDED_START_DAY = "2024-01-02"
 EXTENDED_END_DAY = "2024-08-11"
-EXPECTED_META_FEATURES = 175
+EXPECTED_META_FEATURES = 175 # 250 ? 
 QUANTILES = ("q10", "q50", "q90")
 CHRONOS_EXPERT_COLUMNS = tuple(f"chronos2__{name}" for name in QUANTILES)
 
@@ -814,7 +814,7 @@ def _run(
         "components": {
             "cat_v1": {
                 "backend": "catboost",
-                "loss": "MAE",
+                "loss": "MAE", # RMSE ?? 
                 "iterations": 700,
                 "depth": 6,
                 "learning_rate": 0.03,
