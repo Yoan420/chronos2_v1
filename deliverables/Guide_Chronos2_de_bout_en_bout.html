@@ -1,0 +1,1417 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; font-src data:; connect-src 'none'; object-src 'none'; base-uri 'none'">
+<meta name="description" content="Guide non technique de bout en bout du modèle Chronos-2 multi-pays de prévision day-ahead.">
+<title>Chronos-2 — Guide de bout en bout</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg: #edf3f8;
+  --paper: #ffffff;
+  --ink: #172235;
+  --muted: #5f6f82;
+  --line: #dbe5ee;
+  --primary: #0c5b9f;
+  --primary-soft: #eaf4fd;
+  --accent: #00a78e;
+  --accent-soft: #e7f8f4;
+  --warning: #9a5c00;
+  --warning-soft: #fff5dc;
+  --shadow: 0 18px 50px rgba(25, 50, 80, .10);
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0c1524;
+  --paper: #111e31;
+  --ink: #edf4fb;
+  --muted: #aebdd0;
+  --line: #2b3a4d;
+  --primary: #79bfff;
+  --primary-soft: #132f4a;
+  --accent: #66d9c6;
+  --accent-soft: #123c38;
+  --warning: #ffd083;
+  --warning-soft: #463514;
+  --shadow: 0 20px 60px rgba(0, 0, 0, .28);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.64;
+}
+.shell {
+  display: grid;
+  grid-template-columns: minmax(230px, 290px) minmax(0, 980px);
+  gap: 34px;
+  justify-content: center;
+  padding: 30px;
+}
+.toc {
+  position: sticky;
+  top: 20px;
+  align-self: start;
+  max-height: calc(100vh - 40px);
+  overflow: auto;
+  padding: 22px 20px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--paper);
+  box-shadow: var(--shadow);
+  font-size: .86rem;
+}
+.toc-title {
+  margin: 0 0 12px;
+  color: var(--primary);
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+.toc ul { margin: 0; padding-left: 17px; }
+.toc li { margin: 5px 0; }
+.toc ul ul { display: none; }
+.toc a { color: var(--muted); text-decoration: none; }
+.toc a:hover, .toc a:focus { color: var(--primary); text-decoration: underline; }
+article {
+  min-width: 0;
+  padding: 58px 68px 74px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--paper);
+  box-shadow: var(--shadow);
+}
+article > h1:first-child {
+  margin: -58px -68px 0;
+  padding: 68px 68px 8px;
+  border-radius: 22px 22px 0 0;
+  color: #fff;
+  background: linear-gradient(120deg, #073b6f, #087aa3 58%, #00a78e);
+  font-size: clamp(2.15rem, 5vw, 4rem);
+  line-height: 1.02;
+  letter-spacing: -.045em;
+}
+article > h1:first-child + h2 {
+  margin: 0 -68px 30px;
+  padding: 12px 68px 48px;
+  border-bottom: 0;
+  color: rgba(255,255,255,.92);
+  background: linear-gradient(120deg, #073b6f, #087aa3 58%, #00a78e);
+  font-size: clamp(1.1rem, 2.4vw, 1.65rem);
+  font-weight: 500;
+}
+h2 {
+  margin: 56px 0 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--line);
+  color: var(--primary);
+  font-size: 1.72rem;
+  line-height: 1.25;
+}
+h3 { margin: 34px 0 10px; font-size: 1.23rem; color: var(--ink); }
+h4 { margin: 26px 0 8px; }
+p, li { max-width: 78ch; }
+a { color: var(--primary); }
+strong { color: inherit; }
+hr { margin: 38px 0; border: 0; border-top: 1px solid var(--line); }
+blockquote {
+  margin: 24px 0;
+  padding: 16px 20px;
+  border-left: 5px solid var(--accent);
+  border-radius: 0 12px 12px 0;
+  background: var(--accent-soft);
+}
+blockquote p { margin: 0; }
+code {
+  padding: .12em .36em;
+  border-radius: 5px;
+  color: var(--primary);
+  background: var(--primary-soft);
+  font-family: "Cascadia Code", Consolas, monospace;
+  font-size: .9em;
+}
+pre {
+  overflow: auto;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #0d1b2a;
+  color: #edf6ff;
+}
+pre code { padding: 0; color: inherit; background: transparent; }
+table {
+  display: block;
+  width: 100%;
+  margin: 20px 0 28px;
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-size: .9rem;
+}
+thead { background: var(--primary-soft); }
+th, td { min-width: 92px; padding: 10px 12px; border: 1px solid var(--line); text-align: left; vertical-align: top; }
+th { color: var(--primary); font-weight: 750; }
+tbody tr:nth-child(even) { background: color-mix(in srgb, var(--primary-soft) 32%, transparent); }
+.pipeline {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  margin: 28px 0 34px;
+  overflow-x: auto;
+  padding: 4px 2px 14px;
+}
+.pipeline-step {
+  min-width: 150px;
+  flex: 1 0 150px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--primary-soft);
+  font-size: .84rem;
+  line-height: 1.4;
+}
+.pipeline-step.evaluation { background: var(--warning-soft); }
+.pipeline-arrow { align-self: center; color: var(--accent); font-size: 1.5rem; font-weight: 800; }
+.actions {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 10;
+  display: flex;
+  gap: 8px;
+}
+.actions button {
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ink);
+  background: var(--paper);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  font: inherit;
+  font-size: .82rem;
+}
+.actions button:hover { border-color: var(--primary); color: var(--primary); }
+.meta-note {
+  margin-top: 28px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  color: var(--muted);
+  background: var(--primary-soft);
+  font-size: .82rem;
+}
+@media (max-width: 1000px) {
+  .shell { display: block; padding: 12px; }
+  .toc { position: relative; top: 0; max-height: none; margin: 0 auto 14px; max-width: 980px; }
+  article { padding: 42px 28px 60px; }
+  article > h1:first-child { margin: -42px -28px 0; padding: 50px 28px 8px; }
+  article > h1:first-child + h2 { margin: 0 -28px 25px; padding: 10px 28px 36px; }
+}
+@media print {
+  :root { --paper: #fff; --ink: #111; --muted: #444; --line: #bbb; --primary: #174f78; --primary-soft: #eef5f9; --accent-soft: #effaf7; --warning-soft: #fff8e7; }
+  @page { size: A4; margin: 16mm 13mm 17mm; }
+  body { background: #fff; font-size: 9.6pt; }
+  .shell { display: block; padding: 0; }
+  .toc, .actions { display: none !important; }
+  article { max-width: none; padding: 0; border: 0; box-shadow: none; }
+  article > h1:first-child { margin: 0; padding: 34mm 16mm 4mm; border-radius: 0; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  article > h1:first-child + h2 { margin: 0 0 18mm; padding: 2mm 16mm 24mm; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  h2 { break-before: auto; break-after: avoid; margin-top: 9mm; }
+  h3, h4 { break-after: avoid; }
+  p, li { max-width: none; orphans: 3; widows: 3; }
+  table { display: table; overflow: visible; break-inside: avoid; font-size: 7.6pt; }
+  tr, blockquote { break-inside: avoid; }
+  .pipeline { display: grid; grid-template-columns: repeat(2, 1fr); overflow: visible; }
+  .pipeline-arrow { display: none; }
+  .pipeline-step { min-width: 0; }
+  a { color: inherit; text-decoration: none; }
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="toc" aria-label="Sommaire"><p class="toc-title">Sommaire</p><div class="toc">
+<ul>
+<li><a href="#guide-de-bout-en-bout-du-modele-de-prevision-day-ahead">Guide de bout en bout du modèle de prévision day-ahead</a></li>
+<li><a href="#comment-utiliser-ce-document">Comment utiliser ce document</a></li>
+<li><a href="#1-resume-en-une-minute">1. Résumé en une minute</a></li>
+<li><a href="#2-la-chaine-complete-en-un-regard">2. La chaîne complète, en un regard</a></li>
+<li><a href="#3-ce-que-le-modele-prevoit-et-ce-quil-ne-prevoit-pas">3. Ce que le modèle prévoit — et ce qu'il ne prévoit pas</a><ul>
+<li><a href="#31-le-produit-prevu">3.1 Le produit prévu</a></li>
+<li><a href="#32-le-calendrier-d-et-d1">3.2 Le calendrier D et D−1</a></li>
+<li><a href="#33-une-nuance-importante-sur-les-prix-historiques">3.3 Une nuance importante sur les prix historiques</a></li>
+</ul>
+</li>
+<li><a href="#4-les-donnees-utilisees-en-production">4. Les données utilisées en production</a><ul>
+<li><a href="#41-lhistorique-des-prix-day-ahead">4.1 L'historique des prix day-ahead</a></li>
+<li><a href="#42-les-cinq-previsions-de-charge-residuelle">4.2 Les cinq prévisions de charge résiduelle</a></li>
+<li><a href="#43-le-calendrier-connu-a-lavance">4.3 Le calendrier connu à l'avance</a></li>
+<li><a href="#44-les-variables-derivees">4.4 Les variables dérivées</a></li>
+<li><a href="#45-ce-qui-nest-pas-une-entree-du-modele">4.5 Ce qui n'est pas une entrée du modèle</a></li>
+</ul>
+</li>
+<li><a href="#5-la-selection-causale-des-donnees-point-in-time">5. La sélection causale des données : « point-in-time »</a></li>
+<li><a href="#6-etape-1-du-modele-amazon-chronos-2">6. Étape 1 du modèle : Amazon Chronos-2</a></li>
+<li><a href="#7-etape-2-le-correcteur-residuel">7. Étape 2 : le correcteur résiduel</a><ul>
+<li><a href="#71-ce-quil-apprend">7.1 Ce qu'il apprend</a></li>
+<li><a href="#72-deux-modeles-complementaires">7.2 Deux modèles complémentaires</a></li>
+<li><a href="#73-la-correction-commune-des-quantiles">7.3 La correction commune des quantiles</a></li>
+</ul>
+</li>
+<li><a href="#8-etape-3-le-melange-mkonline-uniquement-lorsquil-est-valide">8. Étape 3 : le mélange MKOnline, uniquement lorsqu'il est validé</a><ul>
+<li><a href="#81-poids-actuellement-geles">8.1 Poids actuellement gelés</a></li>
+<li><a href="#82-mkonline-nest-pas-storm">8.2 MKOnline n'est pas Storm</a></li>
+<li><a href="#83-reserve-de-gouvernance">8.3 Réserve de gouvernance</a></li>
+</ul>
+</li>
+<li><a href="#9-les-variantes-par-pays">9. Les variantes par pays</a></li>
+<li><a href="#10-comment-le-modele-a-ete-entraine-sans-tricher">10. Comment le modèle a été entraîné sans tricher</a><ul>
+<li><a href="#101-des-previsions-historiques-comme-en-vrai">10.1 Des prévisions historiques « comme en vrai »</a></li>
+<li><a href="#102-les-fenetres-gelees-de-la-recette-autonome">10.2 Les fenêtres gelées de la recette autonome</a></li>
+<li><a href="#103-le-final-scelle">10.3 Le final scellé</a></li>
+<li><a href="#104-le-protocole-a-b1-b2-pour-une-amelioration">10.4 Le protocole A / B1 / B2 pour une amélioration</a></li>
+</ul>
+</li>
+<li><a href="#11-ce-qui-se-passe-apres-un-clic-dans-lapplication">11. Ce qui se passe après un clic dans l'application</a><ul>
+<li><a href="#111-lancement">11.1 Lancement</a></li>
+<li><a href="#112-preparation-du-run">11.2 Préparation du run</a></li>
+<li><a href="#113-controles-avant-calcul">11.3 Contrôles avant calcul</a></li>
+<li><a href="#114-calcul-du-forecast">11.4 Calcul du forecast</a></li>
+<li><a href="#115-publication-prioritaire-et-reporting">11.5 Publication prioritaire et reporting</a></li>
+<li><a href="#116-historique-manquant-et-replays">11.6 Historique manquant et replays</a></li>
+<li><a href="#117-archive-deja-publiee">11.7 Archive déjà publiée</a></li>
+</ul>
+</li>
+<li><a href="#12-les-fichiers-publies-et-leur-role">12. Les fichiers publiés et leur rôle</a></li>
+<li><a href="#13-comment-lire-p10-p50-et-p90">13. Comment lire P10, P50 et P90</a><ul>
+<li><a href="#p50-la-courbe-centrale">P50 — la courbe centrale</a></li>
+<li><a href="#p10-le-scenario-bas">P10 — le scénario bas</a></li>
+<li><a href="#p90-le-scenario-haut">P90 — le scénario haut</a></li>
+<li><a href="#la-bande-p10p90">La bande P10–P90</a></li>
+</ul>
+</li>
+<li><a href="#14-storm-le-modele-a-battre-jamais-une-entree-de-prediction">14. Storm : le modèle à battre, jamais une entrée de prédiction</a><ul>
+<li><a href="#141-separation-stricte">14.1 Séparation stricte</a></li>
+<li><a href="#142-serie-officielle-du-dashboard">14.2 Série officielle du dashboard</a></li>
+<li><a href="#143-cas-de-lespagne">14.3 Cas de l'Espagne</a></li>
+<li><a href="#144-couverture-appariee">14.4 Couverture appariée</a></li>
+</ul>
+</li>
+<li><a href="#15-comprendre-la-section-statistics">15. Comprendre la section Statistics</a><ul>
+<li><a href="#151-tableau-des-sept-metriques">15.1 Tableau des sept métriques</a></li>
+<li><a href="#152-mae-erreur-absolue-moyenne">15.2 MAE — erreur absolue moyenne</a></li>
+<li><a href="#153-rmse-attention-aux-gros-rates">15.3 RMSE — attention aux gros ratés</a></li>
+<li><a href="#154-mape-un-pourcentage-a-manier-avec-prudence">15.4 MAPE — un pourcentage à manier avec prudence</a></li>
+<li><a href="#155-explained-variance">15.5 Explained Variance</a></li>
+<li><a href="#156-r2">15.6 R²</a></li>
+<li><a href="#157-ecart-type-de-lerreur">15.7 Écart-type de l'erreur</a></li>
+<li><a href="#158-correlation">15.8 Corrélation</a></li>
+</ul>
+</li>
+<li><a href="#16-le-win-rate-face-a-storm">16. Le win rate face à Storm</a><ul>
+<li><a href="#exemple">Exemple</a></li>
+<li><a href="#ce-que-le-win-rate-ne-dit-pas">Ce que le win rate ne dit pas</a></li>
+</ul>
+</li>
+<li><a href="#17-daily-weekly-et-monthly">17. Daily, Weekly et Monthly</a><ul>
+<li><a href="#daily">Daily</a></li>
+<li><a href="#weekly">Weekly</a></li>
+<li><a href="#monthly">Monthly</a></li>
+</ul>
+</li>
+<li><a href="#18-lire-le-rapport-html-consolide-interactif">18. Lire le rapport HTML consolidé interactif</a><ul>
+<li><a href="#181-forecast-consolide">18.1 Forecast consolidé</a></li>
+<li><a href="#182-historique-et-erreurs">18.2 Historique et erreurs</a></li>
+<li><a href="#183-statistics-completes">18.3 Statistics complètes</a></li>
+<li><a href="#184-audit-et-provenance">18.4 Audit et provenance</a></li>
+</ul>
+</li>
+<li><a href="#19-etat-de-performance-au-14-aout-2026">19. État de performance au 14 août 2026</a><ul>
+<li><a href="#win-rates-quotidiens-des-sept-metriques-sur-ce-snapshot">Win rates quotidiens des sept métriques sur ce snapshot</a></li>
+</ul>
+</li>
+<li><a href="#20-ameliorer-le-modele-ce-qui-est-en-production-et-ce-qui-reste-experimental">20. Améliorer le modèle : ce qui est en production et ce qui reste expérimental</a><ul>
+<li><a href="#201-principe-de-promotion">20.1 Principe de promotion</a></li>
+<li><a href="#202-sources-explorees-mais-non-promues">20.2 Sources explorées mais non promues</a></li>
+<li><a href="#203-images-et-texte">20.3 Images et texte</a></li>
+<li><a href="#204-priorites-actuelles">20.4 Priorités actuelles</a></li>
+</ul>
+</li>
+<li><a href="#21-garde-fous-et-raisons-de-confiance">21. Garde-fous et raisons de confiance</a><ul>
+<li><a href="#controles-principaux">Contrôles principaux</a></li>
+<li><a href="#ce-que-ces-controles-ne-garantissent-pas">Ce que ces contrôles ne garantissent pas</a></li>
+</ul>
+</li>
+<li><a href="#22-bonnes-pratiques-de-lecture">22. Bonnes pratiques de lecture</a></li>
+<li><a href="#23-depannage-courant">23. Dépannage courant</a><ul>
+<li><a href="#lapplication-mentionne-le-proxy-1270019">L'application mentionne le proxy 127.0.0.1:9</a></li>
+<li><a href="#une-archive-est-indiquee-deja-publiee">Une archive est indiquée « déjà publiée »</a></li>
+<li><a href="#statistics-est-partiel">Statistics est « partiel »</a></li>
+<li><a href="#storm-vaut-na-pour-es">Storm vaut N/A pour ES</a></li>
+<li><a href="#une-journee-comporte-23-ou-25-lignes">Une journée comporte 23 ou 25 lignes</a></li>
+<li><a href="#le-rapport-consolide-semble-volumineux">Le rapport consolidé semble volumineux</a></li>
+</ul>
+</li>
+<li><a href="#24-glossaire">24. Glossaire</a></li>
+<li><a href="#25-questions-frequentes">25. Questions fréquentes</a><ul>
+<li><a href="#le-modele-sait-il-pourquoi-le-prix-monte">Le modèle « sait-il » pourquoi le prix monte ?</a></li>
+<li><a href="#peut-on-lancer-tous-les-pays-dun-coup">Peut-on lancer tous les pays d'un coup ?</a></li>
+<li><a href="#pourquoi-ne-pas-donner-directement-storm-au-modele">Pourquoi ne pas donner directement Storm au modèle ?</a></li>
+<li><a href="#pourquoi-garder-plusieurs-metriques">Pourquoi garder plusieurs métriques ?</a></li>
+<li><a href="#plus-de-50-de-win-rate-signifie-t-il-que-notre-mae-globale-est-meilleure">Plus de 50 % de win rate signifie-t-il que notre MAE globale est meilleure ?</a></li>
+<li><a href="#pourquoi-ne-pas-combler-une-heure-storm-manquante">Pourquoi ne pas combler une heure Storm manquante ?</a></li>
+<li><a href="#le-modele-se-reentraine-t-il-tous-les-jours">Le modèle se réentraîne-t-il tous les jours ?</a></li>
+<li><a href="#lapplication-execute-t-elle-des-ordres">L'application exécute-t-elle des ordres ?</a></li>
+</ul>
+</li>
+<li><a href="#26-references-internes-pour-audit">26. Références internes pour audit</a></li>
+<li><a href="#conclusion">Conclusion</a></li>
+</ul>
+</div>
+</aside>
+  <article><h1 id="chronos-2-multi-pays">Chronos-2 multi-pays</h1>
+<h2 id="guide-de-bout-en-bout-du-modele-de-prevision-day-ahead">Guide de bout en bout du modèle de prévision day-ahead</h2>
+<p><strong>Version 1.0 — 14 août 2026</strong><br>
+<strong>Périmètre : France, Allemagne, Belgique, Pays-Bas et Espagne</strong><br>
+<strong>Public : utilisateurs métier, responsables, analystes et toute personne souhaitant comprendre le modèle sans être spécialiste de la data science</strong></p>
+<hr>
+<h2 id="comment-utiliser-ce-document">Comment utiliser ce document</h2>
+<p>Ce guide répond à quatre questions simples :</p>
+<ol>
+<li><strong>Que prévoit exactement le système ?</strong></li>
+<li><strong>Comment passe-t-on des données disponibles à 08:00 à une courbe de prix pour le lendemain ?</strong></li>
+<li><strong>Comment lire P10, P50, P90 et toutes les Statistics ?</strong></li>
+<li><strong>Quelles protections empêchent une comparaison trompeuse ou l'utilisation d'informations futures ?</strong></li>
+</ol>
+<p>Pour une lecture rapide, lire le résumé, le schéma de bout en bout, la fiche par pays et la section « Lire les résultats ». Les autres chapitres servent de référence.</p>
+<blockquote>
+<p><strong>Idée essentielle</strong> — Le système produit un forecast avant la livraison, le fige, puis seulement après compare cette prévision au prix réalisé et à Storm. Storm ne participe jamais à la fabrication du forecast.</p>
+</blockquote>
+<hr>
+<h2 id="1-resume-en-une-minute">1. Résumé en une minute</h2>
+<p>L'application prévoit le <strong>prix day-ahead de l'électricité</strong>, en <strong>EUR/MWh</strong>, pour chaque heure du prochain jour de livraison.</p>
+<p>Elle couvre aujourd'hui cinq marchés :</p>
+<ul>
+<li>France (FR) ;</li>
+<li>Allemagne / Luxembourg (DE) ;</li>
+<li>Belgique (BE) ;</li>
+<li>Pays-Bas (NL) ;</li>
+<li>Espagne (ES).</li>
+</ul>
+<p>Pour chaque heure, elle publie trois valeurs :</p>
+<ul>
+<li><strong>P50</strong>, la prévision centrale ;</li>
+<li><strong>P10</strong>, un scénario bas ;</li>
+<li><strong>P90</strong>, un scénario haut.</li>
+</ul>
+<p>Le cœur autonome est identique dans son principe pour tous les pays :</p>
+<ol>
+<li><strong>Amazon Chronos-2</strong> dessine une première courbe de prix probabiliste ;</li>
+<li>un <strong>correcteur d'erreurs historiques</strong> ajuste cette courbe en fonction du contexte ;</li>
+<li>en France et aux Pays-Bas, un forecast <strong>MKOnline</strong> validé apporte un second avis avec un poids fixe ;</li>
+<li>le résultat est contrôlé, archivé et protégé par des empreintes SHA-256 ;</li>
+<li>une fois les prix réels connus, le rapport mesure la performance et la compare à <strong>Storm</strong>.</li>
+</ol>
+<p>Le forecast porte normalement sur 24 heures. Il en contient <strong>23 ou 25 lors des changements d'heure</strong>, ce qui est normal : le système suit la véritable journée physique de chaque marché.</p>
+<hr>
+<h2 id="2-la-chaine-complete-en-un-regard">2. La chaîne complète, en un regard</h2>
+<div class="pipeline" role="img" aria-label="Chaîne de prévision : données disponibles, contrôles, Chronos-2, correcteur résiduel, mélange MKOnline optionnel, quantiles, archive, puis évaluation Storm">
+  <div class="pipeline-step"><strong>1. Données disponibles</strong><br>Prix passés, calendriers et charges résiduelles prévues</div>
+  <div class="pipeline-arrow">→</div>
+  <div class="pipeline-step"><strong>2. Gel à D−1 08:00</strong><br>Uniquement l'information réellement disponible</div>
+  <div class="pipeline-arrow">→</div>
+  <div class="pipeline-step"><strong>3. Chronos-2</strong><br>Première courbe P10 / P50 / P90</div>
+  <div class="pipeline-arrow">→</div>
+  <div class="pipeline-step"><strong>4. Correcteur résiduel</strong><br>Correction des biais récurrents</div>
+  <div class="pipeline-arrow">→</div>
+  <div class="pipeline-step"><strong>5. MKOnline si validé</strong><br>FR et NL uniquement</div>
+  <div class="pipeline-arrow">→</div>
+  <div class="pipeline-step"><strong>6. Forecast figé</strong><br>Contrôles, archive et checksums</div>
+  <div class="pipeline-arrow">→</div>
+  <div class="pipeline-step evaluation"><strong>7. Évaluation après coup</strong><br>Prix réalisé + Storm + Statistics</div>
+</div>
+
+<p>La partie située avant « Forecast figé » est la <strong>chaîne de prédiction</strong>. La partie Storm se trouve après : elle appartient exclusivement à l'<strong>évaluation</strong>.</p>
+<hr>
+<h2 id="3-ce-que-le-modele-prevoit-et-ce-quil-ne-prevoit-pas">3. Ce que le modèle prévoit — et ce qu'il ne prévoit pas</h2>
+<h3 id="31-le-produit-prevu">3.1 Le produit prévu</h3>
+<p>Le modèle prévoit le prix de l'enchère <strong>day-ahead</strong> pour chaque heure du jour de livraison suivant. Il ne prévoit pas :</p>
+<ul>
+<li>le prix intraday ;</li>
+<li>le prix d'équilibrage ;</li>
+<li>un volume échangé ;</li>
+<li>un flux physique entre pays ;</li>
+<li>une décision de trading automatique.</li>
+</ul>
+<p>Le prix peut être positif, nul ou négatif. Un prix négatif est possible sur le marché et ne constitue pas, à lui seul, une erreur du modèle.</p>
+<h3 id="32-le-calendrier-d-et-d1">3.2 Le calendrier D et D−1</h3>
+<p>Dans ce document :</p>
+<ul>
+<li><strong>D</strong> désigne le jour de livraison ;</li>
+<li><strong>D−1</strong> désigne la veille ;</li>
+<li><strong>08:00</strong> est l'heure civile de gel utilisée par la chaîne actuelle, dans le fuseau Europe/Paris.</li>
+</ul>
+<p>À 08:00 le jour D−1, le système ne conserve que les données publiées ou révisées au plus tard à cette heure. Il refuse toute révision plus tardive, même si elle serait plus précise.</p>
+<p>Cette règle simule honnêtement ce qu'un utilisateur pouvait savoir au moment du forecast.</p>
+<h3 id="33-une-nuance-importante-sur-les-prix-historiques">3.3 Une nuance importante sur les prix historiques</h3>
+<p>Le timestamp d'un prix day-ahead correspond à son <strong>heure de livraison</strong>, pas à son heure de publication. Toute la courbe du jour D−1 a déjà été fixée lors du clearing de D−2. Elle est donc connue à 08:00 en D−1 et peut légitimement servir au contexte historique.</p>
+<p>Le modèle accepte ainsi les prix de livraison de D−1, mais refuse les prix du jour D qu'il cherche précisément à prévoir.</p>
+<hr>
+<h2 id="4-les-donnees-utilisees-en-production">4. Les données utilisées en production</h2>
+<h3 id="41-lhistorique-des-prix-day-ahead">4.1 L'historique des prix day-ahead</h3>
+<p>La série de prix passée donne à Chronos-2 le contexte du marché : niveaux habituels, alternance heures creuses / heures de pointe, comportements de semaine et changements de régime.</p>
+<p>La cible est propre à chaque zone : FR, DE-LU, BE, NL ou ES. Les prix sont exprimés en EUR/MWh et alignés sur une grille horaire UTC, puis présentés dans l'heure locale du pays.</p>
+<p>La cible horaire n'est pas interpolée : un trou non admissible provoque un refus, pas une valeur inventée.</p>
+<h3 id="42-les-cinq-previsions-de-charge-residuelle">4.2 Les cinq prévisions de charge résiduelle</h3>
+<p>Chaque modèle utilise le panel prévu de charge résiduelle de :</p>
+<ul>
+<li>la France ;</li>
+<li>l'Allemagne ;</li>
+<li>la Belgique ;</li>
+<li>les Pays-Bas ;</li>
+<li>l'Espagne.</li>
+</ul>
+<p>La <strong>charge résiduelle</strong> représente, de façon simplifiée, la demande restant à satisfaire après déduction d'une partie de la production renouvelable. Un niveau élevé peut signaler un système plus tendu ; un niveau faible peut être associé à davantage d'offre renouvelable disponible.</p>
+<p>Utiliser les cinq pays aide le modèle à tenir compte du caractère interconnecté des marchés européens, sans prétendre prévoir directement les flux transfrontaliers.</p>
+<h3 id="43-le-calendrier-connu-a-lavance">4.3 Le calendrier connu à l'avance</h3>
+<p>Le modèle connaît des informations sans ambiguïté avant la livraison :</p>
+<ul>
+<li>heure de la journée ;</li>
+<li>jour de la semaine ;</li>
+<li>week-end ou jour ouvré ;</li>
+<li>jours fériés et calendriers des cinq pays ;</li>
+<li>forme intra-journalière des courbes prévues.</li>
+</ul>
+<h3 id="44-les-variables-derivees">4.4 Les variables dérivées</h3>
+<p>Le correcteur transforme les données brutes en indicateurs de contexte, par exemple :</p>
+<ul>
+<li>largeur et asymétrie de l'intervalle Chronos-2 ;</li>
+<li>niveau moyen, minimum, maximum et amplitude de la journée ;</li>
+<li>rampes entre heures successives ;</li>
+<li>dispersion des charges résiduelles entre pays ;</li>
+<li>écart entre la situation locale et la situation régionale.</li>
+</ul>
+<p>Le schéma déployé comporte <strong>175 variables explicatives</strong>. Leur liste et leur ordre sont gelés. Une variable manquante, inattendue ou réordonnée provoque un refus au lieu d'une adaptation silencieuse.</p>
+<h3 id="45-ce-qui-nest-pas-une-entree-du-modele">4.5 Ce qui n'est pas une entrée du modèle</h3>
+<p>Le forecast de production n'utilise pas :</p>
+<ul>
+<li>Storm ;</li>
+<li>les prix futurs réellement observés ;</li>
+<li>des révisions arrivées après le cutoff ;</li>
+<li>des articles, images ou réseaux sociaux non audités ;</li>
+<li>un proxy inventé lorsqu'une série officielle manque ;</li>
+<li>des lags ou moyennes glissantes du prix observé ajoutés au correcteur résiduel.</li>
+</ul>
+<p>Chronos-2 utilise bien l'historique causal du prix comme contexte. En revanche, le second étage ne rajoute pas artificiellement une longue collection de variables de prix passé susceptibles de rendre l'évaluation moins robuste.</p>
+<hr>
+<h2 id="5-la-selection-causale-des-donnees-point-in-time">5. La sélection causale des données : « point-in-time »</h2>
+<p>Une série énergétique peut être révisée plusieurs fois. Utiliser aujourd'hui sa dernière version pour simuler une prévision ancienne donnerait au modèle une information qu'il ne possédait pas encore.</p>
+<p>Le système applique donc une logique <strong>point-in-time</strong>, ou PIT :</p>
+<ol>
+<li>il fixe le jour D et le cutoff D−1 à 08:00 ;</li>
+<li>il élimine tout snapshot ou toute révision postérieure ;</li>
+<li>pour chaque heure de livraison, il conserve la dernière version admissible ;</li>
+<li>il vérifie que les 23, 24 ou 25 heures physiques sont toutes couvertes ;</li>
+<li>il refuse les doublons, les valeurs non numériques et les trous non autorisés.</li>
+</ol>
+<blockquote>
+<p><strong>Pourquoi c'est important</strong> — Un backtest utilisant des données corrigées après coup peut sembler excellent tout en étant impossible à reproduire en réel. La sélection PIT réduit ce risque de « voir le futur ».</p>
+</blockquote>
+<p>Les données live doivent également être suffisamment fraîches. Le contrat actuel contrôle la couverture exacte du jour D et refuse les vintages trop anciens au lieu de publier discrètement une prévision obsolète.</p>
+<hr>
+<h2 id="6-etape-1-du-modele-amazon-chronos-2">6. Étape 1 du modèle : Amazon Chronos-2</h2>
+<p>Chronos-2 est un modèle pré-entraîné spécialisé dans les séries temporelles. Il reçoit :</p>
+<ul>
+<li>l'historique causal du prix ;</li>
+<li>le contexte temporel ;</li>
+<li>les variables futures autorisées et déjà connues, notamment les charges résiduelles prévues.</li>
+</ul>
+<p>La configuration actuelle utilise jusqu'à <strong>2 048 heures de contexte</strong>, soit environ douze semaines de données horaires récentes.</p>
+<p>Il produit une première courbe de scénarios :</p>
+<ul>
+<li><code>q10</code> : estimation basse ;</li>
+<li><code>q50</code> : estimation centrale ;</li>
+<li><code>q90</code> : estimation haute.</li>
+</ul>
+<p>Chronos-2 joue le rôle du <strong>prévisionniste principal</strong> : il dessine la forme générale de la journée, les pointes, les creux et l'incertitude.</p>
+<p>Il n'est toutefois pas supposé être parfait pour chaque zone et chaque régime de prix. Un deuxième étage apprend donc à corriger ses erreurs récurrentes.</p>
+<hr>
+<h2 id="7-etape-2-le-correcteur-residuel">7. Étape 2 : le correcteur résiduel</h2>
+<h3 id="71-ce-quil-apprend">7.1 Ce qu'il apprend</h3>
+<p>Pour chaque ancienne heure, le système calcule l'erreur de la prévision centrale :</p>
+<p><strong>erreur résiduelle = prix réalisé − P50 Chronos-2</strong></p>
+<p>Le correcteur apprend dans quels contextes Chronos-2 tend à être trop haut ou trop bas : heure de pointe, week-end, jour férié, forte rampe de charge résiduelle, divergence entre pays, etc.</p>
+<h3 id="72-deux-modeles-complementaires">7.2 Deux modèles complémentaires</h3>
+<p>La recette autonome déployée combine à parts égales :</p>
+<ul>
+<li>un modèle <strong>CatBoost</strong> ;</li>
+<li>un modèle <strong>HistGradientBoosting</strong> de scikit-learn.</li>
+</ul>
+<p>Ce sont deux familles de modèles à base d'arbres. Chacune cherche des relations non linéaires entre le contexte et l'erreur attendue. Leur correction est moyennée à <strong>50 % / 50 %</strong>.</p>
+<p>La correction finale est bornée à <strong>±40 EUR/MWh</strong>. Cette limite évite qu'un second étage très confiant déplace excessivement la courbe de base.</p>
+<h3 id="73-la-correction-commune-des-quantiles">7.3 La correction commune des quantiles</h3>
+<p>La même correction est ajoutée à P10, P50 et P90 :</p>
+<ul>
+<li>nouveau P10 = ancien P10 + correction ;</li>
+<li>nouveau P50 = ancien P50 + correction ;</li>
+<li>nouveau P90 = ancien P90 + correction.</li>
+</ul>
+<p>Cette méthode conserve automatiquement :</p>
+<ul>
+<li>l'ordre <strong>P10 ≤ P50 ≤ P90</strong> ;</li>
+<li>la largeur de l'intervalle P10–P90.</li>
+</ul>
+<p>Le correcteur déplace donc la bande sans prétendre recalculer une nouvelle incertitude complète.</p>
+<hr>
+<h2 id="8-etape-3-le-melange-mkonline-uniquement-lorsquil-est-valide">8. Étape 3 : le mélange MKOnline, uniquement lorsqu'il est validé</h2>
+<p>La France et les Pays-Bas disposent d'un second forecast MKOnline ayant franchi un protocole de validation dédié.</p>
+<p>Le système mélange uniquement les prévisions centrales :</p>
+<p><strong>P50 final = poids autonome × P50 autonome + poids MKOnline × P50 MKOnline</strong></p>
+<p>Puis il déplace P10 et P90 de la même quantité que P50. Là encore, la largeur et l'ordre des quantiles sont conservés.</p>
+<h3 id="81-poids-actuellement-geles">8.1 Poids actuellement gelés</h3>
+<table>
+<thead>
+<tr>
+<th>Pays</th>
+<th style="text-align: right;">Poids autonome</th>
+<th style="text-align: right;">Poids MKOnline</th>
+<th>Série MKOnline primaire</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>France</td>
+<td style="text-align: right;">49,7761 %</td>
+<td style="text-align: right;">50,2239 %</td>
+<td><code>41551_native</code></td>
+</tr>
+<tr>
+<td>Pays-Bas</td>
+<td style="text-align: right;">53,2274 %</td>
+<td style="text-align: right;">46,7726 %</td>
+<td><code>41554_native</code></td>
+</tr>
+</tbody>
+</table>
+<p>Ces poids sont <strong>fixes</strong>. Ils ne sont pas recalculés chaque matin et ne peuvent pas être saisis librement dans l'application.</p>
+<p>L'Allemagne, la Belgique et l'Espagne utilisent le modèle autonome corrigé : aucun poids français ou néerlandais n'est réutilisé par défaut.</p>
+<h3 id="82-mkonline-nest-pas-storm">8.2 MKOnline n'est pas Storm</h3>
+<ul>
+<li><strong>MKOnline</strong> peut contribuer à la prédiction en FR et NL.</li>
+<li><strong>Storm</strong> est un benchmark d'évaluation et n'entre jamais dans la formule du forecast.</li>
+</ul>
+<p>Storm peut servir à décider si une recette figée mérite d'être promue, mais ses valeurs ne sont ni des variables du modèle, ni une solution de secours en cas de donnée manquante.</p>
+<h3 id="83-reserve-de-gouvernance">8.3 Réserve de gouvernance</h3>
+<p>Les manifestes MKOnline indiquent que les droits commerciaux et de remplacement restent à confirmer avec les propriétaires de la donnée. C'est une question de gouvernance contractuelle distincte de la validation statistique et technique.</p>
+<hr>
+<h2 id="9-les-variantes-par-pays">9. Les variantes par pays</h2>
+<table>
+<thead>
+<tr>
+<th>Pays</th>
+<th>Fuseau de livraison</th>
+<th>Modèle de production</th>
+<th>Storm officiel dans Statistics</th>
+<th>Particularité</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>FR</strong></td>
+<td>Europe/Paris</td>
+<td>Chronos-2 + correcteur + blend MKOnline</td>
+<td>Oui</td>
+<td>MKOnline <code>41551_native</code></td>
+</tr>
+<tr>
+<td><strong>DE</strong></td>
+<td>Europe/Berlin</td>
+<td>Chronos-2 + correcteur autonome</td>
+<td>Oui</td>
+<td>Zone de prix DE-LU</td>
+</tr>
+<tr>
+<td><strong>BE</strong></td>
+<td>Europe/Brussels</td>
+<td>Chronos-2 + correcteur autonome</td>
+<td>Oui</td>
+<td>Les améliorations expérimentales restent hors production tant qu'elles ne battent pas Storm de façon robuste</td>
+</tr>
+<tr>
+<td><strong>NL</strong></td>
+<td>Europe/Amsterdam</td>
+<td>Chronos-2 + correcteur + blend MKOnline</td>
+<td>Oui</td>
+<td>MKOnline <code>41554_native</code> ; traitement explicite du fuseau de la charge résiduelle NL</td>
+</tr>
+<tr>
+<td><strong>ES</strong></td>
+<td>Europe/Madrid</td>
+<td>Chronos-2 + correcteur autonome</td>
+<td>Non</td>
+<td>Aucune série Storm native équivalente n'est aujourd'hui vérifiée ; le rapport affiche N/A</td>
+</tr>
+</tbody>
+</table>
+<p>Le Royaume-Uni et l'Italie ne sont pas activés. Le Royaume-Uni manque encore d'un contrat complet cible / variables / devise. L'Italie nécessite d'abord de choisir et valider une zone de prix précise : IT_NORD, PUN et les autres zones ne sont pas interchangeables.</p>
+<hr>
+<h2 id="10-comment-le-modele-a-ete-entraine-sans-tricher">10. Comment le modèle a été entraîné sans tricher</h2>
+<h3 id="101-des-previsions-historiques-comme-en-vrai">10.1 Des prévisions historiques « comme en vrai »</h3>
+<p>Le correcteur ne doit pas apprendre sur des prévisions qui auraient déjà vu leur propre résultat. Les prévisions historiques utilisées sont donc <strong>out-of-fold</strong> : chaque bloc est prédit par un modèle entraîné uniquement sur une période antérieure admissible.</p>
+<p>En langage simple, on rejoue le passé en respectant l'ordre du temps :</p>
+<ol>
+<li>apprendre sur le passé ;</li>
+<li>prévoir la période suivante ;</li>
+<li>conserver cette prévision ;</li>
+<li>avancer dans le temps ;</li>
+<li>ne jamais réentraîner rétroactivement la prévision déjà conservée.</li>
+</ol>
+<h3 id="102-les-fenetres-gelees-de-la-recette-autonome">10.2 Les fenêtres gelées de la recette autonome</h3>
+<p>La version actuelle repose sur :</p>
+<ul>
+<li><strong>EXT223</strong> : 223 jours historiques supplémentaires, du 2 janvier au 11 août 2024 ;</li>
+<li><strong>365 jours de calibration</strong> ;</li>
+<li><strong>365 jours de final scellé</strong> ;</li>
+<li>soit 730 jours de prévisions existantes, auxquels s'ajoutent EXT223.</li>
+</ul>
+<p>Pour l'évaluation annuelle, le correcteur est ajusté sur EXT223 + les 365 premiers jours, puis testé sur les 365 derniers jours restés intacts.</p>
+<p>Pour le forecast opérationnel ultérieur, une instance séparée est ajustée sur EXT223 + les 730 jours historiques désormais observés. Cette instance ne réécrit pas le résultat du backtest annuel.</p>
+<h3 id="103-le-final-scelle">10.3 Le final scellé</h3>
+<p>Le final actuel couvre du <strong>12 août 2025 au 11 août 2026</strong> :</p>
+<ul>
+<li>365 jours civils ;</li>
+<li>8 760 heures physiques ;</li>
+<li>une journée de 23 heures ;</li>
+<li>363 journées de 24 heures ;</li>
+<li>une journée de 25 heures.</li>
+</ul>
+<p>La recette, le schéma et les poids sont gelés avant l'ouverture de cette période. Le final ne sert pas à retoucher les hyperparamètres après lecture du résultat.</p>
+<h3 id="104-le-protocole-a-b1-b2-pour-une-amelioration">10.4 Le protocole A / B1 / B2 pour une amélioration</h3>
+<p>Une nouvelle idée ne remplace pas directement le modèle en production. Elle suit un parcours par étapes :</p>
+<ol>
+<li><strong>A — construction et validation croisée chronologique</strong> : choix du candidat sans regarder les périodes de veto ;</li>
+<li><strong>B1 — premier test indépendant</strong> : le candidat figé doit apporter un gain suffisant et cohérent ;</li>
+<li><strong>B2 — second veto indépendant</strong> : aucune nouvelle sélection ni retouche n'est autorisée ;</li>
+<li><strong>scellement</strong> : code, données, poids et paramètres reçoivent des checksums ;</li>
+<li><strong>final</strong> : une seule évaluation sur la période scellée ;</li>
+<li><strong>promotion</strong> : le registre de production change seulement si les critères sont réellement satisfaits.</li>
+</ol>
+<p>Cette séparation protège contre le sur-ajustement, c'est-à-dire le fait de choisir par hasard une recette qui correspond très bien à une période déjà observée mais se dégrade ensuite.</p>
+<hr>
+<h2 id="11-ce-qui-se-passe-apres-un-clic-dans-lapplication">11. Ce qui se passe après un clic dans l'application</h2>
+<h3 id="111-lancement">11.1 Lancement</h3>
+<p>Le moyen le plus simple est de double-cliquer sur :</p>
+<p><code>C:\Users\BQ6757\chronos2_v1\launch_forecast_app.cmd</code></p>
+<p>L'équivalent PowerShell est :</p>
+<pre><code class="language-powershell">&amp; 'C:\Users\BQ6757\chronos2_v1\Start-ForecastApp.ps1'
+</code></pre>
+<p>L'application Streamlit s'ouvre dans le navigateur local.</p>
+<h3 id="112-preparation-du-run">11.2 Préparation du run</h3>
+<p>L'utilisateur :</p>
+<ol>
+<li>vérifie que le pays est marqué prêt ;</li>
+<li>sélectionne un ou plusieurs pays, ou tous les pays disponibles ;</li>
+<li>choisit le jour de livraison ;</li>
+<li>clique sur le bouton de lancement ;</li>
+<li>suit l'avancement et les logs.</li>
+</ol>
+<p>Le jour proposé par défaut est le lendemain. Des options avancées permettent de choisir le device, le nombre de workers et de threads, ainsi que l'utilisation exclusive du cache local du modèle Hugging Face. Les réglages de recette, de schéma et de poids ne sont pas exposés comme des paramètres libres.</p>
+<p>Les pays sont traités <strong>séquentiellement</strong> afin d'éviter la concurrence sur le modèle, le GPU et les caches.</p>
+<h3 id="113-controles-avant-calcul">11.3 Contrôles avant calcul</h3>
+<p>Pour chaque pays, le moteur vérifie notamment :</p>
+<ul>
+<li>l'identité de la zone, de la cible et du fuseau ;</li>
+<li>la présence de la recette et du benchmark scellés ;</li>
+<li>les checksums des données et du code de refit ;</li>
+<li>la date de livraison et son cutoff ;</li>
+<li>la disponibilité des covariables requises ;</li>
+<li>le mode explicite <code>autonomous_only</code> ou <code>mkonline_blend</code>.</li>
+</ul>
+<p>Il n'existe pas de bascule silencieuse d'un mode vers un autre. Si MKOnline est requis mais absent, un modèle blend ne se transforme pas discrètement en modèle autonome.</p>
+<h3 id="114-calcul-du-forecast">11.4 Calcul du forecast</h3>
+<p>Le moteur :</p>
+<ol>
+<li>synchronise les données admissibles ;</li>
+<li>construit la journée locale exacte ;</li>
+<li>exécute Chronos-2 ;</li>
+<li>réajuste le correcteur avec la recette et l'historique gelés ;</li>
+<li>applique éventuellement le blend MKOnline ;</li>
+<li>valide P10, P50, P90, l'origine et la timeline ;</li>
+<li>écrit le candidat dans un dossier privé de préparation.</li>
+</ol>
+<h3 id="115-publication-prioritaire-et-reporting">11.5 Publication prioritaire et reporting</h3>
+<p>Le forecast validé est figé avant tout chargement de Storm. Ensuite seulement, le moteur met à jour l'historique réalisé, les Statistics et le rapport HTML.</p>
+<p>Une panne de reporting postérieure au gel ne doit pas transformer un forecast valide en forecast perdu. Elle est signalée séparément. Les erreurs portant sur le candidat, son checksum ou sa publication restent, elles, bloquantes.</p>
+<h3 id="116-historique-manquant-et-replays">11.6 Historique manquant et replays</h3>
+<p>Si quelques journées récentes manquent dans l'historique des Statistics, le système peut reconstruire automatiquement jusqu'à <strong>trois jours</strong> de forecasts causaux, dans l'ordre chronologique. Ils sont étiquetés comme <strong>replays PIT</strong>, jamais comme forecasts réellement émis ce jour-là.</p>
+<p>Si le trou ne peut pas être réparé, les Statistics utilisent uniquement le préfixe historique complet précédant le premier trou. Le statut devient partiel ; aucune journée postérieure n'est ajoutée artificiellement.</p>
+<h3 id="117-archive-deja-publiee">11.7 Archive déjà publiée</h3>
+<p>Une archive existante n'est pas écrasée. Si son identité, sa grille et tous ses checksums sont valides, l'application indique qu'elle est déjà publiée et l'ignore proprement. Si elle est incomplète ou altérée, le run est bloqué pour examen.</p>
+<hr>
+<h2 id="12-les-fichiers-publies-et-leur-role">12. Les fichiers publiés et leur rôle</h2>
+<p>Un run contient notamment :</p>
+<table>
+<thead>
+<tr>
+<th>Fichier</th>
+<th>Rôle</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>forecast_hourly_&lt;pays&gt;.csv</code></td>
+<td>P10, P50 et P90 de chaque heure, métadonnées et origine</td>
+</tr>
+<tr>
+<td><code>run_manifest.json</code></td>
+<td>identité du run, zone, date, cutoff, recette et provenance</td>
+</tr>
+<tr>
+<td><code>artifact_checksums.json</code></td>
+<td>taille et SHA-256 de chaque artefact</td>
+</tr>
+<tr>
+<td><code>statistics_history_hourly.csv.gz</code></td>
+<td>historique utilisé par la section Statistics</td>
+</tr>
+<tr>
+<td><code>statistics_history_audit.json</code></td>
+<td>couverture, jours manquants, nature live/replay et contrat Storm</td>
+</tr>
+<tr>
+<td>rapport <code>.html</code></td>
+<td>visualisation mono-pays ou consolidée</td>
+</tr>
+</tbody>
+</table>
+<p>Les archives sont d'abord construites dans un dossier temporaire, contrôlées, puis publiées par renommage. Cette méthode limite le risque de voir un dossier à moitié écrit.</p>
+<hr>
+<h2 id="13-comment-lire-p10-p50-et-p90">13. Comment lire P10, P50 et P90</h2>
+<h3 id="p50-la-courbe-centrale">P50 — la courbe centrale</h3>
+<p>P50 est le scénario central. C'est cette série qui est comparée au prix réalisé pour calculer les principales métriques.</p>
+<p>P50 ne signifie pas que le prix réel sera exactement égal à cette valeur. Il s'agit du milieu estimé de la distribution prévue.</p>
+<h3 id="p10-le-scenario-bas">P10 — le scénario bas</h3>
+<p>P10 est le scénario bas produit par Chronos-2. Il indique la partie basse de la distribution interne du modèle, sans taux de couverture garanti par les artefacts actuels.</p>
+<h3 id="p90-le-scenario-haut">P90 — le scénario haut</h3>
+<p>P90 est le scénario haut produit par Chronos-2. Il indique la partie haute de la distribution interne du modèle, sans constituer un plafond garanti.</p>
+<h3 id="la-bande-p10p90">La bande P10–P90</h3>
+<p>La bande donne une indication de l'incertitude vue par Chronos-2. Le système ne publie aujourd'hui aucune étude de calibration démontrant qu'elle contient le prix réel avec une fréquence donnée. Elle n'est ni un minimum, ni un maximum, ni un intervalle de confiance garanti.</p>
+<ul>
+<li>bande large : incertitude annoncée plus forte ;</li>
+<li>bande étroite : incertitude annoncée plus faible ;</li>
+<li>prix réel hors bande : possible, notamment lors d'un événement exceptionnel.</li>
+</ul>
+<p>Dans la recette actuelle, le correcteur et le blend déplacent la bande sans modifier sa largeur. La largeur provient donc principalement de Chronos-2.</p>
+<hr>
+<h2 id="14-storm-le-modele-a-battre-jamais-une-entree-de-prediction">14. Storm : le modèle à battre, jamais une entrée de prédiction</h2>
+<p>Storm est le <strong>benchmark</strong>, c'est-à-dire le forecast de référence. Le prix réellement observé reste la vérité de marché ; Storm n'est pas la vérité.</p>
+<h3 id="141-separation-stricte">14.1 Séparation stricte</h3>
+<p>Storm est chargé uniquement après le gel du candidat :</p>
+<ul>
+<li>il ne figure pas dans les variables du modèle ;</li>
+<li>il ne modifie pas P10, P50 ou P90 ;</li>
+<li>il n'est pas utilisé comme fallback ;</li>
+<li>il sert à mesurer la performance relative.</li>
+</ul>
+<h3 id="142-serie-officielle-du-dashboard">14.2 Série officielle du dashboard</h3>
+<p>Pour FR, DE, BE et NL, le rapport utilise la série native officielle identifiée par pays. Cette série est extraite dans son état courant, normalisée selon le fuseau civil, puis figée avec son instant d'extraction et son SHA-256.</p>
+<p>Elle peut être révisée à la source. Le snapshot conservé dans l'artefact rend le rapport reproductible, mais il faut garder à l'esprit qu'il s'agit d'un benchmark d'évaluation « état courant », pas nécessairement de la version exacte que Storm affichait à 08:00 chaque jour historique.</p>
+<p>Un comparateur causal distinct « Storm disponible à 08:00 » peut exister pour certains audits. Il ne doit jamais être confondu avec le benchmark officiel du dashboard.</p>
+<h3 id="143-cas-de-lespagne">14.3 Cas de l'Espagne</h3>
+<p>Aucune série native officielle Storm équivalente n'est aujourd'hui vérifiée pour ES. Le rapport affiche donc <strong>N/A</strong>. Il ne remplace pas Storm par une basecase ou un proxy sous un nom trompeur.</p>
+<h3 id="144-couverture-appariee">14.4 Couverture appariée</h3>
+<p>Notre modèle et Storm sont comparés :</p>
+<ul>
+<li>aux mêmes prix réalisés ;</li>
+<li>sur les mêmes heures ;</li>
+<li>uniquement lorsque les deux valeurs sont finies ;</li>
+<li>sur des journées complètes pour les win rates journaliers stricts.</li>
+</ul>
+<p>Lors du passage à l'heure d'hiver, la série Storm native peut ne contenir qu'un des deux folds de 02:00. La journée incomplète est alors exclue plutôt qu'interpolée.</p>
+<hr>
+<h2 id="15-comprendre-la-section-statistics">15. Comprendre la section Statistics</h2>
+<p>Le tableau présente, pour chaque pays et chaque métrique :</p>
+<ul>
+<li>la performance globale de notre modèle ;</li>
+<li>la performance globale de Storm ;</li>
+<li>leur écart ;</li>
+<li>le nombre de périodes gagnées, à égalité ou perdues ;</li>
+<li>le nombre de périodes comparables ;</li>
+<li>le win rate ;</li>
+<li>le volume d'historique ;</li>
+<li>le statut complet, partiel ou indisponible.</li>
+</ul>
+<p>Les sept métriques ne sont pas redondantes. Chacune éclaire une dimension différente.</p>
+<h3 id="151-tableau-des-sept-metriques">15.1 Tableau des sept métriques</h3>
+<table>
+<thead>
+<tr>
+<th>Statistique</th>
+<th>Ce qu'elle mesure</th>
+<th>Sens souhaité</th>
+<th>Unité</th>
+<th>Principal piège</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>MAE</strong></td>
+<td>erreur absolue moyenne</td>
+<td>plus faible</td>
+<td>EUR/MWh</td>
+<td>masque l'ampleur particulière des très gros ratés</td>
+</tr>
+<tr>
+<td><strong>RMSE</strong></td>
+<td>erreur avec forte pénalisation des gros ratés</td>
+<td>plus faible</td>
+<td>EUR/MWh</td>
+<td>très sensible à quelques pointes extrêmes</td>
+</tr>
+<tr>
+<td><strong>MAPE</strong></td>
+<td>erreur relative au prix réalisé</td>
+<td>plus faible</td>
+<td>%</td>
+<td>explose lorsque le prix est proche de zéro</td>
+</tr>
+<tr>
+<td><strong>Explained Variance</strong></td>
+<td>capacité à reproduire les variations</td>
+<td>plus élevée</td>
+<td>sans unité</td>
+<td>peut rester bonne malgré un biais constant</td>
+</tr>
+<tr>
+<td><strong>R²</strong></td>
+<td>gain par rapport à une prévision égale à la moyenne</td>
+<td>plus élevé</td>
+<td>sans unité</td>
+<td>peut être négatif ou instable sur une période peu variable</td>
+</tr>
+<tr>
+<td><strong>Écart-type de l'erreur</strong></td>
+<td>stabilité / dispersion des erreurs</td>
+<td>plus faible</td>
+<td>EUR/MWh</td>
+<td>ne détecte pas un biais constant à lui seul</td>
+</tr>
+<tr>
+<td><strong>Corrélation</strong></td>
+<td>synchronisation des hausses et baisses</td>
+<td>plus élevée</td>
+<td>de −1 à 1</td>
+<td>peut être excellente avec un niveau de prix faux</td>
+</tr>
+</tbody>
+</table>
+<h3 id="152-mae-erreur-absolue-moyenne">15.2 MAE — erreur absolue moyenne</h3>
+<p>Une MAE de 10 EUR/MWh signifie que la prévision se trouve en moyenne à environ 10 EUR/MWh du prix réel, sans distinguer erreur à la hausse ou à la baisse.</p>
+<p>C'est l'indicateur le plus simple pour commencer la lecture.</p>
+<h3 id="153-rmse-attention-aux-gros-rates">15.3 RMSE — attention aux gros ratés</h3>
+<p>Le RMSE met au carré les erreurs avant de les moyenner. Il pénalise donc fortement les pointes mal prévues.</p>
+<p>Si le RMSE est très supérieur à la MAE, quelques erreurs importantes pèsent probablement sur le résultat.</p>
+<h3 id="154-mape-un-pourcentage-a-manier-avec-prudence">15.4 MAPE — un pourcentage à manier avec prudence</h3>
+<p>La MAPE divise l'erreur absolue par la valeur absolue du prix réalisé. Le code exclut uniquement les valeurs quasi nulles, avec <strong>|prix| ≤ 10⁻⁹ EUR/MWh</strong>.</p>
+<p>Exemple : une erreur de 5 EUR/MWh représente 5 % si le prix vaut 100 EUR/MWh, mais 500 % s'il vaut 1 EUR/MWh.</p>
+<p>Sur les marchés électriques, où des prix proches de zéro ou négatifs sont possibles, la MAPE ne doit jamais être utilisée seule.</p>
+<h3 id="155-explained-variance">15.5 Explained Variance</h3>
+<p>Elle mesure la capacité à reproduire les variations : pointes, creux et volatilité.</p>
+<ul>
+<li>1 : variations parfaitement reproduites ;</li>
+<li>0 : peu de variation expliquée ;</li>
+<li>négatif : mauvaise reproduction de la dynamique.</li>
+</ul>
+<p>Un forecast toujours décalé de +10 EUR/MWh peut conserver une excellente variance expliquée. Il faut donc la lire avec la MAE ou le R².</p>
+<h3 id="156-r2">15.6 R²</h3>
+<p>Le R² compare le forecast à une référence très simple qui utiliserait le prix moyen de la période.</p>
+<ul>
+<li>1 : parfait ;</li>
+<li>0 : équivalent à la référence moyenne ;</li>
+<li>négatif : moins bon que cette référence.</li>
+</ul>
+<p>Une valeur négative n'est pas une panne informatique.</p>
+<h3 id="157-ecart-type-de-lerreur">15.7 Écart-type de l'erreur</h3>
+<p>Il mesure la dispersion des erreurs autour de leur moyenne. Une valeur faible indique des erreurs régulières ; une valeur élevée signale un comportement instable.</p>
+<p>Un modèle toujours trop haut de 10 EUR/MWh peut avoir un écart-type nul tout en restant mauvais en MAE.</p>
+<h3 id="158-correlation">15.8 Corrélation</h3>
+<p>La corrélation indique si la courbe monte et descend au même moment que le prix réel.</p>
+<p>Une corrélation élevée ne garantit pas le bon niveau de prix. Un forecast deux fois trop élevé peut encore être parfaitement corrélé.</p>
+<hr>
+<h2 id="16-le-win-rate-face-a-storm">16. Le win rate face à Storm</h2>
+<p>Le win rate transforme chaque période en un match.</p>
+<ul>
+<li><strong>W — Win / gagné</strong> : notre modèle est meilleur ;</li>
+<li><strong>T — Tie / égalité</strong> : les valeurs sont égales à la tolérance numérique près ;</li>
+<li><strong>L — Loss / perdu</strong> : Storm est meilleur.</li>
+</ul>
+<p>Pour MAE, RMSE, MAPE et écart-type, la valeur la plus faible gagne. Pour Explained Variance, R² et corrélation, la valeur la plus élevée gagne.</p>
+<p><strong>Win rate = W ÷ (W + T + L)</strong></p>
+<p>Les égalités restent dans le dénominateur et ne valent pas une demi-victoire.</p>
+<h3 id="exemple">Exemple</h3>
+<p>Sur 100 journées complètes :</p>
+<ul>
+<li>56 gagnées ;</li>
+<li>1 égalité ;</li>
+<li>43 perdues.</li>
+</ul>
+<p>Le win rate est de <strong>56 %</strong>.</p>
+<h3 id="ce-que-le-win-rate-ne-dit-pas">Ce que le win rate ne dit pas</h3>
+<p>Il mesure la fréquence des victoires, pas leur ampleur. Un modèle peut gagner souvent de peu et perdre rarement de beaucoup. Il peut alors afficher plus de 50 % de win rate tout en ayant une MAE globale légèrement supérieure à Storm.</p>
+<p>Il faut donc toujours lire ensemble :</p>
+<ol>
+<li>le win rate ;</li>
+<li>W / T / L ;</li>
+<li>le nombre de périodes ;</li>
+<li>la MAE ou la métrique globale ;</li>
+<li>la stabilité au fil du temps.</li>
+</ol>
+<hr>
+<h2 id="17-daily-weekly-et-monthly">17. Daily, Weekly et Monthly</h2>
+<h3 id="daily">Daily</h3>
+<p>Chaque journée locale est un match, avec 23, 24 ou 25 heures selon le calendrier. C'est la vue la plus opérationnelle et l'objectif principal actuel pour la MAE.</p>
+<h3 id="weekly">Weekly</h3>
+<p>Les heures d'une semaine locale, du lundi au dimanche, sont regroupées. La vue est plus stable mais moins sensible à une journée particulière.</p>
+<h3 id="monthly">Monthly</h3>
+<p>Les heures d'un mois civil sont regroupées. Cette vue convient au pilotage de long terme mais peut masquer des épisodes courts.</p>
+<p>Une même recette peut gagner 18 jours sur 30 et perdre le mois si ses 12 défaites sont beaucoup plus fortes. Les trois vues sont donc complémentaires.</p>
+<p>Les semaines ou mois situés au bord de l'historique peuvent être partiels. Le rapport expose le nombre d'heures et le statut afin d'éviter une fausse équivalence.</p>
+<hr>
+<h2 id="18-lire-le-rapport-html-consolide-interactif">18. Lire le rapport HTML consolidé interactif</h2>
+<p>Le rapport consolidé est autonome : les données et Plotly sont inclus dans le fichier. Il peut être ouvert dans Edge ou Chrome sans serveur et sans CDN.</p>
+<p>JavaScript doit être autorisé dans le navigateur. Le fichier est un <strong>snapshot</strong> : il ne s'actualise pas tout seul lorsque de nouveaux runs apparaissent ; il faut télécharger une nouvelle version depuis l'application.</p>
+<p>La comparaison multi-pays charge les dernières archives portant le statut <code>issued_live</code>. Elle refuse par défaut d'assembler des jours de livraison différents. L'autorisation multi-dates existe pour un diagnostic explicite, mais ne doit pas être utilisée pour présenter une comparaison homogène.</p>
+<h3 id="181-forecast-consolide">18.1 Forecast consolidé</h3>
+<p>L'utilisateur peut :</p>
+<ul>
+<li>choisir un ou plusieurs pays ;</li>
+<li>filtrer les dates ;</li>
+<li>afficher ou masquer P10–P90 ;</li>
+<li>normaliser les courbes depuis H00 pour comparer leurs formes ;</li>
+<li>survoler une heure pour lire la valeur exacte ;</li>
+<li>zoomer, déplacer le graphique et masquer une série via la légende ;</li>
+<li>exporter le graphe en PNG.</li>
+</ul>
+<p>Storm n'apparaît pas dans ce graphique de prédiction. Il reste confiné à la partie Statistics.</p>
+<h3 id="182-historique-et-erreurs">18.2 Historique et erreurs</h3>
+<p>Pour chaque pays disposant d'un historique, le rapport permet d'afficher :</p>
+<ul>
+<li>prix réalisé, notre P50 et Storm ;</li>
+<li>erreurs absolues de notre modèle et de Storm ;</li>
+<li>erreur moyenne selon l'heure ;</li>
+<li>plages récentes ou plage complète.</li>
+</ul>
+<h3 id="183-statistics-completes">18.3 Statistics complètes</h3>
+<p>Le rapport contient :</p>
+<ul>
+<li>les 7 métriques pour tous les pays ;</li>
+<li>les vues Daily, Weekly et Monthly ;</li>
+<li>une heatmap des win rates ;</li>
+<li>une courbe d'évolution par période ;</li>
+<li>un tableau exhaustif de 35 lignes pour cinq pays et sept métriques ;</li>
+<li>le détail W / T / L ;</li>
+<li>l'export CSV des Statistics.</li>
+</ul>
+<p>Pour ES, les valeurs de notre modèle restent visibles et le benchmark Storm est N/A.</p>
+<h3 id="184-audit-et-provenance">18.4 Audit et provenance</h3>
+<p>La section d'audit indique les archives sources, dates, identifiants et empreintes. Elle permet de vérifier que le rapport n'a pas assemblé des pays ou des jours incompatibles.</p>
+<hr>
+<h2 id="19-etat-de-performance-au-14-aout-2026">19. État de performance au 14 août 2026</h2>
+<p>Le tableau ci-dessous est un <strong>instantané des artefacts utilisés pour la livraison du 15 août 2026</strong>, pas une promesse de performance future. L'historique réunit le benchmark scellé et les archives réalisées admissibles. Les comparaisons portent sur les périodes communes à notre modèle et à la série Storm officielle ; les heures Storm absentes ne sont pas interpolées.</p>
+<table>
+<thead>
+<tr>
+<th>Pays</th>
+<th>Modèle évalué</th>
+<th style="text-align: right;">Win rate journalier MAE vs Storm</th>
+<th style="text-align: right;">W / T / L</th>
+<th style="text-align: right;">MAE modèle</th>
+<th style="text-align: right;">MAE Storm</th>
+<th>Lecture</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FR</td>
+<td>blend MKOnline</td>
+<td style="text-align: right;"><strong>54,62 %</strong></td>
+<td style="text-align: right;">201 / 0 / 167</td>
+<td style="text-align: right;">11,250</td>
+<td style="text-align: right;">11,653</td>
+<td>majorité de jours gagnés et MAE globale meilleure</td>
+</tr>
+<tr>
+<td>DE</td>
+<td>autonome corrigé</td>
+<td style="text-align: right;"><strong>54,08 %</strong></td>
+<td style="text-align: right;">199 / 0 / 169</td>
+<td style="text-align: right;">11,348</td>
+<td style="text-align: right;">11,147</td>
+<td>gagne plus souvent, mais perd plus fortement certains jours ; MAE globale moins bonne</td>
+</tr>
+<tr>
+<td>BE</td>
+<td>autonome corrigé</td>
+<td style="text-align: right;"><strong>40,49 %</strong></td>
+<td style="text-align: right;">149 / 0 / 219</td>
+<td style="text-align: right;">11,423</td>
+<td style="text-align: right;">10,357</td>
+<td>objectif &gt; 50 % non atteint ; priorité d'amélioration</td>
+</tr>
+<tr>
+<td>NL</td>
+<td>blend MKOnline promu</td>
+<td style="text-align: right;"><strong>52,73 %</strong></td>
+<td style="text-align: right;">193 / 0 / 173</td>
+<td style="text-align: right;">10,677¹</td>
+<td style="text-align: right;">10,621¹</td>
+<td>objectif de fréquence franchi ; Statistics encore partielles</td>
+</tr>
+<tr>
+<td>ES</td>
+<td>autonome corrigé</td>
+<td style="text-align: right;">N/A</td>
+<td style="text-align: right;">N/A</td>
+<td style="text-align: right;">9,762</td>
+<td style="text-align: right;">N/A</td>
+<td>aucune série Storm native officielle vérifiée ; aucun proxy n'est affiché</td>
+</tr>
+</tbody>
+</table>
+<p>¹ L'historique NL est actuellement marqué <code>partial_contiguous_prefix</code> : il s'arrête au 12 août 2026, car les archives des 13 et 14 août manquent dans ce nouveau périmètre blend. Il contient 8 784 heures et 366 périodes journalières comparables. FR, DE, BE et ES vont jusqu'au 14 août.</p>
+<blockquote>
+<p><strong>Conclusion métier</strong> — Dépasser 50 % de win rate ne suffit pas à lui seul. DE et NL illustrent pourquoi la fréquence des victoires doit être lue avec la MAE globale et l'ampleur des défaites.</p>
+</blockquote>
+<h3 id="win-rates-quotidiens-des-sept-metriques-sur-ce-snapshot">Win rates quotidiens des sept métriques sur ce snapshot</h3>
+<table>
+<thead>
+<tr>
+<th>Pays</th>
+<th style="text-align: right;">MAE</th>
+<th style="text-align: right;">RMSE</th>
+<th style="text-align: right;">MAPE</th>
+<th style="text-align: right;">Explained Variance</th>
+<th style="text-align: right;">R²</th>
+<th style="text-align: right;">Écart-type erreur</th>
+<th style="text-align: right;">Corrélation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FR</td>
+<td style="text-align: right;">54,62 %</td>
+<td style="text-align: right;">54,89 %</td>
+<td style="text-align: right;">48,64 %</td>
+<td style="text-align: right;">61,14 %</td>
+<td style="text-align: right;">54,89 %</td>
+<td style="text-align: right;">61,14 %</td>
+<td style="text-align: right;">65,22 %</td>
+</tr>
+<tr>
+<td>DE</td>
+<td style="text-align: right;">54,08 %</td>
+<td style="text-align: right;">52,45 %</td>
+<td style="text-align: right;">50,27 %</td>
+<td style="text-align: right;">50,27 %</td>
+<td style="text-align: right;">52,45 %</td>
+<td style="text-align: right;">50,27 %</td>
+<td style="text-align: right;">50,00 %</td>
+</tr>
+<tr>
+<td>BE</td>
+<td style="text-align: right;">40,49 %</td>
+<td style="text-align: right;">39,95 %</td>
+<td style="text-align: right;">37,50 %</td>
+<td style="text-align: right;">47,01 %</td>
+<td style="text-align: right;">39,95 %</td>
+<td style="text-align: right;">47,01 %</td>
+<td style="text-align: right;">49,46 %</td>
+</tr>
+<tr>
+<td>NL¹</td>
+<td style="text-align: right;">52,73 %</td>
+<td style="text-align: right;">50,00 %</td>
+<td style="text-align: right;">44,81 %</td>
+<td style="text-align: right;">54,64 %</td>
+<td style="text-align: right;">50,00 %</td>
+<td style="text-align: right;">54,64 %</td>
+<td style="text-align: right;">56,56 %</td>
+</tr>
+<tr>
+<td>ES</td>
+<td style="text-align: right;">N/A</td>
+<td style="text-align: right;">N/A</td>
+<td style="text-align: right;">N/A</td>
+<td style="text-align: right;">N/A</td>
+<td style="text-align: right;">N/A</td>
+<td style="text-align: right;">N/A</td>
+<td style="text-align: right;">N/A</td>
+</tr>
+</tbody>
+</table>
+<p>Ces pourcentages ne comportent pas d'intervalle de confiance dans le rapport courant. Un écart proche de 50 % doit donc être considéré comme fragile tant qu'il n'est pas confirmé sur davantage de prévisions réellement émises.</p>
+<p>Les chiffres du rapport interactif sélectionné restent la source opérationnelle : ils peuvent inclure des jours live ou des replays postérieurs au final scellé.</p>
+<hr>
+<h2 id="20-ameliorer-le-modele-ce-qui-est-en-production-et-ce-qui-reste-experimental">20. Améliorer le modèle : ce qui est en production et ce qui reste expérimental</h2>
+<h3 id="201-principe-de-promotion">20.1 Principe de promotion</h3>
+<p>Une source externe n'est pas retenue parce qu'elle paraît intuitivement intéressante. Elle doit prouver :</p>
+<ol>
+<li>une heure de disponibilité antérieure au cutoff ;</li>
+<li>un historique de versions ou des snapshots permettant un backtest honnête ;</li>
+<li>une couverture 23/24/25 heures sans remplissage inventé ;</li>
+<li>un gain sur B1 ;</li>
+<li>la confirmation indépendante sur B2 ;</li>
+<li>une amélioration robuste face à l'autonome et, lorsque disponible, face à Storm ;</li>
+<li>des droits d'utilisation compatibles avec la production.</li>
+</ol>
+<h3 id="202-sources-explorees-mais-non-promues">20.2 Sources explorées mais non promues</h3>
+<p>À la date de ce document :</p>
+<ul>
+<li>la météo Open-Meteo en previous-run D−2 n'a pas amélioré le gate FR ;</li>
+<li>les données Eco2Mix disponibles n'offrent pas encore un historique PIT suffisamment propre pour une promotion ;</li>
+<li>un prototype de vigilance Météo-France révision-aware existe, mais n'est pas intégré au modèle de production ;</li>
+<li>les expériences BE de correction non linéaire et de signaux cross-zone améliorent certaines références mais n'atteignent pas le critère robuste &gt; 50 % face à Storm ;</li>
+<li>les indisponibilités de centrales, alertes REMIT, données ENTSO-E et signaux de texte restent prometteurs mais exigent un historique versionné vérifiable.</li>
+</ul>
+<h3 id="203-images-et-texte">20.3 Images et texte</h3>
+<p>Le modèle de production n'analyse aujourd'hui ni images, ni PDF, ni articles.</p>
+<p>Pour la vigilance météo, le JSON structuré est préférable à une image ou à un PDF représentant la même information : il est horodaté, plus fiable et évite les erreurs d'OCR.</p>
+<p>Des images radar ou satellite ne seraient envisagées que si elles apportaient un signal supplémentaire démontré après les variables météo numériques. Les articles et annonces exigeraient une preuve de leur heure de première disponibilité, une déduplication et une validation multilingue.</p>
+<h3 id="204-priorites-actuelles">20.4 Priorités actuelles</h3>
+<ul>
+<li>consolider le gain FR et NL hors échantillon live ;</li>
+<li>réduire les grosses pertes DE lors des épisodes extrêmes ;</li>
+<li>améliorer en priorité BE, qui reste sous 50 % ;</li>
+<li>identifier une série Storm native officielle pour ES avant de prétendre mesurer son win rate ;</li>
+<li>conserver chaque nouvelle piste hors production jusqu'au passage complet des gates.</li>
+</ul>
+<hr>
+<h2 id="21-garde-fous-et-raisons-de-confiance">21. Garde-fous et raisons de confiance</h2>
+<p>Le système adopte une logique <strong>fail-closed</strong> : en cas d'ambiguïté, il refuse ou signale la partie concernée au lieu de fabriquer une valeur.</p>
+<h3 id="controles-principaux">Contrôles principaux</h3>
+<ul>
+<li>timeline UTC unique, triée et horaire ;</li>
+<li>journée locale exacte de 23, 24 ou 25 heures ;</li>
+<li>absence de valeur non finie ;</li>
+<li>P10 ≤ P50 ≤ P90 ;</li>
+<li>origine de forecast antérieure à la livraison ;</li>
+<li>snapshots et révisions antérieurs au cutoff ;</li>
+<li>identité stricte pays / cible / modèle / mode ;</li>
+<li>absence de Storm dans les entrées de prédiction ;</li>
+<li>schéma de 175 variables exact ;</li>
+<li>vérification des fichiers gelés et du code algorithmique par SHA-256 ;</li>
+<li>publication par staging puis renommage ;</li>
+<li>archives existantes non écrasées silencieusement ;</li>
+<li>benchmark manquant affiché N/A, jamais remplacé par un faux équivalent.</li>
+</ul>
+<h3 id="ce-que-ces-controles-ne-garantissent-pas">Ce que ces contrôles ne garantissent pas</h3>
+<p>Ils garantissent la cohérence, la causalité et la traçabilité de la chaîne. Ils ne garantissent pas :</p>
+<ul>
+<li>que le marché ne connaîtra jamais un événement inédit ;</li>
+<li>que P50 sera toujours proche du prix réel ;</li>
+<li>que le modèle battra Storm chaque jour ;</li>
+<li>que la licence commerciale d'une source externe est automatiquement acquise ;</li>
+<li>qu'une forte performance passée se répétera à l'identique.</li>
+</ul>
+<hr>
+<h2 id="22-bonnes-pratiques-de-lecture">22. Bonnes pratiques de lecture</h2>
+<ol>
+<li>Commencer par la <strong>courbe P50</strong> et la bande P10–P90.</li>
+<li>Repérer les heures de pointe, les rampes et les zones d'incertitude.</li>
+<li>Lire la <strong>MAE</strong>, puis le <strong>RMSE</strong> pour détecter les gros ratés.</li>
+<li>Vérifier le <strong>win rate MAE</strong>, W/T/L et le nombre de périodes.</li>
+<li>Examiner Daily, Weekly et Monthly.</li>
+<li>Vérifier le statut complet / partiel et la couverture.</li>
+<li>Utiliser MAPE, corrélation, R² et Explained Variance comme compléments, jamais isolément.</li>
+<li>Pour une décision à risque, considérer P10/P90 et les scénarios métier, pas seulement P50.</li>
+<li>Ne pas confondre backtest, replay PIT et forecast réellement émis.</li>
+<li>Consulter la provenance lorsqu'un résultat paraît surprenant.</li>
+</ol>
+<hr>
+<h2 id="23-depannage-courant">23. Dépannage courant</h2>
+<h3 id="lapplication-mentionne-le-proxy-1270019">L'application mentionne le proxy <code>127.0.0.1:9</code></h3>
+<p>Ce proxy correspond à un environnement réseau isolé et empêche l'accès à Saturn.</p>
+<ol>
+<li>fermer complètement les processus Streamlit / Python précédents ;</li>
+<li>quitter entièrement Codex si le terminal en dépend ;</li>
+<li>double-cliquer sur <code>launch_forecast_app.cmd</code> depuis l'Explorateur Windows ;</li>
+<li>si le message persiste, faire vérifier les variables Windows <code>HTTP_PROXY</code>, <code>HTTPS_PROXY</code> et <code>ALL_PROXY</code> par le support, sans supprimer un éventuel proxy d'entreprise légitime.</li>
+</ol>
+<h3 id="une-archive-est-indiquee-deja-publiee">Une archive est indiquée « déjà publiée »</h3>
+<p>C'est normal si le forecast du pays et du jour existe déjà avec des checksums valides. Le système l'ignore pour préserver son immutabilité.</p>
+<h3 id="statistics-est-partiel">Statistics est « partiel »</h3>
+<p>Un jour antérieur manque ou n'est pas complet. Le forecast courant peut rester valide. Le rapport s'arrête avant le premier trou et n'invente aucune performance.</p>
+<h3 id="storm-vaut-na-pour-es">Storm vaut N/A pour ES</h3>
+<p>C'est le comportement attendu tant qu'aucune série native officielle équivalente n'a été vérifiée.</p>
+<h3 id="une-journee-comporte-23-ou-25-lignes">Une journée comporte 23 ou 25 lignes</h3>
+<p>C'est normal lors du changement d'heure. Une journée artificiellement forcée à 24 heures serait au contraire suspecte.</p>
+<h3 id="le-rapport-consolide-semble-volumineux">Le rapport consolidé semble volumineux</h3>
+<p>Il embarque Plotly, l'historique et les données de cinq pays afin de fonctionner hors ligne. Sa taille est donc supérieure à celle d'une simple page web.</p>
+<hr>
+<h2 id="24-glossaire">24. Glossaire</h2>
+<table>
+<thead>
+<tr>
+<th>Terme</th>
+<th>Définition simple</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Actual / prix réalisé</strong></td>
+<td>prix de marché réellement observé après livraison</td>
+</tr>
+<tr>
+<td><strong>Backtest</strong></td>
+<td>simulation historique d'une prévision passée</td>
+</tr>
+<tr>
+<td><strong>Benchmark</strong></td>
+<td>modèle de référence utilisé pour comparer les performances</td>
+</tr>
+<tr>
+<td><strong>Biais</strong></td>
+<td>tendance à prévoir systématiquement trop haut ou trop bas</td>
+</tr>
+<tr>
+<td><strong>Charge résiduelle</strong></td>
+<td>demande restant à couvrir après prise en compte d'une partie des renouvelables</td>
+</tr>
+<tr>
+<td><strong>Checksum / SHA-256</strong></td>
+<td>empreinte numérique permettant de détecter une modification de fichier</td>
+</tr>
+<tr>
+<td><strong>Chronos-2</strong></td>
+<td>modèle de séries temporelles qui produit la première prévision probabiliste</td>
+</tr>
+<tr>
+<td><strong>Cutoff</strong></td>
+<td>dernière heure à laquelle une information est autorisée pour le forecast</td>
+</tr>
+<tr>
+<td><strong>Day-ahead</strong></td>
+<td>marché fixant aujourd'hui les prix horaires du lendemain</td>
+</tr>
+<tr>
+<td><strong>DST</strong></td>
+<td>changement d'heure donnant des journées de 23 ou 25 heures</td>
+</tr>
+<tr>
+<td><strong>Fail-closed</strong></td>
+<td>refuser une situation douteuse au lieu de deviner ou compléter silencieusement</td>
+</tr>
+<tr>
+<td><strong>Final scellé</strong></td>
+<td>période d'évaluation ouverte uniquement après gel de la recette</td>
+</tr>
+<tr>
+<td><strong>Forecast origin</strong></td>
+<td>instant officiel auquel la prévision est réputée produite</td>
+</tr>
+<tr>
+<td><strong>MKOnline</strong></td>
+<td>forecast externe utilisé dans le blend FR/NL après validation</td>
+</tr>
+<tr>
+<td><strong>OOF / out-of-fold</strong></td>
+<td>prévision historique produite sans utiliser son propre résultat</td>
+</tr>
+<tr>
+<td><strong>P10 / P50 / P90</strong></td>
+<td>quantiles bas, central et haut du forecast</td>
+</tr>
+<tr>
+<td><strong>PIT / point-in-time</strong></td>
+<td>sélection de la version réellement disponible à l'époque</td>
+</tr>
+<tr>
+<td><strong>Replay PIT</strong></td>
+<td>reconstruction causale a posteriori, clairement séparée d'un forecast réellement émis</td>
+</tr>
+<tr>
+<td><strong>Résidu</strong></td>
+<td>différence entre le prix réalisé et la prévision de base</td>
+</tr>
+<tr>
+<td><strong>Storm</strong></td>
+<td>forecast de référence utilisé seulement pour l'évaluation</td>
+</tr>
+<tr>
+<td><strong>Win rate</strong></td>
+<td>part des périodes comparables gagnées face à Storm</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="25-questions-frequentes">25. Questions fréquentes</h2>
+<h3 id="le-modele-sait-il-pourquoi-le-prix-monte">Le modèle « sait-il » pourquoi le prix monte ?</h3>
+<p>Il apprend des relations statistiques entre historique, calendrier, charge résiduelle et courbe Chronos-2. Il ne produit pas automatiquement une explication causale complète d'un événement de marché.</p>
+<h3 id="peut-on-lancer-tous-les-pays-dun-coup">Peut-on lancer tous les pays d'un coup ?</h3>
+<p>Oui. L'application les place dans une file et les traite l'un après l'autre.</p>
+<h3 id="pourquoi-ne-pas-donner-directement-storm-au-modele">Pourquoi ne pas donner directement Storm au modèle ?</h3>
+<p>Parce que Storm est le benchmark à battre. L'utiliser comme entrée brouillerait la comparaison et créerait une dépendance opérationnelle au concurrent.</p>
+<h3 id="pourquoi-garder-plusieurs-metriques">Pourquoi garder plusieurs métriques ?</h3>
+<p>Parce qu'un modèle peut être bon en moyenne mais mauvais sur les pointes, suivre la forme sans le niveau, ou gagner souvent tout en perdant très fortement certains jours.</p>
+<h3 id="plus-de-50-de-win-rate-signifie-t-il-que-notre-mae-globale-est-meilleure">Plus de 50 % de win rate signifie-t-il que notre MAE globale est meilleure ?</h3>
+<p>Non. Le win rate compte les périodes gagnées ; la MAE globale tient compte de l'ampleur de toutes les erreurs. Il faut lire les deux.</p>
+<h3 id="pourquoi-ne-pas-combler-une-heure-storm-manquante">Pourquoi ne pas combler une heure Storm manquante ?</h3>
+<p>Une interpolation fabriquerait une valeur de benchmark et pourrait changer artificiellement le gagnant. Le système préfère exclure la période incomplète et l'indiquer.</p>
+<h3 id="le-modele-se-reentraine-t-il-tous-les-jours">Le modèle se réentraîne-t-il tous les jours ?</h3>
+<p>Le correcteur opérationnel est refitté à partir de la recette, du code et de l'historique gelés. Les hyperparamètres, le schéma et les poids de blend ne sont pas retunés chaque matin.</p>
+<h3 id="lapplication-execute-t-elle-des-ordres">L'application exécute-t-elle des ordres ?</h3>
+<p>Non. Elle produit et évalue des forecasts. Toute décision ou action de marché reste sous contrôle humain et dans les processus autorisés.</p>
+<hr>
+<h2 id="26-references-internes-pour-audit">26. Références internes pour audit</h2>
+<p>Les contrats de production sont notamment définis dans :</p>
+<ul>
+<li><code>chronos2_hourly_live_zones.yaml</code> — registre des pays activés ;</li>
+<li><code>run_extended_residual_hourly.py</code> — recette autonome étendue ;</li>
+<li><code>chronos2_hourly/models/residual_corrector.py</code> — correcteur résiduel ;</li>
+<li><code>chronos2_hourly/models/blended_residual_corrector.py</code> — combinaison CatBoost / HGB ;</li>
+<li><code>mkonline_fr_blend_recipe_v1.json</code> — poids FR gelés ;</li>
+<li><code>mkonline_nl_blend_recipe_v1.json</code> — poids NL gelés ;</li>
+<li><code>chronos2_hourly/multizone_live.py</code> — moteur live générique ;</li>
+<li><code>chronos2_hourly/app_service.py</code> — lecture des archives et calcul des Statistics ;</li>
+<li><code>chronos2_hourly/consolidated_report.py</code> — rapport HTML interactif ;</li>
+<li><code>app_multizone.py</code> — interface utilisateur.</li>
+</ul>
+<p>Ces références sont destinées à l'audit. L'utilisateur quotidien n'a pas besoin de les modifier.</p>
+<hr>
+<h2 id="conclusion">Conclusion</h2>
+<p>Chronos-2 multi-pays est une chaîne complète, pas un unique algorithme :</p>
+<ul>
+<li>données causales gelées à 08:00 ;</li>
+<li>première prévision probabiliste Chronos-2 ;</li>
+<li>correction des erreurs récurrentes par deux modèles complémentaires ;</li>
+<li>second avis MKOnline uniquement en FR et NL ;</li>
+<li>contrôles stricts de timeline, de quantiles, de fraîcheur et d'identité ;</li>
+<li>archive immuable et traçable ;</li>
+<li>comparaison Storm séparée après gel ;</li>
+<li>lecture multi-métriques plutôt qu'un score isolé.</li>
+</ul>
+<p>Son objectif n'est pas de prétendre connaître le prix avec certitude. Il vise à fournir une prévision day-ahead reproductible, auditée et progressivement meilleure, tout en montrant honnêtement son incertitude, ses échecs et le périmètre exact de chaque comparaison.</p><p class="meta-note">Document généré à partir de <code>Guide_Chronos2_de_bout_en_bout.md</code>. Version 1.0 — 14 août 2026.</p></article>
+</div>
+<div class="actions" aria-label="Actions du document">
+  <button id="theme" type="button" title="Changer de thème">◐ Thème</button>
+  <button id="print" type="button" title="Imprimer ou enregistrer en PDF">Imprimer / PDF</button>
+  <button id="top" type="button" title="Retour en haut">↑ Haut</button>
+</div>
+<script>
+const root = document.documentElement;
+const saved = localStorage.getItem('chronos-guide-theme');
+if (saved === 'dark') root.dataset.theme = 'dark';
+document.getElementById('theme').addEventListener('click', () => {
+  root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
+  localStorage.setItem('chronos-guide-theme', root.dataset.theme);
+});
+document.getElementById('print').addEventListener('click', () => window.print());
+document.getElementById('top').addEventListener('click', () => window.scrollTo({top: 0, behavior: 'smooth'}));
+</script>
+</body>
+</html>
