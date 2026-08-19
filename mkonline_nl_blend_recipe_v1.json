@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "name": "mkonline_nl_primary_41554_l1_blend_v1",
+  "status": "frozen_before_final_opening",
+  "recipe_mode": "mkonline_blend",
+  "prediction_mode": "mkonline_blend",
+  "mkonline_enabled": true,
+  "zone": "NL",
+  "timezone": "Europe/Amsterdam",
+  "target": "day-ahead hourly electricity price in EUR/MWh",
+  "source_autonomous_run": "runs/chronos2_hourly_nl_residual_extended_v1",
+  "source_autonomous_model": "residual_corrected",
+  "source_autonomous_checksum_manifest_sha256": "516537bd87b1dd432aba983b763ea04881e570a1aaab8e0a671f378fdcd770e3",
+  "final_target_used_for_weight_or_hyperparameters": false,
+  "external_expert": {
+    "series": "41554_native",
+    "wrapper_series": "power.price.nl.euromwh.h.fcst.mkonline.ecop",
+    "provider": "MKONLINE",
+    "source": "WATTSIGHT",
+    "dependency_manifest": "mkonline_nl_primary_dependency_v1.json",
+    "dependency_manifest_sha256": "6c6fb39ab017d14268948d9e7b29bad5b93dfc92903ccd54347bb46743b682f6",
+    "forecast_cutoff": "civil D-1 08:00 Europe/Paris",
+    "interpolation_allowed": false,
+    "storm_used_as_feature": false,
+    "commercial_entitlement_status": "UNCONFIRMED: MKOnline/WattSight entitlement and replacement rights must be confirmed before production use."
+  },
+  "weights": {
+    "mkonline_primary": 0.4677256033079484,
+    "autonomous": 0.5322743966920516
+  },
+  "quantile_contract": {
+    "q50": "0.4677256033079484 * mkonline_primary + 0.5322743966920516 * autonomous_q50",
+    "q10_q90": "common shift of autonomous q10/q90 by blended_q50 - autonomous_q50"
+  },
+  "selection_protocol": {
+    "screen_script": "screen_mkonline_zone_crossfit.py",
+    "screen_script_sha256": "82bf1af82deb765a0ee3e29b3ba92dcf8e10dc0d4bb40e949f55125064d1416d",
+    "objective_revision": "The production objective was changed before B2 opening from a 0.75 EUR/MWh aggregate-gain screen to a country-level daily MAE win rate above 50% versus Storm; B2 remained the mandatory independent veto and Storm was never a prediction or weight input.",
+    "b1_gate_artifact": "runs/tmp/mkonline_nl_b1_gate_winrate_v2.json",
+    "b1_gate_artifact_sha256": "d489e6b4c9ab7cff5e499c2c3a959906e87c3c439f787472d4c7370be4dae621",
+    "b2_veto_artifact": "runs/tmp/mkonline_nl_b2_reconsidered.json",
+    "b2_veto_artifact_sha256": "6b5d9489c775c29c17eac00b60e685a26cb555af3e893b76415f549128ae0748",
+    "weight_fit": "exact constrained L1 optimum on five chronological expanding-window OOF folds over A",
+    "extended_days": 223,
+    "a_days": 245,
+    "b1_days": 60,
+    "b2_days": 60,
+    "b1": {
+      "autonomous_mae": 11.844672616419738,
+      "blend_mae": 11.666101388877086,
+      "gain": 0.1785712275426512,
+      "first_30_day_gain": 0.051615876958191365,
+      "last_30_day_gain": 0.30552657812711104,
+      "passes_revised_gate": true
+    },
+    "b2": {
+      "autonomous_mae": 10.938602516222074,
+      "blend_mae": 9.914484023479247,
+      "gain": 1.0241184927428275,
+      "first_30_day_gain": 0.9871210116090285,
+      "last_30_day_gain": 1.0611159738766265,
+      "passes": true
+    },
+    "final_loaded": false,
+    "final_period_loaded_during_selection": false,
+    "final_target_used_for_weight_or_hyperparameters": false
+  },
+  "sealed_final_protocol": {
+    "start_local_day": "2025-08-12",
+    "end_local_day": "2026-08-11",
+    "expected_local_days": 365,
+    "expected_physical_hours": 8760,
+    "expected_local_day_hour_histogram": {
+      "23": 1,
+      "24": 363,
+      "25": 1
+    },
+    "single_opening_after_runner_and_tests_are_ready": true,
+    "selection_used_final_targets": false
+  }
+}

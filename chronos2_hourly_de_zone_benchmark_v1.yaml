@@ -1,0 +1,29 @@
+zone_benchmark:
+  schema_version: 1
+  zone: DE
+  timezone: Europe/Berlin
+  registry: chronos2_hourly_live_zones.yaml
+  source_run: runs/chronos2_hourly_de_residual_extended_v1
+  recipe_manifest: chronos2_hourly_de_autonomous_recipe_v1.json
+  recipe_manifest_sha256: e4ccf23df791aebf4287f65a53c2aa7873af4e6234745de57757d4e1e7410dc3
+  final_start: 2025-08-12
+  final_end: 2026-08-11
+  live_day: 2026-08-12
+  storm_dashboard:
+    kind: native_exact_naive
+    series: power.price.de.euromwh.h.fcst.3mv.storm
+    primary_series: 41376_native
+    path: runs/materialized/de_storm_dashboard_native_20250812_20260811.parquet
+    sha256: 245b1d7b51365d52500ca5ef15d9781d0f9017b385ffd6ccdc8d721e4c426a0b
+    timestamp_column: timestamp
+    value_column: value
+  bootstrap_samples: 20000
+
+output:
+  directory: runs/chronos2_hourly_de_sealed_benchmark_v1
+
+report:
+  filename: chronos2_hourly_de_sealed_benchmark_v1.html
+  title: Chronos-2 horaire DE - benchmark autonome scelle
+  forecast_history_hours: 168
+  extreme_threshold: 150.0

@@ -8,6 +8,8 @@ venv/
 .cache/
 huggingface/
 models/
+!chronos2_hourly/models/
+!chronos2_hourly/models/*.py
 data/
 runs/
 *.parquet

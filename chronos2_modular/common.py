@@ -4,6 +4,7 @@ import logging
 import math
 import os
 import random
+import re
 import ssl
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
@@ -15,8 +16,23 @@ import torch
 import yaml
 
 LOGGER = logging.getLogger("chronos2_modular")
-SCRIPT_VERSION = "2.2.0-coverage-window-net-exports"
+SCRIPT_VERSION = "2.3.5-hourly-fixed-lag96"
 DEFAULT_QUANTILES = tuple(round(value / 10, 1) for value in range(1, 10))
+SUPPORTED_FUTURE_LAG_HOURS = (24, 48, 96, 168)
+SUPPORTED_FUTURE_LAG_STRATEGIES = frozenset(
+    f"lag{hours}" for hours in SUPPORTED_FUTURE_LAG_HOURS
+)
+KNOWN_FUTURE_COLUMN_PATTERN = re.compile(
+    r"^known_(.+)_("
+    + "|".join(
+        [
+            *(f"lag{hours}" for hours in SUPPORTED_FUTURE_LAG_HOURS),
+            "persistence",
+            "oracle",
+        ]
+    )
+    + r")$"
+)
 CALENDAR_COLUMNS = (
     "known_hour_sin",
     "known_hour_cos",
@@ -47,6 +63,13 @@ class SeriesSpec:
     include_base_context: bool = True
     known_future: bool = False
     future_strategies: tuple[str, ...] = field(default_factory=tuple)
+    # Appended to preserve the positional signature of legacy SeriesSpec
+    # callers while allowing an explicit contract for naive Saturn indices.
+    naive_timezone: str | None = None
+    # Opt-in repair for local-naive covariates whose second autumn DST fold
+    # was dropped by the source.  Keep this field last for positional
+    # compatibility with legacy SeriesSpec callers.
+    incomplete_dst_policy: str = "raise"
 
 
 @dataclass
@@ -121,6 +144,14 @@ def resolve_path(value: str | Path, base: Path) -> Path:
     return path.resolve()
 
 
+def parse_future_lag_hours(strategy: str) -> int | None:
+    """Return the validated physical-hour lag encoded by a strategy."""
+    normalized = str(strategy).strip().lower()
+    if normalized not in SUPPORTED_FUTURE_LAG_STRATEGIES:
+        return None
+    return int(normalized.removeprefix("lag"))
+
+
 def parse_series_spec(
     alias: str,
     raw: Mapping[str, Any],
@@ -141,7 +172,11 @@ def parse_series_spec(
     strategies_tuple = tuple(
         str(item).lower() for item in (strategies or [])
     )
-    allowed = {"lag24", "lag168", "persistence", "oracle"}
+    allowed = {
+        *SUPPORTED_FUTURE_LAG_STRATEGIES,
+        "persistence",
+        "oracle",
+    }
     unknown = sorted(set(strategies_tuple) - allowed)
     if unknown:
         raise ValueError(
@@ -154,6 +189,17 @@ def parse_series_spec(
             "future.known_future: true."
         )
 
+    incomplete_dst_policy = str(
+        raw.get("incomplete_dst_policy", "raise")
+    ).strip().lower()
+    allowed_dst_policies = {"raise", "duplicate"}
+    if incomplete_dst_policy not in allowed_dst_policies:
+        raise ValueError(
+            f"{alias}: incomplete_dst_policy inconnue "
+            f"'{incomplete_dst_policy}'. Valeurs autorisées : "
+            "raise, duplicate."
+        )
+
     return SeriesSpec(
         alias=alias,
         series=raw.get("series"),
@@ -163,6 +209,11 @@ def parse_series_spec(
         file=raw.get("file"),
         pit_file=raw.get("pit_file"),
         timestamp_col=raw.get("timestamp_col"),
+        naive_timezone=(
+            str(raw.get("naive_timezone")).strip()
+            if raw.get("naive_timezone") not in (None, "")
+            else None
+        ),
         value_col=raw.get("value_col"),
         availability_col=raw.get("availability_col"),
         revision_col=raw.get("revision_col"),
@@ -174,6 +225,7 @@ def parse_series_spec(
         ),
         known_future=known_future,
         future_strategies=strategies_tuple,
+        incomplete_dst_policy=incomplete_dst_policy,
     )
 
 
@@ -217,6 +269,12 @@ def build_zone_configs(
         target = parse_series_spec("target", target_raw, default_fill)
         if not target.series and not target.file:
             raise ValueError(f"{zone}: target exige series ou file.")
+        if target.incomplete_dst_policy != "raise":
+            raise ValueError(
+                f"{zone}/target: incomplete_dst_policy=duplicate est "
+                "interdit pour la cible. La timeline cible doit fournir "
+                "les deux folds DST physiques sans copie ni imputation."
+            )
 
         covariates: dict[str, SeriesSpec] = {}
 
@@ -236,6 +294,31 @@ def build_zone_configs(
                 enabled = False
 
             spec = SeriesSpec(**{**asdict(spec), "enabled": enabled})
+
+            unsafe_observed_lags = [
+                strategy
+                for strategy in spec.future_strategies
+                if (
+                    (lag_hours := parse_future_lag_hours(strategy))
+                    is not None
+                    and lag_hours < 48
+                )
+            ]
+            if (
+                enabled
+                and alias_lower == "fr_net_exports"
+                and spec.series
+                and spec.series.endswith(".obs")
+                and unsafe_observed_lags
+            ):
+                raise ValueError(
+                    "fr_net_exports: "
+                    f"{', '.join(unsafe_observed_lags)} d'une série "
+                    "observée est "
+                    "non causal au cutoff D-1. Utilisez une série "
+                    "scheduled/forecast PIT ou un lag >= 48 h avec "
+                    "include_base_context: false."
+                )
 
             if enabled:
                 covariates[alias_lower] = spec

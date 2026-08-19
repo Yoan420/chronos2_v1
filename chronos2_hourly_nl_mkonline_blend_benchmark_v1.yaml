@@ -1,0 +1,33 @@
+zone_benchmark:
+  schema_version: 1
+  zone: NL
+  timezone: Europe/Amsterdam
+  registry: chronos2_hourly_live_zones.yaml
+  source_run: runs/chronos2_hourly_nl_residual_extended_v1
+  recipe_manifest: mkonline_nl_blend_recipe_v1.json
+  recipe_manifest_sha256: de691832431b15acacc5336a6ae2587a677c899cc7c7e1ac87b81e986c4fc6f3
+  dependency_manifest: mkonline_nl_primary_dependency_v1.json
+  dependency_manifest_sha256: 6c6fb39ab017d14268948d9e7b29bad5b93dfc92903ccd54347bb46743b682f6
+  final_start: 2025-08-12
+  final_end: 2026-08-11
+  live_day: 2026-08-12
+  primary_final_file: runs/tmp/saturn_fr_price_nonstorm/mkonline_ecop_nl_primary_final.parquet
+  primary_live_file: runs/tmp/saturn_fr_price_nonstorm/mkonline_ecop_nl_primary_live_20260812.parquet
+  storm_dashboard:
+    kind: native_exact_naive
+    series: power.price.nl.euromwh.h.fcst.3mv.storm
+    primary_series: 41379_native
+    path: runs/materialized/nl_storm_dashboard_native_20250812_20260811.parquet
+    sha256: b5ee015466db95304f5c24b92aca196c04e196b52071b3c071273bec37b95474
+    timestamp_column: timestamp
+    value_column: value
+  bootstrap_samples: 20000
+
+output:
+  directory: runs/chronos2_hourly_nl_mkonline_blend_v1
+
+report:
+  filename: chronos2_hourly_nl_mkonline_blend_v1.html
+  title: Chronos-2 horaire NL - benchmark MKOnline scelle
+  forecast_history_hours: 168
+  extreme_threshold: 150.0

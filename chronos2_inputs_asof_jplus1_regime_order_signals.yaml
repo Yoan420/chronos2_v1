@@ -58,7 +58,7 @@ report:
   forecast_history_hours: 168
 
 market_regime:
-  enabled: false
+  enabled: true
   short_window_hours: 168
   long_window_hours: 720
   short_min_periods: 72

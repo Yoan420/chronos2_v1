@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "zone": "BE",
+  "timezone": "Europe/Brussels",
+  "wrapper_series": "power.price.be.euromwh.h.fcst.mkonline.ecop",
+  "wrapper_type": "formula",
+  "wrapper_formula": "(series \"41555_native\")",
+  "wrapper_formula_sha256": "7dea3ba2251d503434a7322d27e9a152dc6ba451432185332eb02e0c501ecd26",
+  "terminal_series": "41555_native",
+  "terminal_type": "primary",
+  "terminal_formula": null,
+  "terminal_metadata_sha256": "ccdebf45bd34f70185740a2d34791fe7956aefe7869b72092dbd93d6c85cf787",
+  "terminal_metadata": {
+    "mercure:label": "BE_EC00_OP_HOURLY_INSTANTPRICE_FORECAST",
+    "mercure:source": "WATTSIGHT",
+    "mercure:provider": "MKONLINE",
+    "mercure:country": "BELGIUM"
+  },
+  "storm_token_found": false,
+  "dependency_gate_passed": true,
+  "forecast_cutoff": "civil D-1 08:00 Europe/Paris",
+  "commercial_entitlement_status": "UNCONFIRMED: MKOnline/WattSight entitlement and replacement rights must be confirmed before production use."
+}

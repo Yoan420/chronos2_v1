@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import math
-import re
 import time
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
@@ -12,11 +11,13 @@ import pandas as pd
 from .common import (
     CALENDAR_COLUMNS,
     DEFAULT_QUANTILES,
+    KNOWN_FUTURE_COLUMN_PATTERN,
     LOGGER,
     ModelRuntime,
     ZoneData,
     configure_huggingface_ssl,
     deep_get,
+    parse_future_lag_hours,
     resolve_device,
 )
 from .data import calendar_frame
@@ -181,10 +182,7 @@ def future_proxy_frame(
     for column in data.known_future_columns:
         if column in CALENDAR_COLUMNS:
             continue
-        match = re.match(
-            r"^known_(.+)_(lag24|lag168|persistence|oracle)$",
-            column,
-        )
+        match = KNOWN_FUTURE_COLUMN_PATTERN.match(column)
         if not match:
             frame[column] = np.nan
             continue
@@ -193,13 +191,10 @@ def future_proxy_frame(
             frame[column] = np.nan
             continue
         series = data.covariates[alias]
-        if strategy == "lag24":
+        lag_hours = parse_future_lag_hours(strategy)
+        if lag_hours is not None:
             frame[column] = series.reindex(
-                future_index - pd.Timedelta(hours=24)
-            ).to_numpy()
-        elif strategy == "lag168":
-            frame[column] = series.reindex(
-                future_index - pd.Timedelta(hours=168)
+                future_index - pd.Timedelta(hours=lag_hours)
             ).to_numpy()
         elif strategy == "persistence":
             history = series.iloc[:origin_position].dropna()

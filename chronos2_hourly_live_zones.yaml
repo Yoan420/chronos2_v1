@@ -1,0 +1,220 @@
+schema_version: 1
+
+# A zone is executable only when both flags are true and every local artefact
+# passes chronos2_hourly.zone_live.audit_zone_live_bundle.  Empty series are
+# deliberate blockers, never invitations to reuse the French series.
+zones:
+  FR:
+    enabled: true
+    production_ready: true
+    training_candidate_ready: true
+    training_config: chronos2_hourly_fr_residual_v1.yaml
+    delivery_timezone: Europe/Paris
+    forecast_origin_timezone: Europe/Paris
+    forecast_origin_local_time: 08:00
+    bidding_zone: FR
+    runner: run_mkonline_live_hourly.py
+    live_config: chronos2_hourly_fr_mkonline_live_v1.yaml
+    target_series: power.price.da.fr.bzn.hourly.entsoe.utc.cdh.eurmwh
+    target_status: audited_dst_strict
+    price_unit: EUR/MWh
+    primary_series: 41551_native
+    primary_status: audited_primary
+    prediction_mode: mkonline_blend
+    mkonline_enabled: true
+    storm_series: power.price.fr.euromwh.h.fcst.3mv.storm
+    storm_status: audited_native_dashboard
+    storm_primary_series: 41377_native
+    storm_naive_timezone: Europe/Paris
+    storm_strict_08_series: power.price.fr.euromwh.h.fcst.3mv.storm.da.basecase
+    storm_pit_path: data/pit/vintages/fr_price_storm_da_fcst.parquet
+    required_covariates:
+      - fr_residual_load_fcst
+      - de_residual_load_fcst
+      - be_residual_load_fcst
+      - nl_residual_load_fcst
+      - es_residual_load_fcst
+
+  BE:
+    enabled: true
+    production_ready: true
+    training_candidate_ready: true
+    training_config: chronos2_hourly_be_residual_candidate_v1.yaml
+    delivery_timezone: Europe/Brussels
+    forecast_origin_timezone: Europe/Paris
+    forecast_origin_local_time: 08:00
+    bidding_zone: BE
+    runner: run_mkonline_live_model.py
+    live_config: chronos2_hourly_be_mkonline_live_v1.yaml
+    target_series: power.price.da.be.bzn.hourly.entsoe.utc.cdh.eurmwh
+    target_status: audited_dst_strict
+    price_unit: EUR/MWh
+    prediction_mode: autonomous_only
+    mkonline_enabled: false
+    primary_series: null
+    primary_status: not_used_autonomous_only
+    storm_series: power.price.be.euromwh.h.fcst.3mv.storm
+    storm_status: audited_native_dashboard
+    storm_primary_series: 41378_native
+    storm_naive_timezone: Europe/Brussels
+    storm_strict_08_series: power.price.be.euromwh.h.fcst.3mv.storm.da.basecase
+    storm_pit_path: null
+    required_covariates:
+      - fr_residual_load_fcst
+      - de_residual_load_fcst
+      - be_residual_load_fcst
+      - nl_residual_load_fcst
+      - es_residual_load_fcst
+    blockers: []
+
+  DE:
+    enabled: true
+    production_ready: true
+    training_candidate_ready: true
+    training_config: chronos2_hourly_de_residual_candidate_v1.yaml
+    delivery_timezone: Europe/Berlin
+    forecast_origin_timezone: Europe/Paris
+    forecast_origin_local_time: 08:00
+    bidding_zone: DE_LU
+    runner: run_mkonline_live_model.py
+    live_config: chronos2_hourly_de_mkonline_live_v1.yaml
+    target_series: power.price.da.de_lu.bzn.hourly.entsoe.utc.cdh.eurmwh
+    target_status: audited_dst_strict
+    price_unit: EUR/MWh
+    prediction_mode: autonomous_only
+    mkonline_enabled: false
+    primary_series: null
+    primary_status: not_used_autonomous_only
+    storm_series: power.price.de.euromwh.h.fcst.3mv.storm
+    storm_status: audited_native_dashboard
+    storm_primary_series: 41376_native
+    storm_naive_timezone: Europe/Berlin
+    storm_strict_08_series: power.price.de.euromwh.h.fcst.3mv.storm.da.basecase
+    storm_pit_path: null
+    required_covariates:
+      - fr_residual_load_fcst
+      - de_residual_load_fcst
+      - be_residual_load_fcst
+      - nl_residual_load_fcst
+      - es_residual_load_fcst
+    blockers: []
+
+  ES:
+    enabled: true
+    production_ready: true
+    training_candidate_ready: true
+    training_config: chronos2_hourly_es_residual_candidate_v1.yaml
+    delivery_timezone: Europe/Madrid
+    forecast_origin_timezone: Europe/Paris
+    forecast_origin_local_time: 08:00
+    bidding_zone: ES
+    runner: run_mkonline_live_model.py
+    live_config: chronos2_hourly_es_mkonline_live_v1.yaml
+    target_series: power.price.da.es.bzn.hourly.entsoe.utc.cdh.eurmwh
+    target_status: audited_dst_strict
+    price_unit: EUR/MWh
+    prediction_mode: autonomous_only
+    mkonline_enabled: false
+    primary_series: null
+    primary_status: not_used_autonomous_only
+    storm_series: null
+    storm_status: native_dashboard_unavailable
+    storm_primary_series: null
+    storm_naive_timezone: null
+    storm_strict_08_series: power.price.es.euromwh.h.fcst.3mv.storm.da.basecase
+    storm_pit_path: null
+    required_covariates:
+      - fr_residual_load_fcst
+      - de_residual_load_fcst
+      - be_residual_load_fcst
+      - nl_residual_load_fcst
+      - es_residual_load_fcst
+    blockers: []
+
+  NL:
+    enabled: true
+    production_ready: true
+    training_candidate_ready: true
+    training_config: chronos2_hourly_nl_residual_candidate_v1.yaml
+    delivery_timezone: Europe/Amsterdam
+    forecast_origin_timezone: Europe/Paris
+    forecast_origin_local_time: 08:00
+    bidding_zone: NL
+    runner: run_mkonline_live_model.py
+    live_config: chronos2_hourly_nl_mkonline_live_v1.yaml
+    target_series: power.price.da.nl.bzn.hourly.entsoe.utc.cdh.eurmwh
+    target_status: audited_dst_strict
+    price_unit: EUR/MWh
+    prediction_mode: mkonline_blend
+    mkonline_enabled: true
+    primary_series: 41554_native
+    primary_status: audited_primary
+    storm_series: power.price.nl.euromwh.h.fcst.3mv.storm
+    storm_status: audited_native_dashboard
+    storm_primary_series: 41379_native
+    storm_naive_timezone: Europe/Amsterdam
+    storm_strict_08_series: power.price.nl.euromwh.h.fcst.3mv.storm.da.basecase
+    storm_pit_path: null
+    required_covariates:
+      - fr_residual_load_fcst
+      - de_residual_load_fcst
+      - be_residual_load_fcst
+      - nl_residual_load_fcst
+      - es_residual_load_fcst
+    covariates:
+      nl_residual_load_fcst:
+        naive_timezone: UTC
+    blockers: []
+
+  GB:
+    enabled: false
+    production_ready: false
+    training_candidate_ready: false
+    training_config: null
+    delivery_timezone: Europe/London
+    forecast_origin_timezone: Europe/Paris
+    forecast_origin_local_time: 08:00
+    bidding_zone: GB
+    runner: null
+    live_config: null
+    target_series: null
+    target_status: absent
+    price_unit: null
+    primary_series: null
+    primary_status: absent
+    storm_series: power.price.uk.euromwh.h.fcst.3mv.storm.da.basecase
+    storm_status: audited_snapshots_pending_materialization
+    storm_pit_path: null
+    required_covariates: []
+    blockers:
+      - snapshots Storm UK valides 23/24/25h mais historique PIT complet non materialise
+      - aucune cible horaire, serie MKOnline ou charge residuelle GB sure
+      - devise/unite de prix et conversion EUR a definir
+
+  IT:
+    enabled: false
+    production_ready: false
+    training_candidate_ready: false
+    training_config: null
+    delivery_timezone: Europe/Rome
+    forecast_origin_timezone: Europe/Paris
+    forecast_origin_local_time: 08:00
+    # Italy is multi-zone.  Choose and audit IT_NORD/IT_CNOR/... first.
+    bidding_zone: null
+    runner: null
+    live_config: null
+    target_series: null
+    candidate_target_series: power.price.da.it_nord_fr.bzn.hourly.entsoe.utc.cdh.eurmwh
+    target_status: rejected_24_nan_and_one_day_lag
+    price_unit: EUR/MWh
+    primary_series: null
+    primary_status: absent
+    storm_series: power.price.it_north.euromwh.h.fcst.3mv.storm.da.basecase
+    storm_status: audited_snapshots_pending_materialization
+    storm_pit_path: null
+    required_covariates: []
+    blockers:
+      - zone de prix a choisir explicitement, IT_NORD et PUN ne sont pas interchangeables
+      - candidat IT_NORD contient 24 NaN et accuse un jour de retard
+      - snapshots Storm IT_NORTH valides 23/24/25h mais historique PIT complet non materialise
+      - aucune serie MKOnline ou charge residuelle IT confirmee

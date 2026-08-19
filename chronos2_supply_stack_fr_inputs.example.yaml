@@ -1,0 +1,133 @@
+# Fragment à fusionner dans chronos2_hourly_fr.yaml.
+# Chaque fichier doit contenir : delivery_utc, availability_utc, revision_utc,
+# value. availability_utc ET revision_utc doivent être <= cutoff D-1.
+
+zones:
+  FR:
+    covariates:
+      load_forecast:
+        enabled: true
+        source: pit_parquet
+        pit_file: fr_load_forecast.parquet
+        fill_method: none
+        minimum_coverage: 0.98
+        future: {known_future: true, strategies: [oracle]}
+
+      wind_forecast:
+        enabled: true
+        source: pit_parquet
+        pit_file: fr_wind_forecast.parquet
+        fill_method: none
+        minimum_coverage: 0.98
+        future: {known_future: true, strategies: [oracle]}
+
+      solar_forecast:
+        enabled: true
+        source: pit_parquet
+        pit_file: fr_solar_forecast.parquet
+        fill_method: none
+        minimum_coverage: 0.98
+        future: {known_future: true, strategies: [oracle]}
+
+      nuclear_available:
+        enabled: true
+        source: pit_parquet
+        pit_file: fr_nuclear_available.parquet
+        fill_method: none
+        minimum_coverage: 0.98
+        future: {known_future: true, strategies: [oracle]}
+
+      thermal_available:
+        enabled: true
+        source: pit_parquet
+        pit_file: fr_thermal_available.parquet
+        fill_method: none
+        minimum_coverage: 0.98
+        future: {known_future: true, strategies: [oracle]}
+
+      hydro_firm:
+        enabled: true
+        source: pit_parquet
+        pit_file: fr_hydro_firm.parquet
+        fill_method: none
+        minimum_coverage: 0.98
+        future: {known_future: true, strategies: [oracle]}
+
+      # Headroom issu du domaine flow-based final connu avant le cutoff.
+      import_headroom:
+        enabled: true
+        source: pit_parquet
+        pit_file: fr_import_headroom.parquet
+        fill_method: none
+        minimum_coverage: 0.98
+        future: {known_future: true, strategies: [oracle]}
+
+      export_headroom:
+        enabled: true
+        source: pit_parquet
+        pit_file: fr_export_headroom.parquet
+        fill_method: none
+        minimum_coverage: 0.98
+        future: {known_future: true, strategies: [oracle]}
+
+      pumping_capacity:
+        enabled: true
+        source: pit_parquet
+        pit_file: fr_pumping_capacity.parquet
+        fill_method: none
+        minimum_coverage: 0.98
+        future: {known_future: true, strategies: [oracle]}
+
+      nuclear_minimum:
+        enabled: true
+        source: pit_parquet
+        pit_file: fr_nuclear_minimum.parquet
+        fill_method: none
+        minimum_coverage: 0.98
+        future: {known_future: true, strategies: [oracle]}
+
+      run_of_river:
+        enabled: true
+        source: pit_parquet
+        pit_file: fr_run_of_river.parquet
+        fill_method: none
+        minimum_coverage: 0.98
+        future: {known_future: true, strategies: [oracle]}
+
+      # Courbes/settlements disponibles à l'origine, matérialisés PIT sur D.
+      ttf_eur_mwh_th:
+        enabled: true
+        source: pit_parquet
+        pit_file: ttf_eur_mwh_th.parquet
+        fill_method: none
+        minimum_coverage: 0.98
+        future: {known_future: true, strategies: [oracle]}
+
+      eua_eur_tco2:
+        enabled: true
+        source: pit_parquet
+        pit_file: eua_eur_tco2.parquet
+        fill_method: none
+        minimum_coverage: 0.98
+        future: {known_future: true, strategies: [oracle]}
+
+      api2_usd_tonne:
+        enabled: true
+        source: pit_parquet
+        pit_file: api2_usd_tonne.parquet
+        fill_method: none
+        minimum_coverage: 0.98
+        future: {known_future: true, strategies: [oracle]}
+
+      eurusd_usd_per_eur:
+        enabled: true
+        source: pit_parquet
+        pit_file: eurusd_usd_per_eur.parquet
+        fill_method: none
+        minimum_coverage: 0.98
+        future: {known_future: true, strategies: [oracle]}
+
+hourly:
+  supply_stack:
+    enabled: true
+    nan_policy: raise

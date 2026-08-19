@@ -4,16 +4,19 @@ from collections.abc import Callable, Mapping, Sequence
 from fnmatch import fnmatchcase
 from pathlib import Path
 from typing import Any
-import re
 
 import pandas as pd
 
-from .common import LOGGER, ZoneConfig, ZoneData, deep_get
-
-
-_FUTURE_PATTERN = re.compile(
-    r"^known_(.+)_(lag24|lag168|persistence|oracle)$"
+from .common import (
+    KNOWN_FUTURE_COLUMN_PATTERN,
+    LOGGER,
+    ZoneConfig,
+    ZoneData,
+    deep_get,
 )
+
+
+_FUTURE_PATTERN = KNOWN_FUTURE_COLUMN_PATTERN
 
 
 def _as_patterns(

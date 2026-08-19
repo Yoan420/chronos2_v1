@@ -22,7 +22,9 @@ data:
   historical_years: 4
   frequency: h
 
-  target_interpolation_limit: 3
+  # Une heure de prix absente bloque le run : la cible et la MAE ne sont
+  # jamais interpolées à partir d'heures voisines.
+  target_interpolation_limit: 0
   default_fill_limit: 0
   require_all_covariates: true
 
@@ -66,8 +68,10 @@ zones:
     include_calendar: true
 
     target:
-      series: power.price.everyday.fr.hourly.eurmwh
-      description: Prix Day-Ahead France
+      # Série canonique UTC, complète sur les journées DST 23/25 heures.
+      series: power.price.da.fr.bzn.hourly.entsoe.utc.cdh.eurmwh
+      naive_timezone: UTC
+      description: Prix Day-Ahead France ENTSO-E (timeline UTC)
 
     covariates:
       fr_residual_load_fcst:
@@ -83,7 +87,9 @@ zones:
             - oracle
 
       fr_nuclear_generation_fcst:
-        enabled: true
+        # Désactivé : l'historique PIT disponible ne couvre pas encore la
+        # fenêtre complète du backtest.
+        enabled: false
         source: pit_parquet
         series: power.fr.generation.nuclear.remit.mw.fcst
         description: Forecast REMIT de génération nucléaire France
@@ -93,6 +99,26 @@ zones:
           known_future: true
           strategies:
             - oracle
+
+      fr_nuclear_generation_obs:
+        enabled: true
+        source: auto
+        series: power.fr.generation.nuclear.entsoe.hourly.gw.obs
+        description: Production nucléaire France observée, proxy causal 96 h
+        naive_timezone: Europe/Paris
+        # Duplique uniquement le 02:00 manquant au passage à l'heure d'hiver.
+        # Cette réparation est réservée aux covariables, jamais à la cible.
+        incomplete_dst_policy: duplicate
+        include_base_context: false
+        fill_method: ffill
+        fill_limit: 2
+        minimum_coverage: 0.90
+        future:
+          known_future: false
+          strategies:
+            # Décalage fixe de 96 heures physiques. lag72 ne couvre pas les
+            # 24 produits avec le retard de publication Saturn constaté.
+            - lag96
 
       de_residual_load_fcst:
         enabled: true
@@ -143,23 +169,31 @@ zones:
             - oracle
 
       fr_net_exports:
+        # Proxy à 96 heures physiques disponible au cutoff. La série
+        # observée n'entre jamais brute dans le contexte et aucun
+        # lag24/lag48/lag72 n'est construit.
         enabled: true
 
         # Série observée chargée depuis Saturn/cache standard,
         # et non depuis les vintages point-in-time.
-        source: saturn
+        source: auto
         series: power.net.fr.exports.core.entsoe.hourly.gw.obs
+        # Répare seulement un 02:00 local singleton ; une vraie paire DST ou
+        # une timeline UTC complète est conservée telle quelle.
+        incomplete_dst_policy: duplicate
 
         # La série est en GW, conformément au nom Saturn.
         description: Exportations nettes de la France (GW)
 
-        fill_method: none
-        minimum_coverage: 0.95
+        fill_method: ffill
+        fill_limit: 2
+        minimum_coverage: 0.90
+        include_base_context: false
 
         # Les exports du jour à prévoir ne sont pas connus à 08:00.
-        # Chronos teste donc des approximations disponibles à l'origine.
+        # Le proxy lag96 est explicite : aucun fallback silencieux vers un lag
+        # plus court n'est autorisé si les observations récentes manquent.
         future:
           known_future: false
           strategies:
-            - lag24
-            - lag168
+            - lag96

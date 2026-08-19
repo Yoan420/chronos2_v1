@@ -1,0 +1,26 @@
+extended_residual:
+  zone: BE
+  timezone: Europe/Brussels
+  source_run: runs/chronos2_hourly_be_residual_v1
+  extended_oof_file: runs/chronos_oof_extended/be/chronos_oof_native_20240102_20240811.csv.gz
+  chronos_oof_file: runs/chronos2_hourly_be_residual_v1/chronos_oof_hourly.csv.gz
+  chronos_live_file: runs/chronos2_hourly_be_residual_v1/chronos_live_hourly.csv
+  schema: chronos_only
+  recipe: blend_cat_hgb_w0.50
+  threads: -1
+
+zones:
+  BE:
+    enabled: true
+    timezone: Europe/Brussels
+    target:
+      series: power.price.da.be.bzn.hourly.entsoe.utc.cdh.eurmwh
+
+output:
+  directory: runs/chronos2_hourly_be_residual_extended_v1
+
+report:
+  filename: chronos2_hourly_be_residual_extended_v1.html
+  title: Chronos-2 horaire BE - correcteur residuel EXT223 CatBoost/HistGBR
+  forecast_history_hours: 168
+  extreme_threshold: 150.0

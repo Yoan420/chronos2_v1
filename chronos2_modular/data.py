@@ -14,6 +14,7 @@ from .common import (
     ZoneConfig,
     ZoneData,
     deep_get,
+    parse_future_lag_hours,
     resolve_path,
 )
 from .saturn import (
@@ -26,6 +27,7 @@ from .saturn import (
 
 PIT_DELIVERY_ALIASES = (
     "value_time_utc",
+    "delivery_utc",
     "delivery_timestamp",
     "delivery_time",
     "delivery_datetime",
@@ -41,6 +43,7 @@ PIT_DELIVERY_ALIASES = (
 
 PIT_AVAILABILITY_ALIASES = (
     "snapshot_time_utc",
+    "availability_utc",
     "as_of",
     "asof",
     "snapshot_as_of",
@@ -55,6 +58,7 @@ PIT_AVAILABILITY_ALIASES = (
 
 PIT_REVISION_ALIASES = (
     "revision_time_utc",
+    "revision_utc",
     "revision",
     "revision_date",
     "revision_time",
@@ -348,18 +352,38 @@ def _clip_target_to_operational_cutoff(
     if cutoff is None:
         return series
 
-    clipped = series.loc[series.index <= cutoff]
+    resolution = str(
+        deep_get(config, "data.target_input_resolution", "hourly")
+    ).strip().lower()
+    if resolution not in {"hourly", "quarter_hour", "auto"}:
+        raise ValueError(
+            "data.target_input_resolution doit être hourly, quarter_hour "
+            "ou auto."
+        )
+    is_quarter_hour = resolution == "quarter_hour" or (
+        resolution == "auto"
+        and isinstance(series.index, pd.DatetimeIndex)
+        and bool((series.index.minute != 0).any())
+    )
+    source_cutoff = (
+        cutoff + pd.Timedelta(minutes=45)
+        if is_quarter_hour
+        else cutoff
+    )
+
+    clipped = series.loc[series.index <= source_cutoff]
 
     if clipped.empty:
         raise ValueError(
-            f"{zone.zone}: aucune valeur cible avant le cutoff {cutoff}."
+            f"{zone.zone}: aucune valeur cible avant le cutoff {source_cutoff}."
         )
 
     last_timestamp = clipped.index.max()
-    if require_complete and last_timestamp < cutoff:
+    if require_complete and last_timestamp < source_cutoff:
         raise ValueError(
             f"{zone.zone}: la cible s'arrête à {last_timestamp}, "
-            f"mais le forecast J+1 exige les prix connus jusqu'à {cutoff}. "
+            f"mais le forecast J+1 exige les prix connus jusqu'à "
+            f"{source_cutoff}. "
             "Relance avec --refresh-data et vérifie que la série Day-Ahead "
             "contient bien toutes les heures de J."
         )
@@ -517,10 +541,33 @@ def read_pit_vintage_series(
     normalized["cutoff_utc"] = cutoff_local.dt.tz_convert(
         "UTC"
     )
+    runtime_raw = deep_get(config, "data.runtime_as_of")
+    runtime_as_of_utc = (
+        pd.Timestamp.now(tz="UTC")
+        if runtime_raw in (None, "")
+        else pd.Timestamp(runtime_raw)
+    )
+    if runtime_as_of_utc.tzinfo is None:
+        runtime_as_of_utc = runtime_as_of_utc.tz_localize("UTC")
+    else:
+        runtime_as_of_utc = runtime_as_of_utc.tz_convert("UTC")
+    # A live run before its nominal auction-origin clock must not see a
+    # snapshot that will only be published later that same morning.  For old
+    # backtest rows the delivery-specific D-1 cutoff remains the tighter one.
+    normalized["cutoff_utc"] = normalized["cutoff_utc"].where(
+        normalized["cutoff_utc"] <= runtime_as_of_utc,
+        runtime_as_of_utc,
+    )
 
     eligible = normalized.loc[
-        normalized["snapshot_time_utc"]
-        <= normalized["cutoff_utc"]
+        (
+            normalized["snapshot_time_utc"]
+            <= normalized["cutoff_utc"]
+        )
+        & (
+            normalized["revision_time_utc"]
+            <= normalized["cutoff_utc"]
+        )
     ].copy()
 
     selected = (
@@ -537,11 +584,21 @@ def read_pit_vintage_series(
         )
     )
 
-    cutoff_violations = int(
+    snapshot_cutoff_violations = int(
         (
             selected["snapshot_time_utc"]
             > selected["cutoff_utc"]
         ).sum()
+    )
+    revision_cutoff_violations = int(
+        (
+            selected["revision_time_utc"]
+            > selected["cutoff_utc"]
+        ).sum()
+    )
+    cutoff_violations = (
+        snapshot_cutoff_violations
+        + revision_cutoff_violations
     )
     if cutoff_violations:
         raise AssertionError(
@@ -572,11 +629,14 @@ def read_pit_vintage_series(
         "forecast_origin_local_time": (
             f"{hour:02d}:{minute:02d}"
         ),
+        "runtime_as_of_utc": str(runtime_as_of_utc),
         "raw_rows": int(len(frame)),
         "eligible_rows": int(len(eligible)),
         "selected_rows": int(len(selected)),
         "selected_null_values": int(selected["value"].isna().sum()),
         "cutoff_violations": cutoff_violations,
+        "snapshot_cutoff_violations": snapshot_cutoff_violations,
+        "revision_cutoff_violations": revision_cutoff_violations,
         "first_selected_revision": (
             str(selected["revision_time_utc"].min())
             if not selected.empty
@@ -615,6 +675,15 @@ def load_input_series(
     config_dir: Path,
     refresh: bool,
 ) -> tuple[pd.Series, dict[str, Any]]:
+    if (
+        spec.alias == "target"
+        and spec.incomplete_dst_policy != "raise"
+    ):
+        raise ValueError(
+            f"{zone.zone}/target: incomplete_dst_policy=duplicate est "
+            "interdit pour la cible."
+        )
+
     project_root = resolve_path(
         deep_get(
             config,
@@ -724,11 +793,27 @@ def load_input_series(
                 config,
                 require_complete=False,
             )
+            input_resolution = str(
+                deep_get(
+                    config,
+                    "data.target_input_resolution",
+                    "hourly",
+                )
+            ).strip().lower()
+            cached_is_qh = input_resolution == "quarter_hour" or (
+                input_resolution == "auto"
+                and bool((cached_series.index.minute != 0).any())
+            )
+            expected_cache_end = (
+                cutoff + pd.Timedelta(minutes=45)
+                if cutoff is not None and cached_is_qh
+                else cutoff
+            )
             cache_is_usable = bool(
-                cutoff is None
+                expected_cache_end is None
                 or (
                     not cached_series.empty
-                    and cached_series.index.max() >= cutoff
+                    and cached_series.index.max() >= expected_cache_end
                 )
             )
 
@@ -794,7 +879,18 @@ def load_input_series(
     if spec.alias == "target" and target_cutoff is not None:
         # On demande explicitement tous les prix déjà connus de J,
         # même s'ils sont postérieurs à l'heure d'exécution.
-        end = target_cutoff
+        input_resolution = str(
+            deep_get(
+                config,
+                "data.target_input_resolution",
+                "hourly",
+            )
+        ).strip().lower()
+        end = (
+            target_cutoff + pd.Timedelta(minutes=45)
+            if input_resolution in {"quarter_hour", "auto"}
+            else target_cutoff
+        )
     else:
         end = (
             pd.Timestamp(end_raw)
@@ -841,6 +937,8 @@ def load_input_series(
             if deep_get(config, "data.runtime_as_of")
             else None
         ),
+        naive_timezone=spec.naive_timezone,
+        incomplete_dst_policy=spec.incomplete_dst_policy,
     ).rename(spec.alias)
 
     series = _clip_target_to_operational_cutoff(
@@ -955,11 +1053,11 @@ def regularize_target(
     )
 
     full_index = pd.date_range(
-        series.index.min(),
-        series.index.max(),
+        series.index.min().tz_convert("UTC"),
+        series.index.max().tz_convert("UTC"),
         freq=freq,
-        tz=timezone,
-    )
+        tz="UTC",
+    ).tz_convert(timezone)
     series = series.reindex(full_index)
 
     missing_before = int(
@@ -1106,6 +1204,27 @@ def prepare_zone_data(
         refresh,
     )
 
+    from chronos2_hourly.hourly_contract import coerce_hourly_target
+
+    target_raw = coerce_hourly_target(
+        target_raw,
+        input_resolution=str(
+            deep_get(
+                config,
+                "data.target_input_resolution",
+                "hourly",
+            )
+        ).strip().lower(),
+        incomplete=str(
+            deep_get(
+                config,
+                "data.quarter_hour_incomplete",
+                "raise",
+            )
+        ).strip().lower(),
+        name="target",
+    ).tz_convert(zone.timezone)
+
     target, frequency, cleaning = regularize_target(
         target_raw,
         zone.timezone,
@@ -1133,30 +1252,56 @@ def prepare_zone_data(
                 "J+1 00:00–23:00 sans les prix de J jusqu'à 23:00."
             )
 
-        LOGGER.info(
-            "[%s] Contexte live fixé à %s ; forecast attendu du %s au %s.",
-            zone.zone,
-            target_cutoff,
-            target_cutoff + pd.tseries.frequencies.to_offset(frequency),
-            target_cutoff + 24 * pd.tseries.frequencies.to_offset(frequency),
-        )
-
-    horizon = int(
-        deep_get(
-            config,
-            "model.horizon",
-            24,
-        )
-    )
     offset = pd.tseries.frequencies.to_offset(
         frequency
     )
-    live_future_index = pd.date_range(
-        start=target.index[-1] + offset,
-        periods=horizon,
-        freq=frequency,
-        tz=zone.timezone,
-    )
+    if bool(
+        deep_get(
+            config,
+            "data.dynamic_delivery_day_horizon",
+            False,
+        )
+    ):
+        if offset != pd.tseries.frequencies.to_offset("h"):
+            raise ValueError(
+                "data.dynamic_delivery_day_horizon exige une cible "
+                "strictement horaire."
+            )
+        from chronos2_hourly.hourly_contract import (
+            local_delivery_day_index,
+        )
+
+        next_delivery_date = (
+            target.index[-1] + offset
+        ).tz_convert(zone.timezone).date()
+        live_future_index = local_delivery_day_index(
+            next_delivery_date,
+            timezone=zone.timezone,
+        ).tz_convert(zone.timezone)
+    else:
+        horizon = int(
+            deep_get(
+                config,
+                "model.horizon",
+                24,
+            )
+        )
+        live_future_index = pd.date_range(
+            start=target.index[-1] + offset,
+            periods=horizon,
+            freq=frequency,
+            tz=zone.timezone,
+        )
+    if target_cutoff is not None:
+        LOGGER.info(
+            "[%s] Contexte live fixé à %s ; forecast attendu du %s au %s "
+            "(%d heures).",
+            zone.zone,
+            target_cutoff,
+            live_future_index[0],
+            live_future_index[-1],
+            len(live_future_index),
+        )
     model_index = target.index.union(
         live_future_index
     ).sort_values()
@@ -1213,17 +1358,24 @@ def prepare_zone_data(
                 stats["coverage_after_fill"]
                 < spec.minimum_coverage
             ):
-                LOGGER.warning(
-                    "[%s] %s ignorée : couverture "
-                    "%.1f%% < %.1f%%.",
-                    zone.zone,
-                    alias,
-                    100
-                    * stats[
-                        "coverage_after_fill"
-                    ],
-                    100 * spec.minimum_coverage,
+                message = (
+                    f"[{zone.zone}] {alias}: couverture "
+                    f"{100 * stats['coverage_after_fill']:.1f}% < "
+                    f"{100 * spec.minimum_coverage:.1f}%."
                 )
+                if bool(
+                    deep_get(
+                        config,
+                        "data.fail_below_minimum_coverage",
+                        deep_get(
+                            config,
+                            "data.require_all_covariates",
+                            False,
+                        ),
+                    )
+                ):
+                    raise ValueError(message)
+                LOGGER.warning("%s Covariable ignorée.", message)
                 continue
 
             aligned_model, model_stats = align_covariate(
@@ -1302,9 +1454,14 @@ def prepare_zone_data(
             ):
                 raise
 
-    model_covariates = (
-        model_base_covariates.copy()
-    )
+    base_context_columns = [
+        alias
+        for alias, spec in usable_specs.items()
+        if spec.include_base_context
+    ]
+    model_covariates = model_base_covariates[
+        base_context_columns
+    ].copy()
     known_future_columns: list[str] = []
 
     if zone.include_calendar:
@@ -1323,16 +1480,11 @@ def prepare_zone_data(
         base = model_base_covariates[alias]
 
         for strategy in spec.future_strategies:
-            if strategy == "lag24":
-                name = f"known_{alias}_lag24"
+            lag_hours = parse_future_lag_hours(strategy)
+            if lag_hours is not None:
+                name = f"known_{alias}_lag{lag_hours}"
                 model_covariates[name] = base.shift(
-                    24
-                )
-
-            elif strategy == "lag168":
-                name = f"known_{alias}_lag168"
-                model_covariates[name] = base.shift(
-                    168
+                    lag_hours
                 )
 
             elif strategy == "persistence":
@@ -1388,6 +1540,42 @@ def prepare_zone_data(
     future_coverage = pd.DataFrame(
         future_coverage_rows
     )
+
+    if (
+        not future_coverage.empty
+        and bool(
+            deep_get(
+                config,
+                "data.require_complete_future_covariates",
+                deep_get(
+                    config,
+                    "data.require_all_covariates",
+                    False,
+                ),
+            )
+        )
+    ):
+        minimum_future_coverage = float(
+            deep_get(
+                config,
+                "data.minimum_future_coverage",
+                1.0,
+            )
+        )
+        incomplete = future_coverage.loc[
+            future_coverage["future_coverage"]
+            < minimum_future_coverage
+        ]
+        if not incomplete.empty:
+            details = ", ".join(
+                f"{row.column}={100 * row.future_coverage:.1f}%"
+                for row in incomplete.itertuples()
+            )
+            raise ValueError(
+                "Couverture future insuffisante pour le forecast live "
+                f"(minimum={100 * minimum_future_coverage:.1f}%): "
+                f"{details}."
+            )
 
     coverage = pd.DataFrame(
         coverage_rows

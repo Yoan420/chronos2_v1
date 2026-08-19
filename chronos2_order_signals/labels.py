@@ -69,7 +69,6 @@ def _complete_local_days(target: pd.Series) -> dict[pd.Timestamp, pd.Series]:
 def _segment_scores(
     prices: np.ndarray,
     previous_price: float,
-    next_price: float,
     settings: LabelSettings,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     n = len(prices)
@@ -109,7 +108,10 @@ def _segment_scores(
             ramp_score = direction_consistency * ramp_magnitude
 
             left_reference = prices[start - 1] if start > 0 else previous_price
-            right_reference = prices[stop] if stop < n else next_price
+            # La frontière droite du dernier segment doit rester strictement
+            # intra-journalière. Utiliser le premier prix du jour suivant
+            # contaminerait le label D-1 avec la cible D.
+            right_reference = prices[stop] if stop < n else prices[-1]
             left_jump = abs(float(segment[0] - left_reference))
             right_jump = abs(float(right_reference - segment[-1]))
             strongest_boundary = max(left_jump, right_jump)
@@ -182,15 +184,10 @@ def build_ex_post_labels(
     for day, day_series in complete_days.items():
         prices = day_series.to_numpy(dtype=np.float64)
         first_timestamp = day_series.index[0]
-        last_timestamp = day_series.index[-1]
 
         before = target.loc[target.index < first_timestamp].dropna()
-        after = target.loc[target.index > last_timestamp].dropna()
         previous_price = (
             float(before.iloc[-1]) if not before.empty else float(prices[0])
-        )
-        next_price = (
-            float(after.iloc[0]) if not after.empty else float(prices[-1])
         )
 
         previous_augmented = np.concatenate([[previous_price], prices])
@@ -203,7 +200,6 @@ def build_ex_post_labels(
         ramp, plateau, block, gradient = _segment_scores(
             prices,
             previous_price,
-            next_price,
             settings,
         )
 

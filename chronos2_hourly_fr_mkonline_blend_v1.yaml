@@ -1,0 +1,14 @@
+mkonline_blend:
+  source_run: runs/chronos2_hourly_fr_residual_extended_v1
+  recipe_manifest: mkonline_fr_blend_recipe_v1.json
+  dependency_manifest: mkonline_fr_primary_dependency_v1.json
+  workers: 8
+
+output:
+  directory: runs/chronos2_hourly_fr_mkonline_blend_v1
+
+report:
+  filename: chronos2_hourly_fr_mkonline_blend_v1.html
+  title: Chronos-2 horaire FR - blend fige avec MKOnline primaire
+  forecast_history_hours: 168
+  extreme_threshold: 150.0

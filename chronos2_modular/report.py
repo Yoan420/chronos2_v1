@@ -676,10 +676,12 @@ def _sample_metrics(frame: pd.DataFrame) -> dict[str, float | None]:
         return {
             "mae": None,
             "rmse": None,
+            "mape": None,
             "explained_variance": None,
             "r2": None,
             "std_error": None,
             "correlation": None,
+            "bias": None,
             "n": 0,
         }
 
@@ -689,6 +691,12 @@ def _sample_metrics(frame: pd.DataFrame) -> dict[str, float | None]:
 
     mae = np.mean(np.abs(error))
     rmse = np.sqrt(np.mean(np.square(error)))
+    nonzero = np.abs(actual) > 1e-9
+    mape = (
+        100.0 * np.mean(np.abs(error[nonzero]) / np.abs(actual[nonzero]))
+        if bool(nonzero.any())
+        else math.nan
+    )
     std_error = np.std(error, ddof=0)
 
     actual_variance = np.var(actual, ddof=0)
@@ -723,24 +731,138 @@ def _sample_metrics(frame: pd.DataFrame) -> dict[str, float | None]:
     return {
         "mae": _finite_or_none(mae),
         "rmse": _finite_or_none(rmse),
+        "mape": _finite_or_none(mape),
         "explained_variance": _finite_or_none(
             explained_variance
         ),
         "r2": _finite_or_none(r2),
         "std_error": _finite_or_none(std_error),
         "correlation": _finite_or_none(correlation),
+        "bias": _finite_or_none(np.mean(error)),
         "n": int(len(valid)),
+    }
+
+
+STATISTICS_METRICS: tuple[dict[str, Any], ...] = (
+    {
+        "key": "mae",
+        "label": "Mean Absolute Error",
+        "higher_is_better": False,
+        "decimals": 2,
+    },
+    {
+        "key": "rmse",
+        "label": "Root Mean Squared Error",
+        "higher_is_better": False,
+        "decimals": 2,
+    },
+    {
+        "key": "mape",
+        "label": "MAPE (%)",
+        "higher_is_better": False,
+        "decimals": 2,
+    },
+    {
+        "key": "explained_variance",
+        "label": "Explained Variance",
+        "higher_is_better": True,
+        "decimals": 3,
+    },
+    {
+        "key": "r2",
+        "label": "R²",
+        "higher_is_better": True,
+        "decimals": 3,
+    },
+    {
+        "key": "std_error",
+        "label": "Standard Deviation",
+        "higher_is_better": False,
+        "decimals": 2,
+    },
+    {
+        "key": "correlation",
+        "label": "Correlation",
+        "higher_is_better": True,
+        "decimals": 3,
+    },
+)
+
+
+def _comparison_outcome(
+    candidate: Any,
+    benchmark: Any,
+    *,
+    higher_is_better: bool,
+) -> str | None:
+    """Classify one comparable period, keeping numerical ties separate."""
+
+    candidate_value = _finite_or_none(candidate)
+    benchmark_value = _finite_or_none(benchmark)
+    if candidate_value is None or benchmark_value is None:
+        return None
+    if math.isclose(
+        candidate_value,
+        benchmark_value,
+        rel_tol=1e-9,
+        abs_tol=1e-12,
+    ):
+        return "tie"
+    candidate_wins = (
+        candidate_value > benchmark_value
+        if higher_is_better
+        else candidate_value < benchmark_value
+    )
+    return "win" if candidate_wins else "loss"
+
+
+def _win_rate_summary(
+    records: Sequence[Mapping[str, Any]],
+    *,
+    metric_key: str,
+    higher_is_better: bool,
+) -> dict[str, Any]:
+    """Aggregate period wins using all comparable periods as denominator."""
+
+    counts = {"win": 0, "tie": 0, "loss": 0}
+    benchmark_key = f"benchmark_{metric_key}"
+    for record in records:
+        outcome = _comparison_outcome(
+            record.get(metric_key),
+            record.get(benchmark_key),
+            higher_is_better=higher_is_better,
+        )
+        if outcome is not None:
+            counts[outcome] += 1
+    comparable = sum(counts.values())
+    return {
+        "wins": counts["win"],
+        "ties": counts["tie"],
+        "losses": counts["loss"],
+        "comparable_periods": comparable,
+        # Ties remain in the denominator and are also reported separately.
+        "win_rate": counts["win"] / comparable if comparable else None,
+        "tie_rate": counts["tie"] / comparable if comparable else None,
+        "loss_rate": counts["loss"] / comparable if comparable else None,
     }
 
 
 def _prepare_statistics_frame(
     result: ZoneRunResult,
+    prediction_frame: pd.DataFrame | None = None,
 ) -> pd.DataFrame:
     frame = (
-        result.backtest_native.copy()
-        .sort_values(["timestamp", "origin_timestamp"])
-        .drop_duplicates("timestamp", keep="last")
-    )
+        prediction_frame if prediction_frame is not None else result.backtest_native
+    ).copy()
+    if "timestamp" not in frame:
+        raise ValueError("La source Statistics ne contient pas timestamp.")
+    parsed_timestamp = pd.to_datetime(frame["timestamp"], errors="raise", utc=True)
+    if bool(parsed_timestamp.duplicated().any()):
+        raise ValueError("La source Statistics contient des timestamps dupliques.")
+    sort_columns = [
+        column for column in ("timestamp", "origin_timestamp") if column in frame
+    ]
+    frame = frame.sort_values(sort_columns, kind="stable")
 
     frame["actual"] = pd.to_numeric(
         frame["actual"],
@@ -750,11 +872,12 @@ def _prepare_statistics_frame(
         frame["q50"],
         errors="coerce",
     )
-    frame["_timestamp_local"] = pd.to_datetime(
+    frame["_timestamp_utc"] = pd.to_datetime(
         frame["timestamp"],
         errors="coerce",
         utc=True,
     )
+    frame["_timestamp_local"] = frame["_timestamp_utc"]
 
     target_timezone = getattr(
         result.zone_data.target.index,
@@ -777,13 +900,243 @@ def _prepare_statistics_frame(
     return frame
 
 
+def _statistics_source(result: ZoneRunResult) -> pd.DataFrame:
+    """Align the candidate and an optional evaluation-only benchmark."""
+
+    candidate_frame = getattr(result, "statistics_candidate", None)
+    source = _prepare_statistics_frame(result, candidate_frame)
+    benchmark_frame = getattr(result, "statistics_benchmark", None)
+    if benchmark_frame is None:
+        source["_benchmark_q50"] = np.nan
+        return source
+
+    benchmark = _prepare_statistics_frame(result, benchmark_frame)
+    benchmark = benchmark.loc[
+        :, ["_timestamp_utc", "actual", "q50"]
+    ].rename(
+        columns={
+            "actual": "_benchmark_actual",
+            "q50": "_benchmark_q50",
+        }
+    )
+    source = source.merge(
+        benchmark,
+        on="_timestamp_utc",
+        how="left",
+        validate="one_to_one",
+    )
+    comparable_actual = source[
+        ["actual", "_benchmark_actual"]
+    ].dropna()
+    if not comparable_actual.empty and not np.allclose(
+        comparable_actual["actual"].to_numpy(dtype=float),
+        comparable_actual["_benchmark_actual"].to_numpy(dtype=float),
+        rtol=0.0,
+        atol=1e-9,
+    ):
+        raise ValueError(
+            "Les observations du candidat et du benchmark diffèrent."
+        )
+    candidate_finite = np.isfinite(
+        pd.to_numeric(source["q50"], errors="coerce").to_numpy(dtype=float)
+    )
+    benchmark_finite = np.isfinite(
+        pd.to_numeric(
+            source["_benchmark_q50"], errors="coerce"
+        ).to_numpy(dtype=float)
+    )
+    if not np.array_equal(candidate_finite, benchmark_finite):
+        raise ValueError(
+            "La couverture du candidat et du benchmark diffère dans "
+            "la fenêtre Statistics."
+        )
+    return source
+
+
+def _statistics_benchmark_contract(
+    result: ZoneRunResult,
+) -> dict[str, Any]:
+    """Return explicit reporting metadata for the active benchmark.
+
+    Older or generic callers may attach a benchmark without a contract.  That
+    remains supported, but the report then says that the contract is
+    unspecified instead of silently attributing dashboard semantics to it.
+    """
+
+    benchmark_label = str(
+        getattr(result, "statistics_benchmark_label", "Benchmark")
+    )
+    raw = getattr(result, "statistics_benchmark_contract", None)
+    if isinstance(raw, Mapping):
+        contract = dict(raw)
+    else:
+        contract = {}
+    contract.setdefault("id", "unspecified")
+    contract.setdefault("label", benchmark_label)
+    contract.setdefault("report_label", benchmark_label)
+    contract.setdefault("official_dashboard_metric", None)
+    contract.setdefault(
+        "report_note",
+        "contrat non déclaré par l’artefact source.",
+    )
+    return contract
+
+
+def figure_storm_comparison(result: ZoneRunResult) -> go.Figure:
+    """Compare the frozen candidate with its declared evaluation benchmark.
+
+    The figure deliberately consumes the same paired source as ``Statistics``.
+    It never reads ``forecast_native`` and therefore cannot expose Storm to the
+    operational forecast path.
+    """
+
+    if getattr(result, "statistics_benchmark", None) is None:
+        raise ValueError(
+            "Le graphique Storm exige un benchmark d'évaluation apparié."
+        )
+
+    source = _statistics_source(result).dropna(
+        subset=["_timestamp_local", "actual", "q50", "_benchmark_q50"]
+    )
+    if source.empty:
+        raise ValueError(
+            "Aucune observation appariée pour le graphique candidat vs "
+            "benchmark."
+        )
+
+    candidate_label = str(
+        getattr(result, "statistics_candidate_label", "Candidat")
+    )
+    benchmark_contract = _statistics_benchmark_contract(result)
+    benchmark_label = str(benchmark_contract["report_label"])
+    timestamps = source["_timestamp_local"]
+    actual = source["actual"].to_numpy(dtype=float)
+    candidate = source["q50"].to_numpy(dtype=float)
+    benchmark = source["_benchmark_q50"].to_numpy(dtype=float)
+    candidate_error = candidate - actual
+    benchmark_error = benchmark - actual
+
+    figure = make_subplots(
+        rows=2,
+        cols=1,
+        shared_xaxes=True,
+        vertical_spacing=0.10,
+        row_heights=[0.62, 0.38],
+        subplot_titles=(
+            "Prix observé et forecasts P50",
+            "Erreur absolue par forecast",
+        ),
+    )
+    figure.add_trace(
+        go.Scattergl(
+            x=timestamps,
+            y=actual,
+            name="Observé",
+            mode="lines",
+            line={"color": "#263238", "width": 1.6},
+            hovertemplate=(
+                "<b>%{x}</b><br>Observé : %{y:.2f} EUR/MWh"
+                "<extra></extra>"
+            ),
+        ),
+        row=1,
+        col=1,
+    )
+    figure.add_trace(
+        go.Scattergl(
+            x=timestamps,
+            y=candidate,
+            name=f"{candidate_label} P50",
+            mode="lines",
+            line={"color": "#1565c0", "width": 1.5},
+            customdata=candidate_error,
+            hovertemplate=(
+                "<b>%{x}</b><br>Forecast : %{y:.2f} EUR/MWh<br>"
+                "Erreur signée : %{customdata:.2f} EUR/MWh"
+                "<extra></extra>"
+            ),
+        ),
+        row=1,
+        col=1,
+    )
+    figure.add_trace(
+        go.Scattergl(
+            x=timestamps,
+            y=benchmark,
+            name=f"{benchmark_label} P50",
+            mode="lines",
+            line={"color": "#ef6c00", "width": 1.5, "dash": "dash"},
+            customdata=benchmark_error,
+            hovertemplate=(
+                "<b>%{x}</b><br>Forecast : %{y:.2f} EUR/MWh<br>"
+                "Erreur signée : %{customdata:.2f} EUR/MWh"
+                "<extra></extra>"
+            ),
+        ),
+        row=1,
+        col=1,
+    )
+    figure.add_trace(
+        go.Scattergl(
+            x=timestamps,
+            y=np.abs(candidate_error),
+            name=f"Erreur absolue {candidate_label}",
+            mode="lines",
+            line={"color": "#1565c0", "width": 1.3},
+            hovertemplate=(
+                "<b>%{x}</b><br>Erreur absolue : %{y:.2f} EUR/MWh"
+                "<extra></extra>"
+            ),
+        ),
+        row=2,
+        col=1,
+    )
+    figure.add_trace(
+        go.Scattergl(
+            x=timestamps,
+            y=np.abs(benchmark_error),
+            name=f"Erreur absolue {benchmark_label}",
+            mode="lines",
+            line={"color": "#ef6c00", "width": 1.3, "dash": "dash"},
+            hovertemplate=(
+                "<b>%{x}</b><br>Erreur absolue : %{y:.2f} EUR/MWh"
+                "<extra></extra>"
+            ),
+        ),
+        row=2,
+        col=1,
+    )
+    figure.update_yaxes(title_text="EUR/MWh", row=1, col=1)
+    figure.update_yaxes(title_text="Erreur absolue (EUR/MWh)", row=2, col=1)
+    figure.update_xaxes(
+        title_text="Date de livraison",
+        rangeslider={"visible": True},
+        row=2,
+        col=1,
+    )
+    figure.update_layout(
+        title=(
+            f"{result.zone} — comparaison historique candidat vs "
+            f"{benchmark_label} "
+            "(évaluation uniquement)"
+        ),
+        height=760,
+        hovermode="x unified",
+        meta={
+            "evaluation_only": True,
+            "source": "statistics_history_or_sealed_backtest",
+        },
+    )
+    return figure
+
+
 def build_statistics_records(
     results: Sequence[ZoneRunResult],
 ) -> list[dict[str, Any]]:
     records: list[dict[str, Any]] = []
 
     for result in results:
-        source = _prepare_statistics_frame(result)
+        source = _statistics_source(result)
 
         for sample in ("daily", "weekly", "monthly"):
             frame = source.copy()
@@ -833,7 +1186,27 @@ def build_statistics_records(
                 sample_number = int(
                     block["_sample_number"].iloc[0]
                 )
-                metrics = _sample_metrics(block)
+                has_benchmark = bool(
+                    block["_benchmark_q50"].notna().any()
+                )
+                paired = (
+                    block.dropna(
+                        subset=["actual", "q50", "_benchmark_q50"]
+                    )
+                    if has_benchmark
+                    else block
+                )
+                metrics = _sample_metrics(paired)
+                if has_benchmark:
+                    benchmark_block = paired.loc[
+                        :, ["actual", "_benchmark_q50"]
+                    ].rename(columns={"_benchmark_q50": "q50"})
+                    benchmark_metrics = _sample_metrics(benchmark_block)
+                else:
+                    benchmark_metrics = {
+                        key: (0 if key == "n" else None)
+                        for key in metrics
+                    }
 
                 timestamp_label = (
                     period_start.strftime("%Y-%m-%d")
@@ -864,59 +1237,200 @@ def build_statistics_records(
                         "sample_number": sample_number,
                         "timestamp": timestamp_label,
                         **metrics,
+                        **{
+                            f"benchmark_{key}": value
+                            for key, value in benchmark_metrics.items()
+                        },
                     }
                 )
 
     return records
 
 
+def _statistics_comparison_payload(
+    results: Sequence[ZoneRunResult],
+    records: Sequence[Mapping[str, Any]],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    zones: list[dict[str, Any]] = []
+    summaries: list[dict[str, Any]] = []
+    for result in results:
+        benchmark = getattr(result, "statistics_benchmark", None)
+        candidate_label = str(
+            getattr(result, "statistics_candidate_label", "Candidat")
+        )
+        benchmark_contract = _statistics_benchmark_contract(result)
+        benchmark_label = str(benchmark_contract["report_label"])
+        has_benchmark = benchmark is not None
+        zones.append(
+            {
+                "key": result.zone,
+                "candidate_label": candidate_label,
+                "benchmark_label": benchmark_label,
+                "benchmark_contract_id": benchmark_contract["id"],
+                "benchmark_is_official_dashboard": benchmark_contract[
+                    "official_dashboard_metric"
+                ],
+                "has_benchmark": has_benchmark,
+            }
+        )
+        if not has_benchmark:
+            continue
+        for sample in ("daily", "weekly", "monthly"):
+            selected = [
+                record
+                for record in records
+                if record.get("zone") == result.zone
+                and record.get("sample") == sample
+            ]
+            for metric in STATISTICS_METRICS:
+                summary = _win_rate_summary(
+                    selected,
+                    metric_key=str(metric["key"]),
+                    higher_is_better=bool(
+                        metric["higher_is_better"]
+                    ),
+                )
+                summaries.append(
+                    {
+                        "zone": result.zone,
+                        "sample": sample,
+                        "metric": metric["key"],
+                        **summary,
+                    }
+                )
+    return zones, summaries
+
+
+def _overall_benchmark_summary_html(
+    results: Sequence[ZoneRunResult],
+) -> str:
+    rows: list[dict[str, Any]] = []
+    notes: list[str] = []
+    contract_notes: list[str] = []
+    active_labels: list[str] = []
+    for result in results:
+        if getattr(result, "statistics_benchmark", None) is None:
+            continue
+        source = _statistics_source(result).dropna(
+            subset=["actual", "q50", "_benchmark_q50"]
+        )
+        candidate = _sample_metrics(source)
+        benchmark = _sample_metrics(
+            source.loc[:, ["actual", "_benchmark_q50"]].rename(
+                columns={"_benchmark_q50": "q50"}
+            )
+        )
+        candidate_label = str(
+            getattr(result, "statistics_candidate_label", "Candidat")
+        )
+        benchmark_contract = _statistics_benchmark_contract(result)
+        benchmark_label = str(benchmark_contract["report_label"])
+        active_labels.append(benchmark_label)
+        for label, metrics in (
+            (candidate_label, candidate),
+            (benchmark_label, benchmark),
+        ):
+            rows.append(
+                {
+                    "Zone": result.zone,
+                    "Forecast": label,
+                    "MAE": metrics["mae"],
+                    "RMSE": metrics["rmse"],
+                    "MAPE (%)": metrics["mape"],
+                    "Biais signé": metrics["bias"],
+                    "Corrélation": metrics["correlation"],
+                    "Heures": metrics["n"],
+                }
+            )
+
+        hourly_records = [
+            {
+                "absolute_error": abs(candidate_value - actual_value),
+                "benchmark_absolute_error": abs(
+                    benchmark_value - actual_value
+                ),
+            }
+            for candidate_value, benchmark_value, actual_value in zip(
+                source["q50"].to_numpy(dtype=float),
+                source["_benchmark_q50"].to_numpy(dtype=float),
+                source["actual"].to_numpy(dtype=float),
+            )
+        ]
+        hourly = _win_rate_summary(
+            hourly_records,
+            metric_key="absolute_error",
+            higher_is_better=False,
+        )
+        notes.append(
+            "<strong>"
+            + html.escape(result.zone)
+            + " — win rate horaire sur l’erreur absolue :</strong> "
+            + f"{100.0 * float(hourly['win_rate']):.2f} % "
+            + f"({hourly['wins']} victoires, {hourly['ties']} égalités, "
+            + f"{hourly['losses']} défaites; n={hourly['comparable_periods']})."
+        )
+        contract_notes.append(
+            "<strong>"
+            + html.escape(result.zone)
+            + " — contrat actif : </strong>"
+            + html.escape(str(benchmark_contract["report_label"]))
+            + " — "
+            + html.escape(str(benchmark_contract["report_note"]))
+        )
+    if not rows:
+        return ""
+    unique_labels = list(dict.fromkeys(active_labels))
+    comparison_label = (
+        unique_labels[0]
+        if len(unique_labels) == 1
+        else "benchmarks déclarés"
+    )
+    return f'''
+    <div class="statistics-overall-summary">
+        <h3>Résumé candidat vs {html.escape(comparison_label)} — fenêtre complète</h3>
+        {html_table(pd.DataFrame(rows))}
+        <p class="statistics-definition">{'<br>'.join(notes)}</p>
+        <p class="statistics-definition"><strong>Contrat du benchmark :</strong><br>
+        {'<br>'.join(contract_notes)}<br>Le benchmark n’est utilisé ni comme
+        variable, ni comme expert, ni pour le forecast live.</p>
+        <p class="statistics-definition"><strong>Définition :</strong>
+        une heure est gagnée lorsque l’erreur absolue du candidat est
+        strictement inférieure à celle du benchmark actif. Les égalités sont
+        conservées séparément et restent dans le dénominateur. La MAPE utilise
+        la valeur absolue du prix réalisé au dénominateur et exclut uniquement
+        les observations dont |prix réalisé| ≤ 1e-9 EUR/MWh.</p>
+    </div>
+    '''
+
+
 def build_statistics_table_html(
     results: Sequence[ZoneRunResult],
 ) -> str:
-    zones = [result.zone for result in results]
     records = build_statistics_records(results)
+    zones, comparison_summaries = _statistics_comparison_payload(
+        results, records
+    )
+    overall_summary = _overall_benchmark_summary_html(results)
+    scope_notes = [
+        str(getattr(result, "statistics_scope_note", "")).strip()
+        for result in results
+        if str(getattr(result, "statistics_scope_note", "")).strip()
+    ]
+    scope_note_html = ""
+    if scope_notes:
+        scope_note_html = (
+            '<p class="statistics-definition"><strong>Perimetre Statistics :</strong> '
+            + "<br>".join(
+                html.escape(note) for note in dict.fromkeys(scope_notes)
+            )
+            + "</p>"
+        )
 
     payload = {
         "zones": zones,
         "records": records,
-        "metrics": [
-            {
-                "key": "mae",
-                "label": "Mean Absolute Error",
-                "higher_is_better": False,
-                "decimals": 2,
-            },
-            {
-                "key": "rmse",
-                "label": "Root Mean Squared Error",
-                "higher_is_better": False,
-                "decimals": 2,
-            },
-            {
-                "key": "explained_variance",
-                "label": "Explained Variance",
-                "higher_is_better": True,
-                "decimals": 3,
-            },
-            {
-                "key": "r2",
-                "label": "R²",
-                "higher_is_better": True,
-                "decimals": 3,
-            },
-            {
-                "key": "std_error",
-                "label": "Standard Deviation",
-                "higher_is_better": False,
-                "decimals": 2,
-            },
-            {
-                "key": "correlation",
-                "label": "Correlation",
-                "higher_is_better": True,
-                "decimals": 3,
-            },
-        ],
+        "metrics": list(STATISTICS_METRICS),
+        "comparison_summaries": comparison_summaries,
         "samples": [
             {"key": "weekly", "label": "Weekly"},
             {"key": "monthly", "label": "Monthly"},
@@ -931,8 +1445,11 @@ def build_statistics_table_html(
     ).replace("</", "<\\/")
 
     return f'''
-    <section id="statistics" class="statistics-section">
+    <section id="statistics" class="statistics-section" data-report-section="statistics">
         <div class="statistics-title-pill">Statistics</div>
+
+        {overall_summary}
+        {scope_note_html}
 
         <div class="statistics-filtering-title">
             FILTERING
@@ -949,6 +1466,11 @@ def build_statistics_table_html(
                 <select id="statistics-sample-select"></select>
             </label>
         </div>
+
+        <div
+            id="statistics-win-rate-summary"
+            class="statistics-win-rate-summary"
+        ></div>
 
         <div
             id="statistics-table-container"
@@ -968,6 +1490,9 @@ def build_statistics_table_html(
         );
         const container = document.getElementById(
             "statistics-table-container"
+        );
+        const comparisonContainer = document.getElementById(
+            "statistics-win-rate-summary"
         );
 
         payload.metrics.forEach((metric) => {{
@@ -1050,6 +1575,120 @@ def build_statistics_table_html(
             return Number(value).toFixed(decimals);
         }}
 
+        function nearlyEqual(left, right) {{
+            if (!Number.isFinite(left) || !Number.isFinite(right)) {{
+                return false;
+            }}
+            const tolerance = Math.max(
+                1e-12,
+                1e-9 * Math.max(Math.abs(left), Math.abs(right))
+            );
+            return Math.abs(left - right) <= tolerance;
+        }}
+
+        function comparisonStatus(
+            candidate,
+            benchmark,
+            higherIsBetter,
+            benchmarkLabel
+        ) {{
+            if (!Number.isFinite(candidate) || !Number.isFinite(benchmark)) {{
+                return "non comparable";
+            }}
+            if (nearlyEqual(candidate, benchmark)) {{
+                return "égalité";
+            }}
+            const win = higherIsBetter
+                ? candidate > benchmark
+                : candidate < benchmark;
+            return win
+                ? "victoire candidat"
+                : `victoire ${{benchmarkLabel}}`;
+        }}
+
+        function deltaColor(
+            delta,
+            maximumAbsolute,
+            higherIsBetter,
+            candidate,
+            benchmark
+        ) {{
+            if (!Number.isFinite(delta)) {{
+                return "transparent";
+            }}
+            if (nearlyEqual(candidate, benchmark)) {{
+                return `rgb(${{white.join(",")}})`;
+            }}
+            const good = higherIsBetter ? delta > 0 : delta < 0;
+            const ratio = maximumAbsolute > 1e-12
+                ? Math.min(1, Math.abs(delta) / maximumAbsolute)
+                : 0;
+            return interpolateColor(
+                white,
+                good ? blue : red,
+                0.2 + 0.65 * ratio
+            );
+        }}
+
+        function formatPercent(value) {{
+            return Number.isFinite(value)
+                ? `${{(100 * value).toFixed(1)}} %`
+                : "—";
+        }}
+
+        function renderComparisonSummary(metricKey, sampleKey) {{
+            const summaries = payload.comparison_summaries.filter(
+                (item) => item.metric === metricKey
+                    && item.sample === sampleKey
+            );
+            if (!summaries.length) {{
+                comparisonContainer.innerHTML = "";
+                return;
+            }}
+            const sample = payload.samples.find(
+                (item) => item.key === sampleKey
+            );
+            const cards = summaries.map((summary) => {{
+                const zoneInfo = payload.zones.find(
+                    (item) => item.key === summary.zone
+                );
+                const benchmarkLabel = zoneInfo
+                    ? zoneInfo.benchmark_label
+                    : "benchmark";
+                return `
+                    <div class="statistics-win-rate-card">
+                        <div class="statistics-win-rate-heading">
+                            ${{summary.zone}} — Win rate vs ${{benchmarkLabel}}
+                        </div>
+                        <div class="statistics-win-rate-value">
+                            ${{formatPercent(summary.win_rate)}}
+                        </div>
+                        <div class="statistics-win-rate-detail">
+                            ${{summary.wins}} victoire(s) ·
+                            ${{summary.ties}} égalité(s) ·
+                            ${{summary.losses}} défaite(s) ·
+                            ${{summary.comparable_periods}} période(s)
+                        </div>
+                    </div>
+                `;
+            }}).join("");
+            comparisonContainer.innerHTML = `
+                ${{cards}}
+                <p class="statistics-definition">
+                    Pour la statistique et l’échantillonnage
+                    <strong>${{sample ? sample.label : sampleKey}}</strong>
+                    sélectionnés, le win rate vaut périodes gagnées / périodes
+                    comparables. Les égalités sont affichées séparément et
+                    restent dans le dénominateur. Une valeur basse gagne pour
+                    MAE, RMSE, MAPE et écart-type; une valeur haute gagne pour
+                    variance expliquée, R² et corrélation. Les périodes
+                    hebdomadaires ou mensuelles situées aux bords de la
+                    fenêtre peuvent être partielles; leur nombre d’heures
+                    est affiché dans la cellule.
+                </p>
+            `;
+        }}
+
         function renderStatisticsTable() {{
             const metricKey = metricSelect.value;
             const sampleKey = sampleSelect.value;
@@ -1080,8 +1719,10 @@ def build_statistics_table_html(
                 periods
                     .get(record.period_key)
                     .values[record.zone] = {{
-                        value: record[metricKey],
+                        candidate: record[metricKey],
+                        benchmark: record[`benchmark_${{metricKey}}`],
                         n: record.n,
+                        benchmarkN: record.benchmark_n,
                     }};
             }});
 
@@ -1095,13 +1736,37 @@ def build_statistics_table_html(
             const displayedValues = [];
 
             rows.forEach((row) => {{
-                payload.zones.forEach((zone) => {{
-                    const entry = row.values[zone];
+                payload.zones.forEach((zoneInfo) => {{
+                    const entry = row.values[zoneInfo.key];
                     if (
                         entry
-                        && Number.isFinite(entry.value)
+                        && Number.isFinite(entry.candidate)
                     ) {{
-                        displayedValues.push(entry.value);
+                        displayedValues.push(entry.candidate);
+                    }}
+                    if (
+                        entry
+                        && zoneInfo.has_benchmark
+                        && Number.isFinite(entry.benchmark)
+                    ) {{
+                        displayedValues.push(entry.benchmark);
+                    }}
+                }});
+            }});
+
+            const displayedDeltas = [];
+            rows.forEach((row) => {{
+                payload.zones.forEach((zoneInfo) => {{
+                    const entry = row.values[zoneInfo.key];
+                    if (
+                        entry
+                        && zoneInfo.has_benchmark
+                        && Number.isFinite(entry.candidate)
+                        && Number.isFinite(entry.benchmark)
+                    ) {{
+                        displayedDeltas.push(
+                            entry.candidate - entry.benchmark
+                        );
                     }}
                 }});
             }});
@@ -1111,6 +1776,9 @@ def build_statistics_table_html(
                 : 0;
             const maximum = displayedValues.length
                 ? Math.max(...displayedValues)
+                : 0;
+            const maximumAbsoluteDelta = displayedDeltas.length
+                ? Math.max(...displayedDeltas.map(Math.abs))
                 : 0;
 
             let sampleHeader = "";
@@ -1133,10 +1801,23 @@ def build_statistics_table_html(
 
             headerParts.push("<th>Timestamp</th>");
 
-            payload.zones.forEach((zone) => {{
+            payload.zones.forEach((zoneInfo) => {{
                 headerParts.push(
-                    `<th class="statistics-zone-header">${{zone}}</th>`
+                    `<th class="statistics-zone-header">`
+                    + `${{zoneInfo.key}}<br>`
+                    + `<small>${{zoneInfo.candidate_label}}</small></th>`
                 );
+                if (zoneInfo.has_benchmark) {{
+                    headerParts.push(
+                        `<th class="statistics-zone-header">`
+                        + `${{zoneInfo.key}}<br>`
+                        + `<small>${{zoneInfo.benchmark_label}}</small></th>`,
+                        `<th class="statistics-zone-header">`
+                        + `${{zoneInfo.key}}<br>`
+                        + `<small>Δ candidat − `
+                        + `${{zoneInfo.benchmark_label}}</small></th>`
+                    );
+                }}
             }});
 
             const bodyRows = rows.map((row) => {{
@@ -1156,9 +1837,9 @@ def build_statistics_table_html(
                     + `${{row.timestamp}}</td>`
                 );
 
-                payload.zones.forEach((zone) => {{
-                    const entry = row.values[zone];
-                    const value = entry ? entry.value : null;
+                payload.zones.forEach((zoneInfo) => {{
+                    const entry = row.values[zoneInfo.key];
+                    const value = entry ? entry.candidate : null;
                     const n = entry ? entry.n : 0;
 
                     const background = cellColor(
@@ -1179,6 +1860,56 @@ def build_statistics_table_html(
                         + ` title="n=${{n}}">`
                         + `${{rendered}}</td>`
                     );
+                    if (zoneInfo.has_benchmark) {{
+                        const benchmarkValue = entry
+                            ? entry.benchmark
+                            : null;
+                        const benchmarkN = entry
+                            ? entry.benchmarkN
+                            : 0;
+                        const benchmarkBackground = cellColor(
+                            benchmarkValue,
+                            minimum,
+                            maximum,
+                            metric.higher_is_better
+                        );
+                        const benchmarkRendered = formatValue(
+                            benchmarkValue,
+                            metric.decimals
+                        );
+                        const delta = (
+                            Number.isFinite(value)
+                            && Number.isFinite(benchmarkValue)
+                        ) ? value - benchmarkValue : null;
+                        const deltaRendered = formatValue(
+                            delta,
+                            metric.decimals
+                        );
+                        const deltaBackground = deltaColor(
+                            delta,
+                            maximumAbsoluteDelta,
+                            metric.higher_is_better,
+                            value,
+                            benchmarkValue
+                        );
+                        const status = comparisonStatus(
+                            value,
+                            benchmarkValue,
+                            metric.higher_is_better,
+                            zoneInfo.benchmark_label
+                        );
+                        cells.push(
+                            `<td class="statistics-value-cell"`
+                            + ` style="background:${{benchmarkBackground}}"`
+                            + ` title="n=${{benchmarkN}}">`
+                            + `${{benchmarkRendered}}</td>`,
+                            `<td class="statistics-value-cell"`
+                            + ` style="background:${{deltaBackground}}"`
+                            + ` title="candidat − `
+                            + `${{zoneInfo.benchmark_label}} · ${{status}}">`
+                            + `${{deltaRendered}}</td>`
+                        );
+                    }}
                 }});
 
                 return `<tr>${{cells.join("")}}</tr>`;
@@ -1203,6 +1934,7 @@ def build_statistics_table_html(
                     </tbody>
                 </table>
             `;
+            renderComparisonSummary(metricKey, sampleKey);
         }}
 
         metricSelect.addEventListener(
@@ -1322,6 +2054,44 @@ def write_html_report(
             figures.append(plotly_div(figure, include_js))
             include_js = False
 
+        storm_comparison_html = ""
+        if getattr(result, "statistics_benchmark", None) is not None:
+            benchmark_contract = _statistics_benchmark_contract(result)
+            benchmark_label_html = html.escape(
+                str(benchmark_contract["report_label"])
+            )
+            storm_div = plotly_div(
+                figure_storm_comparison(result),
+                include_js,
+            )
+            include_js = False
+            scope_note = str(
+                getattr(result, "statistics_scope_note", "")
+            ).strip()
+            scope_html = (
+                "<br><strong>Périmètre :</strong> "
+                + html.escape(scope_note)
+                if scope_note
+                else ""
+            )
+            storm_comparison_html = f'''
+            <div
+                class="storm-comparison"
+                data-report-section="storm-comparison"
+            >
+                <h3>Comparaison graphique au benchmark actif — {benchmark_label_html}</h3>
+                <p class="muted">
+                    Les courbes utilisent exclusivement l'historique
+                    d'évaluation apparié de Statistics.
+                    {benchmark_label_html} reste un comparateur d'évaluation :
+                    il n'entre ni dans les variables, ni dans le modèle, ni
+                    dans la prévision live.
+                    {scope_html}
+                </p>
+                {storm_div}
+            </div>
+            '''
+
         sections.append(
             f'''<section id="{result.zone.lower()}">
             <div class="zone-title"><div><h2>{result.zone}</h2>
@@ -1334,6 +2104,7 @@ def write_html_report(
             {figures[0]}
             <h3>Backtest et probabilités</h3>
             {figures[1]}
+            {storm_comparison_html}
             <h3>Erreur temporelle du backtest</h3>
             <p class="muted">
                 Erreur = prévision P50 − prix observé.
@@ -1394,6 +2165,22 @@ def write_html_report(
         padding:7px 12px;
         border-radius:0 0 12px 0;
     }
+    .statistics-overall-summary {
+        margin:18px 12px 4px;
+        padding:16px;
+        border:1px solid var(--border);
+        border-radius:12px;
+        background:#f8fafc;
+    }
+    .statistics-overall-summary h3 {
+        margin:0 0 12px;
+    }
+    .statistics-definition {
+        margin:10px 0 0;
+        color:var(--muted);
+        font-size:12px;
+        line-height:1.5;
+    }
     .statistics-filtering-title {
         padding:22px 10px 4px;
         color:#637181;
@@ -1429,6 +2216,39 @@ def write_html_report(
         font-family:inherit;
         font-size:16px;
         cursor:pointer;
+    }
+    .statistics-win-rate-summary {
+        display:grid;
+        grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+        gap:10px;
+        padding:14px 10px;
+        border-bottom:1px solid var(--border);
+        background:#f8fafc;
+    }
+    .statistics-win-rate-summary > .statistics-definition {
+        grid-column:1 / -1;
+    }
+    .statistics-win-rate-card {
+        padding:13px 15px;
+        border:1px solid #c9d8e8;
+        border-radius:10px;
+        background:#ffffff;
+    }
+    .statistics-win-rate-heading {
+        color:var(--muted);
+        font-size:12px;
+        font-weight:700;
+    }
+    .statistics-win-rate-value {
+        margin-top:3px;
+        color:#174f86;
+        font-size:26px;
+        font-weight:750;
+    }
+    .statistics-win-rate-detail {
+        margin-top:4px;
+        color:var(--muted);
+        font-size:12px;
     }
     .statistics-table-container {
         overflow:auto;

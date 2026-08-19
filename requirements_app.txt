@@ -1,0 +1,5 @@
+-r requirements_hourly.txt
+
+# UI only. The forecasting service remains importable without Streamlit.
+streamlit>=1.57,<2
+

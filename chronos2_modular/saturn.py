@@ -9,6 +9,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
+import numpy as np
 import pandas as pd
 
 from .common import (
@@ -64,6 +65,20 @@ def cache_path_for_series(
         or spec.pit_file
         or spec.alias
     )
+    if spec.naive_timezone:
+        # Changing the interpretation of naive timestamps must not silently
+        # reuse a cache produced with another timezone contract.
+        identity = (
+            f"{identity}|naive_timezone={spec.naive_timezone}"
+        )
+    # Preserve every legacy strict-cache path.  Only an opt-in repaired cache
+    # needs a distinct identity so it can never be reused under the default
+    # strict contract (or conversely).
+    if spec.incomplete_dst_policy != "raise":
+        identity = (
+            f"{identity}|incomplete_dst_policy="
+            f"{spec.incomplete_dst_policy}"
+        )
     digest = hashlib.sha1(
         str(identity).encode("utf-8")
     ).hexdigest()[:10]
@@ -188,7 +203,32 @@ def normalize_saturn_series(
     raw: Any,
     name: str,
     timezone: str,
+    *,
+    naive_timezone: str | None = None,
+    incomplete_dst_policy: str = "raise",
 ) -> pd.Series:
+    """Normalise a Saturn series while preserving physical DST products.
+
+    Saturn series without timezone metadata are classified from their DST
+    shape.  A grid containing a nonexistent local spring label is interpreted
+    as UTC-naive; otherwise it is interpreted as local civil time.  The caller
+    may pass an explicit ``naive_timezone`` when the inspected interval does
+    not cross a DST transition and is therefore intrinsically ambiguous.
+
+    For a local-naive source, each ambiguous autumn timestamp must normally
+    occur exactly twice.  The first occurrence is assigned to the DST fold and
+    the second to standard time.  ``incomplete_dst_policy='duplicate'`` is an
+    explicit covariate-only escape hatch: a singleton autumn label is copied
+    onto both folds and the repair is logged.  Nonexistent spring timestamps
+    and malformed groups containing more than two labels remain rejected.
+    """
+    dst_policy = str(incomplete_dst_policy).strip().lower()
+    if dst_policy not in {"raise", "duplicate"}:
+        raise ValueError(
+            f"{name}: incomplete_dst_policy inconnue '{dst_policy}'. "
+            "Valeurs autorisées : raise, duplicate."
+        )
+
     series = coerce_saturn_to_series(raw, name)
 
     try:
@@ -212,18 +252,132 @@ def normalize_saturn_series(
     index = index[valid]
 
     if index.tz is None:
-        try:
-            index = index.tz_localize(
-                timezone,
-                ambiguous="infer",
-                nonexistent="shift_forward",
-            )
-        except Exception:
-            index = index.tz_localize(
+        # Saturn payloads may be returned in descending or otherwise
+        # non-monotonic order.  DST disambiguation must operate on delivery
+        # order, while preserving the order within an autumn duplicate pair.
+        deltas = np.diff(index.asi8)
+        forward_steps = int((deltas > 0).sum())
+        backward_steps = int((deltas < 0).sum())
+        directional_steps = forward_steps + backward_steps
+        order_coherence = (
+            max(forward_steps, backward_steps) / directional_steps
+            if directional_steps
+            else 1.0
+        )
+        if backward_steps > forward_steps:
+            index = index[::-1]
+            series = series.iloc[::-1]
+        order = np.argsort(index.asi8, kind="stable")
+        index = index.take(order)
+        series = series.iloc[order]
+
+        timezone_hint = (
+            "auto"
+            if naive_timezone is None
+            else str(naive_timezone).strip() or "auto"
+        )
+        if timezone_hint.lower() == "auto":
+            # A continuous UTC-naive grid contains civil labels that do not
+            # exist on the spring transition day.  A genuine local-naive grid
+            # skips those labels.  Outside a transition the two conventions
+            # cannot be inferred, so the market timezone is the conservative
+            # default used by Saturn price series.
+            local_probe = index.tz_localize(
                 timezone,
                 ambiguous=True,
-                nonexistent="shift_forward",
+                nonexistent="NaT",
             )
+            source_timezone = (
+                "UTC" if bool(local_probe.isna().any()) else timezone
+            )
+        else:
+            source_timezone = timezone_hint
+        if source_timezone.upper() == "UTC":
+            index = index.tz_localize("UTC")
+        else:
+            try:
+                probe = index.tz_localize(
+                    source_timezone,
+                    ambiguous="NaT",
+                    nonexistent="raise",
+                )
+                ambiguous_mask = probe.isna()
+                if bool(ambiguous_mask.any()) and order_coherence < 0.8:
+                    raise ValueError(
+                        f"{name}: ordre source insuffisant pour associer "
+                        "les deux folds DST sans échanger leurs prix."
+                    )
+                ambiguous_timestamps = index[ambiguous_mask].unique()
+                repair_positions: list[int] = []
+                repaired_timestamps: list[pd.Timestamp] = []
+                for timestamp in ambiguous_timestamps:
+                    positions = np.flatnonzero(index == timestamp)
+                    if len(positions) == 1 and dst_policy == "duplicate":
+                        repair_positions.append(int(positions[0]))
+                        repaired_timestamps.append(pd.Timestamp(timestamp))
+                    elif len(positions) != 2:
+                        raise ValueError(
+                            f"{name}: l'heure DST ambiguë {timestamp} "
+                            f"apparaît {len(positions)} fois au lieu de 2."
+                        )
+
+                if repair_positions:
+                    repeat_counts = np.ones(len(index), dtype=int)
+                    repeat_counts[repair_positions] = 2
+                    expanded_positions = np.repeat(
+                        np.arange(len(index)),
+                        repeat_counts,
+                    )
+                    index = index.take(expanded_positions)
+                    series = series.iloc[expanded_positions]
+                    LOGGER.warning(
+                        "%s: réparation DST opt-in "
+                        "incomplete_dst_policy=duplicate; %s heure(s) "
+                        "automnale(s) singleton dupliquée(s) sur les deux "
+                        "folds: %s",
+                        name,
+                        len(repaired_timestamps),
+                        ", ".join(
+                            str(timestamp)
+                            for timestamp in repaired_timestamps
+                        ),
+                    )
+
+                probe = index.tz_localize(
+                    source_timezone,
+                    ambiguous="NaT",
+                    nonexistent="raise",
+                )
+                ambiguous_mask = probe.isna()
+                ambiguous_flags = np.zeros(len(index), dtype=bool)
+                for timestamp in index[ambiguous_mask].unique():
+                    positions = np.flatnonzero(index == timestamp)
+                    if len(positions) != 2:
+                        raise ValueError(
+                            f"{name}: l'heure DST ambiguë {timestamp} "
+                            f"apparaît {len(positions)} fois au lieu de 2."
+                        )
+                    ambiguous_flags[positions[0]] = True
+                    ambiguous_flags[positions[1]] = False
+                index = index.tz_localize(
+                    source_timezone,
+                    ambiguous=ambiguous_flags,
+                    nonexistent="raise",
+                )
+            except Exception as exc:
+                if isinstance(exc, ValueError) and str(exc).startswith(
+                    (
+                        f"{name}: l'heure DST ambiguë",
+                        f"{name}: ordre source insuffisant",
+                    )
+                ):
+                    raise
+                raise ValueError(
+                    f"{name}: timestamps naïfs non désambiguïsables dans "
+                    f"{source_timezone}; fournissez des instants UTC ou "
+                    "des offsets explicites pour chaque heure DST."
+                ) from exc
+        index = index.tz_convert(timezone)
     else:
         index = index.tz_convert(timezone)
 
@@ -276,6 +430,8 @@ def fetch_saturn_series_from_client(
     timezone: str,
     *,
     revision_date: pd.Timestamp | None = None,
+    naive_timezone: str | None = None,
+    incomplete_dst_policy: str = "raise",
 ) -> pd.Series:
     date_kwargs = (
         {
@@ -294,6 +450,7 @@ def fetch_saturn_series_from_client(
 
     errors: list[str] = []
     raw = None
+    terminal_error = False
 
     for kwargs in date_kwargs:
         if revision_date is not None:
@@ -305,10 +462,17 @@ def fetch_saturn_series_from_client(
             raw = client.get(series_name, **kwargs)
             if _has_values(raw):
                 break
+        except TypeError as exc:
+            errors.append(f"{type(exc).__name__}: {exc}")
+            if "unexpected keyword argument" not in str(exc):
+                terminal_error = True
+                break
         except Exception as exc:
             errors.append(f"{type(exc).__name__}: {exc}")
+            terminal_error = True
+            break
 
-    if not _has_values(raw) and revision_date is None:
+    if not _has_values(raw) and revision_date is None and not terminal_error:
         try:
             raw = client.get(series_name, start, end)
         except Exception as exc:
@@ -325,6 +489,8 @@ def fetch_saturn_series_from_client(
         raw,
         series_name,
         timezone,
+        naive_timezone=naive_timezone,
+        incomplete_dst_policy=incomplete_dst_policy,
     )
 
 
@@ -337,6 +503,8 @@ def fetch_saturn_series(
     author: str,
     *,
     revision_date: pd.Timestamp | None = None,
+    naive_timezone: str | None = None,
+    incomplete_dst_policy: str = "raise",
 ) -> pd.Series:
     client = create_saturn_client(
         saturn_url,
@@ -349,6 +517,8 @@ def fetch_saturn_series(
         end,
         timezone,
         revision_date=revision_date,
+        naive_timezone=naive_timezone,
+        incomplete_dst_policy=incomplete_dst_policy,
     )
 
 
@@ -409,6 +579,8 @@ def history_to_vintage_frame(
     timezone: str,
     *,
     downloaded_at_utc: pd.Timestamp | None = None,
+    naive_timezone: str | None = None,
+    incomplete_dst_policy: str = "raise",
 ) -> pd.DataFrame:
     downloaded_at = _as_utc(
         downloaded_at_utc or pd.Timestamp.now(tz="UTC")
@@ -423,6 +595,8 @@ def history_to_vintage_frame(
             raw,
             series_name,
             timezone,
+            naive_timezone=naive_timezone,
+            incomplete_dst_policy=incomplete_dst_policy,
         )
         if series.empty:
             continue
@@ -597,9 +771,21 @@ def sync_latest_series(
     end: pd.Timestamp,
     timezone: str,
     sync_as_of_utc: pd.Timestamp,
+    naive_timezone: str | None = None,
+    incomplete_dst_policy: str = "raise",
     overlap_days: int = 7,
     full: bool = False,
+    require_contiguous_hourly: bool = False,
 ) -> SaturnSyncResult:
+    if (
+        str(alias).lower() == "target"
+        and incomplete_dst_policy != "raise"
+    ):
+        raise ValueError(
+            f"{zone}/target: incomplete_dst_policy=duplicate est interdit "
+            "pour la cible."
+        )
+
     existing = (
         pd.Series(dtype=float, name=alias)
         if full
@@ -608,6 +794,7 @@ def sync_latest_series(
     rows_before = int(len(existing))
     fetch_start = _as_zone(start, timezone)
     fetch_end = _as_zone(end, timezone)
+    requested_start = fetch_start
 
     if not existing.empty:
         overlap_start = (
@@ -616,6 +803,40 @@ def sync_latest_series(
         )
         fetch_start = max(fetch_start, overlap_start)
 
+    continuity_start = (
+        requested_start
+        if existing.empty
+        else pd.Timestamp(existing.index.min())
+    )
+    if require_contiguous_hourly and continuity_start <= fetch_end:
+        expected_before = pd.date_range(
+            start=continuity_start,
+            end=fetch_end,
+            freq="h",
+        )
+        finite_existing = existing.loc[existing.notna()].index
+        missing_before = expected_before.difference(finite_existing)
+        if len(missing_before):
+            first_missing = pd.Timestamp(missing_before[0])
+            # A sync-only live start may sit after the end of an older cache.
+            # Always bridge from immediately before the earliest missing
+            # physical hour; otherwise a failed/interrupted run can append new
+            # values after a permanent internal hole.
+            repair_start = max(
+                continuity_start,
+                first_missing - pd.Timedelta(hours=1),
+            )
+            if repair_start < fetch_start:
+                LOGGER.warning(
+                    "[Saturn] %s/%s | cache cible discontinu: "
+                    "%s heure(s) absente(s), reprise depuis %s.",
+                    zone,
+                    alias,
+                    len(missing_before),
+                    repair_start,
+                )
+                fetch_start = repair_start
+
     downloaded = fetch_saturn_series_from_client(
         client,
         series_name,
@@ -623,6 +844,8 @@ def sync_latest_series(
         fetch_end,
         timezone,
         revision_date=sync_as_of_utc,
+        naive_timezone=naive_timezone,
+        incomplete_dst_policy=incomplete_dst_policy,
     ).rename(alias)
 
     merged = (
@@ -633,6 +856,22 @@ def sync_latest_series(
     merged = merged.loc[
         ~merged.index.duplicated(keep="last")
     ]
+    if require_contiguous_hourly and continuity_start <= fetch_end:
+        expected_after = pd.date_range(
+            start=continuity_start,
+            end=fetch_end,
+            freq="h",
+        )
+        finite_merged = merged.loc[merged.notna()].index
+        missing_after = expected_after.difference(finite_merged)
+        if len(missing_after):
+            examples = [str(value) for value in missing_after[:8]]
+            raise ValueError(
+                f"{zone}/{alias}: Saturn n'a pas comble le cache cible "
+                f"horaire; {len(missing_after)} heure(s) absente(s) entre "
+                f"{continuity_start} et {fetch_end}. Exemples: {examples}. "
+                "Le cache existant n'a pas ete remplace."
+            )
     _atomic_write_latest(merged, path)
 
     return SaturnSyncResult(
@@ -663,6 +902,8 @@ def sync_vintage_series(
     value_start: pd.Timestamp,
     value_end: pd.Timestamp,
     timezone: str,
+    naive_timezone: str | None = None,
+    incomplete_dst_policy: str = "raise",
     overlap_days: int = 2,
     chunk_days: int = 90,
     retries: int = 3,
@@ -746,6 +987,8 @@ def sync_vintage_series(
             series_name,
             timezone,
             downloaded_at_utc=downloaded_at,
+            naive_timezone=naive_timezone,
+            incomplete_dst_policy=incomplete_dst_policy,
         )
         if not frame.empty:
             frames.append(frame)
@@ -857,6 +1100,8 @@ def sync_saturn_data(
     config_dir: Path,
     *,
     full: bool = False,
+    full_target: bool = False,
+    skip_pit: bool = False,
     as_of: Any | None = None,
     client: Any | None = None,
 ) -> pd.DataFrame:
@@ -865,6 +1110,12 @@ def sync_saturn_data(
     ``as_of`` est un plafond global d'ingestion. La sélection de la révision
     utilisable pour chaque livraison reste effectuée dans ``data.py`` avec
     ``forecast_origin_local_time``.
+
+    ``full_target`` reconstruit uniquement le cache latest de la cible et
+    laisse les historiques PIT en mode incrémental. ``skip_pit`` permet de ne
+    pas contacter Saturn pour les historiques PIT pendant cette opération.
+    ``full`` conserve son comportement historique et reconstruit toutes les
+    séries traitées.
     """
     if not zone_configs:
         return pd.DataFrame()
@@ -944,6 +1195,16 @@ def sync_saturn_data(
             if not spec.enabled or spec.file or not spec.series:
                 continue
 
+            if (
+                spec.alias == "target"
+                and spec.incomplete_dst_policy != "raise"
+            ):
+                raise ValueError(
+                    f"{zone.zone}/target: "
+                    "incomplete_dst_policy=duplicate est interdit pour "
+                    "la cible."
+                )
+
             source = (
                 spec.source
                 if spec.source != "auto"
@@ -952,6 +1213,14 @@ def sync_saturn_data(
             pit = is_pit_spec(spec, config)
 
             if not pit and source not in {"auto", "saturn"}:
+                continue
+
+            if pit and skip_pit:
+                LOGGER.info(
+                    "[Saturn/PIT] %s/%s | actualisation ignorée.",
+                    zone.zone,
+                    spec.alias,
+                )
                 continue
 
             if pit:
@@ -993,6 +1262,8 @@ def sync_saturn_data(
                     value_start=value_start,
                     value_end=value_end,
                     timezone=zone.timezone,
+                    naive_timezone=spec.naive_timezone,
+                    incomplete_dst_policy=spec.incomplete_dst_policy,
                     overlap_days=revision_overlap_days,
                     chunk_days=chunk_days,
                     retries=retries,
@@ -1018,8 +1289,27 @@ def sync_saturn_data(
                     end=end,
                     timezone=zone.timezone,
                     sync_as_of_utc=sync_as_of_utc,
+                    naive_timezone=spec.naive_timezone,
+                    incomplete_dst_policy=spec.incomplete_dst_policy,
                     overlap_days=latest_overlap_days,
-                    full=full,
+                    full=bool(
+                        full
+                        or (
+                            full_target
+                            and spec is zone.target
+                        )
+                    ),
+                    require_contiguous_hourly=(
+                        spec.alias == "target"
+                        and str(
+                            deep_get(
+                                config,
+                                "data.target_input_resolution",
+                                "hourly",
+                            )
+                        ).strip().lower()
+                        == "hourly"
+                    ),
                 )
 
             results.append(result)

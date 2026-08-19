@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "name": "mkonline_primary_41551_l1_blend_v1",
+  "status": "frozen_before_final_opening",
+  "zone": "FR",
+  "timezone": "Europe/Paris",
+  "target": "day-ahead hourly electricity price in EUR/MWh",
+  "source_autonomous_run": "runs/chronos2_hourly_fr_residual_extended_v1",
+  "source_autonomous_model": "residual_corrected",
+  "source_autonomous_annual_mae": 12.165442058542235,
+  "source_autonomous_checksum_manifest_sha256": "e08eacdabf7d3c9d03e061706b20839ee75689138c682a22880e388de7b466bc",
+  "external_expert": {
+    "series": "41551_native",
+    "wrapper_series": "power.price.fr.euromwh.h.fcst.mkonline.ecop",
+    "provider": "MKONLINE",
+    "source": "WATTSIGHT",
+    "dependency_manifest": "mkonline_fr_primary_dependency_v1.json",
+    "dependency_manifest_sha256": "2dae7a579aee1c1f8bb2e96b70e6e0224a7e8b133e5a9e5f836dee5a646f53cc",
+    "forecast_cutoff": "civil D-1 08:00 Europe/Paris",
+    "interpolation_allowed": false,
+    "storm_used_as_feature": false,
+    "commercial_entitlement_status": "UNCONFIRMED: MKOnline/WattSight entitlement and replacement rights must be confirmed before production use."
+  },
+  "weights": {
+    "mkonline_primary": 0.5022390717075804,
+    "autonomous": 0.4977609282924196
+  },
+  "quantile_contract": {
+    "q50": "0.5022390717075804 * mkonline_primary + 0.4977609282924196 * autonomous_q50",
+    "q10_q90": "common shift of autonomous q10/q90 by blended_q50 - autonomous_q50"
+  },
+  "selection_protocol": {
+    "screen_script": "runs/tmp/screen_mkonline_primary_crossfit.py",
+    "screen_script_sha256": "35f151037870045323d995fdf467c87bed86b487849b71e9afeb5614b6044c2d",
+    "b1_gate_artifact": "runs/tmp/saturn_fr_price_nonstorm/mkonline_primary_b1_gate.json",
+    "b1_gate_artifact_sha256": "79d8ddb635918d91755721a13e90c89e805441cc8b8129619b4f46efb0996230",
+    "b2_veto_artifact": "runs/tmp/saturn_fr_price_nonstorm/mkonline_primary_b2_veto.json",
+    "b2_veto_artifact_sha256": "9ef4594193b7c78298535c0fb7756507288199a00bee930c5de73a6911368b95",
+    "weight_fit": "exact constrained L1 optimum on five chronological expanding-window OOF folds over A",
+    "extended_days": 223,
+    "a_days": 245,
+    "b1_days": 60,
+    "b2_days": 60,
+    "b1_materialization_sha256": "e5943d7247febd32790b7ea591682fe7ed6203c08883128f0e3afd012e7bd696",
+    "b2_materialization_sha256": "5ba949b9c91ab8e95782106bb97e5a0309dc51c59ad87e1de1f9bb0a0424efb5",
+    "b1": {
+      "autonomous_mae": 11.089325406136961,
+      "blend_mae": 10.185329776683547,
+      "gain": 0.9039956294534139,
+      "first_30_day_gain": 1.1632346118076313,
+      "last_30_day_gain": 0.6447566470991983
+    },
+    "b2": {
+      "autonomous_mae": 13.36976078300425,
+      "blend_mae": 12.383648621888673,
+      "gain": 0.9861121611155763,
+      "first_30_day_autonomous_mae": 15.126874879290916,
+      "first_30_day_blend_mae": 14.088207976485364,
+      "first_30_day_gain": 1.0386669028055522,
+      "last_30_day_autonomous_mae": 11.612646686717582,
+      "last_30_day_blend_mae": 10.679089267291983,
+      "last_30_day_gain": 0.9335574194255987
+    },
+    "final_period_loaded_during_selection": false,
+    "final_target_used_for_weight_or_hyperparameters": false
+  },
+  "sealed_final_protocol": {
+    "start_local_day": "2025-08-12",
+    "end_local_day": "2026-08-11",
+    "expected_local_days": 365,
+    "expected_physical_hours": 8760,
+    "expected_local_day_hour_histogram": {
+      "23": 1,
+      "24": 363,
+      "25": 1
+    },
+    "single_opening_after_runner_and_tests_are_ready": true
+  }
+}
