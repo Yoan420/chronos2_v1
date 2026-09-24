@@ -1,0 +1,5 @@
+zone,snapshot_extracted_at_utc,snapshot_hours,storm_snapshot_fallback_hours,full350_storm_fallback_hours,test75_storm_fallback_hours,full350_storm_fallback_fraction_of_paired,test75_storm_fallback_fraction,full350_label_fallback_hours,test75_label_fallback_hours,fallback_count_equals_full_day_capacity,storm_fallback_live_recomputation,retained_kalman_windows,retained_window_checks_pass
+BE,2026-09-15 12:05:22.571976+00:00,8784,480,456,72,0.05429217764019526,0.04,0,0,True,True,350,True
+DE,2026-09-15 12:06:07.760882+00:00,8784,480,456,72,0.05429217764019526,0.04,0,0,True,True,350,True
+FR,2026-09-15 12:06:51.322085+00:00,8784,504,480,96,0.05714966067388975,0.05333333333333334,0,0,True,True,350,True
+NL,2026-09-15 12:07:34.065696+00:00,8784,504,480,96,0.05714966067388975,0.05333333333333334,0,0,True,True,350,True

@@ -1,0 +1,14 @@
+zone,column,future_non_missing,future_expected,future_coverage
+FR,known_hour_sin,24,24,1.0
+FR,known_hour_cos,24,24,1.0
+FR,known_dow_sin,24,24,1.0
+FR,known_dow_cos,24,24,1.0
+FR,known_doy_sin,24,24,1.0
+FR,known_doy_cos,24,24,1.0
+FR,known_is_weekend,24,24,1.0
+FR,known_fr_residual_load_fcst_oracle,24,24,1.0
+FR,known_de_residual_load_fcst_oracle,24,24,1.0
+FR,known_be_residual_load_fcst_oracle,24,24,1.0
+FR,known_nl_residual_load_fcst_oracle,24,24,1.0
+FR,known_es_residual_load_fcst_oracle,24,24,1.0
+FR,known_fr_nuclear_generation_fcst_gw_oracle,24,24,1.0

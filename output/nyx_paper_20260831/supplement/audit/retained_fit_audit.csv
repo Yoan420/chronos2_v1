@@ -1,0 +1,146 @@
+stage,family,spec,refit_day,fit_first_day,fit_last_day,max_permitted_label_day,fit_physical_hours,original_predicted_physical_hours,retained_predicted_physical_hours
+validation,ridge_univariate,"{""alpha"": 10, ""family"": ""ridge_univariate""}",2026-03-15,2025-09-30,2026-03-13,2026-03-13,3961,168,168
+validation,ridge_univariate,"{""alpha"": 10, ""family"": ""ridge_univariate""}",2026-03-22,2025-09-30,2026-03-20,2026-03-20,4129,168,168
+validation,ridge_univariate,"{""alpha"": 10, ""family"": ""ridge_univariate""}",2026-03-29,2025-09-30,2026-03-27,2026-03-27,4297,167,167
+validation,ridge_univariate,"{""alpha"": 10, ""family"": ""ridge_univariate""}",2026-04-05,2025-10-06,2026-04-03,2026-04-03,4320,168,168
+validation,ridge_univariate,"{""alpha"": 10, ""family"": ""ridge_univariate""}",2026-04-12,2025-10-13,2026-04-10,2026-04-10,4320,168,168
+validation,ridge_univariate,"{""alpha"": 10, ""family"": ""ridge_univariate""}",2026-04-19,2025-10-20,2026-04-17,2026-04-17,4320,168,168
+validation,ridge_univariate,"{""alpha"": 10, ""family"": ""ridge_univariate""}",2026-04-26,2025-10-27,2026-04-24,2026-04-24,4319,168,168
+validation,ridge_univariate,"{""alpha"": 10, ""family"": ""ridge_univariate""}",2026-05-03,2025-11-03,2026-05-01,2026-05-01,4319,168,168
+validation,ridge_univariate,"{""alpha"": 10, ""family"": ""ridge_univariate""}",2026-05-10,2025-11-10,2026-05-08,2026-05-08,4319,168,168
+validation,ridge_univariate,"{""alpha"": 10, ""family"": ""ridge_univariate""}",2026-05-17,2025-11-17,2026-05-15,2026-05-15,4319,168,168
+validation,ridge_univariate,"{""alpha"": 10, ""family"": ""ridge_univariate""}",2026-05-24,2025-11-24,2026-05-22,2026-05-22,4319,168,168
+validation,ridge_univariate,"{""alpha"": 10, ""family"": ""ridge_univariate""}",2026-05-31,2025-12-01,2026-05-29,2026-05-29,4319,168,168
+validation,ridge_univariate,"{""alpha"": 10, ""family"": ""ridge_univariate""}",2026-06-07,2025-12-08,2026-06-05,2026-06-05,4319,168,168
+validation,ridge_univariate,"{""alpha"": 10, ""family"": ""ridge_univariate""}",2026-06-14,2025-12-15,2026-06-12,2026-06-12,4319,96,96
+validation,ridge_univariate,"{""alpha"": 100, ""family"": ""ridge_univariate""}",2026-03-15,2025-09-30,2026-03-13,2026-03-13,3961,168,168
+validation,ridge_univariate,"{""alpha"": 100, ""family"": ""ridge_univariate""}",2026-03-22,2025-09-30,2026-03-20,2026-03-20,4129,168,168
+validation,ridge_univariate,"{""alpha"": 100, ""family"": ""ridge_univariate""}",2026-03-29,2025-09-30,2026-03-27,2026-03-27,4297,167,167
+validation,ridge_univariate,"{""alpha"": 100, ""family"": ""ridge_univariate""}",2026-04-05,2025-10-06,2026-04-03,2026-04-03,4320,168,168
+validation,ridge_univariate,"{""alpha"": 100, ""family"": ""ridge_univariate""}",2026-04-12,2025-10-13,2026-04-10,2026-04-10,4320,168,168
+validation,ridge_univariate,"{""alpha"": 100, ""family"": ""ridge_univariate""}",2026-04-19,2025-10-20,2026-04-17,2026-04-17,4320,168,168
+validation,ridge_univariate,"{""alpha"": 100, ""family"": ""ridge_univariate""}",2026-04-26,2025-10-27,2026-04-24,2026-04-24,4319,168,168
+validation,ridge_univariate,"{""alpha"": 100, ""family"": ""ridge_univariate""}",2026-05-03,2025-11-03,2026-05-01,2026-05-01,4319,168,168
+validation,ridge_univariate,"{""alpha"": 100, ""family"": ""ridge_univariate""}",2026-05-10,2025-11-10,2026-05-08,2026-05-08,4319,168,168
+validation,ridge_univariate,"{""alpha"": 100, ""family"": ""ridge_univariate""}",2026-05-17,2025-11-17,2026-05-15,2026-05-15,4319,168,168
+validation,ridge_univariate,"{""alpha"": 100, ""family"": ""ridge_univariate""}",2026-05-24,2025-11-24,2026-05-22,2026-05-22,4319,168,168
+validation,ridge_univariate,"{""alpha"": 100, ""family"": ""ridge_univariate""}",2026-05-31,2025-12-01,2026-05-29,2026-05-29,4319,168,168
+validation,ridge_univariate,"{""alpha"": 100, ""family"": ""ridge_univariate""}",2026-06-07,2025-12-08,2026-06-05,2026-06-05,4319,168,168
+validation,ridge_univariate,"{""alpha"": 100, ""family"": ""ridge_univariate""}",2026-06-14,2025-12-15,2026-06-12,2026-06-12,4319,96,96
+validation,ridge_multivariate,"{""alpha"": 10, ""family"": ""ridge_multivariate""}",2026-03-15,2025-09-30,2026-03-13,2026-03-13,3961,168,168
+validation,ridge_multivariate,"{""alpha"": 10, ""family"": ""ridge_multivariate""}",2026-03-22,2025-09-30,2026-03-20,2026-03-20,4129,168,168
+validation,ridge_multivariate,"{""alpha"": 10, ""family"": ""ridge_multivariate""}",2026-03-29,2025-09-30,2026-03-27,2026-03-27,4297,167,167
+validation,ridge_multivariate,"{""alpha"": 10, ""family"": ""ridge_multivariate""}",2026-04-05,2025-10-06,2026-04-03,2026-04-03,4320,168,168
+validation,ridge_multivariate,"{""alpha"": 10, ""family"": ""ridge_multivariate""}",2026-04-12,2025-10-13,2026-04-10,2026-04-10,4320,168,168
+validation,ridge_multivariate,"{""alpha"": 10, ""family"": ""ridge_multivariate""}",2026-04-19,2025-10-20,2026-04-17,2026-04-17,4320,168,168
+validation,ridge_multivariate,"{""alpha"": 10, ""family"": ""ridge_multivariate""}",2026-04-26,2025-10-27,2026-04-24,2026-04-24,4319,168,168
+validation,ridge_multivariate,"{""alpha"": 10, ""family"": ""ridge_multivariate""}",2026-05-03,2025-11-03,2026-05-01,2026-05-01,4319,168,168
+validation,ridge_multivariate,"{""alpha"": 10, ""family"": ""ridge_multivariate""}",2026-05-10,2025-11-10,2026-05-08,2026-05-08,4319,168,168
+validation,ridge_multivariate,"{""alpha"": 10, ""family"": ""ridge_multivariate""}",2026-05-17,2025-11-17,2026-05-15,2026-05-15,4319,168,168
+validation,ridge_multivariate,"{""alpha"": 10, ""family"": ""ridge_multivariate""}",2026-05-24,2025-11-24,2026-05-22,2026-05-22,4319,168,168
+validation,ridge_multivariate,"{""alpha"": 10, ""family"": ""ridge_multivariate""}",2026-05-31,2025-12-01,2026-05-29,2026-05-29,4319,168,168
+validation,ridge_multivariate,"{""alpha"": 10, ""family"": ""ridge_multivariate""}",2026-06-07,2025-12-08,2026-06-05,2026-06-05,4319,168,168
+validation,ridge_multivariate,"{""alpha"": 10, ""family"": ""ridge_multivariate""}",2026-06-14,2025-12-15,2026-06-12,2026-06-12,4319,96,96
+validation,ridge_multivariate,"{""alpha"": 100, ""family"": ""ridge_multivariate""}",2026-03-15,2025-09-30,2026-03-13,2026-03-13,3961,168,168
+validation,ridge_multivariate,"{""alpha"": 100, ""family"": ""ridge_multivariate""}",2026-03-22,2025-09-30,2026-03-20,2026-03-20,4129,168,168
+validation,ridge_multivariate,"{""alpha"": 100, ""family"": ""ridge_multivariate""}",2026-03-29,2025-09-30,2026-03-27,2026-03-27,4297,167,167
+validation,ridge_multivariate,"{""alpha"": 100, ""family"": ""ridge_multivariate""}",2026-04-05,2025-10-06,2026-04-03,2026-04-03,4320,168,168
+validation,ridge_multivariate,"{""alpha"": 100, ""family"": ""ridge_multivariate""}",2026-04-12,2025-10-13,2026-04-10,2026-04-10,4320,168,168
+validation,ridge_multivariate,"{""alpha"": 100, ""family"": ""ridge_multivariate""}",2026-04-19,2025-10-20,2026-04-17,2026-04-17,4320,168,168
+validation,ridge_multivariate,"{""alpha"": 100, ""family"": ""ridge_multivariate""}",2026-04-26,2025-10-27,2026-04-24,2026-04-24,4319,168,168
+validation,ridge_multivariate,"{""alpha"": 100, ""family"": ""ridge_multivariate""}",2026-05-03,2025-11-03,2026-05-01,2026-05-01,4319,168,168
+validation,ridge_multivariate,"{""alpha"": 100, ""family"": ""ridge_multivariate""}",2026-05-10,2025-11-10,2026-05-08,2026-05-08,4319,168,168
+validation,ridge_multivariate,"{""alpha"": 100, ""family"": ""ridge_multivariate""}",2026-05-17,2025-11-17,2026-05-15,2026-05-15,4319,168,168
+validation,ridge_multivariate,"{""alpha"": 100, ""family"": ""ridge_multivariate""}",2026-05-24,2025-11-24,2026-05-22,2026-05-22,4319,168,168
+validation,ridge_multivariate,"{""alpha"": 100, ""family"": ""ridge_multivariate""}",2026-05-31,2025-12-01,2026-05-29,2026-05-29,4319,168,168
+validation,ridge_multivariate,"{""alpha"": 100, ""family"": ""ridge_multivariate""}",2026-06-07,2025-12-08,2026-06-05,2026-06-05,4319,168,168
+validation,ridge_multivariate,"{""alpha"": 100, ""family"": ""ridge_multivariate""}",2026-06-14,2025-12-15,2026-06-12,2026-06-12,4319,96,96
+validation,pca_ridge,"{""alpha"": 10, ""family"": ""pca_ridge"", ""rank"": 1}",2026-03-15,2025-09-30,2026-03-13,2026-03-13,3961,168,168
+validation,pca_ridge,"{""alpha"": 10, ""family"": ""pca_ridge"", ""rank"": 1}",2026-03-22,2025-09-30,2026-03-20,2026-03-20,4129,168,168
+validation,pca_ridge,"{""alpha"": 10, ""family"": ""pca_ridge"", ""rank"": 1}",2026-03-29,2025-09-30,2026-03-27,2026-03-27,4297,167,167
+validation,pca_ridge,"{""alpha"": 10, ""family"": ""pca_ridge"", ""rank"": 1}",2026-04-05,2025-10-06,2026-04-03,2026-04-03,4320,168,168
+validation,pca_ridge,"{""alpha"": 10, ""family"": ""pca_ridge"", ""rank"": 1}",2026-04-12,2025-10-13,2026-04-10,2026-04-10,4320,168,168
+validation,pca_ridge,"{""alpha"": 10, ""family"": ""pca_ridge"", ""rank"": 1}",2026-04-19,2025-10-20,2026-04-17,2026-04-17,4320,168,168
+validation,pca_ridge,"{""alpha"": 10, ""family"": ""pca_ridge"", ""rank"": 1}",2026-04-26,2025-10-27,2026-04-24,2026-04-24,4319,168,168
+validation,pca_ridge,"{""alpha"": 10, ""family"": ""pca_ridge"", ""rank"": 1}",2026-05-03,2025-11-03,2026-05-01,2026-05-01,4319,168,168
+validation,pca_ridge,"{""alpha"": 10, ""family"": ""pca_ridge"", ""rank"": 1}",2026-05-10,2025-11-10,2026-05-08,2026-05-08,4319,168,168
+validation,pca_ridge,"{""alpha"": 10, ""family"": ""pca_ridge"", ""rank"": 1}",2026-05-17,2025-11-17,2026-05-15,2026-05-15,4319,168,168
+validation,pca_ridge,"{""alpha"": 10, ""family"": ""pca_ridge"", ""rank"": 1}",2026-05-24,2025-11-24,2026-05-22,2026-05-22,4319,168,168
+validation,pca_ridge,"{""alpha"": 10, ""family"": ""pca_ridge"", ""rank"": 1}",2026-05-31,2025-12-01,2026-05-29,2026-05-29,4319,168,168
+validation,pca_ridge,"{""alpha"": 10, ""family"": ""pca_ridge"", ""rank"": 1}",2026-06-07,2025-12-08,2026-06-05,2026-06-05,4319,168,168
+validation,pca_ridge,"{""alpha"": 10, ""family"": ""pca_ridge"", ""rank"": 1}",2026-06-14,2025-12-15,2026-06-12,2026-06-12,4319,96,96
+validation,pca_ridge,"{""alpha"": 100, ""family"": ""pca_ridge"", ""rank"": 1}",2026-03-15,2025-09-30,2026-03-13,2026-03-13,3961,168,168
+validation,pca_ridge,"{""alpha"": 100, ""family"": ""pca_ridge"", ""rank"": 1}",2026-03-22,2025-09-30,2026-03-20,2026-03-20,4129,168,168
+validation,pca_ridge,"{""alpha"": 100, ""family"": ""pca_ridge"", ""rank"": 1}",2026-03-29,2025-09-30,2026-03-27,2026-03-27,4297,167,167
+validation,pca_ridge,"{""alpha"": 100, ""family"": ""pca_ridge"", ""rank"": 1}",2026-04-05,2025-10-06,2026-04-03,2026-04-03,4320,168,168
+validation,pca_ridge,"{""alpha"": 100, ""family"": ""pca_ridge"", ""rank"": 1}",2026-04-12,2025-10-13,2026-04-10,2026-04-10,4320,168,168
+validation,pca_ridge,"{""alpha"": 100, ""family"": ""pca_ridge"", ""rank"": 1}",2026-04-19,2025-10-20,2026-04-17,2026-04-17,4320,168,168
+validation,pca_ridge,"{""alpha"": 100, ""family"": ""pca_ridge"", ""rank"": 1}",2026-04-26,2025-10-27,2026-04-24,2026-04-24,4319,168,168
+validation,pca_ridge,"{""alpha"": 100, ""family"": ""pca_ridge"", ""rank"": 1}",2026-05-03,2025-11-03,2026-05-01,2026-05-01,4319,168,168
+validation,pca_ridge,"{""alpha"": 100, ""family"": ""pca_ridge"", ""rank"": 1}",2026-05-10,2025-11-10,2026-05-08,2026-05-08,4319,168,168
+validation,pca_ridge,"{""alpha"": 100, ""family"": ""pca_ridge"", ""rank"": 1}",2026-05-17,2025-11-17,2026-05-15,2026-05-15,4319,168,168
+validation,pca_ridge,"{""alpha"": 100, ""family"": ""pca_ridge"", ""rank"": 1}",2026-05-24,2025-11-24,2026-05-22,2026-05-22,4319,168,168
+validation,pca_ridge,"{""alpha"": 100, ""family"": ""pca_ridge"", ""rank"": 1}",2026-05-31,2025-12-01,2026-05-29,2026-05-29,4319,168,168
+validation,pca_ridge,"{""alpha"": 100, ""family"": ""pca_ridge"", ""rank"": 1}",2026-06-07,2025-12-08,2026-06-05,2026-06-05,4319,168,168
+validation,pca_ridge,"{""alpha"": 100, ""family"": ""pca_ridge"", ""rank"": 1}",2026-06-14,2025-12-15,2026-06-12,2026-06-12,4319,96,96
+validation,pca_ridge,"{""alpha"": 10, ""family"": ""pca_ridge"", ""rank"": 2}",2026-03-15,2025-09-30,2026-03-13,2026-03-13,3961,168,168
+validation,pca_ridge,"{""alpha"": 10, ""family"": ""pca_ridge"", ""rank"": 2}",2026-03-22,2025-09-30,2026-03-20,2026-03-20,4129,168,168
+validation,pca_ridge,"{""alpha"": 10, ""family"": ""pca_ridge"", ""rank"": 2}",2026-03-29,2025-09-30,2026-03-27,2026-03-27,4297,167,167
+validation,pca_ridge,"{""alpha"": 10, ""family"": ""pca_ridge"", ""rank"": 2}",2026-04-05,2025-10-06,2026-04-03,2026-04-03,4320,168,168
+validation,pca_ridge,"{""alpha"": 10, ""family"": ""pca_ridge"", ""rank"": 2}",2026-04-12,2025-10-13,2026-04-10,2026-04-10,4320,168,168
+validation,pca_ridge,"{""alpha"": 10, ""family"": ""pca_ridge"", ""rank"": 2}",2026-04-19,2025-10-20,2026-04-17,2026-04-17,4320,168,168
+validation,pca_ridge,"{""alpha"": 10, ""family"": ""pca_ridge"", ""rank"": 2}",2026-04-26,2025-10-27,2026-04-24,2026-04-24,4319,168,168
+validation,pca_ridge,"{""alpha"": 10, ""family"": ""pca_ridge"", ""rank"": 2}",2026-05-03,2025-11-03,2026-05-01,2026-05-01,4319,168,168
+validation,pca_ridge,"{""alpha"": 10, ""family"": ""pca_ridge"", ""rank"": 2}",2026-05-10,2025-11-10,2026-05-08,2026-05-08,4319,168,168
+validation,pca_ridge,"{""alpha"": 10, ""family"": ""pca_ridge"", ""rank"": 2}",2026-05-17,2025-11-17,2026-05-15,2026-05-15,4319,168,168
+validation,pca_ridge,"{""alpha"": 10, ""family"": ""pca_ridge"", ""rank"": 2}",2026-05-24,2025-11-24,2026-05-22,2026-05-22,4319,168,168
+validation,pca_ridge,"{""alpha"": 10, ""family"": ""pca_ridge"", ""rank"": 2}",2026-05-31,2025-12-01,2026-05-29,2026-05-29,4319,168,168
+validation,pca_ridge,"{""alpha"": 10, ""family"": ""pca_ridge"", ""rank"": 2}",2026-06-07,2025-12-08,2026-06-05,2026-06-05,4319,168,168
+validation,pca_ridge,"{""alpha"": 10, ""family"": ""pca_ridge"", ""rank"": 2}",2026-06-14,2025-12-15,2026-06-12,2026-06-12,4319,96,96
+validation,pca_ridge,"{""alpha"": 100, ""family"": ""pca_ridge"", ""rank"": 2}",2026-03-15,2025-09-30,2026-03-13,2026-03-13,3961,168,168
+validation,pca_ridge,"{""alpha"": 100, ""family"": ""pca_ridge"", ""rank"": 2}",2026-03-22,2025-09-30,2026-03-20,2026-03-20,4129,168,168
+validation,pca_ridge,"{""alpha"": 100, ""family"": ""pca_ridge"", ""rank"": 2}",2026-03-29,2025-09-30,2026-03-27,2026-03-27,4297,167,167
+validation,pca_ridge,"{""alpha"": 100, ""family"": ""pca_ridge"", ""rank"": 2}",2026-04-05,2025-10-06,2026-04-03,2026-04-03,4320,168,168
+validation,pca_ridge,"{""alpha"": 100, ""family"": ""pca_ridge"", ""rank"": 2}",2026-04-12,2025-10-13,2026-04-10,2026-04-10,4320,168,168
+validation,pca_ridge,"{""alpha"": 100, ""family"": ""pca_ridge"", ""rank"": 2}",2026-04-19,2025-10-20,2026-04-17,2026-04-17,4320,168,168
+validation,pca_ridge,"{""alpha"": 100, ""family"": ""pca_ridge"", ""rank"": 2}",2026-04-26,2025-10-27,2026-04-24,2026-04-24,4319,168,168
+validation,pca_ridge,"{""alpha"": 100, ""family"": ""pca_ridge"", ""rank"": 2}",2026-05-03,2025-11-03,2026-05-01,2026-05-01,4319,168,168
+validation,pca_ridge,"{""alpha"": 100, ""family"": ""pca_ridge"", ""rank"": 2}",2026-05-10,2025-11-10,2026-05-08,2026-05-08,4319,168,168
+validation,pca_ridge,"{""alpha"": 100, ""family"": ""pca_ridge"", ""rank"": 2}",2026-05-17,2025-11-17,2026-05-15,2026-05-15,4319,168,168
+validation,pca_ridge,"{""alpha"": 100, ""family"": ""pca_ridge"", ""rank"": 2}",2026-05-24,2025-11-24,2026-05-22,2026-05-22,4319,168,168
+validation,pca_ridge,"{""alpha"": 100, ""family"": ""pca_ridge"", ""rank"": 2}",2026-05-31,2025-12-01,2026-05-29,2026-05-29,4319,168,168
+validation,pca_ridge,"{""alpha"": 100, ""family"": ""pca_ridge"", ""rank"": 2}",2026-06-07,2025-12-08,2026-06-05,2026-06-05,4319,168,168
+validation,pca_ridge,"{""alpha"": 100, ""family"": ""pca_ridge"", ""rank"": 2}",2026-06-14,2025-12-15,2026-06-12,2026-06-12,4319,96,96
+test,ridge_univariate,"{""alpha"": 100, ""family"": ""ridge_univariate""}",2026-06-18,2025-12-19,2026-06-16,2026-06-16,4319,168,168
+test,ridge_univariate,"{""alpha"": 100, ""family"": ""ridge_univariate""}",2026-06-25,2025-12-26,2026-06-23,2026-06-23,4319,168,168
+test,ridge_univariate,"{""alpha"": 100, ""family"": ""ridge_univariate""}",2026-07-02,2026-01-02,2026-06-30,2026-06-30,4319,168,168
+test,ridge_univariate,"{""alpha"": 100, ""family"": ""ridge_univariate""}",2026-07-09,2026-01-09,2026-07-07,2026-07-07,4319,168,168
+test,ridge_univariate,"{""alpha"": 100, ""family"": ""ridge_univariate""}",2026-07-16,2026-01-16,2026-07-14,2026-07-14,4319,168,168
+test,ridge_univariate,"{""alpha"": 100, ""family"": ""ridge_univariate""}",2026-07-23,2026-01-23,2026-07-21,2026-07-21,4319,168,168
+test,ridge_univariate,"{""alpha"": 100, ""family"": ""ridge_univariate""}",2026-07-30,2026-01-30,2026-07-28,2026-07-28,4319,168,168
+test,ridge_univariate,"{""alpha"": 100, ""family"": ""ridge_univariate""}",2026-08-06,2026-02-06,2026-08-04,2026-08-04,4319,168,168
+test,ridge_univariate,"{""alpha"": 100, ""family"": ""ridge_univariate""}",2026-08-13,2026-02-13,2026-08-11,2026-08-11,4319,168,168
+test,ridge_univariate,"{""alpha"": 100, ""family"": ""ridge_univariate""}",2026-08-20,2026-02-20,2026-08-18,2026-08-18,4319,168,168
+test,ridge_univariate,"{""alpha"": 100, ""family"": ""ridge_univariate""}",2026-08-27,2026-02-27,2026-08-25,2026-08-25,4319,168,120
+test,ridge_multivariate,"{""alpha"": 100, ""family"": ""ridge_multivariate""}",2026-06-18,2025-12-19,2026-06-16,2026-06-16,4319,168,168
+test,ridge_multivariate,"{""alpha"": 100, ""family"": ""ridge_multivariate""}",2026-06-25,2025-12-26,2026-06-23,2026-06-23,4319,168,168
+test,ridge_multivariate,"{""alpha"": 100, ""family"": ""ridge_multivariate""}",2026-07-02,2026-01-02,2026-06-30,2026-06-30,4319,168,168
+test,ridge_multivariate,"{""alpha"": 100, ""family"": ""ridge_multivariate""}",2026-07-09,2026-01-09,2026-07-07,2026-07-07,4319,168,168
+test,ridge_multivariate,"{""alpha"": 100, ""family"": ""ridge_multivariate""}",2026-07-16,2026-01-16,2026-07-14,2026-07-14,4319,168,168
+test,ridge_multivariate,"{""alpha"": 100, ""family"": ""ridge_multivariate""}",2026-07-23,2026-01-23,2026-07-21,2026-07-21,4319,168,168
+test,ridge_multivariate,"{""alpha"": 100, ""family"": ""ridge_multivariate""}",2026-07-30,2026-01-30,2026-07-28,2026-07-28,4319,168,168
+test,ridge_multivariate,"{""alpha"": 100, ""family"": ""ridge_multivariate""}",2026-08-06,2026-02-06,2026-08-04,2026-08-04,4319,168,168
+test,ridge_multivariate,"{""alpha"": 100, ""family"": ""ridge_multivariate""}",2026-08-13,2026-02-13,2026-08-11,2026-08-11,4319,168,168
+test,ridge_multivariate,"{""alpha"": 100, ""family"": ""ridge_multivariate""}",2026-08-20,2026-02-20,2026-08-18,2026-08-18,4319,168,168
+test,ridge_multivariate,"{""alpha"": 100, ""family"": ""ridge_multivariate""}",2026-08-27,2026-02-27,2026-08-25,2026-08-25,4319,168,120
+test,pca_ridge,"{""alpha"": 100, ""family"": ""pca_ridge"", ""rank"": 1}",2026-06-18,2025-12-19,2026-06-16,2026-06-16,4319,168,168
+test,pca_ridge,"{""alpha"": 100, ""family"": ""pca_ridge"", ""rank"": 1}",2026-06-25,2025-12-26,2026-06-23,2026-06-23,4319,168,168
+test,pca_ridge,"{""alpha"": 100, ""family"": ""pca_ridge"", ""rank"": 1}",2026-07-02,2026-01-02,2026-06-30,2026-06-30,4319,168,168
+test,pca_ridge,"{""alpha"": 100, ""family"": ""pca_ridge"", ""rank"": 1}",2026-07-09,2026-01-09,2026-07-07,2026-07-07,4319,168,168
+test,pca_ridge,"{""alpha"": 100, ""family"": ""pca_ridge"", ""rank"": 1}",2026-07-16,2026-01-16,2026-07-14,2026-07-14,4319,168,168
+test,pca_ridge,"{""alpha"": 100, ""family"": ""pca_ridge"", ""rank"": 1}",2026-07-23,2026-01-23,2026-07-21,2026-07-21,4319,168,168
+test,pca_ridge,"{""alpha"": 100, ""family"": ""pca_ridge"", ""rank"": 1}",2026-07-30,2026-01-30,2026-07-28,2026-07-28,4319,168,168
+test,pca_ridge,"{""alpha"": 100, ""family"": ""pca_ridge"", ""rank"": 1}",2026-08-06,2026-02-06,2026-08-04,2026-08-04,4319,168,168
+test,pca_ridge,"{""alpha"": 100, ""family"": ""pca_ridge"", ""rank"": 1}",2026-08-13,2026-02-13,2026-08-11,2026-08-11,4319,168,168
+test,pca_ridge,"{""alpha"": 100, ""family"": ""pca_ridge"", ""rank"": 1}",2026-08-20,2026-02-20,2026-08-18,2026-08-18,4319,168,168
+test,pca_ridge,"{""alpha"": 100, ""family"": ""pca_ridge"", ""rank"": 1}",2026-08-27,2026-02-27,2026-08-25,2026-08-25,4319,168,120

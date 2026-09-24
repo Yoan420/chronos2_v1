@@ -1,0 +1,7 @@
+zone,alias,series,coverage_exact,coverage_after_fill,missing_after_fill
+FR,fr_residual_load_fcst,power.fr.residual.load.hourly.gw.fcst,0.9086130206227254,0.9086130206227254,1808
+FR,de_residual_load_fcst,power.de.residual.load.hourly.gw.fcst,0.9086130206227254,0.9086130206227254,1808
+FR,be_residual_load_fcst,power.be.residual.load.hourly.gw.fcst,0.9086130206227254,0.9086130206227254,1808
+FR,nl_residual_load_fcst,power.nl.residual.load.hourly.gw.fcst,0.9086130206227254,0.9086130206227254,1808
+FR,es_residual_load_fcst,power.es.residual.load.hourly.gw.fcst,0.9086130206227254,0.9086130206227254,1808
+FR,fr_nuclear_generation_fcst_gw,power.fr.generation.nuclear.gw.fcst,0.8964820056611403,0.8964820056611403,2048

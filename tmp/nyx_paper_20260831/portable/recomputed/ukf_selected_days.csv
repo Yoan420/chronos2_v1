@@ -1,0 +1,2 @@
+zone,day,physical_hours,weight_min,weight_max,shift_min,shift_max,sum_absolute_shift,in_test75
+NL,2026-02-21,24,0.45,0.45,-0.7358988572169665,-0.7352998055718687,17.653999104694044,False

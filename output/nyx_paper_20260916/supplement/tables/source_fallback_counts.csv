@@ -1,0 +1,5 @@
+zone,snapshot_hours,storm_snapshot_fallback_hours,storm_fallback_days,fallback_count_equals_full_day_capacity,annual_storm_fallback_hours,test90_storm_fallback_hours,annual_storm_fallback_fraction_of_paired,test90_storm_fallback_fraction,annual_label_fallback_hours,test90_label_fallback_hours,storm_fallback_live_recomputation,label_overlap_validation_n,label_overlap_max_abs
+BE,8784,480,20,True,480,96,0.054800776344331545,0.044444444444444446,0,0,True,168,2.842170943040401e-14
+DE,8784,480,20,True,480,96,0.054800776344331545,0.044444444444444446,24,24,True,216,5.684341886080802e-14
+FR,8784,504,21,True,504,120,0.057540815161548124,0.05555555555555555,24,24,True,216,2.842170943040401e-14
+NL,8784,504,21,True,504,120,0.057540815161548124,0.05555555555555555,24,24,True,216,5.684341886080802e-14

@@ -1,0 +1,9 @@
+stage,family,baseline,zone,regime,threshold,n,distinct_days,evidence,candidate_mae,baseline_mae,mae_relative_degradation,within_5pct
+test,full_quarterhour,nyx,BE,negative,0.0,73,20,sufficient,4.675106571150041,6.410439396053163,-0.27070419322138006,True
+test,full_quarterhour,nyx,BE,above_train_q95,143.19000244140625,992,89,sufficient,20.13475921610145,19.563108241882272,0.02922086649785749,True
+test,full_quarterhour,nyx,DE,negative,0.0,165,32,sufficient,4.9469891187214605,5.8719117267915575,-0.15751643606118704,True
+test,full_quarterhour,nyx,DE,above_train_q95,162.70399475097653,548,74,sufficient,22.22698070868096,21.020885226440257,0.057376055729739805,False
+test,full_quarterhour,nyx,FR,negative,0.0,147,27,sufficient,6.083159072745953,6.819416237587437,-0.1079648373395018,True
+test,full_quarterhour,nyx,FR,above_train_q95,124.80400085449219,1119,90,sufficient,11.600330491648865,12.657863091261527,-0.08354748285614966,True
+test,full_quarterhour,nyx,NL,negative,0.0,137,33,sufficient,5.382990848888542,6.542648382159295,-0.1772458896664758,True
+test,full_quarterhour,nyx,NL,above_train_q95,153.37400207519528,744,83,sufficient,20.217810644653092,19.269179176038957,0.04923050743094182,True

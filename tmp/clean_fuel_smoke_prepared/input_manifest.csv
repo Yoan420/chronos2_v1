@@ -1,0 +1,8 @@
+alias,role,series,description,future_strategies,known_future,source
+target,target,power.price.da.fr.bzn.hourly.entsoe.utc.cdh.eurmwh,Prix Day-Ahead France horaire ENTSO-E (timeline UTC),,False,file
+fr_residual_load_fcst,known_future_covariate,power.fr.residual.load.hourly.gw.fcst,,oracle,True,file
+de_residual_load_fcst,known_future_covariate,power.de.residual.load.hourly.gw.fcst,,oracle,True,file
+be_residual_load_fcst,known_future_covariate,power.be.residual.load.hourly.gw.fcst,,oracle,True,file
+nl_residual_load_fcst,known_future_covariate,power.nl.residual.load.hourly.gw.fcst,,oracle,True,file
+es_residual_load_fcst,known_future_covariate,power.es.residual.load.hourly.gw.fcst,,oracle,True,file
+fr_nuclear_generation_fcst_gw,known_future_covariate,power.fr.generation.nuclear.gw.fcst,"Production nucleaire FR prevue en GW, as-of D-1 08:00 Paris",oracle,True,file
