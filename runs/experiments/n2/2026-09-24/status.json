@@ -1,0 +1,541 @@
+{
+  "baseline_progress": {
+    "active_wave_workers": 1,
+    "cached_days": 0,
+    "completed": 337,
+    "elapsed_seconds": 5916.140999999945,
+    "phase": "residual_prefill",
+    "total": 716,
+    "workers": 4,
+    "zone": "FR"
+  },
+  "baseline_results": {
+    "BE": {
+      "covariates_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\m\\47dcb0e3a7d2acc1\\runs\\experiments\\solar_wind_v1\\r\\report_only\\frozen_result\\covariates.parquet",
+      "forecast_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\m\\47dcb0e3a7d2acc1\\runs\\experiments\\solar_wind_v1\\r\\report_only\\frozen_result\\kalman_forecast.parquet",
+      "history_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\m\\47dcb0e3a7d2acc1\\runs\\experiments\\solar_wind_v1\\r\\report_only\\frozen_result\\kalman_backtest.parquet",
+      "hybrid_covariates_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\m\\47dcb0e3a7d2acc1\\runs\\experiments\\solar_wind_v1\\r\\hybrid_covariates.parquet",
+      "identity": {
+        "chronos_generation_aliases": [
+          "fr_solar_generation_fcst",
+          "de_solar_generation_fcst",
+          "be_solar_generation_fcst",
+          "nl_solar_generation_fcst",
+          "de_wind_generation_fcst",
+          "nl_wind_generation_fcst"
+        ],
+        "correction_clip": [
+          -40.0,
+          40.0
+        ],
+        "delivery_day": "2026-09-24",
+        "dependencies": {
+          "holidays": "0.100",
+          "joblib": "1.5.1",
+          "pykalman": "0.11.2",
+          "scikit-learn": "1.6.1",
+          "scipy": "1.17.1"
+        },
+        "device": "cpu",
+        "engine": "nyx_test2_fast_v1",
+        "execution_only_acceleration": true,
+        "history_anchor_day": "2024-09-10",
+        "implementation": {
+          "chronos2_hourly/hourly_contract.py": "fdfe907a4a1a410935072ebc99076cad000d4171a7f31135c14931448decee5d",
+          "chronos2_hourly/nuclear_cwe_forecast.py": "afad01fd121fe84db58a3347b6c8a64e63060706ec915bfa007d0d21af31617c",
+          "chronos2_hourly/nuclear_daily_cache.py": "b69d7066855ff28f56cefb9e6177d3c8bffb5e7b9ff0bb9a34589433ff95c14a",
+          "chronos2_hourly/nuclear_exports.py": "ba63db3337aafb51ba22e03ff1a2c9201359647b6789d2f003ffb6627bf064e6",
+          "chronos2_hourly/nuclear_residual_cache.py": "7b189cd8dff71788b47b3b1af5ce6162b2cb086bf924f448c92d7f1bba63a6fd",
+          "chronos2_hourly/nuclear_run_archive.py": "083a14cec073102cba7ec171b479e1d1b2a1c9c1acfe56eb5abe0925a21c93bb",
+          "chronos2_hourly/nyx_fast_baseline.py": "f54630f0d788898ca6829e0ff7cdd2ab86375bfd9ca1c6634f4e5e52970b3e46",
+          "chronos2_hourly/nyx_live_parallel.py": "393e1e36d8a01dc50670fe4fdfded71e8e863a2b3cbcd205ba84fd902a9cbcd1",
+          "chronos2_hourly/solar_wind_interaction_features.py": "372690a39c7a2088fe475a4e104200215edd43a33c2d7f8f189b0a1c4e547471",
+          "chronos2_modular/common.py": "777fb87ee9f72cc6d4c199d6b54b8d11d46553dec63005070cf95330b5453b6f"
+        },
+        "input_protocol": "civil_pit_solar_wind_v1_56ea7a78102d72e0d705ce613bd227f35344dc46c2e352a5c2c52f7c1564eafc",
+        "interaction_builder": {
+          "module": "chronos2_hourly.nyx_live_hybrid",
+          "name": "build_pair_interaction",
+          "path": "C:\\Users\\BQ6757\\chronos2_v1\\chronos2_hourly\\nyx_live_hybrid.py",
+          "sha256": "5ef12917868042f51460cdc6e184306b3a50dcad5156d7983beb79ef4e43936b"
+        },
+        "interaction_location": "corrector_only",
+        "kalman_generation_aliases": [
+          "fr_solar_generation_fcst",
+          "de_solar_generation_fcst",
+          "be_solar_generation_fcst",
+          "nl_solar_generation_fcst",
+          "de_wind_generation_fcst",
+          "nl_wind_generation_fcst"
+        ],
+        "memory_reserve_gib": 3.5,
+        "nuclear_manifest_sha256": "b1818a97afdf6d6413f890d927fcb0df33f7f8afd80aed4eabffc78c96e9944d",
+        "nuclear_resolved_sha256": "4111d6ee06e397bcf45de138d65cbf2595015bbd0dc31ccc7fb19b52eef19684",
+        "nuclear_snapshot_sha256": "65cb419e988378732d3d3054a6c10ffea48cf697c9a2d2d0e436567ceaec9572",
+        "nuclear_workdir": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-24\\be\\civil_pit_v2",
+        "production_modified": false,
+        "production_pit_evidence": false,
+        "prospective_validation": false,
+        "raw_history_start_day": "2024-09-10",
+        "reference_recipe": {
+          "status": "separately_approved_country_extension"
+        },
+        "residual_threads": 2,
+        "residual_workers_max": 4,
+        "run_id": "47dcb0e3a7d2acc1",
+        "scientific_identity": {
+          "dependencies": {
+            "catboost": "1.2.10",
+            "chronos-forecasting": "2.3.1",
+            "numpy": "2.4.6",
+            "pandas": "2.3.3",
+            "torch": "2.13.0+xpu"
+          },
+          "files": {
+            "chronos2_hourly/chronos_adapter.py": "66ec9ec04f008f1083be6a613b5ff322868ae7bd398cb8f8638b932d30349305",
+            "chronos2_hourly/features.py": "03f94db2083c6c0ee06e5477921edfd25785cc3344b976a6714958a8de7bbe9e",
+            "chronos2_hourly/kalman_covariates.py": "8fec18c28bfdfd52492236cf12f251e4354bbe394f4bcaac48ec8d5a0aa3eed1",
+            "chronos2_hourly/kalman_residual.py": "62566e49ce50e491b6070f237ffe5a3c8dbb0e2c745208482c3414df5a58abf8",
+            "chronos2_hourly/models/residual_corrector.py": "5c47036f2ac621215038b8b6451f8fa85d1de486fb356447cc2b90c3ce4a19f9",
+            "chronos2_hourly/nuclear_forecast.py": "04d64754ba13a08ca5e1f6a22695a4a43ab934f4b01d13991269f4ad98ac54c4",
+            "chronos2_hourly/nuclear_incremental.py": "e314ac3db1ae3d7c49bdd584f2e30c11f1de1ee6a19f84809333a1fe8c4b538b",
+            "chronos2_hourly/nuclear_preparation.py": "72ea23447ff0f0a60adb079007cd6270ef3695bb03d185e1db0ba65860bd7423",
+            "chronos2_hourly/solar_wind_forecast.py": "bde6f3d462b7113d1353419f6d34bbc2bb41dc3ed856e535ac7909bca41f5d64",
+            "chronos2_hourly/solar_wind_sources.py": "95ab77d6930fc827df907c5dde0a2441f5bcbeb95e0ea19cefd0f9d80e1c6829",
+            "chronos2_modular/data.py": "37542e85c99fc8f2608b0e7f8b062ad172b73b9d760202b045fbff4035f1d9d4",
+            "chronos2_modular/forecasting.py": "c9841c32428a6667e8696ba47b4e92f766731dcdb354701bc2cbb05c41eff743",
+            "run_chronos2_hourly.py": "0bdd253e7350efa6ea936c00aea51dbc2ee94fc8abbacb0f2ba95ef4b0aeaa82"
+          }
+        },
+        "source_records": {
+          "be_solar_generation_fcst": {
+            "audit_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\sources\\be_solar_generation_fcst.parquet.audit.json",
+            "audit_sha256": "a5497e1566c89d23c85fd1d1d6abfe6722082357004ef459f172ce99e32e92cc",
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\sources\\be_solar_generation_fcst.parquet",
+            "series": "power.be.generation.solar.hourly.gw.fcst",
+            "sha256": "4dc3ceee5d7735da4122e7226a9ed9f5c62412afacbed27c045ce93459d6eaaf"
+          },
+          "be_wind_generation_fcst": {
+            "audit_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\sources\\be_wind_generation_fcst.parquet.audit.json",
+            "audit_sha256": "413c3dfaed575ad640f7161eb7d84b4baf54cc79bd3febd341d91792f2526b20",
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\sources\\be_wind_generation_fcst.parquet",
+            "series": "power.be.generation.wind.hourly.gw.fcst",
+            "sha256": "e23c1332c8119b5ca116834c2f1fa44dc81c395365262d7c16ece2569936be52"
+          },
+          "de_solar_generation_fcst": {
+            "audit_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\sources\\de_solar_generation_fcst.parquet.audit.json",
+            "audit_sha256": "fb9f24c6bc88cf3605b3538df287283113fe63a3eeab967b00e97c9bffc822b6",
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\sources\\de_solar_generation_fcst.parquet",
+            "series": "power.de.generation.solar.hourly.gw.fcst",
+            "sha256": "2e8f739ed7e6096166e6ff21d915d9591a3edb26124f7f4f7304e6f79ab8b9f8"
+          },
+          "de_wind_generation_fcst": {
+            "audit_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\sources\\de_wind_generation_fcst.parquet.audit.json",
+            "audit_sha256": "40f37042457034d0b6ec70d456d4bed38a01c3a4696681e034f1433a0bab148e",
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\sources\\de_wind_generation_fcst.parquet",
+            "series": "power.de.generation.wind.hourly.gw.fcst",
+            "sha256": "2193bf4518cf8ee07b055d643934b1573ca5636405a8699b776bd100e6b8f4f1"
+          },
+          "fr_solar_generation_fcst": {
+            "audit_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\sources\\fr_solar_generation_fcst.parquet.audit.json",
+            "audit_sha256": "c269b4199cb2f5e15b0b6b1f4bb581ec7b35f2998be8e0723a6172ce9365641d",
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\sources\\fr_solar_generation_fcst.parquet",
+            "series": "power.fr.generation.solar.hourly.gw.fcst",
+            "sha256": "0700828f74897db0f7358d5a8849c36a98f1342c5f027384707cc13b31798e6c"
+          },
+          "fr_wind_generation_fcst": {
+            "audit_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\sources\\fr_wind_generation_fcst.parquet.audit.json",
+            "audit_sha256": "8189e860400de9a1d6bc2bba74f616fc84127f83eea5da6c758da77c198cefb7",
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\sources\\fr_wind_generation_fcst.parquet",
+            "series": "power.fr.generation.wind.hourly.gw.fcst",
+            "sha256": "4ad1aa96075cf19540604fe9f2179a4f1727eafaae1317d62e0587489ccb8583"
+          },
+          "nl_solar_generation_fcst": {
+            "audit_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\sources\\nl_solar_generation_fcst.parquet.audit.json",
+            "audit_sha256": "cfabcc6462eb517d0c80e069047a1ee2eaf6d0efee3f6da3a066a704cebb7549",
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\sources\\nl_solar_generation_fcst.parquet",
+            "series": "power.nl.generation.solar.hourly.gw.fcst",
+            "sha256": "850172d7baa4a689cbd14ff81698473030ca899c4b0d5c2ae82c2d7bc9d4c127"
+          },
+          "nl_wind_generation_fcst": {
+            "audit_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\sources\\nl_wind_generation_fcst.parquet.audit.json",
+            "audit_sha256": "909e881457bfe8696fd86e6b8332d305a933bc1c5d9118fa2049934847f0bac3",
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\sources\\nl_wind_generation_fcst.parquet",
+            "series": "power.nl.generation.wind.hourly.gw.fcst",
+            "sha256": "2ca0fa1b602508c01c4489e61413d24d39b686be3c326db77b7cbcd76ea96202"
+          }
+        },
+        "threads": 16,
+        "variant": "interaction_40",
+        "workers": 4,
+        "workroot": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2",
+        "zone": "BE"
+      },
+      "residual_history_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\m\\47dcb0e3a7d2acc1\\runs\\experiments\\solar_wind_v1\\r\\report_only\\frozen_result\\residual_statistics.parquet",
+      "result_dir": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\m\\47dcb0e3a7d2acc1\\runs\\experiments\\solar_wind_v1\\r",
+      "result_reused": false,
+      "source_forecast_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\m\\47dcb0e3a7d2acc1\\runs\\experiments\\solar_wind_v1\\r\\report_only\\frozen_result\\source_forecast.parquet",
+      "status": "COMPLETE",
+      "workdir": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\m\\47dcb0e3a7d2acc1\\runs\\experiments\\solar_wind_v1\\r"
+    },
+    "DE": {
+      "covariates_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\m\\b2d724d314027026\\runs\\experiments\\solar_wind_v1\\r\\report_only\\frozen_result\\covariates.parquet",
+      "forecast_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\m\\b2d724d314027026\\runs\\experiments\\solar_wind_v1\\r\\report_only\\frozen_result\\kalman_forecast.parquet",
+      "history_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\m\\b2d724d314027026\\runs\\experiments\\solar_wind_v1\\r\\report_only\\frozen_result\\kalman_backtest.parquet",
+      "hybrid_covariates_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\m\\b2d724d314027026\\runs\\experiments\\solar_wind_v1\\r\\hybrid_covariates.parquet",
+      "identity": {
+        "chronos_generation_aliases": [
+          "fr_solar_generation_fcst",
+          "de_solar_generation_fcst",
+          "be_solar_generation_fcst",
+          "nl_solar_generation_fcst",
+          "de_wind_generation_fcst",
+          "nl_wind_generation_fcst"
+        ],
+        "correction_clip": [
+          -40.0,
+          40.0
+        ],
+        "delivery_day": "2026-09-24",
+        "dependencies": {
+          "holidays": "0.100",
+          "joblib": "1.5.1",
+          "pykalman": "0.11.2",
+          "scikit-learn": "1.6.1",
+          "scipy": "1.17.1"
+        },
+        "device": "cpu",
+        "engine": "nyx_test2_fast_v1",
+        "execution_only_acceleration": true,
+        "history_anchor_day": "2024-09-10",
+        "implementation": {
+          "chronos2_hourly/hourly_contract.py": "fdfe907a4a1a410935072ebc99076cad000d4171a7f31135c14931448decee5d",
+          "chronos2_hourly/nuclear_cwe_forecast.py": "afad01fd121fe84db58a3347b6c8a64e63060706ec915bfa007d0d21af31617c",
+          "chronos2_hourly/nuclear_daily_cache.py": "b69d7066855ff28f56cefb9e6177d3c8bffb5e7b9ff0bb9a34589433ff95c14a",
+          "chronos2_hourly/nuclear_exports.py": "ba63db3337aafb51ba22e03ff1a2c9201359647b6789d2f003ffb6627bf064e6",
+          "chronos2_hourly/nuclear_residual_cache.py": "7b189cd8dff71788b47b3b1af5ce6162b2cb086bf924f448c92d7f1bba63a6fd",
+          "chronos2_hourly/nuclear_run_archive.py": "083a14cec073102cba7ec171b479e1d1b2a1c9c1acfe56eb5abe0925a21c93bb",
+          "chronos2_hourly/nyx_fast_baseline.py": "f54630f0d788898ca6829e0ff7cdd2ab86375bfd9ca1c6634f4e5e52970b3e46",
+          "chronos2_hourly/nyx_live_parallel.py": "393e1e36d8a01dc50670fe4fdfded71e8e863a2b3cbcd205ba84fd902a9cbcd1",
+          "chronos2_hourly/solar_wind_interaction_features.py": "372690a39c7a2088fe475a4e104200215edd43a33c2d7f8f189b0a1c4e547471",
+          "chronos2_modular/common.py": "777fb87ee9f72cc6d4c199d6b54b8d11d46553dec63005070cf95330b5453b6f"
+        },
+        "input_protocol": "civil_pit_solar_wind_v1_56ea7a78102d72e0d705ce613bd227f35344dc46c2e352a5c2c52f7c1564eafc",
+        "interaction_builder": {
+          "module": "chronos2_hourly.nyx_live_hybrid",
+          "name": "build_pair_interaction",
+          "path": "C:\\Users\\BQ6757\\chronos2_v1\\chronos2_hourly\\nyx_live_hybrid.py",
+          "sha256": "5ef12917868042f51460cdc6e184306b3a50dcad5156d7983beb79ef4e43936b"
+        },
+        "interaction_location": "corrector_only",
+        "kalman_generation_aliases": [
+          "fr_solar_generation_fcst",
+          "de_solar_generation_fcst",
+          "be_solar_generation_fcst",
+          "nl_solar_generation_fcst",
+          "de_wind_generation_fcst",
+          "nl_wind_generation_fcst"
+        ],
+        "memory_reserve_gib": 3.5,
+        "nuclear_manifest_sha256": "a61c87a5d513e94bc96512eeb98536be856168c90bd8de71cef1c9eb10acc7ee",
+        "nuclear_resolved_sha256": "349401ec61af9a8f1f05a7d57703311b3181fd6c13be5ac613594c1cbaf2c300",
+        "nuclear_snapshot_sha256": "c2fe79bd69e9ae5d2cde6b30b2f0b0cc4557871e3bb175be9db2304b760dae2c",
+        "nuclear_workdir": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-24\\de\\civil_pit_v2",
+        "production_modified": false,
+        "production_pit_evidence": false,
+        "prospective_validation": false,
+        "raw_history_start_day": "2024-09-10",
+        "reference_recipe": {
+          "audits_sha256": "81af33a56db1b4b17eae4e1f6c794305bdfd96a3ab0e97d7ace94d1a3be69995",
+          "manifest_sha256": "79c10788c93b914842ac59e234746ceefede4256f1916c3c75123d1d289dd3e5",
+          "status": "same_except_explicit_thread_count",
+          "workdir": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\solar_wind_v1\\2026-09-22\\de\\45ec8314c37a2fe5"
+        },
+        "residual_threads": 2,
+        "residual_workers_max": 4,
+        "run_id": "b2d724d314027026",
+        "scientific_identity": {
+          "dependencies": {
+            "catboost": "1.2.10",
+            "chronos-forecasting": "2.3.1",
+            "numpy": "2.4.6",
+            "pandas": "2.3.3",
+            "torch": "2.13.0+xpu"
+          },
+          "files": {
+            "chronos2_hourly/chronos_adapter.py": "66ec9ec04f008f1083be6a613b5ff322868ae7bd398cb8f8638b932d30349305",
+            "chronos2_hourly/features.py": "03f94db2083c6c0ee06e5477921edfd25785cc3344b976a6714958a8de7bbe9e",
+            "chronos2_hourly/kalman_covariates.py": "8fec18c28bfdfd52492236cf12f251e4354bbe394f4bcaac48ec8d5a0aa3eed1",
+            "chronos2_hourly/kalman_residual.py": "62566e49ce50e491b6070f237ffe5a3c8dbb0e2c745208482c3414df5a58abf8",
+            "chronos2_hourly/models/residual_corrector.py": "5c47036f2ac621215038b8b6451f8fa85d1de486fb356447cc2b90c3ce4a19f9",
+            "chronos2_hourly/nuclear_forecast.py": "04d64754ba13a08ca5e1f6a22695a4a43ab934f4b01d13991269f4ad98ac54c4",
+            "chronos2_hourly/nuclear_incremental.py": "e314ac3db1ae3d7c49bdd584f2e30c11f1de1ee6a19f84809333a1fe8c4b538b",
+            "chronos2_hourly/nuclear_preparation.py": "72ea23447ff0f0a60adb079007cd6270ef3695bb03d185e1db0ba65860bd7423",
+            "chronos2_hourly/solar_wind_forecast.py": "bde6f3d462b7113d1353419f6d34bbc2bb41dc3ed856e535ac7909bca41f5d64",
+            "chronos2_hourly/solar_wind_sources.py": "95ab77d6930fc827df907c5dde0a2441f5bcbeb95e0ea19cefd0f9d80e1c6829",
+            "chronos2_modular/data.py": "37542e85c99fc8f2608b0e7f8b062ad172b73b9d760202b045fbff4035f1d9d4",
+            "chronos2_modular/forecasting.py": "c9841c32428a6667e8696ba47b4e92f766731dcdb354701bc2cbb05c41eff743",
+            "run_chronos2_hourly.py": "0bdd253e7350efa6ea936c00aea51dbc2ee94fc8abbacb0f2ba95ef4b0aeaa82"
+          }
+        },
+        "source_records": {
+          "be_solar_generation_fcst": {
+            "audit_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\sources\\be_solar_generation_fcst.parquet.audit.json",
+            "audit_sha256": "a5497e1566c89d23c85fd1d1d6abfe6722082357004ef459f172ce99e32e92cc",
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\sources\\be_solar_generation_fcst.parquet",
+            "series": "power.be.generation.solar.hourly.gw.fcst",
+            "sha256": "4dc3ceee5d7735da4122e7226a9ed9f5c62412afacbed27c045ce93459d6eaaf"
+          },
+          "de_solar_generation_fcst": {
+            "audit_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\sources\\de_solar_generation_fcst.parquet.audit.json",
+            "audit_sha256": "fb9f24c6bc88cf3605b3538df287283113fe63a3eeab967b00e97c9bffc822b6",
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\sources\\de_solar_generation_fcst.parquet",
+            "series": "power.de.generation.solar.hourly.gw.fcst",
+            "sha256": "2e8f739ed7e6096166e6ff21d915d9591a3edb26124f7f4f7304e6f79ab8b9f8"
+          },
+          "de_wind_generation_fcst": {
+            "audit_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\sources\\de_wind_generation_fcst.parquet.audit.json",
+            "audit_sha256": "40f37042457034d0b6ec70d456d4bed38a01c3a4696681e034f1433a0bab148e",
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\sources\\de_wind_generation_fcst.parquet",
+            "series": "power.de.generation.wind.hourly.gw.fcst",
+            "sha256": "2193bf4518cf8ee07b055d643934b1573ca5636405a8699b776bd100e6b8f4f1"
+          },
+          "fr_solar_generation_fcst": {
+            "audit_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\sources\\fr_solar_generation_fcst.parquet.audit.json",
+            "audit_sha256": "c269b4199cb2f5e15b0b6b1f4bb581ec7b35f2998be8e0723a6172ce9365641d",
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\sources\\fr_solar_generation_fcst.parquet",
+            "series": "power.fr.generation.solar.hourly.gw.fcst",
+            "sha256": "0700828f74897db0f7358d5a8849c36a98f1342c5f027384707cc13b31798e6c"
+          },
+          "nl_solar_generation_fcst": {
+            "audit_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\sources\\nl_solar_generation_fcst.parquet.audit.json",
+            "audit_sha256": "cfabcc6462eb517d0c80e069047a1ee2eaf6d0efee3f6da3a066a704cebb7549",
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\sources\\nl_solar_generation_fcst.parquet",
+            "series": "power.nl.generation.solar.hourly.gw.fcst",
+            "sha256": "850172d7baa4a689cbd14ff81698473030ca899c4b0d5c2ae82c2d7bc9d4c127"
+          },
+          "nl_wind_generation_fcst": {
+            "audit_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\sources\\nl_wind_generation_fcst.parquet.audit.json",
+            "audit_sha256": "909e881457bfe8696fd86e6b8332d305a933bc1c5d9118fa2049934847f0bac3",
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\sources\\nl_wind_generation_fcst.parquet",
+            "series": "power.nl.generation.wind.hourly.gw.fcst",
+            "sha256": "2ca0fa1b602508c01c4489e61413d24d39b686be3c326db77b7cbcd76ea96202"
+          }
+        },
+        "threads": 16,
+        "variant": "interaction_40",
+        "workers": 4,
+        "workroot": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2",
+        "zone": "DE"
+      },
+      "residual_history_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\m\\b2d724d314027026\\runs\\experiments\\solar_wind_v1\\r\\report_only\\frozen_result\\residual_statistics.parquet",
+      "result_dir": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\m\\b2d724d314027026\\runs\\experiments\\solar_wind_v1\\r",
+      "result_reused": false,
+      "source_forecast_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\m\\b2d724d314027026\\runs\\experiments\\solar_wind_v1\\r\\report_only\\frozen_result\\source_forecast.parquet",
+      "status": "COMPLETE",
+      "workdir": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\m\\b2d724d314027026\\runs\\experiments\\solar_wind_v1\\r"
+    },
+    "NL": {
+      "covariates_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\m\\596956d583d5afc7\\runs\\experiments\\solar_wind_v1\\r\\report_only\\frozen_result\\covariates.parquet",
+      "forecast_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\m\\596956d583d5afc7\\runs\\experiments\\solar_wind_v1\\r\\report_only\\frozen_result\\kalman_forecast.parquet",
+      "history_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\m\\596956d583d5afc7\\runs\\experiments\\solar_wind_v1\\r\\report_only\\frozen_result\\kalman_backtest.parquet",
+      "hybrid_covariates_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\m\\596956d583d5afc7\\runs\\experiments\\solar_wind_v1\\r\\hybrid_covariates.parquet",
+      "identity": {
+        "chronos_generation_aliases": [
+          "fr_solar_generation_fcst",
+          "de_solar_generation_fcst",
+          "be_solar_generation_fcst",
+          "nl_solar_generation_fcst",
+          "de_wind_generation_fcst",
+          "nl_wind_generation_fcst"
+        ],
+        "correction_clip": [
+          -40.0,
+          40.0
+        ],
+        "delivery_day": "2026-09-24",
+        "dependencies": {
+          "holidays": "0.100",
+          "joblib": "1.5.1",
+          "pykalman": "0.11.2",
+          "scikit-learn": "1.6.1",
+          "scipy": "1.17.1"
+        },
+        "device": "cpu",
+        "engine": "nyx_test2_fast_v1",
+        "execution_only_acceleration": true,
+        "history_anchor_day": "2024-09-09",
+        "implementation": {
+          "chronos2_hourly/hourly_contract.py": "fdfe907a4a1a410935072ebc99076cad000d4171a7f31135c14931448decee5d",
+          "chronos2_hourly/nuclear_cwe_forecast.py": "afad01fd121fe84db58a3347b6c8a64e63060706ec915bfa007d0d21af31617c",
+          "chronos2_hourly/nuclear_daily_cache.py": "b69d7066855ff28f56cefb9e6177d3c8bffb5e7b9ff0bb9a34589433ff95c14a",
+          "chronos2_hourly/nuclear_exports.py": "ba63db3337aafb51ba22e03ff1a2c9201359647b6789d2f003ffb6627bf064e6",
+          "chronos2_hourly/nuclear_residual_cache.py": "7b189cd8dff71788b47b3b1af5ce6162b2cb086bf924f448c92d7f1bba63a6fd",
+          "chronos2_hourly/nuclear_run_archive.py": "083a14cec073102cba7ec171b479e1d1b2a1c9c1acfe56eb5abe0925a21c93bb",
+          "chronos2_hourly/nyx_fast_baseline.py": "f54630f0d788898ca6829e0ff7cdd2ab86375bfd9ca1c6634f4e5e52970b3e46",
+          "chronos2_hourly/nyx_live_parallel.py": "393e1e36d8a01dc50670fe4fdfded71e8e863a2b3cbcd205ba84fd902a9cbcd1",
+          "chronos2_hourly/solar_wind_interaction_features.py": "372690a39c7a2088fe475a4e104200215edd43a33c2d7f8f189b0a1c4e547471",
+          "chronos2_modular/common.py": "777fb87ee9f72cc6d4c199d6b54b8d11d46553dec63005070cf95330b5453b6f"
+        },
+        "input_protocol": "civil_pit_solar_wind_v1_56ea7a78102d72e0d705ce613bd227f35344dc46c2e352a5c2c52f7c1564eafc",
+        "interaction_builder": {
+          "module": "chronos2_hourly.nyx_live_hybrid",
+          "name": "build_pair_interaction",
+          "path": "C:\\Users\\BQ6757\\chronos2_v1\\chronos2_hourly\\nyx_live_hybrid.py",
+          "sha256": "5ef12917868042f51460cdc6e184306b3a50dcad5156d7983beb79ef4e43936b"
+        },
+        "interaction_location": "corrector_only",
+        "kalman_generation_aliases": [
+          "fr_solar_generation_fcst",
+          "de_solar_generation_fcst",
+          "be_solar_generation_fcst",
+          "nl_solar_generation_fcst",
+          "de_wind_generation_fcst",
+          "nl_wind_generation_fcst"
+        ],
+        "memory_reserve_gib": 3.5,
+        "nuclear_manifest_sha256": "ab7241488271a363ca40f42dbffa0b118d24bc3192d26d262d60fa3a7feba9d8",
+        "nuclear_resolved_sha256": "e782b007004ce257255182e55fa7720cea7722c31fb40cc9ed6f32becd13266a",
+        "nuclear_snapshot_sha256": "ad758efeb456f450f602e08aa0cd45b7863638eeb547196ee8fe638303f54933",
+        "nuclear_workdir": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-24\\nl\\civil_pit_v2",
+        "production_modified": false,
+        "production_pit_evidence": false,
+        "prospective_validation": false,
+        "raw_history_start_day": "2024-09-09",
+        "reference_recipe": {
+          "audits_sha256": "8a314ac7e798775a21554013a2e4737a5b9163c4eac5ed3a9249afd364d1f054",
+          "manifest_sha256": "4747571568716d882365eba52ad9305a9b63c2e46a2ddd4ea4ac4b15e2be5283",
+          "status": "same_except_explicit_thread_count",
+          "workdir": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\solar_wind_v1\\2026-09-22\\nl\\b1da388bb4df6c63"
+        },
+        "residual_threads": 2,
+        "residual_workers_max": 4,
+        "run_id": "596956d583d5afc7",
+        "scientific_identity": {
+          "dependencies": {
+            "catboost": "1.2.10",
+            "chronos-forecasting": "2.3.1",
+            "numpy": "2.4.6",
+            "pandas": "2.3.3",
+            "torch": "2.13.0+xpu"
+          },
+          "files": {
+            "chronos2_hourly/chronos_adapter.py": "66ec9ec04f008f1083be6a613b5ff322868ae7bd398cb8f8638b932d30349305",
+            "chronos2_hourly/features.py": "03f94db2083c6c0ee06e5477921edfd25785cc3344b976a6714958a8de7bbe9e",
+            "chronos2_hourly/kalman_covariates.py": "8fec18c28bfdfd52492236cf12f251e4354bbe394f4bcaac48ec8d5a0aa3eed1",
+            "chronos2_hourly/kalman_residual.py": "62566e49ce50e491b6070f237ffe5a3c8dbb0e2c745208482c3414df5a58abf8",
+            "chronos2_hourly/models/residual_corrector.py": "5c47036f2ac621215038b8b6451f8fa85d1de486fb356447cc2b90c3ce4a19f9",
+            "chronos2_hourly/nuclear_forecast.py": "04d64754ba13a08ca5e1f6a22695a4a43ab934f4b01d13991269f4ad98ac54c4",
+            "chronos2_hourly/nuclear_incremental.py": "e314ac3db1ae3d7c49bdd584f2e30c11f1de1ee6a19f84809333a1fe8c4b538b",
+            "chronos2_hourly/nuclear_preparation.py": "72ea23447ff0f0a60adb079007cd6270ef3695bb03d185e1db0ba65860bd7423",
+            "chronos2_hourly/solar_wind_forecast.py": "bde6f3d462b7113d1353419f6d34bbc2bb41dc3ed856e535ac7909bca41f5d64",
+            "chronos2_hourly/solar_wind_sources.py": "95ab77d6930fc827df907c5dde0a2441f5bcbeb95e0ea19cefd0f9d80e1c6829",
+            "chronos2_modular/data.py": "37542e85c99fc8f2608b0e7f8b062ad172b73b9d760202b045fbff4035f1d9d4",
+            "chronos2_modular/forecasting.py": "c9841c32428a6667e8696ba47b4e92f766731dcdb354701bc2cbb05c41eff743",
+            "run_chronos2_hourly.py": "0bdd253e7350efa6ea936c00aea51dbc2ee94fc8abbacb0f2ba95ef4b0aeaa82"
+          }
+        },
+        "source_records": {
+          "be_solar_generation_fcst": {
+            "audit_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\sources\\be_solar_generation_fcst.parquet.audit.json",
+            "audit_sha256": "a5497e1566c89d23c85fd1d1d6abfe6722082357004ef459f172ce99e32e92cc",
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\sources\\be_solar_generation_fcst.parquet",
+            "series": "power.be.generation.solar.hourly.gw.fcst",
+            "sha256": "4dc3ceee5d7735da4122e7226a9ed9f5c62412afacbed27c045ce93459d6eaaf"
+          },
+          "de_solar_generation_fcst": {
+            "audit_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\sources\\de_solar_generation_fcst.parquet.audit.json",
+            "audit_sha256": "fb9f24c6bc88cf3605b3538df287283113fe63a3eeab967b00e97c9bffc822b6",
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\sources\\de_solar_generation_fcst.parquet",
+            "series": "power.de.generation.solar.hourly.gw.fcst",
+            "sha256": "2e8f739ed7e6096166e6ff21d915d9591a3edb26124f7f4f7304e6f79ab8b9f8"
+          },
+          "de_wind_generation_fcst": {
+            "audit_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\sources\\de_wind_generation_fcst.parquet.audit.json",
+            "audit_sha256": "40f37042457034d0b6ec70d456d4bed38a01c3a4696681e034f1433a0bab148e",
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\sources\\de_wind_generation_fcst.parquet",
+            "series": "power.de.generation.wind.hourly.gw.fcst",
+            "sha256": "2193bf4518cf8ee07b055d643934b1573ca5636405a8699b776bd100e6b8f4f1"
+          },
+          "fr_solar_generation_fcst": {
+            "audit_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\sources\\fr_solar_generation_fcst.parquet.audit.json",
+            "audit_sha256": "c269b4199cb2f5e15b0b6b1f4bb581ec7b35f2998be8e0723a6172ce9365641d",
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\sources\\fr_solar_generation_fcst.parquet",
+            "series": "power.fr.generation.solar.hourly.gw.fcst",
+            "sha256": "0700828f74897db0f7358d5a8849c36a98f1342c5f027384707cc13b31798e6c"
+          },
+          "nl_solar_generation_fcst": {
+            "audit_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\sources\\nl_solar_generation_fcst.parquet.audit.json",
+            "audit_sha256": "cfabcc6462eb517d0c80e069047a1ee2eaf6d0efee3f6da3a066a704cebb7549",
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\sources\\nl_solar_generation_fcst.parquet",
+            "series": "power.nl.generation.solar.hourly.gw.fcst",
+            "sha256": "850172d7baa4a689cbd14ff81698473030ca899c4b0d5c2ae82c2d7bc9d4c127"
+          },
+          "nl_wind_generation_fcst": {
+            "audit_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\sources\\nl_wind_generation_fcst.parquet.audit.json",
+            "audit_sha256": "909e881457bfe8696fd86e6b8332d305a933bc1c5d9118fa2049934847f0bac3",
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\sources\\nl_wind_generation_fcst.parquet",
+            "series": "power.nl.generation.wind.hourly.gw.fcst",
+            "sha256": "2ca0fa1b602508c01c4489e61413d24d39b686be3c326db77b7cbcd76ea96202"
+          }
+        },
+        "threads": 16,
+        "variant": "interaction_40",
+        "workers": 4,
+        "workroot": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2",
+        "zone": "NL"
+      },
+      "residual_history_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\m\\596956d583d5afc7\\runs\\experiments\\solar_wind_v1\\r\\report_only\\frozen_result\\residual_statistics.parquet",
+      "result_dir": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\m\\596956d583d5afc7\\runs\\experiments\\solar_wind_v1\\r",
+      "result_reused": false,
+      "source_forecast_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\m\\596956d583d5afc7\\runs\\experiments\\solar_wind_v1\\r\\report_only\\frozen_result\\source_forecast.parquet",
+      "status": "COMPLETE",
+      "workdir": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\m\\596956d583d5afc7\\runs\\experiments\\solar_wind_v1\\r"
+    }
+  },
+  "command": [
+    "C:\\Users\\BQ6757\\venvs\\pricefm311\\Scripts\\python.exe",
+    "C:\\Users\\BQ6757\\chronos2_v1\\run_nyx_test2_fast.py",
+    "--action",
+    "run",
+    "--delivery-day",
+    "2026-09-24",
+    "--expected-plan",
+    "00d209866cf5b130189d4a4a3966160286df9270c576046780a04aa376a98dda"
+  ],
+  "completed_pairs": [
+    [
+      "DE",
+      "NL"
+    ]
+  ],
+  "completed_zones": [
+    "DE",
+    "NL",
+    "BE"
+  ],
+  "delivery_day": "2026-09-24",
+  "engine": "nyx_test2_fast_v1",
+  "eta_basis": "unavailable_until_measured_new_baseline_replay",
+  "eta_seconds": null,
+  "origin": "2026-09-24",
+  "pair": "DE_NL",
+  "pair_workdir": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\pairs\\DE_NL\\0a47b7c356da2982",
+  "phase": "baseline_progress",
+  "pid": 50676,
+  "plan_sha256": "00d209866cf5b130189d4a4a3966160286df9270c576046780a04aa376a98dda",
+  "process_create_time": 1790178510.5532644,
+  "production_modified": false,
+  "reports": {
+    "DE": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\pairs\\DE_NL\\0a47b7c356da2982\\forecast_de_2026-09-24_nyx_test2.html",
+    "NL": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\n2\\2026-09-24\\pairs\\DE_NL\\0a47b7c356da2982\\forecast_nl_2026-09-24_nyx_test2.html"
+  },
+  "residual_threads": 2,
+  "residual_workers": 4,
+  "started_utc": "2026-09-23T15:48:35.225905+00:00",
+  "status": "RUNNING",
+  "threads": 16,
+  "updated_utc": "2026-09-24T07:00:11.573970+00:00",
+  "workers": 4,
+  "zone": "FR"
+}
