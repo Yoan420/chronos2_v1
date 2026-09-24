@@ -1,0 +1,68 @@
+format_version: 1
+experiment_id: chronos2_exogenous_lora_residual_fuel_poc_v1
+evaluation_role: diagnostic_only
+project_root: ..
+data:
+  panel_path: runs/experiments/chronos2_exogenous_lora_residual_fuel_poc_v1/inputs/training_panel.parquet
+  timestamp_column: timestamp
+  origin_column: origin_timestamp
+  item_column: item_id
+  feature_available_at_column: feature_available_at_utc
+  target_columns: [target]
+  known_future_covariates:
+    - fr_residual_load_fcst
+    - de_residual_load_fcst
+    - be_residual_load_fcst
+    - nl_residual_load_fcst
+    - es_residual_load_fcst
+    - known_hour_sin
+    - known_hour_cos
+    - known_dow_sin
+    - known_dow_cos
+    - known_doy_sin
+    - known_doy_cos
+    - known_is_weekend
+    - ttf_m1_eur_mwh_th
+    - eua_first_dec_eur_tco2
+    - ttf_change_1d
+    - ttf_change_5d
+    - eua_change_1d
+    - eua_change_5d
+    - fuel_volatility_20d
+    - ccgt_marginal_cost_eur_mwh
+  past_only_covariates: []
+  timezone: Europe/Paris
+  cutoff_local_time: "08:00"
+  frequency: h
+  context_length: 2048
+  prediction_length: 24
+  training_window_days: 365
+  validation_days: 30
+  evaluation_days: 365
+  require_consecutive_origins: true
+  require_complete_known_future: true
+  production_pit_evidence: false
+model:
+  model_id: amazon/chronos-2
+  revision: 29ec3766d36d6f73f0696f85560a422f50e8498c
+  local_files_only: true
+  device_map: auto
+training:
+  finetune_mode: lora
+  learning_rate: 1.0e-5
+  num_steps: 500
+  batch_size: 64
+  seed: 42
+  lora_config:
+    r: 8
+    lora_alpha: 16
+    lora_dropout: 0.05
+    bias: none
+    target_modules:
+      - self_attention.q
+      - self_attention.v
+      - self_attention.k
+      - self_attention.o
+      - output_patch_embedding.output_layer
+output:
+  directory: runs/experiments/chronos2_exogenous_lora_residual_fuel_poc_v1/artifact

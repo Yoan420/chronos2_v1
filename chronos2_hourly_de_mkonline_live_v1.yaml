@@ -8,8 +8,8 @@ live:
   prediction_mode: autonomous_only
   mkonline_enabled: false
   primary_series: null
-  storm_dashboard_series: power.price.de.euromwh.h.fcst.3mv.storm
-  storm_dashboard_primary_series: 41376_native
+  storm_dashboard_series: power.price.de.euromwh.h.fcst.3mv.storm.da.cache
+  storm_dashboard_primary_series: power.price.de.euromwh.h.fcst.3mv.storm.da.cache
   storm_dashboard_naive_timezone: Europe/Berlin
   storm_strict_08_series: power.price.de.euromwh.h.fcst.3mv.storm.da.basecase
   storm_pit_path: null

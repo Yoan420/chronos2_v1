@@ -1,0 +1,36 @@
+program: ./walmart_lagp_TimesFM_debug_Nov_17.py
+project: coupled_tensor_timesfm_walmart
+
+method: grid
+metric:
+  name: epoch_val_loss
+  goal: minimize
+
+parameters:
+  num_epochs:       {value: 15}          # --num_epochs
+  batch_size:       {value: 131072}     # --batch_size
+  learning_rate:    {values: [0.001]}  # --learning_rate
+  Rank_CP:          {value: 200}        # --Rank_CP
+  mlp_layers_t1:    {value: 4}
+  lambda_param:     {value: 1.0}        # --lambda_param (overall loss scale)
+  dropout_prob:     {value: 0.15}        # --dropout_prob
+
+  # Reconstruction weights for T1/T2/T3 (T3 = 1 - w1 - w2)
+  w1:               {value: 0.3333}       # --w1 (T1 weight)
+  w2:               {value: 0.3333}       # --w2 (T2 weight)
+
+  # Whether to learn weights via softmax or keep them fixed
+  train_weights:    {value: 0}          # --train_weights (1 = trainable, 0 = fixed)
+
+  # Overall recon vs forecast when train_weights = 0
+  w_recon_fixed:    {value: 0.5}        # --w_recon_fixed
+
+  cuda:             {value: 1}          # --cuda (use GPU if available)
+  forecast_horizon: {value: 28}         # --forecast_horizon
+  lag_p:            {value: 365}         # --lag_p for sliding_window_validation
+                                        # (must be < n_time = 150 in this script)
+command:
+  - ${env}
+  - ${interpreter}
+  - ${program}
+  - ${args}

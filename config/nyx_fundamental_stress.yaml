@@ -1,0 +1,12 @@
+schema_version: 1
+source_suite: runs/experiments/nyx_scarcity_v1/zonal/snapshots/20260914T143837Z_a05a1572
+output_root: runs/experiments/nyx_scarcity_v1/fundamental
+variants: [fundamental, calendar]
+primary_variant: fundamental
+max_parallel: 2
+# Fixed before this backtest. Main candidate uses the strict governor.
+# Fixed 25% is an explicitly separate diagnostic, not automatic promotion.
+fixed_alpha: 0.25
+diagnostic_only: true
+production_modified: false
+activation_performed: false

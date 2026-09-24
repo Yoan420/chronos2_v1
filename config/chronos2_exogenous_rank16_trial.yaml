@@ -1,0 +1,18 @@
+version: 1
+project_root: ..
+output_root: runs/experiments/chronos2_exogenous_rank16_prospective_v1
+candidate_config: config/chronos2_exogenous_lora_poc.yaml
+zone_artifacts_root: runs/experiments/chronos2_exogenous_lora_poc_v2/zones
+checkpoint_sha256: 06929807a5bb1f534063c1b85ca158e08d177f2556afd929cd975cc9b153f5ae
+calibration_panel: runs/experiments/chronos2_exogenous_lora_poc_v1/inputs/training_panel.parquet
+calibration_panel_sha256: 4d5d5bfd5cf84c4c24eec4d06f0a81ec62dca9063836fa2957e77ec3b3b3ef46
+zones: [FR, DE, BE, NL]
+# Recipe fixed before the first prospective forecast. Coefficients are refitted
+# on the preceding 365 days; the historical neural checkpoint is not neural OOF.
+residual_recipe:
+  ridge_alpha: 1.0
+  maximum_shift_eur_mwh: 20.0
+  minimum_training_days: 30
+  lookback_days: 365
+# Standard governed Kalman defaults are frozen in trial_manifest.json.
+# No operational activation, promotion, or NOAA dependency in this experiment.

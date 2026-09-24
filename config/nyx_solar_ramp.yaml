@@ -1,0 +1,37 @@
+schema_version: 1
+source_snapshot: runs/experiments/nyx_scarcity_v1/snapshots/20260914T125027Z_ed1dc982
+baseline_delivery_day: '2026-09-18'
+output_root: runs/experiments/nyx_solar_ramp_v1
+enabled: true
+mode: diagnostic_shadow
+primary_variant: governed
+zones: [FR, DE, BE, NL]
+timezone: Europe/Paris
+cutoff_time: '08:00'
+training_window_days: 365
+minimum_training_days: 120
+calibration_days: 28
+refit_days: 7
+final_days: 90
+selection_days: 60
+business_spike: 300.0
+statistical_quantile: 0.99
+price_ramp_threshold: 100.0
+false_alert_budget: 0.01
+label_delay_days: 2
+max_iter: 50
+max_leaf_nodes: 7
+min_samples_leaf: 60
+l2_regularization: 10.0
+learning_rate: 0.06
+correction_clip: 300.0
+governance_days: 90
+governance_min_days: 28
+governance_min_changed_days: 5
+governance_min_alert_rows: 30
+candidate_weights: [0.0, 0.25, 0.5, 1.0]
+mae_tolerance: 0.0
+bootstrap_samples: 500
+block_days: 7
+seed: 1729
+threads: 2

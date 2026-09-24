@@ -1,0 +1,29 @@
+# Copiez ce fichier, changez experiment_id/output_directory, puis ajoutez une
+# entree sous "series". Mettez enabled: false pour exclure une serie du test.
+schema_version: 1
+experiment_id: fr_wind_pit_test
+
+production_configs:
+  FR: chronos2_hourly_fr_residual_v1.yaml
+  DE: chronos2_hourly_de_residual_candidate_v1.yaml
+  BE: chronos2_hourly_be_residual_candidate_v1.yaml
+  NL: chronos2_hourly_nl_residual_candidate_v1.yaml
+  ES: chronos2_hourly_es_residual_candidate_v1.yaml
+
+# Les resultats d'un futur runner d'experiment seront obligatoirement isoles ici.
+output_directory: runs/experiments/fr_wind_pit_test
+
+series:
+  fr_wind_generation_fcst_test:
+    enabled: true
+    zones: [FR, DE, BE, NL, ES]
+    kind: hourly_numeric_pit
+    timezone: UTC
+    series: power.fr.generation.wind.hourly.gw.fcst
+    pit_file: data/pit/vintages/fr_wind_generation_fcst.parquet
+    columns:
+      delivery: value_time_utc
+      value: value
+      availability: snapshot_time_utc
+      revision: revision_time_utc
+    minimum_coverage: 0.50

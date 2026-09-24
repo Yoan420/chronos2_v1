@@ -1,0 +1,251 @@
+model:
+  model_id: amazon/chronos-2
+  device: auto
+  local_files_only: true
+  attn_implementation: auto
+  context_length: 2048
+  horizon: 24
+  origin_batch_size: 12
+  model_batch_size: 128
+  seed: 42
+data:
+  project_root: C:\Users\BQ6757\chronos2_v1\tmp\primary-date-regressions\test_hourly_snapshot_retains_s0\project
+    with spaces
+  source: cache
+  cache_dir: data/cache
+  saturn_url: https://saturn-energyscan.gem.myengie.com//api
+  saturn_author: BQ6757
+  historical_years: 4
+  frequency: h
+  target_input_resolution: hourly
+  quarter_hour_incomplete: raise
+  target_interpolation_limit: 0
+  dynamic_delivery_day_horizon: true
+  default_fill_limit: 0
+  require_all_covariates: true
+  fail_below_minimum_coverage: true
+  require_complete_future_covariates: true
+  minimum_future_coverage: 1.0
+  forecast_origin_local_time: 08:00
+  revision_policy: latest_before_asof
+  target_end_policy: current_day_end
+  require_complete_target_day: true
+  pit_vintage_dir: C:\Users\BQ6757\chronos2_v1\tmp\primary-date-regressions\test_hourly_snapshot_retains_s0\project
+    with spaces\data\pit\vintages
+  pit_files:
+    fr_residual_load_fcst: fr_residual_load_fcst.parquet
+    fr_nuclear_generation_fcst: fr_nuclear_generation_fcst.parquet
+    de_residual_load_fcst: de_residual_load_fcst.parquet
+    be_residual_load_fcst: be_residual_load_fcst.parquet
+    nl_residual_load_fcst: nl_residual_load_fcst.parquet
+    es_residual_load_fcst: es_residual_load_fcst.parquet
+  runtime_as_of: '2026-08-11T12:00:00+02:00'
+backtest:
+  windows: 730
+  origin_hour: 0
+  skip_irregular_local_days: false
+hourly:
+  feature_engineering:
+    target_lags:
+    - 24
+    - 48
+    - 168
+    - 336
+    target_rolling_windows:
+    - 24
+    - 72
+    - 168
+    timezone: Europe/Paris
+  oof:
+    n_splits: 5
+    min_train_days: 730
+    gap_days: 1
+    evaluation_days: 365
+    ensemble_minimum_rows: 720
+  lear:
+    alpha: 0.02
+    l1_ratio: 0.8
+    min_samples_per_hour: 60
+    max_iter: 10000
+  catboost:
+    backend: catboost
+    iterations: 500
+    depth: 7
+    learning_rate: 0.035
+    l2_leaf_reg: 6.0
+    min_samples_per_hour: 1000000
+    thread_count: -1
+  ensemble:
+    minimum_rows: 720
+    weight_l2: 1.0e-06
+  residual_correction:
+    enabled: true
+    base_model: chronos2
+    backend: catboost
+    iterations: 700
+    depth: 6
+    learning_rate: 0.03
+    l2_leaf_reg: 15.0
+    min_samples_leaf: 30
+    min_training_rows: 720
+    random_state: 42
+    thread_count: -1
+    verbose: false
+    correction_scale: 1.0
+    max_abs_correction: 40.0
+    feature_builder:
+      timezone: Europe/Paris
+      include_calendar: true
+      include_rich_calendar: true
+      rich_calendar_countries:
+      - FR
+      - DE
+      - BE
+      - ES
+      - NL
+      rich_calendar_primary_country: FR
+      include_daily_profiles: true
+      exclude_historical_prices: true
+      exclude_day_of_year: true
+  data_quality:
+    audit_feature_substrings:
+    - residual_load
+    - nuclear
+    - net_export
+    - firm_margin
+    warn_below_hourly_coverage: 0.9
+    minimum_hourly_coverage: null
+  supply_stack:
+    enabled: false
+    nan_policy: raise
+    rolling_windows:
+    - 3
+    - 6
+    - 24
+    columns:
+      load_forecast: load_forecast
+      wind_forecast: wind_forecast
+      solar_forecast: solar_forecast
+      nuclear_available: nuclear_available
+      thermal_available: thermal_available
+      hydro_firm: hydro_firm
+      import_headroom: import_headroom
+      export_headroom: export_headroom
+      pumping_capacity: pumping_capacity
+      nuclear_minimum: nuclear_minimum
+      run_of_river: run_of_river
+      ttf_eur_mwh_th: ttf_eur_mwh_th
+      eua_eur_tco2: eua_eur_tco2
+      api2_usd_tonne: api2_usd_tonne
+      eurusd_usd_per_eur: eurusd_usd_per_eur
+      coal_eur_mwh_th: null
+output:
+  directory: C:\Users\BQ6757\chronos2_v1\tmp\primary-date-regressions\test_hourly_snapshot_retains_s0\project
+    with spaces\console-data\forecast-1\outputs
+report:
+  enabled: true
+  filename: C:\Users\BQ6757\chronos2_v1\tmp\primary-date-regressions\test_hourly_snapshot_retains_s0\project
+    with spaces\console-data\forecast-1\outputs\report.html
+  title: Chronos-2 horaire FR — correcteur résiduel v1
+  native_model: residual_corrected
+  baseline_model: ensemble
+  forecast_history_hours: 168
+  extreme_threshold: 150.0
+zones:
+  FR:
+    enabled: true
+    timezone: Europe/Paris
+    include_calendar: true
+    target:
+      series: power.price.da.fr.bzn.hourly.entsoe.utc.cdh.eurmwh
+      naive_timezone: UTC
+      description: Prix Day-Ahead France horaire ENTSO-E (timeline UTC)
+      source: cache
+    covariates:
+      fr_residual_load_fcst:
+        enabled: true
+        source: pit_parquet
+        series: power.fr.residual.load.hourly.gw.fcst
+        fill_method: none
+        minimum_coverage: 0.5
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      fr_nuclear_generation_fcst:
+        enabled: false
+        source: pit_parquet
+        series: power.fr.generation.nuclear.remit.mw.fcst
+        fill_method: none
+        minimum_coverage: 0.5
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      fr_nuclear_generation_obs:
+        enabled: false
+        source: cache
+        series: power.fr.generation.nuclear.entsoe.hourly.gw.obs
+        naive_timezone: Europe/Paris
+        incomplete_dst_policy: duplicate
+        include_base_context: false
+        fill_method: ffill
+        fill_limit: 2
+        minimum_coverage: 0.9
+        future:
+          known_future: false
+          strategies:
+          - lag96
+      de_residual_load_fcst:
+        enabled: true
+        source: pit_parquet
+        series: power.de.residual.load.hourly.gw.fcst
+        fill_method: none
+        minimum_coverage: 0.5
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      be_residual_load_fcst:
+        enabled: true
+        source: pit_parquet
+        series: power.be.residual.load.hourly.gw.fcst
+        fill_method: none
+        minimum_coverage: 0.5
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      nl_residual_load_fcst:
+        enabled: true
+        source: pit_parquet
+        series: power.nl.residual.load.hourly.gw.fcst
+        fill_method: none
+        minimum_coverage: 0.5
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      es_residual_load_fcst:
+        enabled: true
+        source: pit_parquet
+        series: power.es.residual.load.hourly.gw.fcst
+        fill_method: none
+        minimum_coverage: 0.5
+        future:
+          known_future: true
+          strategies:
+          - oracle
+      fr_net_exports:
+        enabled: false
+        source: cache
+        series: power.net.fr.exports.core.entsoe.hourly.gw.obs
+        incomplete_dst_policy: duplicate
+        include_base_context: false
+        fill_method: ffill
+        fill_limit: 2
+        minimum_coverage: 0.9
+        future:
+          known_future: false
+          strategies:
+          - lag96

@@ -1,0 +1,208 @@
+# Experience FR autonome : Kalman meteo Saturn avec refit quotidien D-365..D-1.
+#
+# Les trois fichiers externes sont des vintages day-ahead stricts, figes au
+# cutoff civil D-1 08:00 Europe/Paris. Le chargeur refuse toute origine ou
+# revision posterieure au cutoff et exige une couverture horaire complete.
+#
+# Le protocole utilise 365 jours de calibration, 60 jours de validation puis
+# les 365 derniers jours de test (29/08/2025 -> 28/08/2026). Le prefixe OOF
+# Chronos audite porte l'historique total a 970 jours; apres recadrage rolling,
+# 790 jours alimentent exactement train+validation+test. Le bridge residuel
+# reconstruit causalement le prefixe train et superpose l'upstream deja publie
+# sur validation/test. Les vintages meteo couvrent 791 jours
+# (30/06/2024 -> 29/08/2026).
+schema_version: 1
+experiment_id: kalman_weather_fr_rolling365_20260829_v2
+source_run: runs/live/fr_day_ahead_2026-08-29
+output_directory: runs/experiments/auxiliary_lab/kalman_weather_fr_rolling365_20260829_v2
+timezone: Europe/Paris
+
+split:
+  validation_days: 60
+  test_days: 365
+  minimum_training_days: 365
+  # Toutes les heures physiques du jour, y compris les jours DST 23/25 h.
+  horizon_hours: null
+
+objective: mae
+metrics:
+  - mae
+  - rmse
+  - bias
+  - pinball_q10
+  - pinball_q50
+  - pinball_q90
+  - coverage80
+  - interval_width80
+  - mean_observed_price
+  - mean_forecast_price
+  - mean_price_error
+random_seed: 42
+report:
+  enabled: true
+  embed_plotly: true
+
+models:
+  # Recette autonome de production. Pour fournir les 365 jours de warm-up au
+  # Kalman, elle est rejouee par blocs causaux uniquement sur le prefixe train.
+  # Les premiers jours sans 720 labels restent strictement identiques a
+  # Chronos. Validation/test reutilisent residual_corrected deja publie.
+  residual_corrector:
+    enabled: true
+    base_model: chronos2
+    expert_models: [chronos2]
+    recipe: blend
+    fixed_parameters:
+      min_training_rows: 720
+      correction_scale: 1.0
+      max_abs_correction: null
+      feature_builder_options:
+        timezone: Europe/Paris
+        include_calendar: true
+        include_rich_calendar: true
+        rich_calendar_countries: [FR, DE, BE, ES, NL]
+        rich_calendar_primary_country: FR
+        include_daily_profiles: true
+        include_fundamental_interactions: false
+        include_missing_indicators: false
+        exclude_historical_prices: true
+        exclude_day_of_year: true
+    parameter_grid: {}
+    components:
+      cat_v1:
+        backend: catboost
+        iterations: 700
+        depth: 6
+        learning_rate: 0.03
+        l2_leaf_reg: 15.0
+        min_samples_leaf: 30
+        thread_count: -1
+        verbose: false
+      hgb31:
+        backend: sklearn
+        iterations: 550
+        depth: 5
+        learning_rate: 0.035
+        l2_leaf_reg: 60.0
+        min_samples_leaf: 30
+        sklearn_early_stopping: false
+    weight_candidates:
+      - {cat_v1: 0.50, hgb31: 0.50}
+    blend_max_abs_correction: 40.0
+    prequential_bridge:
+      refit_cadence_days: 28
+      training_lookback_days: 365
+      cold_start_policy: identity
+      history_prefix_path: runs/chronos2_hourly_fr_residual_extended_v1/inputs/chronos_oof_extended.csv.gz
+
+  mkonline_blend:
+    enabled: false
+    autonomous_model: residual_corrected
+    primary_column: mkonline_primary__q50
+    weight_step: 0.01
+    fixed_parameters: {}
+    parameter_grid: {}
+
+  kalman:
+    enabled: true
+    upstream_model: residual_corrected
+    # Chaque jour evalue est refitte depuis zero uniquement sur D-365..D-1.
+    training_lookback_days: 365
+    # Les origines D sont independantes; quatre processus reduisent le temps
+    # de calcul sans modifier les observations, les poids ni les predictions.
+    rolling_refit_workers: 4
+
+    covariates:
+      input_columns:
+        - fr_temperature_fcst
+        - fr_wind_generation_fcst
+        - fr_solar_generation_fcst
+
+      derived:
+        fr_heating_degree:
+          kind: heating_degree
+          source: fr_temperature_fcst
+          threshold: 15.0
+        fr_cooling_degree:
+          kind: cooling_degree
+          source: fr_temperature_fcst
+          threshold: 22.0
+        fr_wind_ramp_3h:
+          kind: ramp
+          source: fr_wind_generation_fcst
+          periods: 3
+        fr_solar_ramp_3h:
+          kind: ramp
+          source: fr_solar_generation_fcst
+          periods: 3
+
+      groups:
+        # Groupe de compatibilite avec le contrat generique. Aucun candidat
+        # linear_market n'est active dans cette experience meteo dediee.
+        market:
+          - fr_temperature_fcst
+        weather:
+          - fr_temperature_fcst
+          - fr_heating_degree
+          - fr_cooling_degree
+        renewables:
+          - fr_wind_generation_fcst
+          - fr_solar_generation_fcst
+          - fr_wind_ramp_3h
+          - fr_solar_ramp_3h
+        # Tous les fondamentaux sont des previsions disponibles au cutoff.
+        fundamentals:
+          - fr_temperature_fcst
+          - fr_heating_degree
+          - fr_cooling_degree
+          - fr_wind_generation_fcst
+          - fr_solar_generation_fcst
+          - fr_wind_ramp_3h
+          - fr_solar_ramp_3h
+      history_missing_policy: complete_trailing
+      minimum_history_coverage: 1.0
+      require_future_complete: true
+
+    additional_sources:
+      - path: data/pit/kalman_weather/fr_temperature_fcst.parquet
+        timestamp_column: value_time_utc
+        columns:
+          fr_temperature_fcst: value
+        origin_column: snapshot_time_utc
+        revision_column: revision_time_utc
+        cutoff_column: snapshot_time_utc
+        cutoff_time: "08:00"
+      - path: data/pit/kalman_weather/fr_wind_generation_fcst.parquet
+        timestamp_column: value_time_utc
+        columns:
+          fr_wind_generation_fcst: value
+        origin_column: snapshot_time_utc
+        revision_column: revision_time_utc
+        cutoff_column: snapshot_time_utc
+        cutoff_time: "08:00"
+      - path: data/pit/kalman_weather/fr_solar_generation_fcst.parquet
+        timestamp_column: value_time_utc
+        columns:
+          fr_solar_generation_fcst: value
+        origin_column: snapshot_time_utc
+        revision_column: revision_time_utc
+        cutoff_column: snapshot_time_utc
+        cutoff_time: "08:00"
+
+    fixed_parameters:
+      candidate_kinds:
+        - linear_weather
+        - linear_renewables
+        - linear_fundamental
+      scale_q_over_r: 0.0001
+      innovation_clip_sigma: 3.0
+      governance_lookback_days: 60
+      governance_minimum_days: 14
+      governance_weight_step: 0.05
+      minimum_gain_eur_mwh: 0.05
+      minimum_relative_gain: 0.005
+      market_feature_clip: 5.0
+    # Deux valeurs de bruit seulement : la selection reste informative, puis
+    # un unique gagnant est rejoue selon le refit rolling365 exact (couteux).
+    parameter_grid:
+      q_over_r: [0.0005, 0.001]

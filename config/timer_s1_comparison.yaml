@@ -1,0 +1,41 @@
+schema_version: 1
+
+# Tous les chemins relatifs sont resolus depuis ce repertoire projet.
+project_root: ..
+
+comparison:
+  source_run: runs/chronos2_hourly_fr_residual_extended_v1
+  output_directory: runs/experiments/timer_s1_fr
+  timer_oof_file: runs/experiments/timer_s1_fr/timer_s1_oof.csv.gz
+  chronos_target_only_oof_file: runs/experiments/timer_s1_fr/chronos2_target_only_oof.csv.gz
+  timezone: Europe/Paris
+
+  # Fenetres exactement identiques au run FR gele.
+  extended_days: 223
+  calibration_days: 365
+  evaluation_days: 365
+  context_length: 2048
+
+  # Chaque checkpoint ne contient que des journees locales completes. La
+  # publication d'un checkpoint et de l'OOF final est atomique.
+  checkpoint_days: 7
+  bootstrap_samples: 20000
+  seed: 42
+  threads: -1
+
+timer_s1:
+  model_id: bytedance-research/Timer-S1
+  revision: 8911430cc7f32add5c8913afe12e3b05742f5bb2
+  device_map: auto
+  torch_dtype: bfloat16
+  batch_size: 1
+  local_files_only: false
+  model_kwargs:
+    use_cache: false
+
+chronos2_target_only:
+  model_id: amazon/chronos-2
+  revision: 29ec3766d36d6f73f0696f85560a422f50e8498c
+  device: auto
+  batch_size: 8
+  local_files_only: true

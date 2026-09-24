@@ -1,0 +1,237 @@
+version: 1
+
+# Challenger isole: une banque unique compare quotidiennement des corrections
+# simples et des corrections conditionnees par le marche, la meteo et les
+# combustibles. L'identite reste toujours disponible dans la gouvernance et
+# aucune de ces donnees ne modifie le forecast amont residual_corrected.
+training_lookback_days: 365
+rolling_refit_workers: 4
+
+filter_parameters:
+  q_over_r: 0.001
+  scale_q_over_r: 0.0001
+  innovation_clip_sigma: 3.0
+  shift_clip_eur_mwh: 20.0
+  governance_lookback_days: 90
+  governance_minimum_days: 30
+  governance_confirmation_days: 14
+  governance_weight_step: 0.05
+  minimum_gain_eur_mwh: 0.10
+  minimum_relative_gain: 0.01
+  scale_minimum: 0.5
+  scale_maximum: 1.5
+  ukf_scale_persistence: 0.99
+  market_feature_clip: 5.0
+  candidate_kinds:
+    - linear_bias
+    - linear_harmonic
+    - linear_market
+    - linear_weather
+    - linear_renewables
+    - linear_fundamental
+    - linear_fuel
+    - linear_market_weather
+    - linear_market_weather_fuel
+    - linear_scale
+    - ukf_scale
+
+covariates:
+  input_columns:
+    - fr_residual_load_fcst
+    - de_residual_load_fcst
+    - be_residual_load_fcst
+    - nl_residual_load_fcst
+    - es_residual_load_fcst
+    - "${zone_lower}_temperature_fcst"
+    - "${zone_lower}_wind_generation_fcst"
+    - "${zone_lower}_solar_generation_fcst"
+    - "${zone_lower}_ttf_m1_eur_mwh_th"
+    - "${zone_lower}_eua_first_dec_eur_tco2"
+    - "${zone_lower}_ttf_change_1d"
+    - "${zone_lower}_ttf_change_5d"
+    - "${zone_lower}_eua_change_1d"
+    - "${zone_lower}_eua_change_5d"
+    - "${zone_lower}_fuel_volatility_20d"
+  derived:
+    residual_load_spread:
+      kind: spread
+      sources:
+        - fr_residual_load_fcst
+        - de_residual_load_fcst
+        - be_residual_load_fcst
+        - nl_residual_load_fcst
+        - es_residual_load_fcst
+    "${zone_lower}_heating_degree":
+      kind: heating_degree
+      source: "${zone_lower}_temperature_fcst"
+      threshold: 15.0
+    "${zone_lower}_cooling_degree":
+      kind: cooling_degree
+      source: "${zone_lower}_temperature_fcst"
+      threshold: 22.0
+    "${zone_lower}_wind_ramp_3h":
+      kind: ramp
+      source: "${zone_lower}_wind_generation_fcst"
+      periods: 3
+    "${zone_lower}_solar_ramp_3h":
+      kind: ramp
+      source: "${zone_lower}_solar_generation_fcst"
+      periods: 3
+  groups:
+    market:
+      - fr_residual_load_fcst
+      - de_residual_load_fcst
+      - be_residual_load_fcst
+      - nl_residual_load_fcst
+      - es_residual_load_fcst
+      - residual_load_spread
+    weather:
+      - "${zone_lower}_temperature_fcst"
+      - "${zone_lower}_heating_degree"
+      - "${zone_lower}_cooling_degree"
+    renewables:
+      - "${zone_lower}_wind_generation_fcst"
+      - "${zone_lower}_solar_generation_fcst"
+      - "${zone_lower}_wind_ramp_3h"
+      - "${zone_lower}_solar_ramp_3h"
+    fundamentals:
+      - "${zone_lower}_temperature_fcst"
+      - "${zone_lower}_heating_degree"
+      - "${zone_lower}_cooling_degree"
+      - "${zone_lower}_wind_generation_fcst"
+      - "${zone_lower}_solar_generation_fcst"
+      - "${zone_lower}_wind_ramp_3h"
+      - "${zone_lower}_solar_ramp_3h"
+    fuel:
+      - "${zone_lower}_ttf_m1_eur_mwh_th"
+      - "${zone_lower}_eua_first_dec_eur_tco2"
+      - "${zone_lower}_ttf_change_1d"
+      - "${zone_lower}_ttf_change_5d"
+      - "${zone_lower}_eua_change_1d"
+      - "${zone_lower}_eua_change_5d"
+      - "${zone_lower}_fuel_volatility_20d"
+    market_weather:
+      - fr_residual_load_fcst
+      - de_residual_load_fcst
+      - be_residual_load_fcst
+      - nl_residual_load_fcst
+      - es_residual_load_fcst
+      - residual_load_spread
+      - "${zone_lower}_temperature_fcst"
+      - "${zone_lower}_heating_degree"
+      - "${zone_lower}_cooling_degree"
+      - "${zone_lower}_wind_generation_fcst"
+      - "${zone_lower}_solar_generation_fcst"
+      - "${zone_lower}_wind_ramp_3h"
+      - "${zone_lower}_solar_ramp_3h"
+    market_weather_fuel:
+      - fr_residual_load_fcst
+      - de_residual_load_fcst
+      - be_residual_load_fcst
+      - nl_residual_load_fcst
+      - es_residual_load_fcst
+      - residual_load_spread
+      - "${zone_lower}_temperature_fcst"
+      - "${zone_lower}_heating_degree"
+      - "${zone_lower}_cooling_degree"
+      - "${zone_lower}_wind_generation_fcst"
+      - "${zone_lower}_solar_generation_fcst"
+      - "${zone_lower}_wind_ramp_3h"
+      - "${zone_lower}_solar_ramp_3h"
+      - "${zone_lower}_ttf_m1_eur_mwh_th"
+      - "${zone_lower}_eua_first_dec_eur_tco2"
+      - "${zone_lower}_ttf_change_1d"
+      - "${zone_lower}_ttf_change_5d"
+      - "${zone_lower}_eua_change_1d"
+      - "${zone_lower}_eua_change_5d"
+      - "${zone_lower}_fuel_volatility_20d"
+  history_missing_policy: complete_trailing
+  minimum_history_coverage: 1.0
+  require_future_complete: true
+
+upstream_history:
+  path: "${runtime_source_root}/${zone_lower}_residual_corrected_prequential.csv.gz"
+  audit_path: "${runtime_source_root}/${zone_lower}_residual_corrected_prequential.audit.json"
+  upstream_model: residual_corrected
+  protocol: blocked_prequential_residual_then_issued_evaluation_overlay
+
+additional_sources:
+  residual_load_market:
+    path: "${runtime_source_root}/residual_load_market_features.parquet"
+    timestamp_column: value_time_utc
+    columns:
+      fr_residual_load_fcst: fr_residual_load_fcst
+      de_residual_load_fcst: de_residual_load_fcst
+      be_residual_load_fcst: be_residual_load_fcst
+      nl_residual_load_fcst: nl_residual_load_fcst
+      es_residual_load_fcst: es_residual_load_fcst
+    information_type: day_ahead_forecast
+    cutoff_policy: Saturn as-of au cutoff civil D-1 08:00
+    origin_column: snapshot_time_utc
+    revision_column: revision_time_utc
+    cutoff_column: cutoff_time_utc
+    cutoff_time: "08:00"
+  "${zone_lower}_temperature_fcst":
+    path: "${runtime_source_root}/${zone_lower}_temperature_fcst.parquet"
+    timestamp_column: value_time_utc
+    columns:
+      "${zone_lower}_temperature_fcst": value
+    information_type: day_ahead_forecast
+    cutoff_policy: Saturn as-of D-1 08:00 civil
+    origin_column: snapshot_time_utc
+    revision_column: revision_time_utc
+    cutoff_column: snapshot_time_utc
+    cutoff_time: "08:00"
+  "${zone_lower}_wind_generation_fcst":
+    path: "${runtime_source_root}/${zone_lower}_wind_generation_fcst.parquet"
+    timestamp_column: value_time_utc
+    columns:
+      "${zone_lower}_wind_generation_fcst": value
+    information_type: day_ahead_forecast
+    cutoff_policy: Saturn as-of D-1 08:00 civil
+    origin_column: snapshot_time_utc
+    revision_column: revision_time_utc
+    cutoff_column: snapshot_time_utc
+    cutoff_time: "08:00"
+  "${zone_lower}_solar_generation_fcst":
+    path: "${runtime_source_root}/${zone_lower}_solar_generation_fcst.parquet"
+    timestamp_column: value_time_utc
+    columns:
+      "${zone_lower}_solar_generation_fcst": value
+    information_type: day_ahead_forecast
+    cutoff_policy: Saturn as-of D-1 08:00 civil
+    origin_column: snapshot_time_utc
+    revision_column: revision_time_utc
+    cutoff_column: snapshot_time_utc
+    cutoff_time: "08:00"
+  "${zone_lower}_fuel_market":
+    path: "${runtime_source_root}/market_fuel_features.parquet"
+    timestamp_column: value_time_utc
+    columns:
+      "${zone_lower}_ttf_m1_eur_mwh_th": ttf_m1_eur_mwh_th
+      "${zone_lower}_eua_first_dec_eur_tco2": eua_first_dec_eur_tco2
+      "${zone_lower}_ttf_change_1d": ttf_change_1d
+      "${zone_lower}_ttf_change_5d": ttf_change_5d
+      "${zone_lower}_eua_change_1d": eua_change_1d
+      "${zone_lower}_eua_change_5d": eua_change_5d
+      "${zone_lower}_fuel_volatility_20d": fuel_volatility_20d
+    information_type: last_known_market_prices
+    cutoff_policy: dernier TTF/EUA connu au plus tard a D-1 08:00 civil
+    origin_column: market_source_value_time_utc
+    revision_column: revision_time_utc
+    cutoff_column: snapshot_time_utc
+    cutoff_time: "08:00"
+
+provenance:
+  purpose: governed_residual_kalman_market_weather_fuel_shadow_test
+  deployment_status: experimental_shadow
+  candidate_bank: market_weather_fuel_ablation
+  governance_protocol: selection_76_days_then_confirmation_14_days
+  training_window: exact_rolling_365_local_days
+  residual_load_source: saturn_day_ahead_asof_d_minus_1_08_local
+  fuel_market_sources: ttf_m1_and_eua_first_dec_last_known_before_cutoff
+  actual_weather_used: false
+  future_fuel_prices_used: false
+  storm_used_as_input: false
+  mkonline_used_as_input: false
+  sealed_live_contract_modified: false

@@ -1,0 +1,14 @@
+schema_version: 1
+# Independent challenger. Forecast.ps1 / Both / Complete remain unchanged.
+project_root: ..
+output_root: runs/experiments/nuclear_cwe_v1
+source_root: data/pit/nuclear_cwe
+delivery_day: '2026-09-11'
+zones: [FR]
+# Same frozen neural recipe, labels, Storm and cold-start anchor as these runs.
+baseline_root: runs/experiments/nuclear_forecast_v1
+baseline_protocol: civil_pit_v2
+include_attribution: true
+# BE/NL are FORECAST AVAILABLE CAPACITY (Pmax GW), not generation forecasts.
+# Model settings come from each frozen baseline resolved_config.yaml.
+# No hyperparameters are selected on the evaluation period.

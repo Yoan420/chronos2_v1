@@ -1,0 +1,110 @@
+schema_version: 2
+activate: false
+output_root: runs/experiments/marginal_cost_expert_v2
+sources_config: config/marginal_cost_sources_v2.yaml
+# Freeze exactly the observations and reference forecasts used for V1.
+reference_snapshot: runs/experiments/marginal_cost_expert_v1/snapshots/20260909T135218Z_afa10eaa
+evaluation:
+  start_day: '2025-09-10'
+  end_day: '2026-09-09'
+  training_days: 365
+  timezone: Europe/Paris
+  cutoff_time: '08:00'
+network:
+  audit_path: data/pit/marginal_cost_expert_v2/network/window_audit.json
+  cutoff_time: '08:00'
+  domain_reference_qualified: false
+  boundary_qualified: false
+  policy: audit_only_until_initial_domain_and_all_boundaries_are_qualified
+expert:
+  demand_basis: residual
+  residual_netting:
+    FR: [wind, solar, hydro_ror]
+    DE: [wind, solar, hydro_ror]
+    BE: [wind, solar]
+    NL: [wind, solar]
+  stack_scope_qualified_by_zone: {FR: false, DE: false, BE: false, NL: false}
+  # Listing a required technology does not create its missing offers.
+  required_technologies:
+    FR: [nuclear, ccgt, ocgt, coal, oil, biomass, hydro_reservoir, storage]
+    DE: [ccgt, ocgt, coal, lignite, oil, biomass, hydro_reservoir, storage]
+    BE: [nuclear, ccgt, ocgt, biomass, hydro_reservoir, storage]
+    NL: [nuclear, ccgt, ocgt, coal, biomass, storage]
+  units:
+    demand_mw: MW
+    nuclear_available_mw: MW
+    gas_available_mw: MW
+    coal_available_mw: MW
+    lignite_available_mw: MW
+    ttf_eur_mwh_th: EUR/MWh_th
+    coal_eur_mwh_th: EUR/MWh_th
+    lignite_eur_mwh_th: EUR/MWh_th
+    eua_eur_tco2: EUR/tCO2
+  residual_surplus_bid_eur_mwh: -20.0
+  scarcity_price_eur_mwh: 4000.0
+  segments:
+    - id: nuclear
+      technology: nuclear
+      capacity_column: nuclear_available_mw
+      zones: [FR, DE, BE, NL]
+      bid:
+        kind: assumed
+        value_eur_mwh: 10.0
+        hypothesis: Engineering low-cost curtailable supply proxy, not an observed nuclear bid.
+    - id: efficient_gas
+      technology: ccgt
+      capacity_column: gas_available_mw
+      capacity_fraction: 0.85
+      bid:
+        kind: fuel
+        fuel_column: ttf_eur_mwh_th
+        eua_column: eua_eur_tco2
+        efficiency: 0.58
+        emissions_tco2_mwh_th: 0.202
+        vom_eur_mwh: 3.0
+    - id: peaking_gas
+      technology: ocgt
+      capacity_column: gas_available_mw
+      capacity_fraction: 0.15
+      bid:
+        kind: fuel
+        fuel_column: ttf_eur_mwh_th
+        eua_column: eua_eur_tco2
+        efficiency: 0.38
+        emissions_tco2_mwh_th: 0.202
+        vom_eur_mwh: 5.0
+    - id: hard_coal
+      technology: coal
+      capacity_column: coal_available_mw
+      zones: [DE, NL]
+      bid:
+        kind: fuel
+        fuel_column: coal_eur_mwh_th
+        eua_column: eua_eur_tco2
+        efficiency: 0.39
+        emissions_tco2_mwh_th: 0.341
+        vom_eur_mwh: 4.0
+    - id: lignite
+      technology: lignite
+      capacity_column: lignite_available_mw
+      zones: [DE]
+      bid:
+        kind: fuel
+        fuel_column: lignite_eur_mwh_th
+        eua_column: eua_eur_tco2
+        efficiency: 0.38
+        emissions_tco2_mwh_th: 0.364
+        vom_eur_mwh: 5.0
+# Predeclared engineering scenarios, not identified generating units.
+# Select each scenario using exactly the preceding 365 calendar days.
+scenarios:
+  efficient: {efficient_gas: 0.62, peaking_gas: 0.42, hard_coal: 0.43, lignite: 0.42}
+  central: {efficient_gas: 0.58, peaking_gas: 0.38, hard_coal: 0.39, lignite: 0.38}
+  inefficient: {efficient_gas: 0.52, peaking_gas: 0.33, hard_coal: 0.34, lignite: 0.33}
+assumptions:
+  gas_split: 85% efficient / 15% peaking is an engineering assumption; never add type.ccgt/type.gt on top of fuel.nat_gas.
+  missing_supply: No imputation of missing national plants, flexible hydro energy, storage or network imports.
+  scarcity_penalty: 4000 EUR/MWh is an artificial diagnostic slack penalty, not a forecast of actual market scarcity.
+  labels: Frozen canonical revisions for calibration; frozen report observations for scoring. Historical insertion timestamps not certified.
+  validation: June 24-26 was identified retrospectively; this is not an untouched final test.
+  temporal_information: Strict D-1 08:00 Europe/Paris; no D2CF/RefProg published at 10:30, no post-coupling features.

@@ -1,0 +1,3 @@
+filter_parameters:
+  governance_lookback_days: SYNTHETIC_SECRET_DO_NOT_EXPOSE_GOVERNANCE
+private_key: SYNTHETIC_SECRET_DO_NOT_EXPOSE_PEM

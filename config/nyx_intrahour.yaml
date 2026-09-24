@@ -1,0 +1,16 @@
+schema_version: 1
+# Fixed before the native-feature backtest; never switch to an in-progress NYX run.
+baseline_delivery_day: '2026-09-16'
+source_manifest: data/pit/nyx_intrahour/be_solar_elia_20250916_20260915/manifest.json
+output_root: runs/experiments/nyx_intrahour_v1
+evaluation:
+  initial_train_days: 180
+  validation_days: 94
+  test_days: 90
+  window_days: 180
+  refit_every_days: 7
+  min_train_rows: 720
+  bootstrap_repetitions: 1000
+  seed: 20260916
+diagnostic_only: true
+activation_performed: false

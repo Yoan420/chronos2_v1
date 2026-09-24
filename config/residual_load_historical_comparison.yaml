@@ -1,0 +1,67 @@
+schema_version: 1
+experiment_id: residual_load_chronos2_historical_v1
+
+protocol:
+  timezone: Europe/Paris
+  forecast_origin_local_time: "08:00"
+  extended_start_day: "2024-01-02"
+  extended_end_day: "2024-08-11"
+  oof_start_day: "2024-08-12"
+  oof_end_day: "2026-08-11"
+  final_start_day: "2025-08-12"
+  final_end_day: "2026-08-11"
+  expected_extended_days: 223
+  expected_oof_days: 730
+  expected_final_days: 365
+  preserve_saturn_availability_mask: true
+
+model:
+  model_id: amazon/chronos-2
+  revision: 29ec3766d36d6f73f0696f85560a422f50e8498c
+  context_length: 2048
+  maximum_internal_gap_hours: 6
+  origin_batch_size: 12
+  model_batch_size: 128
+  residual_batch_size: 64
+
+saturn:
+  url: https://saturn-energyscan.gem.myengie.com//api
+  author: BQ6757
+  observed_history_margin_days: 14
+  history_chunk_days: 60
+  retries: 3
+
+observed_series:
+  fr_residual_load_fcst: power.fr.residual.load.entsoe.hourly.gw.obs
+  de_residual_load_fcst: power.de.residual.load.entsoe.hourly.gw.obs
+  be_residual_load_fcst: power.be.residual.load.entsoe.hourly.gw.obs
+  nl_residual_load_fcst: power.nl.residual.load.entsoe.hourly.gw.obs
+  es_residual_load_fcst: power.es.residual.load.entsoe.hourly.gw.obs
+
+zones:
+  FR:
+    timezone: Europe/Paris
+    base_config: chronos2_hourly_fr_residual_v1.yaml
+    sealed_extended_run: runs/chronos2_hourly_fr_residual_extended_v1
+    sealed_blend_run: runs/chronos2_hourly_fr_mkonline_blend_v1
+  DE:
+    timezone: Europe/Berlin
+    base_config: chronos2_hourly_de_residual_candidate_v1.yaml
+    sealed_extended_run: runs/chronos2_hourly_de_residual_extended_v1
+  BE:
+    timezone: Europe/Brussels
+    base_config: chronos2_hourly_be_residual_candidate_v1.yaml
+    sealed_extended_run: runs/chronos2_hourly_be_residual_extended_v1
+  NL:
+    timezone: Europe/Amsterdam
+    base_config: chronos2_hourly_nl_residual_candidate_v1.yaml
+    sealed_extended_run: runs/chronos2_hourly_nl_residual_extended_v1
+    sealed_blend_run: runs/chronos2_hourly_nl_mkonline_blend_v1
+  ES:
+    timezone: Europe/Madrid
+    base_config: chronos2_hourly_es_residual_candidate_v1.yaml
+    sealed_extended_run: runs/chronos2_hourly_es_residual_extended_v1
+
+outputs:
+  experiment_root: runs/experiments/residual_load_chronos2_historical_v1
+  export_root: runs/exports/residual_load_chronos2

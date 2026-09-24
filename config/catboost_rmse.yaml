@@ -1,0 +1,10 @@
+schema_version: 1
+delivery_day: '2026-09-19'
+evaluation_days: 365
+zones: [FR, DE, BE, NL]
+source_state: runs/experiments/solar_correction_v1/2026-09-19/latest_FR_DE_BE_NL.json
+output_root: runs/experiments/catboost_rmse_v1
+loss_function: RMSE
+max_abs_correction: 40.0
+diagnostic_only: true
+production_modified: false

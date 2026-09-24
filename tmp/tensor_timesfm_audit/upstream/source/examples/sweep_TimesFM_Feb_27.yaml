@@ -1,0 +1,113 @@
+# sweep_timesfm_eps_ortho.yaml
+project: eps-timesfm-tensor-ortho
+name: timesfm-eps-vanilla-grid
+method: grid
+
+metric:
+  name: final/model_r2          # maximize model R² on final summary
+  goal: maximize
+
+# CHANGE this path to the actual script filename if different
+program: ./examples/EPS_TimesFM_debug_Feb28_2026.py
+parameters:
+  # ---- TimesFM path (fixed) ----
+  use_timesfm:
+    value: true
+  # w_predict:
+  #   value: 0.0                  # disabled with TimesFM
+  trainable_weights:
+    value: false                # vanilla fixed weights
+
+  # ---- training/data (fixed) ----
+  epochs_per_window:
+    values: [10]
+  start_split_ratio:
+    value: 0.8
+  batch_size:
+    value: 131072
+  learning_rate:
+    value: 0.001
+  weight_decay:
+    value: 0.00001
+  num_workers:
+    value: 16
+
+  # ---- model capacity (fixed) ----
+  Rank_CP:
+    values: [200]
+  mlp_hidden:
+    value: 1024
+  dropout_p:
+    value: 0.1
+
+  # ---- heads & drivers (fixed) ----
+  use_two_stage_forecast:
+    value: true
+  driver_feature_indices:
+    value: "0,1,2,3,4,5,6,7,8,9,10,11,12,13"
+
+  # ---- window hygiene (fixed) ----
+  reset_each_window:
+    value: false
+  recompute_norm_each_window:
+    value: false 
+
+  # ---- TimesFM knobs (fixed) ----
+  timesfm_repo_id:
+    value: google/timesfm-2.0-500m-pytorch
+  timesfm_horizon_len:
+    value: 1
+  timesfm_context_cap:
+    value: 2048
+  timesfm_per_core_batch_size:
+    value: 32
+  timesfm_freq_category:
+    value: 2   # quarterly/yearly per model card
+
+  # ---- runtime / paths (fixed) ----
+  cuda:
+    value: 0
+  output_dir:
+    value: ./examples/EPS_TimesFM_weights_grid_Mar2_2_head_ortho_1_layer_mlp
+  target_feature_index:
+    value: 13
+  consensus_feature_index:
+    value: 12
+
+  # ---- input tensors (grid) ----
+  tensor_npy_path:
+    values:
+      - ./fundamentals_analyst_forecast_EPS_regression.npy
+  ticker_sidecar_npy_path:
+    value: ./fundamentals_analyst_forecast_EPS_regression_ticker.npy
+
+  # ---- loss weights (grid; vanilla, easy to reason) ----
+  # small recon weight, keep regression dominant, try moderate drivers weight
+  w_recon:
+    values: [!!float 1e-1]
+  w_forecast_drivers:
+    values: [!!float 1e-1]
+  w_predict:
+    values: [!!float 1e-3]   # disabled with TimesFM
+  w_regression:
+    values: [1.0]   # keep EPS regression main driver
+
+  # ---- orthogonality hyperparams (grid) ----
+  lambda_ortho_time:
+    values: [!!float 1e2]
+  ortho_penalty_norm:
+    values: ["L2"]
+  make_fiber_forecast_plot:
+    value: true
+  plot_firm_index:
+    value: 0
+  plot_feature_index:
+    values: [0]   # consensus + drivers
+  plot_all_firms:
+    value: true
+  timesfm_baseline_use_gpu:
+    value: true
+  timesfm_baseline_decode_batch_size:
+    value: 1024
+  seed:
+    values: [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]

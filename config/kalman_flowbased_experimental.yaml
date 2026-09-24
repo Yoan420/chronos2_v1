@@ -1,0 +1,87 @@
+version: 1
+model_key: residual_kalman_flowbased
+deployment_status: experimental_shadow
+
+# Comparable protocol: each of the 365 reported origins is refitted on the
+# immediately preceding 365 complete local delivery days.
+evaluation_days: 365
+training_lookback_days: 365
+rolling_refit_workers: 4
+
+filter_parameters:
+  q_over_r: 0.001
+  scale_q_over_r: 0.0001
+  innovation_clip_sigma: 3.0
+  shift_clip_eur_mwh: 20.0
+  governance_lookback_days: 90
+  governance_minimum_days: 30
+  governance_confirmation_days: 14
+  governance_weight_step: 0.05
+  minimum_gain_eur_mwh: 0.10
+  minimum_relative_gain: 0.01
+  scale_minimum: 0.5
+  scale_maximum: 1.5
+  ukf_scale_persistence: 0.99
+  market_feature_clip: 5.0
+  candidate_kinds:
+    - linear_bias
+    - linear_harmonic
+    - linear_market
+    - linear_fundamental
+    - linear_market_weather
+    - linear_scale
+
+# The POC deliberately reuses two generic, already-tested exogenous Kalman
+# families. This avoids touching kalman_residual.py and invalidating every
+# operational kalman/weather/hybrid cache. Reports expose the semantic aliases
+# below. A promoted version may introduce native names during a planned cache
+# migration.
+candidate_aliases:
+  linear_fundamental: linear_flowbased
+  linear_market_weather: linear_market_flowbased
+
+market_columns:
+  - fr_residual_load_fcst
+  - de_residual_load_fcst
+  - be_residual_load_fcst
+  - nl_residual_load_fcst
+  - es_residual_load_fcst
+
+# Compact, stable aggregates; no CNEC identifier, active constraint, shadow
+# price, realised net position or post-coupling price spread enters the state.
+flowbased_feature_columns:
+  - flowbased_cnec_mtu_availability
+  - flowbased_missing_mtu_share
+  - flowbased_hour_imputed
+  - flowbased_cnec_count
+  - flowbased_external_constraint_count
+  - flowbased_equality_constraint_count
+  - flowbased_external_ram_min_mw
+  - flowbased_external_ram_p10_mw
+  - flowbased_ram_min_mw
+  - flowbased_ram_p10_mw
+  - flowbased_ram_median_mw
+  - flowbased_ram_below_500_share
+  - flowbased_ram_to_fmax_p05
+  - flowbased_fr_de_ptdf_spread_p90
+  - flowbased_fr_be_ptdf_spread_p90
+  - flowbased_fr_nl_ptdf_spread_p90
+  - flowbased_fr_neighbor_ptdf_spread_p90
+  - flowbased_alegro_ptdf_spread_p90
+  - flowbased_core_ptdf_range_p90
+  - flowbased_fr_neighbor_ram_stress_p95_per_gw
+  - flowbased_alegro_ram_stress_p95_per_gw
+  - flowbased_core_ram_stress_p95_per_gw
+  - flowbased_stress_hhi
+
+provenance:
+  purpose: governed_residual_kalman_flowbased_poc
+  source_stage: JAO_Core_initialComputation_Presolved_true
+  cutoff: D-1_08:00_civil
+  historical_vintage_gate: JAO_lastModifiedOn_not_after_cutoff
+  exact_rolling_window: 365_local_days
+  report_window: 365_local_days
+  postcoupling_fields_used_as_input: false
+  storm_used_as_input: false
+  mkonline_used_as_input: false
+  forecast_mode_all_modified: false

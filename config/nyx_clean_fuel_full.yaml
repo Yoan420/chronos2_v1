@@ -1,0 +1,10 @@
+schema_version: 1
+delivery_day: '2026-09-18'
+zones: [FR, DE, BE, NL]
+output_root: runs/experiments/nyx_clean_fuel_full_v1
+source_root: runs/experiments/nuclear_forecast_v1
+fuel_sources:
+  maximum_age_hours: 176
+include_attribution: true
+diagnostic_only: true
+production_modified: false

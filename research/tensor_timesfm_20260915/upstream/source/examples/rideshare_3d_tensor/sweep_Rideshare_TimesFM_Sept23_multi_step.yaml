@@ -1,0 +1,69 @@
+# sweep_rideshare_timesfm_3d.yaml
+project: rideshare-timesfm-grid-search-multistep
+name: rideshare-timesfm-3d-multistep
+method: grid
+
+metric:
+  name: final/model_r2
+  goal: maximize
+
+program: ./examples/rideshare_3d_tensor/Rideshare_TimesFM_debug_Sept22_3losses_ortho_multi_step.py
+command:
+  - ${env}
+  - ${interpreter}
+  - ${program}
+  - ${args_no_boolean_flags}
+
+parameters:
+  # ---------- TimesFM on (disables GRU prediction loss) ----------
+  use_timesfm:             {value: true}
+  w_predict:               {value: 0}
+  trainable_weights:       {value: false}
+
+  # ---------- horizon & rolling ----------
+  forecast_horizon:        {value: 168}
+  epochs_per_window:       {value: 10}
+  context_len:             {value: 210}
+
+  # ---------- data / training ----------
+  start_split_ratio:       {value: 0.8}
+  batch_size:              {value: 131072}
+  learning_rate:           {value: 0.001}
+  weight_decay:            {value: 0.00001}
+  num_workers:             {value: 16}
+
+  # ---------- model capacity ----------
+  Rank_CP:                 {values: [300, 500, 1000, 1500, 2000]}
+  mlp_hidden:              {value: 1024}
+  dropout_p:               {value: 0.1}
+
+  # ---------- targets ----------
+  # Provide as a single comma-separated string; the script parses it.
+  target_feature_indices:  {values: ["0,1,2,3,4,5,6,7,8,9"]}
+  # Keep legacy single-target harmless to satisfy any checks.
+  target_feature_index:    {value: 0}
+
+  # ---------- window hygiene ----------
+  reset_each_window:           {value: false}
+  recompute_norm_each_window:  {value: false}
+
+  # ---------- TimesFM knobs ----------
+  timesfm_repo_id:             {value: google/timesfm-2.0-500m-pytorch}
+  timesfm_context_cap:         {value: 2048}
+  timesfm_per_core_batch_size: {value: 32}
+  timesfm_freq_category:       {value: 0}
+
+  # ---------- runtime / paths ----------
+  cuda:                    {value: 0}
+  output_dir:              {value: ./examples/rideshare_3d_tensor/rideshare_timesfm_3d_168steps_Nov_3_original}
+  consensus_feature_index: {value: 12}
+
+  # ---------- GRID: keep recon tiny; sweep forecast weight ----------
+  w_recon:               {values: [!!float 1e-6, !!float 1e-5,!!float 1e-4,!!float 1e-3,!!float 1e-2,!!float 1e-1,!!float 1e0,!!float 1e1,!!float 1e2,!!float 1e3]}
+  w_forecast:            {values: [!!float 1e-6, !!float 1e-5,!!float 1e-4,!!float 1e-3,!!float 1e-2,!!float 1e-1,!!float 1e0,!!float 1e1,!!float 1e2,!!float 1e3]}
+
+  # ---------- Orthogonality regularization ----------
+  lambda_ortho_time:     {values: [!!float 1e-1]}
+  ortho_penalty_norm:    {values: [ "L2"]}
+
+  mlp_layers: {values: [4]}

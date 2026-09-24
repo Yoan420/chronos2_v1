@@ -1,0 +1,8 @@
+schema_version: 1
+source_suite: runs/experiments/nyx_physical_p50_v1/snapshots/20260915T133116Z_095dc0d3
+output_root: runs/experiments/nyx_congestion_v1
+diagnostic_only: true
+production_modified: false
+activation_performed: false
+options:
+  threads: 2

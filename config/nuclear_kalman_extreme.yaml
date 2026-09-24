@@ -1,0 +1,36 @@
+schema_version: 1
+output_root: runs/experiments/nuclear_kalman_extreme_v1
+# Immutable inputs of the previous experiment; preserve the comparison year.
+source_expert_snapshot: runs/experiments/economic_extreme_policy_v1/snapshots/20260910T094048Z_191882db
+baseline_model: nuclear_kalman
+candidate_model: nuclear_kalman_extreme
+zones: [FR, DE, BE, NL]
+training_window_days: 365
+# Only 365 days of genuine baseline forecasts exist. Do not manufacture a
+# preceding year from the nuclear-autonomous/identity warmup. Use progressive
+# calibration, explicitly labelled in the report. Set 365 for strict fallback.
+minimum_training_days: 90
+expert:
+  minimum_training_coverage: 0.95
+  refit_every_days: 7
+  minimum_residual_eur_mwh: 10.0
+  correction_clip_eur_mwh: 100.0
+  candidate_weights: [0.0, 0.25, 0.5]
+  max_iter: 60
+  learning_rate: 0.06
+  max_leaf_nodes: 15
+  min_samples_leaf: 40
+  l2_regularization: 10.0
+  random_state: 1729
+  use_past_residual_features: false
+governance:
+  governance_lookback_days: 60
+  governance_minimum_days: 28
+  governance_minimum_changed_days: 7
+  governance_minimum_gain_eur_mwh: 0.05
+  governance_minimum_mae_gain_eur_mwh: 0.0
+  governance_regularization_eur_mwh: 0.02
+  governance_uncertainty_z: 1.96
+diagnostic_only: true
+production_modified: false
+order_execution_enabled: false

@@ -1,0 +1,49 @@
+live:
+  contract_schema_version: 1
+  zone: NL
+  delivery_timezone: Europe/Amsterdam
+  forecast_origin_timezone: Europe/Paris
+  forecast_origin_local_time: "08:00"
+  target_series: power.price.da.nl.bzn.hourly.entsoe.utc.cdh.eurmwh
+  prediction_mode: mkonline_blend
+  mkonline_enabled: true
+  primary_series: 41554_native
+  storm_dashboard_series: power.price.nl.euromwh.h.fcst.3mv.storm
+  storm_dashboard_primary_series: 41379_native
+  storm_dashboard_naive_timezone: Europe/Amsterdam
+  storm_strict_08_series: power.price.nl.euromwh.h.fcst.3mv.storm.da.basecase
+  storm_pit_path: null
+  forecast_filename: forecast_hourly_nl.csv
+  required_covariates:
+    - fr_residual_load_fcst
+    - de_residual_load_fcst
+    - be_residual_load_fcst
+    - nl_residual_load_fcst
+    - es_residual_load_fcst
+  base_config: chronos2_hourly_nl_residual_candidate_v1.yaml
+  frozen_autonomous_run: runs/chronos2_hourly_nl_residual_extended_v1
+  sealed_benchmark_run: runs/chronos2_hourly_nl_mkonline_blend_v1
+  recipe_manifest: runs/chronos2_hourly_nl_mkonline_blend_v1/zone_live_recipe.json
+  dependency_manifest: mkonline_nl_primary_dependency_v1.json
+  output_root: runs/live/nl_mkonline_v1
+  expected_hashes:
+    base_config_sha256: 69b0fbed1d04de7a44e947a05d4fe94a41650181d7e80f187016e50902188cd6
+    frozen_autonomous_checksum_manifest_sha256: 516537bd87b1dd432aba983b763ea04881e570a1aaab8e0a671f378fdcd770e3
+    sealed_benchmark_checksum_manifest_sha256: a99c38a6f023f91c2e5e6c6cd2a3f18d956071236cfa9ce217aba1ed5a6eebbb
+    recipe_manifest_sha256: bd8f36aafb7a47b0a204bb9a5819b1dc77da343ac9126bc112067d8d1c54917f
+    dependency_manifest_sha256: 6c6fb39ab017d14268948d9e7b29bad5b93dfc92903ccd54347bb46743b682f6
+  weights:
+    autonomous: 0.5322743966920516
+    mkonline_primary: 0.4677256033079484
+  threads: -1
+  workers: 8
+  max_revision_age_hours: 24
+  max_automatic_replay_days: 3
+  naive_timezone_overrides:
+    nl_residual_load_fcst: UTC
+
+report:
+  filename: chronos2_hourly_nl_live_{delivery_day}.html
+  title: Forecast day-ahead NL - livraison {delivery_day}
+  forecast_history_hours: 168
+  extreme_threshold: 150.0

@@ -1,0 +1,11 @@
+schema_version: 1
+source_suite: runs/experiments/nyx_scarcity_v1/fundamental/snapshots/20260914T152452Z_41529943
+output_root: runs/experiments/nyx_scarcity_v1/coherent_p50
+variants: [forest, empirical]
+primary_variant: forest
+max_parallel: 2
+# Primary is the DIRECT coherent median, fixed before this new backtest.
+# A governed counterpart is reported separately, without automatic promotion.
+diagnostic_only: true
+production_modified: false
+activation_performed: false

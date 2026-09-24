@@ -1,0 +1,21 @@
+schema_version: 1
+# Challenger isole : aucune modification des configurations live ou LoRA.
+project_root: ..
+output_root: runs/experiments/nuclear_forecast_v1
+# First delivery builds history once; following deliveries extend verified days.
+computation_mode: incremental
+nuclear_store: data/pit/nuclear_forecast/fr_nuclear_generation_fcst_gw.parquet
+# Reuse only the separately audited Saturn as-of bank, never the truncated
+# historical data/pit/vintages residual-load files. Extend an isolated copy.
+residual_bank: data/pit/nuclear_forecast/residual_load_market_features.parquet
+residual_bank_seed: data/pit/kalman_hybrid/residual_load_market_features.parquet
+incomplete_dst_policy: duplicate
+sync_chunk_days: 31
+lora_activation_config: config/chronos2_exogenous_activation_v1.yaml
+kalman_config: config/kalman_operational.yaml
+zone_configs:
+  FR: chronos2_hourly_fr_residual_v1.yaml
+  DE: chronos2_hourly_de_residual_candidate_v1.yaml
+  BE: chronos2_hourly_be_residual_candidate_v1.yaml
+  NL: chronos2_hourly_nl_residual_candidate_v1.yaml
+  ES: chronos2_hourly_es_residual_candidate_v1.yaml

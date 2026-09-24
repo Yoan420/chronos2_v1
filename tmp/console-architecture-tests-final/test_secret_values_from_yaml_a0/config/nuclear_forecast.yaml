@@ -1,0 +1,10 @@
+computation_mode: SYNTHETIC_SECRET_DO_NOT_EXPOSE_MODE
+kalman_config: config/kalman.yaml
+lora_activation_config: config/activation.yaml
+nuclear_store: SYNTHETIC_SECRET_DO_NOT_EXPOSE_PRIVATE_PATH
+password: SYNTHETIC_SECRET_DO_NOT_EXPOSE_PASSWORD
+zone_configs:
+  BE: config/zone.yaml
+  DE: config/zone.yaml
+  FR: config/zone.yaml
+  NL: config/zone.yaml

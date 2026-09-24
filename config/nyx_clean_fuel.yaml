@@ -1,0 +1,15 @@
+schema_version: 1
+# Separate challenger: never changes Forecast.ps1, Both, All or Complete.
+output_root: runs/experiments/nyx_clean_fuel_v1
+source_root: runs/experiments/nuclear_forecast_v1
+zones: [FR, DE, BE, NL]
+delivery_day: '2026-09-18'
+threads: 4
+workers: 2
+# Refit the existing residual recipe daily; keep its loss, clipping and seed.
+# Optional Kalman is refitted on this candidate's OWN 730-day corrected history.
+include_kalman: true
+fuel_sources:
+  maximum_age_hours: 176
+diagnostic_only: true
+production_modified: false

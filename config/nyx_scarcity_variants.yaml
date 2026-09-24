@@ -1,0 +1,19 @@
+schema_version: 1
+# Immutable completed HGB control: all challengers use these SAME observations.
+source_snapshot: runs/experiments/nyx_scarcity_v1/snapshots/20260914T125027Z_ed1dc982
+output_root: runs/experiments/nyx_scarcity_v1/variants
+max_parallel: 2
+# Optional existing policy parameters only; no feature/label allowlist override.
+policy_overrides: {}
+variants:
+  - {id: xgb_unweighted_fixed, weighted: false, threshold_kind: fixed}
+  - {id: xgb_weighted_fixed, weighted: true, threshold_kind: fixed}
+  - {id: xgb_unweighted_dwt, weighted: false, threshold_kind: dwt}
+  - {id: xgb_weighted_dwt, weighted: true, threshold_kind: dwt}
+explanations:
+  sample_days_last: 7
+  historical_stride_days: 7
+  historical_hour: 19
+diagnostic_only: true
+production_modified: false
+activation_performed: false

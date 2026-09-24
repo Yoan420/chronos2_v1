@@ -1,0 +1,193 @@
+schema_version: 1
+timezone: Europe/Paris
+purpose: independent_marginal_cost_research
+production_pit_evidence: false
+promotion_eligible: false
+# A partial net-demand stack, NOT a reconstruction of the entire bidding stack.
+# Coal/lignite data are collected separately but excluded here until their
+# fuel-cost and fleet-coverage contracts have been validated.
+sources:
+  fr_residual_load:
+    path: data/pit/nuclear_forecast/residual_load_market_features.parquet
+    value_column: fr_residual_load_fcst
+    unit: GW
+    information_type: day_ahead_forecast
+    series: power.fr.residual.load.hourly.gw.fcst
+    component: residual_load
+  de_residual_load:
+    path: data/pit/nuclear_forecast/residual_load_market_features.parquet
+    value_column: de_residual_load_fcst
+    unit: GW
+    information_type: day_ahead_forecast
+    series: power.de.residual.load.hourly.gw.fcst
+    component: residual_load
+  be_residual_load:
+    path: data/pit/nuclear_forecast/residual_load_market_features.parquet
+    value_column: be_residual_load_fcst
+    unit: GW
+    information_type: day_ahead_forecast
+    series: power.be.residual.load.hourly.gw.fcst
+    component: residual_load
+  nl_residual_load:
+    path: data/pit/nuclear_forecast/residual_load_market_features.parquet
+    value_column: nl_residual_load_fcst
+    unit: GW
+    information_type: day_ahead_forecast
+    series: power.nl.residual.load.hourly.gw.fcst
+    component: residual_load
+  fr_nuclear_generation:
+    path: data/pit/nuclear_forecast/fr_nuclear_generation_fcst_gw.parquet
+    unit: GW
+    information_type: day_ahead_forecast
+    series: power.fr.generation.nuclear.gw.fcst
+    component: nuclear
+  fr_ccgt:
+    path: data/pit/marginal_cost_expert/capacities/fr_ccgt_available_gw.parquet
+    unit: GW
+    information_type: capacity_forecast
+    series: power.nrjscan.fr.3mv.availability.pmax.type.ccgt.gw
+    component: ccgt
+  fr_gt:
+    path: data/pit/marginal_cost_expert/capacities/fr_gt_available_gw.parquet
+    unit: GW
+    information_type: capacity_forecast
+    series: power.nrjscan.fr.3mv.availability.pmax.type.gt.gw
+    component: gt
+  de_ccgt:
+    path: data/pit/marginal_cost_expert/capacities/de_ccgt_available_gw.parquet
+    unit: GW
+    information_type: capacity_forecast
+    series: power.nrjscan.de.3mv.availability.pmax.type.ccgt.gw
+    component: ccgt
+  de_gt:
+    path: data/pit/marginal_cost_expert/capacities/de_gt_available_gw.parquet
+    unit: GW
+    information_type: capacity_forecast
+    series: power.nrjscan.de.3mv.availability.pmax.type.gt.gw
+    component: gt
+  be_ccgt:
+    path: data/pit/marginal_cost_expert/capacities/be_ccgt_available_gw.parquet
+    unit: GW
+    information_type: capacity_forecast
+    series: power.nrjscan.be.3mv.availability.pmax.type.ccgt.gw
+    component: ccgt
+  be_gt:
+    path: data/pit/marginal_cost_expert/capacities/be_gt_available_gw.parquet
+    unit: GW
+    information_type: capacity_forecast
+    series: power.nrjscan.be.3mv.availability.pmax.type.gt.gw
+    component: gt
+  be_nuclear_available:
+    path: data/pit/marginal_cost_expert/capacities/be_nuclear_available_gw.parquet
+    unit: GW
+    information_type: capacity_forecast
+    series: power.nrjscan.be.3mv.availability.pmax.type.nuclear.gw
+    component: nuclear
+  nl_ccgt:
+    path: data/pit/marginal_cost_expert/capacities/nl_ccgt_available_gw.parquet
+    unit: GW
+    information_type: capacity_forecast
+    series: power.nrjscan.nl.3mv.availability.pmax.type.ccgt.gw
+    component: ccgt
+  nl_gt:
+    path: data/pit/marginal_cost_expert/capacities/nl_gt_available_gw.parquet
+    unit: GW
+    information_type: capacity_forecast
+    series: power.nrjscan.nl.3mv.availability.pmax.type.gt.gw
+    component: gt
+  nl_nuclear_available:
+    path: data/pit/marginal_cost_expert/capacities/nl_nuclear_available_gw.parquet
+    unit: GW
+    information_type: capacity_forecast
+    series: power.nrjscan.nl.3mv.availability.pmax.type.nuclear.gw
+    component: nuclear
+  ttf:
+    path: data/pit/marginal_cost_expert/fuel/market_fuel_features.parquet
+    value_column: ttf_m1_eur_mwh_th
+    unit: EUR/MWh_th
+    information_type: market_observation_known_before_cutoff
+    series: gas.ttf.price.everyday.month.1.ice.eurmwh
+    source_value_time_column: ttf_source_value_time_utc
+    maximum_age_hours: 192
+  eua:
+    path: data/pit/marginal_cost_expert/fuel/market_fuel_features.parquet
+    value_column: eua_first_dec_eur_tco2
+    unit: EUR/tCO2
+    information_type: market_observation_known_before_cutoff
+    series: carbon.eu.price.everyday.eua.ice.1st.dec
+    source_value_time_column: eua_source_value_time_utc
+    maximum_age_hours: 192
+zones:
+  FR:
+    demand_basis: residual
+    residual_definition:
+      evidence: "Saturn GET /series/formula read on 2026-09-09: FR residual = load - solar - wind - hydro ROR. Formula revision history not attested."
+      already_subtracted_components: [wind, solar, hydro_ror]
+    excluded_segments: [coal, oil, biomass_chp, flexible_hydro, storage]
+    inputs:
+      demand_mw: {terms: [{source: fr_residual_load}]}
+      must_run_mw: {terms: [{source: fr_nuclear_generation}]}
+      ccgt_available_mw: {terms: [{source: fr_ccgt}]}
+      ocgt_available_mw:
+        terms:
+          - source: fr_gt
+            assumption: "Provider GT-type availability mapped to gas OCGT cost segment; exact unit fuel split is not verified."
+      ttf_eur_mwh_th: {terms: [{source: ttf}]}
+      eua_eur_tco2: {terms: [{source: eua}]}
+  DE:
+    demand_basis: residual
+    residual_definition:
+      evidence: "Saturn GET /series/formula read on 2026-09-09: DE residual = load - solar - wind - hydro ROR GMA. Formula revision history not attested."
+      already_subtracted_components: [wind, solar, hydro_ror]
+    excluded_segments: [coal, lignite, oil, biomass_chp, flexible_hydro, storage]
+    inputs:
+      demand_mw: {terms: [{source: de_residual_load}]}
+      must_run_mw:
+        constant: 0
+        unit: MW
+        assumption: "Nuclear component zero for Germany after its 2023 phase-out; other non-gas dispatchable segments are omitted, not assumed absent."
+      ccgt_available_mw: {terms: [{source: de_ccgt}]}
+      ocgt_available_mw:
+        terms:
+          - source: de_gt
+            assumption: "Provider GT-type availability mapped to gas OCGT cost segment; exact unit fuel split is not verified."
+      ttf_eur_mwh_th: {terms: [{source: ttf}]}
+      eua_eur_tco2: {terms: [{source: eua}]}
+  BE:
+    demand_basis: residual
+    residual_definition:
+      evidence: "Saturn GET /series/formula read on 2026-09-09: BE residual = load - solar - wind. Formula revision history not attested."
+      already_subtracted_components: [wind, solar]
+    excluded_segments: [oil, biomass_chp, hydro, storage]
+    inputs:
+      demand_mw: {terms: [{source: be_residual_load}]}
+      must_run_mw:
+        terms:
+          - source: be_nuclear_available
+            assumption: "Forecast daily nuclear Pmax used as a curtailable low-cost supply proxy, not as a production forecast; provider fleet scope is unverified."
+      ccgt_available_mw: {terms: [{source: be_ccgt}]}
+      ocgt_available_mw:
+        terms:
+          - source: be_gt
+            assumption: "Provider GT-type availability mapped to gas OCGT cost segment; exact unit fuel split is not verified."
+      ttf_eur_mwh_th: {terms: [{source: ttf}]}
+      eua_eur_tco2: {terms: [{source: eua}]}
+  NL:
+    demand_basis: residual
+    residual_definition:
+      evidence: "Saturn GET /series/formula read on 2026-09-09: NL residual = load - solar - wind. Native residual series is UTC-naive; isolated audited source already maps physical hours. Formula revision history not attested."
+      already_subtracted_components: [wind, solar]
+    excluded_segments: [coal, oil, biomass_chp, hydro, storage]
+    inputs:
+      demand_mw: {terms: [{source: nl_residual_load}]}
+      must_run_mw:
+        terms:
+          - source: nl_nuclear_available
+            assumption: "Forecast daily nuclear Pmax used as a curtailable low-cost supply proxy, not as a production forecast; provider fleet scope is unverified."
+      ccgt_available_mw: {terms: [{source: nl_ccgt}]}
+      ocgt_available_mw:
+        terms:
+          - source: nl_gt
+            assumption: "Provider GT-type availability mapped to gas OCGT cost segment; exact unit fuel split is not verified."
+      ttf_eur_mwh_th: {terms: [{source: ttf}]}
+      eua_eur_tco2: {terms: [{source: eua}]}

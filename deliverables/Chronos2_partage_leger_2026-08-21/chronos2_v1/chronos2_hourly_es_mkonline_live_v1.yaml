@@ -1,0 +1,47 @@
+live:
+  contract_schema_version: 1
+  zone: ES
+  delivery_timezone: Europe/Madrid
+  forecast_origin_timezone: Europe/Paris
+  forecast_origin_local_time: "08:00"
+  target_series: power.price.da.es.bzn.hourly.entsoe.utc.cdh.eurmwh
+  prediction_mode: autonomous_only
+  mkonline_enabled: false
+  primary_series: null
+  storm_dashboard_series: null
+  storm_dashboard_primary_series: null
+  storm_dashboard_naive_timezone: null
+  storm_strict_08_series: power.price.es.euromwh.h.fcst.3mv.storm.da.basecase
+  storm_pit_path: null
+  forecast_filename: forecast_hourly_es.csv
+  required_covariates:
+    - fr_residual_load_fcst
+    - de_residual_load_fcst
+    - be_residual_load_fcst
+    - nl_residual_load_fcst
+    - es_residual_load_fcst
+  base_config: chronos2_hourly_es_residual_candidate_v1.yaml
+  frozen_autonomous_run: runs/chronos2_hourly_es_residual_extended_v1
+  sealed_benchmark_run: runs/chronos2_hourly_es_sealed_benchmark_v1
+  recipe_manifest: chronos2_hourly_es_autonomous_recipe_v1.json
+  dependency_manifest: null
+  output_root: runs/live/es
+  expected_hashes:
+    base_config_sha256: 6ca1b3a1ee0cfb805adb4a5d896877f2a4a17ab82390bbca0d29f12a70d1cf00
+    frozen_autonomous_checksum_manifest_sha256: ef35805af31c7e3ce7be6f44791620f8717f09865ce26a4c9dae275435422fc1
+    sealed_benchmark_checksum_manifest_sha256: 22298349587593fb695934c689b54a0e9e584a2a500a008f8334ba907de920b8
+    recipe_manifest_sha256: b8d18e684886e93e2fcc4a09bfce69918857d773728e6645c62b5f325cae3802
+    dependency_manifest_sha256: null
+  weights:
+    autonomous: 1.0
+    mkonline_primary: 0.0
+  threads: -1
+  workers: 8
+  max_revision_age_hours: 24
+  naive_timezone_overrides: {}
+
+report:
+  filename: chronos2_hourly_es_live_{delivery_day}.html
+  title: Forecast day-ahead ES - livraison {delivery_day}
+  forecast_history_hours: 168
+  extreme_threshold: 150.0

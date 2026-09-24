@@ -1,0 +1,8 @@
+schema_version: 1
+source_suite: runs/experiments/nyx_congestion_calibration_v1/snapshots/20260915T160622Z_2de43144
+output_root: runs/experiments/nyx_demand_response_v1
+# Optional JSON bundle of documented pre-08 forecast scenarios, never final
+# auction curves for the delivery being predicted. See NYX_DEMAND_RESPONSE.md.
+bundle_path: null
+diagnostic_only: true
+production_modified: false

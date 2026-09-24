@@ -1,0 +1,14 @@
+token: SYNTHETIC_SECRET_DO_NOT_EXPOSE_TOKEN
+zones:
+  BE:
+    enabled_modes:
+    - SYNTHETIC_SECRET_DO_NOT_EXPOSE_ADAPTER
+  DE:
+    enabled_modes:
+    - SYNTHETIC_SECRET_DO_NOT_EXPOSE_ADAPTER
+  FR:
+    enabled_modes:
+    - SYNTHETIC_SECRET_DO_NOT_EXPOSE_ADAPTER
+  NL:
+    enabled_modes:
+    - SYNTHETIC_SECRET_DO_NOT_EXPOSE_ADAPTER

@@ -1,0 +1,9 @@
+schema_version: 1
+# Frozen comparison against the existing nuclear-FR run of this delivery.
+delivery_day: '2026-09-19'
+zones: [FR, DE, BE, NL]
+output_root: runs/experiments/solar_cwe_v1
+source_root: data/pit/solar_cwe
+include_attribution: false
+diagnostic_only: true
+production_modified: false

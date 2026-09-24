@@ -22,9 +22,9 @@ zones:
     primary_status: audited_primary
     prediction_mode: mkonline_blend
     mkonline_enabled: true
-    storm_series: power.price.fr.euromwh.h.fcst.3mv.storm
-    storm_status: audited_native_dashboard
-    storm_primary_series: 41377_native
+    storm_series: power.price.fr.euromwh.h.fcst.3mv.storm.da.cache
+    storm_status: audited_day_ahead_cache
+    storm_primary_series: power.price.fr.euromwh.h.fcst.3mv.storm.da.cache
     storm_naive_timezone: Europe/Paris
     storm_strict_08_series: power.price.fr.euromwh.h.fcst.3mv.storm.da.basecase
     storm_pit_path: data/pit/vintages/fr_price_storm_da_fcst.parquet
@@ -53,9 +53,9 @@ zones:
     mkonline_enabled: false
     primary_series: null
     primary_status: not_used_autonomous_only
-    storm_series: power.price.be.euromwh.h.fcst.3mv.storm
-    storm_status: audited_native_dashboard
-    storm_primary_series: 41378_native
+    storm_series: power.price.be.euromwh.h.fcst.3mv.storm.da.cache
+    storm_status: audited_day_ahead_cache
+    storm_primary_series: power.price.be.euromwh.h.fcst.3mv.storm.da.cache
     storm_naive_timezone: Europe/Brussels
     storm_strict_08_series: power.price.be.euromwh.h.fcst.3mv.storm.da.basecase
     storm_pit_path: null
@@ -85,9 +85,9 @@ zones:
     mkonline_enabled: false
     primary_series: null
     primary_status: not_used_autonomous_only
-    storm_series: power.price.de.euromwh.h.fcst.3mv.storm
-    storm_status: audited_native_dashboard
-    storm_primary_series: 41376_native
+    storm_series: power.price.de.euromwh.h.fcst.3mv.storm.da.cache
+    storm_status: audited_day_ahead_cache
+    storm_primary_series: power.price.de.euromwh.h.fcst.3mv.storm.da.cache
     storm_naive_timezone: Europe/Berlin
     storm_strict_08_series: power.price.de.euromwh.h.fcst.3mv.storm.da.basecase
     storm_pit_path: null
@@ -149,9 +149,9 @@ zones:
     mkonline_enabled: true
     primary_series: 41554_native
     primary_status: audited_primary
-    storm_series: power.price.nl.euromwh.h.fcst.3mv.storm
-    storm_status: audited_native_dashboard
-    storm_primary_series: 41379_native
+    storm_series: power.price.nl.euromwh.h.fcst.3mv.storm.da.cache
+    storm_status: audited_day_ahead_cache
+    storm_primary_series: power.price.nl.euromwh.h.fcst.3mv.storm.da.cache
     storm_naive_timezone: Europe/Amsterdam
     storm_strict_08_series: power.price.nl.euromwh.h.fcst.3mv.storm.da.basecase
     storm_pit_path: null

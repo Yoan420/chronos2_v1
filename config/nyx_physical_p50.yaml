@@ -1,0 +1,9 @@
+schema_version: 1
+# Frozen source: a newer report is never substituted silently.
+source_suite: runs/experiments/nyx_scarcity_v1/coherent_p50/snapshots/20260914T160104Z_d7366f80
+output_root: runs/experiments/nyx_physical_p50_v1
+diagnostic_only: true
+production_modified: false
+activation_performed: false
+options:
+  threads: 2

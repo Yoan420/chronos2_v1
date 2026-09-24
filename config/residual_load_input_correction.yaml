@@ -1,0 +1,86 @@
+schema_version: 1
+experiment_id: residual_load_input_correction_v1
+
+protocol:
+  timezone: Europe/Paris
+  forecast_origin_local_time: "08:00"
+  # Le store Saturn contient un trou historique multi-jour mi-août 2024.
+  # On démarre après ce trou afin de ne jamais inventer une trajectoire brute.
+  history_start_day: "2024-08-18"
+  evaluation_start_day: "2025-08-12"
+  evaluation_end_day: "2026-08-11"
+  final_start_day: "2025-08-12"
+  final_end_day: "2026-08-11"
+  label_delay_days: 2
+
+inputs:
+  forecast_vintage_root: data/pit/vintages
+  observed_vintage_root: runs/experiments/residual_load_chronos2_historical_v1/observed_vintages
+  # Les recettes prix scellees utilisent fill_method: none pour ces cinq
+  # covariates. Les NaN sont donc preserves, jamais inventes par ffill.
+  forecast_fill_limit_hours: 0
+  forecast_minimum_coverage: 0.50
+  aliases:
+    fr_residual_load_fcst:
+      country: FR
+      forecast_file: fr_residual_load_fcst.parquet
+      observed_file: fr_residual_load_fcst.parquet
+      observed_series: power.fr.residual.load.entsoe.hourly.gw.obs
+    de_residual_load_fcst:
+      country: DE
+      forecast_file: de_residual_load_fcst.parquet
+      observed_file: de_residual_load_fcst.parquet
+      observed_series: power.de.residual.load.entsoe.hourly.gw.obs
+    be_residual_load_fcst:
+      country: BE
+      forecast_file: be_residual_load_fcst.parquet
+      observed_file: be_residual_load_fcst.parquet
+      observed_series: power.be.residual.load.entsoe.hourly.gw.obs
+    nl_residual_load_fcst:
+      country: NL
+      forecast_file: nl_residual_load_fcst.parquet
+      observed_file: nl_residual_load_fcst.parquet
+      observed_series: power.nl.residual.load.entsoe.hourly.gw.obs
+    es_residual_load_fcst:
+      country: ES
+      forecast_file: es_residual_load_fcst.parquet
+      observed_file: es_residual_load_fcst.parquet
+      observed_series: power.es.residual.load.entsoe.hourly.gw.obs
+
+model:
+  recipe: blend_cat_hgb_w0.50
+  catboost_weight: 0.50
+  hist_gradient_boosting_weight: 0.50
+  max_abs_correction_gw: 8.0
+  # Refit quotidien : la mémoire d'erreur disponible à D-1 08:00 est ainsi
+  # rafraîchie chaque jour, ce qui est essentiel pour les changements de régime.
+  refit_every_days: 1
+  # Une série sans vintage historique disponible reste brute jusqu'à ce que
+  # 48 couples raw/observation causaux soient disponibles.
+  cold_start_policy: raw_passthrough
+  minimum_training_rows: 48
+  forecast_change_lags_hours:
+    - 1
+    - 2
+    - 24
+    - 48
+    - 168
+  error_lags_hours:
+    - 48
+    - 72
+    - 168
+    - 336
+  error_rolling_windows_hours:
+    - 24
+    - 72
+    - 168
+
+outputs:
+  experiment_root: runs/experiments/residual_load_input_correction_v1
+  corrected_directory: corrected
+  audit_directory: audit
+  report_directory: report
+
+report:
+  minimum_scoring_coverage: 0.90
+  minimum_scoring_ramps: 720

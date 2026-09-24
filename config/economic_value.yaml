@@ -1,0 +1,34 @@
+schema_version: 1
+output_root: runs/experiments/economic_value_v1
+zones: [FR, DE, BE, NL]
+models: [autonomous, kalman, nuclear_autonomous, nuclear_kalman]
+evaluation_days: 365
+timezone: Europe/Paris
+cutoff_time: '08:00'
+# Default: latest delivery date COMMON to all countries and model alternatives.
+delivery_day: null
+# Default: latest complete observed day COMMON to all selected report histories.
+end_day: null
+reference:
+  kind: lagged_day_ahead_proxy
+  executable: false
+  historical_publication_proof: false
+portfolio:
+  capacity_mw: 100.0
+  allocation: equal_fixed
+  # Never allocate 100 MW independently to each country.
+  # Each model is a separate alternative for the SAME portfolio.
+strategy:
+  signal_threshold_eur_mwh: 5.0
+  transaction_cost_eur_mwh: 0.5
+  slippage_eur_mwh: 0.5
+  confidence_filter: none
+  confidence_high_edge_width_ratio: 0.5
+  confidence_medium_edge_width_ratio: 0.25
+  spike_high_eur_mwh: 200.0
+  spike_low_eur_mwh: 0.0
+  initial_capital_eur: null
+  # Thresholds/costs are declared assumptions, never fitted on the scored year.
+  # Confidence bins are descriptive only; not calibrated probabilities.
+production_modified: false
+order_execution_enabled: false

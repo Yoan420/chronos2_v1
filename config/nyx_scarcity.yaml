@@ -1,0 +1,54 @@
+schema_version: 1
+output_root: runs/experiments/nyx_scarcity_v1
+baseline_model: nuclear_kalman
+candidate_model: nyx_scarcity
+zones: [FR, DE, BE, NL]
+# null selects the latest COMMON existing export / complete observed day.
+# Prepare freezes the selection; Backtest never follows a mutable source.
+delivery_day: null
+end_day: null
+timezone: Europe/Paris
+cutoff_time: '08:00'
+evaluation_days: 365
+refresh:
+  workers: 2
+  max_suffix_days: 30
+  retries: 2
+  request_timeout_seconds: 45
+data:
+  source_overrides: {}
+  ccgt_efficiency: 0.58
+  ocgt_efficiency: 0.39
+  gas_emissions_tco2_mwh_th: 0.202
+  minimum_available_gas_gw: 0.1
+policy:
+  training_window_days: 365
+  # Only 365 baseline days are available: growing history, then capped365.
+  # Set365 to enforce full prior-year training (fallback if unavailable).
+  minimum_training_days: 90
+  minimum_training_coverage: 0.9
+  refit_every_days: 7
+  calibration_days: 28
+  threshold_quantile: 0.95
+  minimum_threshold_eur_mwh: 50.0
+  probability_gate: 0.6
+  correction_clip_eur_mwh: 400.0
+  candidate_weights: [0.0, 0.25, 0.5, 1.0]
+  governance_lookback_days: 90
+  governance_minimum_days: 28
+  governance_minimum_changed_days: 5
+  governance_minimum_tail_rows: 12
+  governance_minimum_mae_gain_eur_mwh: 0.0
+  governance_minimum_tail_gain_eur_mwh: 0.5
+  governance_uncertainty_z: 1.0
+  interval_minimum_rows: 120
+  max_iter: 60
+  learning_rate: 0.06
+  max_leaf_nodes: 15
+  min_samples_leaf: 40
+  l2_regularization: 10.0
+  random_state: 1729
+  threads: 2
+diagnostic_only: true
+production_modified: false
+activation_performed: false

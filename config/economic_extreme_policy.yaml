@@ -1,0 +1,36 @@
+schema_version: 1
+output_root: runs/experiments/economic_extreme_policy_v1
+# Frozen comparison: do not replace the year after looking at its performance.
+source_snapshot: runs/experiments/economic_value_v1/snapshots/20260910T085138Z_13a598c8
+baseline_model: nuclear_kalman
+candidate_model: nuclear_kalman_extreme_governed
+zones: [FR, DE, BE, NL]
+training_days: 365
+include_optional_fuels: false
+include_optional_weather: false
+expert:
+  minimum_training_calendar_days: 365
+  minimum_training_coverage: 0.95
+  refit_every_days: 7
+  extreme_move_eur_mwh: 50.0
+  extreme_probability_threshold: 0.6
+  minimum_amplitude_events: 30
+  max_iter: 60
+  learning_rate: 0.06
+  max_leaf_nodes: 15
+  min_samples_leaf: 40
+  l2_regularization: 10.0
+  random_state: 1729
+  candidate_policies: [baseline, reduce_opposite, blend_tail]
+  reduction_fraction: 0.5
+  expert_blend_weight: 0.5
+governance:
+  governance_lookback_days: 60
+  governance_minimum_days: 28
+  governance_minimum_changed_days: 7
+  governance_minimum_gain_eur_mwh: 0.05
+  governance_regularization_eur_mwh: 0.02
+  governance_uncertainty_z: 1.96
+diagnostic_only: true
+production_modified: false
+order_execution_enabled: false

@@ -1,0 +1,13 @@
+schema_version: 1
+source_suite: runs/experiments/nyx_scarcity_v1/variants/snapshots/20260914T135026Z_0efb0e05
+output_root: runs/experiments/nyx_scarcity_v1/zonal
+variants: [regional_hiercal, zonal_context, zonal_hiercal]
+primary_variant: zonal_hiercal
+max_parallel: 2
+# Predeclared: no per-country weight selected on the evaluation year.
+offset_penalty: 1.0
+offset_bound: 3.0
+fixed_alpha: 0.25
+diagnostic_only: true
+production_modified: false
+activation_performed: false

@@ -1,0 +1,8 @@
+schema_version: 1
+source_suite: runs/experiments/nyx_congestion_v1/snapshots/20260915T150242Z_5b87c16a
+output_root: runs/experiments/nyx_congestion_calibration_v1
+diagnostic_only: true
+production_modified: false
+activation_performed: false
+options:
+  threads: 2

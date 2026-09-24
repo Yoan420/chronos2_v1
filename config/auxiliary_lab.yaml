@@ -1,0 +1,143 @@
+# Laboratoire independant du pipeline live. Copiez ce fichier et modifiez
+# experiment_id/output_directory avant chaque nouvelle campagne.
+schema_version: 1
+experiment_id: auxiliary_models_fr_20260828_v2
+source_run: runs/live/fr_day_ahead_2026-08-28
+output_directory: runs/experiments/auxiliary_lab/auxiliary_models_fr_20260828_v2
+timezone: Europe/Paris
+
+split:
+  # La selection utilise validation; test reste ferme jusqu'au choix final.
+  # FINAL365 fonctionne pour residual + Kalman : le laboratoire prolonge la
+  # source Statistics avec l'OOF scelle et chaine causalement les deux modeles.
+  # MKOnline doit rester desactive sans archive de calibration plus longue.
+  validation_days: 60
+  test_days: 365
+  minimum_training_days: 120
+  # null = toutes les heures physiques du jour (23/24/25 selon DST).
+  horizon_hours: null
+
+objective: mae
+metrics: [mae, rmse, bias, pinball_q10, pinball_q50, pinball_q90, coverage80, interval_width80, mean_observed_price, mean_forecast_price, mean_price_error]
+random_seed: 42
+report:
+  enabled: true
+  embed_plotly: true
+
+models:
+  residual_corrector:
+    enabled: true
+    base_model: chronos2
+    expert_models: [chronos2]
+    recipe: blend
+    # Parametres partages par les composants; chaque composant peut les ecraser.
+    fixed_parameters:
+      min_training_rows: 720
+      correction_scale: 1.0
+      max_abs_correction: null
+      feature_builder_options:
+        timezone: Europe/Paris
+        include_calendar: true
+        include_rich_calendar: true
+        rich_calendar_countries: [FR, DE, BE, ES, NL]
+        rich_calendar_primary_country: FR
+        include_daily_profiles: true
+        include_fundamental_interactions: false
+        include_missing_indicators: false
+        exclude_historical_prices: true
+        exclude_day_of_year: true
+    # Toute liste produit une grille cartesienne avec weight_candidates.
+    parameter_grid: {}
+    # Exemples de grilles par composant (a decommenter) :
+    #   components.cat_v1.learning_rate: [0.025, 0.03, 0.04]
+    #   components.hgb31.learning_rate: [0.03, 0.035, 0.04]
+    components:
+      cat_v1:
+        backend: catboost
+        iterations: 700
+        depth: 6
+        learning_rate: 0.03
+        l2_leaf_reg: 15.0
+        min_samples_leaf: 30
+        thread_count: -1
+        verbose: false
+      hgb31:
+        backend: sklearn
+        iterations: 550
+        depth: 5
+        learning_rate: 0.035
+        l2_leaf_reg: 60.0
+        min_samples_leaf: 30
+        sklearn_early_stopping: false
+    weight_candidates:
+      - {cat_v1: 0.50, hgb31: 0.50}
+      - {cat_v1: 0.60, hgb31: 0.40}
+      - {cat_v1: 0.40, hgb31: 0.60}
+    blend_max_abs_correction: 40.0
+
+  mkonline_blend:
+    enabled: false
+    autonomous_model: residual_corrected
+    primary_column: mkonline_primary__q50
+    weight_step: 0.01
+    fixed_parameters: {}
+    parameter_grid:
+      # null = aucun clip; les autres valeurs plafonnent le shift MKOnline.
+      max_abs_shift_eur_mwh: [null, 40.0, 80.0]
+
+  kalman:
+    enabled: true
+    upstream_model: residual_corrected
+    # Décommenter pour un refit strict sur D-365..D-1 à chaque journée D.
+    # training_lookback_days: 365
+    # Contrat optionnel de covariables. L'absence de ces deux blocs conserve
+    # exactement le contrat historique des cinq charges residuelles.
+    #
+    # covariates:
+    #   input_columns:
+    #     [fr_residual_load_fcst, de_residual_load_fcst,
+    #      be_residual_load_fcst, nl_residual_load_fcst,
+    #      es_residual_load_fcst, fr_temperature_fcst,
+    #      fr_wind_generation_fcst]
+    #   groups:
+    #     market: [fr_residual_load_fcst, de_residual_load_fcst,
+    #              be_residual_load_fcst, nl_residual_load_fcst,
+    #              es_residual_load_fcst]
+    #     weather: [fr_temperature_fcst, fr_heating_degree]
+    #     renewables: [fr_wind_generation_fcst, fr_wind_ramp]
+    #     fundamentals: [fr_temperature_fcst, fr_wind_generation_fcst]
+    #   derived:
+    #     fr_heating_degree:
+    #       {kind: heating_degree, source: fr_temperature_fcst, threshold: 15.0}
+    #     fr_wind_ramp:
+    #       {kind: ramp, source: fr_wind_generation_fcst, periods: 1}
+    #   history_missing_policy: neutral
+    #   minimum_history_coverage: 0.95
+    #   require_future_complete: true
+    # additional_sources:
+    #   - path: data/pit/kalman_weather_fr.csv.gz
+    #     timestamp_column: delivery_start_utc
+    #     origin_column: run_init_utc
+    #     revision_column: revision_time_utc
+    #     cutoff_column: cutoff_utc
+    #     cutoff_time: "08:00"
+    #     # Convention unique : alias modele -> colonne dans le fichier.
+    #     columns:
+    #       fr_temperature_fcst: temperature_c
+    #       fr_wind_generation_fcst: wind_generation_gw
+    fixed_parameters:
+      candidate_kinds: [linear_bias, linear_harmonic, linear_market, linear_scale, ukf_scale]
+      # linear_bias: b, corrige le biais constant du résidu; linear_harmonic: b + a*sin(wt+phi), corrige les variations saisonnieres; 
+      # linear_market: b + a*market, corrige la correlation avec le prix du marché; linear_scale: b + a*residu, corrige la variance des résidus; 
+      # ukf_scale: filtre de Kalman non lineaire pour corriger la variance du résidu.
+      # linear_weather / linear_renewables / linear_fundamental utilisent
+      # exclusivement le groupe homonyme configure ci-dessus.
+      governance_minimum_days: 14
+      governance_weight_step: 0.05
+      minimum_gain_eur_mwh: 0.05
+      minimum_relative_gain: 0.005
+    parameter_grid:
+      q_over_r: [0.0005, 0.001, 0.002]
+      scale_q_over_r: [0.00005, 0.0001]
+      governance_lookback_days: [30, 60, 90]
+      shift_clip_eur_mwh: [15.0, 20.0, 30.0]

@@ -1,0 +1,13 @@
+schema_version: 1
+source_suite: runs/experiments/nyx_scarcity_v1/coherent_p50/snapshots/20260914T160104Z_d7366f80
+output_root: runs/experiments/nyx_scarcity_v1/stress_guard
+primary_variant: physics_governed
+event_probability_gate: 0.5
+amplitude_kind: empirical
+intervals: {}
+prospective:
+  issue_policy: pre_observation_asof08
+  deadline_local: '11:45'
+diagnostic_only: true
+production_modified: false
+activation_performed: false

@@ -1,0 +1,18 @@
+live:
+  base_config: chronos2_hourly_fr_residual_v1.yaml
+  frozen_autonomous_run: runs/chronos2_hourly_fr_residual_extended_v1
+  sealed_benchmark_run: runs/chronos2_hourly_fr_mkonline_blend_v1
+  recipe_manifest: mkonline_fr_blend_recipe_v1.json
+  dependency_manifest: mkonline_fr_primary_dependency_v1.json
+  output_root: runs/live
+  threads: -1
+  workers: 8
+  max_revision_age_hours: 24
+  naive_timezone_overrides:
+    nl_residual_load_fcst: UTC
+
+report:
+  filename: chronos2_hourly_fr_mkonline_live_{delivery_day}.html
+  title: Forecast day-ahead FR - livraison {delivery_day}
+  forecast_history_hours: 168
+  extreme_threshold: 150.0

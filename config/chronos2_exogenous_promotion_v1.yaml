@@ -1,0 +1,42 @@
+schema_version: 1
+timezone: Europe/Paris
+
+# Gate retrospective primaire. La fenetre est reconstruite depuis les
+# predictions horaires et doit couvrir exactement 365 jours civils locaux,
+# avec 23/24/25 heures selon le DST et une origine au plus tard a D-1 08:00.
+rolling_evaluation_days: 365
+minimum_mae_gain_eur_mwh: 0.05
+minimum_relative_mae_gain: 0.005
+minimum_daily_win_rate: 0.50
+require_positive_chronological_halves: true
+
+# Bootstrap apparie par blocs circulaires de sept jours afin de conserver une
+# partie de l'autocorrelation hebdomadaire des erreurs.
+bootstrap_samples: 20000
+bootstrap_seed: 20260903
+bootstrap_confidence: 0.95
+bootstrap_block_days: 7
+require_bootstrap_lower_bound_positive: true
+
+# Garde-fous metier: la moyenne globale ne peut pas masquer une degradation
+# excessive sur les pointes, extremes ou prix moyens journaliers.
+peak_local_hours: [7, 8, 17, 18, 19, 20]
+tail_actual_absolute_quantile: 0.90
+maximum_peak_mae_relative_degradation: 0.02
+maximum_tail_mae_relative_degradation: 0.05
+maximum_daily_mean_mae_relative_degradation: 0.0
+
+# Le challenger doit conserver ou ameliorer la qualite probabiliste q10/q90.
+require_probabilistic_metrics: true
+maximum_pinball_relative_degradation: 0.0
+maximum_interval_coverage_error_increase: 0.02
+interval_nominal_coverage: 0.80
+
+# Une gate rolling365 passee autorise uniquement le shadow prospectif. La
+# promotion exige ensuite 30 jours complets emis en live avec le meme bundle.
+shadow_required_for_promotion: true
+shadow_evaluation_days: 30
+shadow_minimum_mae_gain_eur_mwh: 0.0
+shadow_minimum_relative_mae_gain: 0.0
+shadow_minimum_daily_win_rate: 0.50
+shadow_require_bootstrap_lower_bound_positive: true

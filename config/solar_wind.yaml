@@ -1,0 +1,15 @@
+schema_version: 1
+# Isolated retrospective case study; unchanged nuclear/solar production recipes.
+delivery_day: '2026-09-22'
+zones: [DE, NL]
+output_root: runs/experiments/solar_wind_v1
+source_root: data/pit/solar_wind_v1
+include_attribution: false
+# Only a singleton repeated autumn civil hour may be duplicated; fully audited.
+# Use 'raise' to reject these ambiguous source hours instead.
+wind_dst_policy: duplicate
+# Approved exception: native NL wind missing 02:00 UTC only on these two spring days.
+# ECMWF forecast at the SAME D-1 08:00 cutoff, MW -> GW. No interpolation.
+wind_gap_policy: nl_ecmwf_spring_2025_2026
+diagnostic_only: true
+production_modified: false

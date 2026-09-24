@@ -1,0 +1,8 @@
+schema_version: 1
+delivery_day: '2026-09-19'
+zones: [FR, DE, BE, NL]
+output_root: runs/experiments/solar_correction_v1
+source_root: data/pit/solar_cwe
+historical_end: '2026-09-19'
+diagnostic_only: true
+production_modified: false

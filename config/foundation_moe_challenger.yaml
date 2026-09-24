@@ -1,0 +1,83 @@
+experiment:
+  name: foundation_moe_autonomous_v3
+  output_dir: runs/experiments/foundation_moe_autonomous_v3
+  train_days: 219
+  validation_days: 73
+  test_days: 73
+  selectable_modes:
+    - paper_balanced
+    - mae_downward_only
+  diagnostic_modes:
+    - anchor_bias
+    - routed
+  minimum_mae_gain_eur_mwh: 0.05
+  bootstrap_samples: 5000
+  bootstrap_block_days: 7
+  seed: 42
+
+sources:
+  FR:
+    run_dir: runs/chronos2_hourly_fr_residual_extended_v1
+    timezone: Europe/Paris
+  DE:
+    run_dir: runs/chronos2_hourly_de_residual_extended_v1
+    timezone: Europe/Berlin
+  BE:
+    run_dir: runs/chronos2_hourly_be_residual_extended_v1
+    timezone: Europe/Brussels
+  NL:
+    run_dir: runs/chronos2_hourly_nl_residual_extended_v1
+    timezone: Europe/Amsterdam
+  ES:
+    run_dir: runs/chronos2_hourly_es_residual_extended_v1
+    timezone: Europe/Madrid
+
+experts:
+  anchor: autonomous
+  foundation_experts:
+    - autonomous
+    - chronos2
+    - ensemble
+    - catboost
+    - lear
+
+model:
+  hidden_size: 64
+  market_embedding_dim: 8
+  horizon_embedding_dim: 8
+  top_k: 2
+  epochs: 250
+  min_epochs: 40
+  early_stopping_patience: 35
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  gradient_clip: 5.0
+  huber_delta: 5.0
+  balance_weight: 0.01
+  tail_weight: 0.04
+  underprediction_weight: 0.02
+  oracle_weight: 0.15
+  regret_weight: 0.35
+  validation_tail_weight: 0.0
+  initial_gain: 0.08
+  smoothing_radius: 1
+  initial_temperature: 1.0
+  max_temperature: 2.5
+  exploration_noise: 0.08
+  max_exploration_noise: 0.5
+  clrs_entropy_floor: 0.72
+  clrs_max_share: 0.55
+  clrs_idle_share: 0.005
+  clrs_growth: 1.08
+  clrs_decay: 0.96
+  clrs_revival_step: 0.08
+  clrs_revival_cap: 1.25
+  down_quantile: 0.60
+  up_quantile: 0.40
+  down_weight: 1.0
+  up_weight: 0.35
+  max_abs_correction: 40.0
+  minimum_training_tokens: 1000
+  minimum_validation_tokens: 500
+  seed: 42
+  device: cpu

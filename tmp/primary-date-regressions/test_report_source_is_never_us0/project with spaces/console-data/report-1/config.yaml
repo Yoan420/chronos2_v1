@@ -1,0 +1,14 @@
+adapter_id: hourly_report
+model: residual_corrected
+parameters:
+  source_run: C:\Users\BQ6757\chronos2_v1\tmp\primary-date-regressions\test_report_source_is_never_us0\project
+    with spaces\runs\chronos2_hourly_fixture
+  zone: FR
+  title: Example; $(never execute)
+  baseline_model: auto
+  history_hours: 168
+  timezone: Europe/Paris
+output_directory: C:\Users\BQ6757\chronos2_v1\tmp\primary-date-regressions\test_report_source_is_never_us0\project
+  with spaces\console-data\report-1\outputs
+source_run: C:\Users\BQ6757\chronos2_v1\tmp\primary-date-regressions\test_report_source_is_never_us0\project
+  with spaces\runs\chronos2_hourly_fixture

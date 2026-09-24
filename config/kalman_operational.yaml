@@ -1,0 +1,125 @@
+version: 1
+
+# Chaque refit journalier apprend exclusivement sur les 365 jours civils
+# strictement anterieurs a l'origine de prevision. Cette valeur est auditee
+# avant publication et aligne le Kalman standard sur les rapports FINAL365.
+training_lookback_days: 365
+rolling_refit_workers: 4
+
+# Prefixes prequentiels deja materialises et audites. Les empreintes sont
+# celles des sidecars hybrid 2026-09-04 (FR/DE/BE/NL) et 2026-09-02 (ES).
+# Une seule zone est chargee; ce prefixe incumbent est exclu pour LoRA.
+upstream_history_by_zone:
+  FR:
+    path: data/pit/kalman_weather/fr_residual_corrected_prequential.csv.gz
+    sha256: 4c5fc2afd8f912265d949f8bae9fc093b72efa3875c602ccb333271b575566e4
+    audit_path: data/pit/kalman_weather/fr_residual_corrected_prequential.audit.json
+    audit_sha256: 978c793e0b51303b097ce85f62a702bc3d2f054d9ead053784fa5ece12f3f378
+    upstream_model: residual_corrected
+    protocol: blocked_prequential_residual_then_issued_evaluation_overlay
+  DE:
+    path: data/pit/kalman_weather/de_residual_corrected_prequential.csv.gz
+    sha256: fbe6bbaeaf784fb83175ed297478ad316f0ef540c3fa98e982992eea6bf021bb
+    audit_path: data/pit/kalman_weather/de_residual_corrected_prequential.audit.json
+    audit_sha256: 978c793e0b51303b097ce85f62a702bc3d2f054d9ead053784fa5ece12f3f378
+    upstream_model: residual_corrected
+    protocol: blocked_prequential_residual_then_issued_evaluation_overlay
+  BE:
+    path: data/pit/kalman_weather/be_residual_corrected_prequential.csv.gz
+    sha256: 63f637253b8cee8beba36443fc73bbc4f48208e417f7af013be7941eef0b1126
+    audit_path: data/pit/kalman_weather/be_residual_corrected_prequential.audit.json
+    audit_sha256: 978c793e0b51303b097ce85f62a702bc3d2f054d9ead053784fa5ece12f3f378
+    upstream_model: residual_corrected
+    protocol: blocked_prequential_residual_then_issued_evaluation_overlay
+  NL:
+    path: data/pit/kalman_weather/nl_residual_corrected_prequential.csv.gz
+    sha256: 9281c2529c45cc14bcce0286bf461a68ab9f44c627004f11c230ab75175756cb
+    audit_path: data/pit/kalman_weather/nl_residual_corrected_prequential.audit.json
+    audit_sha256: 978c793e0b51303b097ce85f62a702bc3d2f054d9ead053784fa5ece12f3f378
+    upstream_model: residual_corrected
+    protocol: blocked_prequential_residual_then_issued_evaluation_overlay
+  ES:
+    path: data/pit/kalman_weather/es_residual_corrected_prequential.csv.gz
+    sha256: 4932dbbce6967666bfca81e61f75922034f9afda5332c684ddd7ddaf2a3600d7
+    audit_path: data/pit/kalman_weather/es_residual_corrected_prequential.audit.json
+    audit_sha256: 978c793e0b51303b097ce85f62a702bc3d2f054d9ead053784fa5ece12f3f378
+    upstream_model: residual_corrected
+    protocol: blocked_prequential_residual_then_issued_evaluation_overlay
+
+# Politique du filtre gouverne.  Ces valeurs reproduisent le comportement
+# operationnel anterieur lorsque aucune nouvelle covariable n'est activee.
+filter_parameters:
+  q_over_r: 0.001
+  scale_q_over_r: 0.0001
+  innovation_clip_sigma: 3.0
+  shift_clip_eur_mwh: 20.0
+  governance_lookback_days: 60
+  governance_minimum_days: 14
+  governance_weight_step: 0.05
+  minimum_gain_eur_mwh: 0.05
+  minimum_relative_gain: 0.005
+  scale_minimum: 0.5
+  scale_maximum: 1.5
+  ukf_scale_persistence: 0.99
+  market_feature_clip: 5.0
+  candidate_kinds:
+    - linear_bias
+    - linear_harmonic
+    - linear_market
+    - linear_scale
+    - ukf_scale
+
+# Les cinq forecasts de charge residuelle sont deja presents dans les archives
+# scellees.  Les deux aggregats ne melangent donc que des series de meme unite.
+covariates:
+  input_columns:
+    - fr_residual_load_fcst
+    - de_residual_load_fcst
+    - be_residual_load_fcst
+    - nl_residual_load_fcst
+    - es_residual_load_fcst
+  derived:
+    residual_load_mean:
+      kind: mean
+      sources:
+        - fr_residual_load_fcst
+        - de_residual_load_fcst
+        - be_residual_load_fcst
+        - nl_residual_load_fcst
+        - es_residual_load_fcst
+    residual_load_spread:
+      kind: spread
+      sources:
+        - fr_residual_load_fcst
+        - de_residual_load_fcst
+        - be_residual_load_fcst
+        - nl_residual_load_fcst
+        - es_residual_load_fcst
+  groups:
+    market:
+      - fr_residual_load_fcst
+      - de_residual_load_fcst
+      - be_residual_load_fcst
+      - nl_residual_load_fcst
+      - es_residual_load_fcst
+      - residual_load_mean
+      - residual_load_spread
+    fundamentals:
+      - fr_residual_load_fcst
+      - de_residual_load_fcst
+      - be_residual_load_fcst
+      - nl_residual_load_fcst
+      - es_residual_load_fcst
+      - residual_load_mean
+      - residual_load_spread
+  history_missing_policy: neutral
+  minimum_history_coverage: 0.0
+  require_future_complete: true
+
+# Exemple d'opt-in (laisse vide tant que les vintages PIT ne couvrent pas tout
+# l'historique et J+1).  Direction de columns: alias_modele: colonne_du_fichier.
+additional_sources: {}
+
+provenance:
+  purpose: governed_residual_kalman_operational_sidecar
+  sealed_live_contract_modified: false

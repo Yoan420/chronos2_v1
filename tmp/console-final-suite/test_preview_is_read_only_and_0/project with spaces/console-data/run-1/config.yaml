@@ -1,0 +1,6 @@
+adapter_id: model_storm_report
+model: Model / Storm
+parameters:
+  delivery_day: '2026-09-11'
+output_directory: C:\Users\BQ6757\chronos2_v1\tmp\console-final-suite\test_preview_is_read_only_and_0\project
+  with spaces\console-data\run-1\outputs

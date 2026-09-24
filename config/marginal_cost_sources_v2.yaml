@@ -1,0 +1,180 @@
+schema_version: 2
+purpose: national_supply_qualification_research_not_production
+timezone: Europe/Paris
+start_day: '2024-09-10'
+end_day: '2026-09-09'
+allow_missing_hours: true
+# Read only the immutable source descriptions; no V1 pipeline or cache changes.
+source_catalog: config/marginal_cost_sources.yaml
+production_pit_evidence: false
+promotion_eligible: false
+evidence:
+  ten_date_saturn_probes: data/pit/marginal_cost_expert_v2/source_probes.json
+  ten_date_gas_scope_probes: data/pit/marginal_cost_expert_v2/gas_qualification/source_probes.json
+  be_nuclear_outages_retrospective_only: https://economie.fgov.be/fr/themes/energie/securite-dapprovisionnement/monitoring-de/le-monitoring-backward-de
+  be_nuclear_outage_note: >-
+    Official August2026 report lists Doel4 unavailable 2026-04-01 through
+    2026-11-01 and Tihange3 2026-04-04 through 2026-11-01. This supports zero
+    nuclear availability in June; it is NOT a forecast vintage or model input.
+  rejected_availability_full: >-
+    Saturn full formulae prioritize realised availability up to today+3 before
+    forecast branches. Never substitute them for a missing forecast history.
+  national_scope_warning: >-
+    Complete timestamps are not proof of a complete national fleet. Static
+    BE Pnom3906.8MW differs from official2026 installed nuclear2056MW, while
+    Pmax0MW can correctly reflect outages of the two remaining reactors.
+sources:
+  fr_gas_aggregate:
+    path: data/pit/marginal_cost_expert_v2/capacities/fr_gas_available_gw.parquet
+    unit: GW
+    information_type: capacity_forecast
+    series: power.nrjscan.fr.3mv.availability.pmax.fuel.nat_gas.gw
+    component: natural_gas
+  de_gas_aggregate:
+    path: data/pit/marginal_cost_expert_v2/capacities/de_gas_available_gw.parquet
+    unit: GW
+    information_type: capacity_forecast
+    series: power.nrjscan.de.3mv.availability.pmax.fuel.nat_gas.gw
+    component: natural_gas
+  be_gas_aggregate:
+    path: data/pit/marginal_cost_expert_v2/capacities/be_gas_available_gw.parquet
+    unit: GW
+    information_type: capacity_forecast
+    series: power.nrjscan.be.3mv.availability.pmax.fuel.nat_gas.gw
+    component: natural_gas
+  nl_gas_aggregate:
+    path: data/pit/marginal_cost_expert_v2/capacities/nl_gas_available_gw.parquet
+    unit: GW
+    information_type: capacity_forecast
+    series: power.nrjscan.nl.3mv.availability.pmax.fuel.nat_gas.gw
+    component: natural_gas
+  de_coal:
+    path: data/pit/marginal_cost_expert/capacities/de_coal_available_gw.parquet
+    unit: GW
+    information_type: capacity_forecast
+    series: power.nrjscan.de.3mv.availability.pmax.fuel.coal.gw
+    component: hard_coal
+  de_lignite:
+    path: data/pit/marginal_cost_expert/capacities/de_lignite_available_gw.parquet
+    unit: GW
+    information_type: capacity_forecast
+    series: power.nrjscan.de.3mv.availability.pmax.fuel.lignite.gw
+    component: lignite
+  nl_coal:
+    path: data/pit/marginal_cost_expert/capacities/nl_coal_available_gw.parquet
+    unit: GW
+    information_type: capacity_forecast
+    series: power.nrjscan.nl.3mv.availability.pmax.fuel.coal.gw
+    component: hard_coal
+  api2_thermal:
+    path: data/pit/marginal_cost_expert_v2/coal_fx_features.parquet
+    value_column: coal_eur_mwh_th
+    unit: EUR/MWh_th
+    information_type: market_observation_known_before_cutoff
+    series: coal.api2.price.everyday.month.1.ice.usdt
+    source_value_time_column: api2_usd_t_source_time_utc
+    maximum_age_hours: 176
+    expected_audit:
+      net_calorific_mwh_t: 6.978
+      same_day_market_closes_excluded: true
+      lignite_not_mapped_to_api2: true
+    conversion: API2_USD_per_t / EURUSD_USD_per_EUR / 6.978_MWh_th_per_t
+    assumption: >-
+      M1 API2 financial benchmark proxies delivered hard-coal fuel cost;
+      plant-specific calorific content, transport and procurement are omitted.
+      API2 is not a lignite cost. Same-civil-day closes are excluded.
+  eurusd:
+    path: data/pit/marginal_cost_expert_v2/coal_fx_features.parquet
+    value_column: eurusd_usd_per_eur
+    unit: USD/EUR
+    information_type: market_observation_known_before_cutoff
+    series: forex.everyday.eurusd.close
+    source_value_time_column: eurusd_usd_per_eur_source_time_utc
+    maximum_age_hours: 176
+    expected_audit:
+      same_day_market_closes_excluded: true
+zones:
+  FR:
+    demand_basis: residual
+    residual_netting: [wind, solar, hydro_ror]
+    qualification:
+      national_fleet_attested: false
+      historical_pit_attested: false
+      omitted_segments: [coal, oil, biomass_chp, flexible_hydro, storage]
+      note: >-
+        FR coal has520 missing days. No zero replacement. Nuclear input is a
+        generation forecast used as a curtailable low-cost supply proxy.
+    fields:
+      demand_mw: {source: fr_residual_load, unit: MW, scale: 1000}
+      nuclear_available_mw: {source: fr_nuclear_generation, unit: MW, scale: 1000}
+      gas_available_mw: {source: fr_gas_aggregate, unit: MW, scale: 1000}
+      ttf_eur_mwh_th: {source: ttf, unit: EUR/MWh_th}
+      eua_eur_tco2: {source: eua, unit: EUR/tCO2}
+  DE:
+    demand_basis: residual
+    residual_netting: [wind, solar, hydro_ror]
+    qualification:
+      national_fleet_attested: false
+      historical_pit_attested: false
+      omitted_segments: [oil, biomass_chp, flexible_hydro, storage]
+      note: >-
+        No forecast vintage for2024-11-08 through2024-11-27; preserve NaNs.
+        Coal and lignite are distinct fuel categories. Do not additionally add
+        CHP-type capacities without a disjoint unit/fuel mapping.
+    fields:
+      demand_mw: {source: de_residual_load, unit: MW, scale: 1000}
+      nuclear_available_mw:
+        constant: 0
+        unit: MW
+        assumption: Germany's last nuclear reactors closed in2023, before the full evaluation support.
+      gas_available_mw: {source: de_gas_aggregate, unit: MW, scale: 1000}
+      coal_available_mw: {source: de_coal, unit: MW, scale: 1000}
+      lignite_available_mw: {source: de_lignite, unit: MW, scale: 1000}
+      ttf_eur_mwh_th: {source: ttf, unit: EUR/MWh_th}
+      eua_eur_tco2: {source: eua, unit: EUR/tCO2}
+      coal_eur_mwh_th: {source: api2_thermal, unit: EUR/MWh_th}
+      eurusd_usd_per_eur: {source: eurusd, unit: USD/EUR}
+      lignite_eur_mwh_th:
+        constant: 2.3
+        unit: EUR/MWh_th
+        assumption: >-
+          Engineering assumption, NOT an observed daily commodity price:
+          Fraunhofer ISE July2024 LCOE study Table5 lignite2.3EUR/MWh_th.
+          No API2-to-lignite mapping and no calibration on evaluation labels.
+        source: https://www.ise.fraunhofer.de/content/dam/ise/en/documents/publications/studies/EN2024_ISE_Study_Levelized_Cost_of_Electricity_Renewable_Energy_Technologies.pdf
+  BE:
+    demand_basis: residual
+    residual_netting: [wind, solar]
+    qualification:
+      national_fleet_attested: false
+      historical_pit_attested: false
+      omitted_segments: [oil, biomass_chp, hydro, storage]
+      note: >-
+        Nuclear Pmax0MW in June is consistent with official planned outages;
+        preserve zero rather than importing realised generation. Daily Pmax
+        is not a production forecast; gas national completeness remains open.
+    fields:
+      demand_mw: {source: be_residual_load, unit: MW, scale: 1000}
+      nuclear_available_mw: {source: be_nuclear_available, unit: MW, scale: 1000}
+      gas_available_mw: {source: be_gas_aggregate, unit: MW, scale: 1000}
+      ttf_eur_mwh_th: {source: ttf, unit: EUR/MWh_th}
+      eua_eur_tco2: {source: eua, unit: EUR/tCO2}
+  NL:
+    demand_basis: residual
+    residual_netting: [wind, solar]
+    qualification:
+      national_fleet_attested: false
+      historical_pit_attested: false
+      omitted_segments: [oil, biomass_chp, hydro, storage]
+      note: >-
+        Coal Pmax/Pnom present on10/10 probes; national fleet mapping remains
+        unverified. Keep signed residual demand; no mixed-provider gross-load reconstruction.
+    fields:
+      demand_mw: {source: nl_residual_load, unit: MW, scale: 1000}
+      nuclear_available_mw: {source: nl_nuclear_available, unit: MW, scale: 1000}
+      gas_available_mw: {source: nl_gas_aggregate, unit: MW, scale: 1000}
+      coal_available_mw: {source: nl_coal, unit: MW, scale: 1000}
+      ttf_eur_mwh_th: {source: ttf, unit: EUR/MWh_th}
+      eua_eur_tco2: {source: eua, unit: EUR/tCO2}
+      coal_eur_mwh_th: {source: api2_thermal, unit: EUR/MWh_th}
+      eurusd_usd_per_eur: {source: eurusd, unit: USD/EUR}

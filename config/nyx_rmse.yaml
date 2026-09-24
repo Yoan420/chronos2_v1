@@ -1,0 +1,29 @@
+schema_version: 1
+# Deliberately frozen: no automatic switch to a newer, non-comparable source.
+source_suite: runs/experiments/nyx_scarcity_v1/coherent_p50/snapshots/20260914T160104Z_d7366f80
+output_root: runs/experiments/nyx_rmse_v1
+diagnostic_only: true
+production_modified: false
+activation_performed: false
+options:
+  threads: 2
+  # The source has 365 evaluation days but no full additional 365-day warmup.
+  # true requires complete prior training support; never fabricates history.
+  require_full_training_history: false
+  correction_clip_eur_mwh: 400.0
+  learner:
+    max_iter: 80
+    max_leaf_nodes: 15
+    min_samples_leaf: 30
+    learning_rate: 0.06
+    l2_regularization: 10.0
+    random_state: 1729
+  governance:
+    lookback_days: 90
+    minimum_days: 28
+    minimum_changed_days: 5
+    weights: [0.0, 0.25, 0.5, 1.0]
+    uncertainty_z: 1.0
+    minimum_mse_gain: 0.0
+    maximum_mae_degradation: 0.0
+    maximum_ordinary_mae_degradation: 0.0

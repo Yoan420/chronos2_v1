@@ -1,0 +1,133 @@
+version: 1
+
+# Challenger operationnel distinct du Kalman actuel. Chaque origine D est
+# refittee depuis zero sur les 365 jours civils D-365..D-1. Les quatre workers
+# ne changent ni les observations ni les predictions, seulement le temps de
+# calcul.
+training_lookback_days: 365
+rolling_refit_workers: 4
+
+filter_parameters:
+  q_over_r: 0.001
+  scale_q_over_r: 0.0001
+  innovation_clip_sigma: 3.0
+  shift_clip_eur_mwh: 20.0
+  governance_lookback_days: 60
+  governance_minimum_days: 14
+  governance_weight_step: 0.05
+  minimum_gain_eur_mwh: 0.05
+  minimum_relative_gain: 0.005
+  scale_minimum: 0.5
+  scale_maximum: 1.5
+  ukf_scale_persistence: 0.99
+  market_feature_clip: 5.0
+  candidate_kinds:
+    - linear_weather
+    - linear_renewables
+    - linear_fundamental
+
+covariates:
+  input_columns:
+    - "${zone_lower}_temperature_fcst"
+    - "${zone_lower}_wind_generation_fcst"
+    - "${zone_lower}_solar_generation_fcst"
+  derived:
+    "${zone_lower}_heating_degree":
+      kind: heating_degree
+      source: "${zone_lower}_temperature_fcst"
+      threshold: 15.0
+    "${zone_lower}_cooling_degree":
+      kind: cooling_degree
+      source: "${zone_lower}_temperature_fcst"
+      threshold: 22.0
+    "${zone_lower}_wind_ramp_3h":
+      kind: ramp
+      source: "${zone_lower}_wind_generation_fcst"
+      periods: 3
+    "${zone_lower}_solar_ramp_3h":
+      kind: ramp
+      source: "${zone_lower}_solar_generation_fcst"
+      periods: 3
+  groups:
+    # Le groupe market est obligatoire dans le contrat generique mais aucun
+    # candidat linear_market n'est active dans cette variante.
+    market:
+      - "${zone_lower}_temperature_fcst"
+    weather:
+      - "${zone_lower}_temperature_fcst"
+      - "${zone_lower}_heating_degree"
+      - "${zone_lower}_cooling_degree"
+    renewables:
+      - "${zone_lower}_wind_generation_fcst"
+      - "${zone_lower}_solar_generation_fcst"
+      - "${zone_lower}_wind_ramp_3h"
+      - "${zone_lower}_solar_ramp_3h"
+    fundamentals:
+      - "${zone_lower}_temperature_fcst"
+      - "${zone_lower}_heating_degree"
+      - "${zone_lower}_cooling_degree"
+      - "${zone_lower}_wind_generation_fcst"
+      - "${zone_lower}_solar_generation_fcst"
+      - "${zone_lower}_wind_ramp_3h"
+      - "${zone_lower}_solar_ramp_3h"
+  history_missing_policy: complete_trailing
+  minimum_history_coverage: 1.0
+  require_future_complete: true
+
+# Ce prefixe a ete produit par refits prequentiels du correcteur residuel :
+# chaque bloc n'utilise que les labels des jours strictement anterieurs. Il
+# fournit le warm-up qui n'est pas conserve dans la fenetre Statistics live.
+# Les checksums sont injectes dans le sidecar runtime apres validation.
+upstream_history:
+  path: "data/pit/kalman_weather/${zone_lower}_residual_corrected_prequential.csv.gz"
+  audit_path: "data/pit/kalman_weather/${zone_lower}_residual_corrected_prequential.audit.json"
+  upstream_model: residual_corrected
+  protocol: blocked_prequential_residual_then_issued_evaluation_overlay
+
+# Ces trois fichiers contiennent exclusivement des previsions Saturn figees au
+# cutoff civil D-1 08:00. Le template editable ne pinne pas leurs SHA : le
+# launcher les actualise puis genere un sidecar immuable avec les SHA courants.
+additional_sources:
+  "${zone_lower}_temperature_fcst":
+    path: "data/pit/kalman_weather/${zone_lower}_temperature_fcst.parquet"
+    timestamp_column: value_time_utc
+    columns:
+      "${zone_lower}_temperature_fcst": value
+    information_type: day_ahead_forecast
+    cutoff_policy: Saturn as-of D-1 08:00 civil
+    origin_column: snapshot_time_utc
+    revision_column: revision_time_utc
+    cutoff_column: snapshot_time_utc
+    cutoff_time: "08:00"
+  "${zone_lower}_wind_generation_fcst":
+    path: "data/pit/kalman_weather/${zone_lower}_wind_generation_fcst.parquet"
+    timestamp_column: value_time_utc
+    columns:
+      "${zone_lower}_wind_generation_fcst": value
+    information_type: day_ahead_forecast
+    cutoff_policy: Saturn as-of D-1 08:00 civil
+    origin_column: snapshot_time_utc
+    revision_column: revision_time_utc
+    cutoff_column: snapshot_time_utc
+    cutoff_time: "08:00"
+  "${zone_lower}_solar_generation_fcst":
+    path: "data/pit/kalman_weather/${zone_lower}_solar_generation_fcst.parquet"
+    timestamp_column: value_time_utc
+    columns:
+      "${zone_lower}_solar_generation_fcst": value
+    information_type: day_ahead_forecast
+    cutoff_policy: Saturn as-of D-1 08:00 civil
+    origin_column: snapshot_time_utc
+    revision_column: revision_time_utc
+    cutoff_column: snapshot_time_utc
+    cutoff_time: "08:00"
+
+provenance:
+  purpose: governed_residual_kalman_weather_shadow_performance_test
+  deployment_status: experimental_shadow
+  calibration_reference: kalman_weather_fr_rolling365_20260829_v2
+  calibration_note: q_over_r selectionne en FR; les autres zones sont evaluees sans promotion
+  actual_weather_used: false
+  storm_used_as_input: false
+  mkonline_used_as_input: false
+  sealed_live_contract_modified: false

@@ -1,0 +1,81 @@
+schema_version: 1
+activate: false
+output_root: runs/experiments/marginal_cost_expert_v1
+sources_config: config/marginal_cost_sources.yaml
+# Preserve missing source hours as NaN; never shorten a 365-day training window.
+# The expert abstains until all required training and forecast hours exist.
+allow_missing_hours: true
+evaluation_labels: frozen_report_observed
+expert_training_labels: canonical_snapshot
+# The governor uses the frozen report observations paired with its reference.
+# Neither source certifies historical label revision availability.
+evaluation:
+  start_day: '2025-09-10'
+  end_day: '2026-09-09'
+  training_days: 365
+  timezone: Europe/Paris
+targets:
+  FR: data/cache/fr/target__5dcf0bdf8c.csv.gz
+  DE: data/cache/de/target__48c616a566.csv.gz
+  BE: data/cache/be/target__b9c1dde640.csv.gz
+  NL: data/cache/nl/target__57b345e449.csv.gz
+references:
+  FR:
+    path: runs/exports/2026-09-09/fr/nuclear_kalman/forecast_fr_2026-09-09_nuclear_kalman.html
+    label: Chronos-2 + nucl. + correcteur + Kalman P50
+  DE:
+    path: runs/exports/2026-09-09/de/kalman/forecast_de_2026-09-09_kalman.html
+    label: Correcteur résiduel + Kalman gouverné P50
+  BE:
+    path: runs/exports/2026-09-10/be/nuclear_kalman/forecast_be_2026-09-10_nuclear_kalman.html
+    label: Chronos-2 + nucl. + correcteur + Kalman P50
+  NL:
+    path: runs/exports/2026-09-09/nl/nuclear_kalman/forecast_nl_2026-09-09_nuclear_kalman.html
+    label: Chronos-2 + nucl. + correcteur + Kalman P50
+expert:
+  demand_basis: residual
+  parameters:
+    ccgt_efficiency: 0.58
+    ocgt_efficiency: 0.39
+    coal_efficiency: 0.40
+    gas_emission_tco2_mwh_th: 0.202
+    coal_emission_tco2_mwh_th: 0.341
+    ccgt_vom_eur_mwh: 3.0
+    ocgt_vom_eur_mwh: 5.0
+    coal_vom_eur_mwh: 4.0
+    # Diagnostic bidding hypotheses, not historical observed offers or price caps.
+    must_run_bid_eur_mwh: 10.0
+    scarcity_price_eur_mwh: 4000.0
+  scenarios:
+    - id: central
+      hypothesis: Capacités prévisionnelles déclarées, coûts techniques, offre bas coût à 10 EUR/MWh.
+      thermal_availability_scale: 1.0
+      thermal_bid_premium_eur_mwh: 0.0
+    - id: flexible
+      hypothesis: Sensibilité à 10 % de disponibilité thermique supplémentaire et offre bas coût négative ; pas une capacité observée additionnelle.
+      thermal_availability_scale: 1.1
+      thermal_bid_premium_eur_mwh: 0.0
+      must_run_bid_eur_mwh: -20.0
+    - id: constrained
+      hypothesis: Sensibilité à 10 % de disponibilité thermique en moins et prime d'offre thermique de 15 EUR/MWh.
+      thermal_availability_scale: 0.9
+      thermal_bid_premium_eur_mwh: 15.0
+      must_run_bid_eur_mwh: 0.0
+  network: {}
+risk:
+  tight_capacity_margin_fraction: 0.15
+  surplus_curtailment_mw: 100.0
+guard:
+  timezone: Europe/Paris
+  weights: [0.0, 0.1, 0.25, 0.5]
+  regimes: [tight, surplus]
+  lookback_days: 365
+  min_history_days: 60
+  min_regime_days: 14
+  update_every_days: 7
+  minimum_gain_eur_mwh: 0.05
+  minimum_relative_gain: 0.005
+  maximum_weight_step: 0.25
+  maximum_adverse_day_increase_eur_mwh: 5.0
+  require_oof_evidence: true
+  require_label_availability: true

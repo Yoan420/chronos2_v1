@@ -1,0 +1,27 @@
+schema_version: 1
+# Independent experiment. Forecast.ps1 / Both / Complete remain unchanged.
+project_root: ..
+output_root: runs/experiments/heatwave_v1
+source_root: data/pit/heatwave/saturn_daily_v1
+source_start_day: '2024-06-30'
+delivery_day: '2026-09-11'
+# Output countries, NOT temperature input countries (always FR, DE, BE, NL, ES).
+# Each output country needs a complete frozen reference run for this date.
+zones: [FR]
+baseline_kind: nuclear_fr
+baseline_root: runs/experiments/nuclear_forecast_v1
+include_attribution: true
+features:
+  countries: [FR, DE, BE, NL, ES]
+  floor_thresholds_c: {FR: 20.0, DE: 20.0, BE: 20.0, NL: 20.0, ES: 24.0}
+  lookback_days: 365
+  threshold_quantile: 0.9
+  minimum_history_days: 60
+  streak_clip_days: 7
+  persistent_days: 3
+  cooling_threshold_c: 22.0
+  include_cooling_mean: true
+# These are predefined daily-index heuristics, not meteorological heatwave alerts.
+# Model/residual/Kalman hyperparameters are copied unchanged from the reference.
+# Change output_root to a NEW subdirectory of runs/experiments/heatwave_v1 for
+# any new configuration; never tune these parameters on the evaluated year.

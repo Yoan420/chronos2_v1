@@ -1,0 +1,160 @@
+# Contrat expérimental figé le 2026-08-21. Ce fichier ne modifie aucune
+# configuration de production et ne publie que sous runs/experiments.
+schema_version: 1
+experiment_id: pricefm_topology_v1
+output_directory: runs/experiments/pricefm_topology_v1
+
+sources:
+  FR:
+    timezone: Europe/Paris
+    autonomous_run: runs/chronos2_hourly_fr_residual_extended_v1
+    checksum_manifest_sha256: e08eacdabf7d3c9d03e061706b20839ee75689138c682a22880e388de7b466bc
+    target_cache: data/cache/fr/target__5dcf0bdf8c.csv.gz
+    target_cache_sha256: 519a1ef74aa5df48d14b1e89852db781f652bcb6e476c643800c1302bbf61489
+  DE:
+    timezone: Europe/Berlin
+    autonomous_run: runs/chronos2_hourly_de_residual_extended_v1
+    checksum_manifest_sha256: fddf4d1e4961f4228777c0d0d3ddc5f12ea8de0f83f13ed1eb2a54e8f0224ddc
+    target_cache: data/cache/de/target__48c616a566.csv.gz
+    target_cache_sha256: 00efa665711b95c43799b06cb75d8488eedc05890b3d95b62e33903011f610bb
+  BE:
+    timezone: Europe/Brussels
+    autonomous_run: runs/chronos2_hourly_be_residual_extended_v1
+    checksum_manifest_sha256: d0428e1f155d874768726690f895d043b9135ae835041de2350d1eb8e69d8cce
+    target_cache: data/cache/be/target__b9c1dde640.csv.gz
+    target_cache_sha256: c5b9dd97a40d584ebd1c20c602f1dda62dfd058bd84bd363d46b91a904467ed1
+  NL:
+    timezone: Europe/Amsterdam
+    autonomous_run: runs/chronos2_hourly_nl_residual_extended_v1
+    checksum_manifest_sha256: 516537bd87b1dd432aba983b763ea04881e570a1aaab8e0a671f378fdcd770e3
+    target_cache: data/cache/nl/target__57b345e449.csv.gz
+    target_cache_sha256: 1d3bc90afb0ebdc2f153b28a999c3c0c76de5d5c4ca9d2929c36b1de60f3dc3e
+  ES:
+    timezone: Europe/Madrid
+    autonomous_run: runs/chronos2_hourly_es_residual_extended_v1
+    checksum_manifest_sha256: ef35805af31c7e3ce7be6f44791620f8717f09865ce26a4c9dae275435422fc1
+    target_cache: data/cache/es/target__d3f2b3bded.csv.gz
+    target_cache_sha256: 21d3a8a7d907a8306ccb53adf6ccfb785013071e3bf640ce05a33048bdca6c7d
+
+topology:
+  radii: [0, 1]
+  adjacency:
+    FR: [BE, DE, ES]
+    DE: [BE, FR, NL]
+    BE: [DE, FR, NL]
+    NL: [BE, DE]
+    ES: [FR]
+  residual_load:
+    columns:
+      FR: fr_residual_load_fcst
+      DE: de_residual_load_fcst
+      BE: be_residual_load_fcst
+      NL: nl_residual_load_fcst
+      ES: es_residual_load_fcst
+    source: sealed_pit_materialization
+    interpolation: none
+  price:
+    column: actual
+    lag_hours: 24
+    lag_basis: physical_utc_rows
+    source_local_day_strictly_before_delivery: true
+  minimum_pit_coverage: 0.90
+  missing_policy: preserve_nan
+  fallback: identity
+
+model:
+  backend: HistGradientBoostingRegressor
+  loss: absolute_error
+  learning_rate: 0.03
+  max_iter: 100
+  max_leaf_nodes: 7
+  min_samples_leaf: 240
+  l2_regularization: 50.0
+  early_stopping: false
+  random_state: 120
+  correction_clip_eur_mwh: 10.0
+  min_training_rows: 168
+  same_hyperparameters_for_radii: true
+  correction_scale_grid: [0.0, 0.1, 0.25, 0.5, 0.75, 1.0]
+
+protocol:
+  start_local_day: "2025-08-12"
+  splits:
+    seed: 120
+    A: 65
+    development: 60
+    B1: 30
+    B2: 30
+    final: 60
+  selection_min_gain_eur_mwh: 0.0
+  training:
+    selection_fit_blocks: [seed]
+    selection_score_block: A
+    selection_includes_identity: true
+    selection_radius_candidates: [0, 1]
+    selection_correction_scale_grid: [0.0, 0.1, 0.25, 0.5, 0.75, 1.0]
+    development_score_block: development
+    development_used_for_formal_gate: false
+    formal_gate_periods_unopened_before_freeze: true
+    recipe_and_config_frozen_before_formal_gates: true
+    gate_fit_blocks: [seed, A, development]
+    gate_score_blocks: [B1, B2]
+    refit_between_gate_blocks: true
+    b2_refit_add_blocks: [B1]
+    final_fit_blocks: [seed, A, development, B1, B2]
+    final_score_block: final
+    single_final_opening: true
+  gates:
+    minimum_mae_gain_eur_mwh: 0.05
+    require_positive_halves: true
+    bootstrap_samples: 20000
+    bootstrap_seed: 120
+    bootstrap_confidence: 0.95
+    require_bootstrap_lower_bound_positive: true
+  storm:
+    evaluation_only: true
+    load_after_candidate_freeze: true
+    used_for_selection_or_tuning: false
+
+variants:
+  autonomous:
+    zones: [FR, DE, BE, NL, ES]
+    native_model: topology_autonomous
+    baseline_model: residual_corrected
+    prediction_inputs:
+      - autonomous_q10_q50_q90
+      - sealed_pit_residual_load
+      - physical_price_lag24h
+      - deterministic_calendar
+  mkonline_blend:
+    zones: [FR, NL]
+    native_model: topology_mkonline_blend
+    baseline_model: mkonline_blend
+    recalibrate_after_autonomous_gates: true
+    weight_fit_block: A
+    weight_fit_method: constrained_l1_grid
+    weight_grid_step: 0.025
+    veto_blocks: [B1, B2]
+    final_targets_used_for_weight_or_hyperparameters: false
+    cutoff_timezone: Europe/Paris
+    dependencies:
+      FR:
+        recipe_manifest: mkonline_fr_blend_recipe_v1.json
+        recipe_manifest_sha256: 9fa7f86a4550b64dd490e48297abd8a7eabd360925f39c75cbdb4654c84f8543
+        dependency_manifest: mkonline_fr_primary_dependency_v1.json
+        dependency_manifest_sha256: 2dae7a579aee1c1f8bb2e96b70e6e0224a7e8b133e5a9e5f836dee5a646f53cc
+        forecast_file: runs/chronos2_hourly_fr_mkonline_blend_v1/inputs/mkonline_primary_final.parquet
+        forecast_file_sha256: 408d6991854e0d077dd2b9691b758c8ce755c07e2d4fff02b1e46e976851c408
+        primary_series: 41551_native
+        current_weight_autonomous: 0.4977609282924196
+        current_weight_mkonline: 0.5022390717075804
+      NL:
+        recipe_manifest: mkonline_nl_blend_recipe_v1.json
+        recipe_manifest_sha256: de691832431b15acacc5336a6ae2587a677c899cc7c7e1ac87b81e986c4fc6f3
+        dependency_manifest: mkonline_nl_primary_dependency_v1.json
+        dependency_manifest_sha256: 6c6fb39ab017d14268948d9e7b29bad5b93dfc92903ccd54347bb46743b682f6
+        forecast_file: runs/tmp/saturn_fr_price_nonstorm/mkonline_ecop_nl_primary_final.parquet
+        forecast_file_sha256: 1d0594f744a909e59d6dd340498c2a80cc38127edc796ff65ccb90d71c5800ec
+        primary_series: 41554_native
+        current_weight_autonomous: 0.5322743966920516
+        current_weight_mkonline: 0.4677256033079484

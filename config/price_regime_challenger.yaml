@@ -1,0 +1,52 @@
+schema_version: 1
+challenger_id: price_regime_shock_v1
+production_eligible: false
+
+# Ce protocole cible le cas observe le 25 aout: une transition J/J-1 de la
+# charge residuelle pendant les heures solaires, suivie d'une sous-prevision
+# positive du prix. Il reste strictement shadow et ne peut etre promu par ce
+# fichier.
+protocol:
+  timezone: Europe/Paris
+  forecast_origin_local_time: "08:00"
+  label_delay_days: 2
+  solar_hours: [9, 10, 11, 12, 13, 14, 15, 16]
+  shock_error_threshold_eur_mwh: 25.0
+
+validation:
+  # Backtest expanding-window, avec un refit toutes les quatre semaines.
+  evaluation_days: 180
+  minimum_training_days: 120
+  refit_every_days: 28
+
+model:
+  recipe: extra_trees_gate_plus_positive_premium_v1
+  random_state: 425
+  n_estimators: 160
+  max_depth: 7
+  classifier_min_samples_leaf: 16
+  regressor_min_samples_leaf: 8
+  minimum_training_rows: 800
+  minimum_positive_rows: 24
+  # Seuil volontairement conservateur: sur le replay prequentiel, 0.55
+  # conserve un gain MAE global tout en gardant un gain net sur les chocs.
+  gate_probability_threshold: 0.55
+  max_premium_eur_mwh: 120.0
+  # La queue haute est davantage relevee afin de representer l'incertitude
+  # asymetrique d'un choc haussier; les quantiles restent ordonnes.
+  quantile_adjustment:
+    q10: 0.25
+    q50: 1.00
+    q90: 1.35
+
+inputs:
+  pit_root: data/pit/vintages
+  residual_load_files:
+    fr_residual_load_fcst: fr_residual_load_fcst.parquet
+    de_residual_load_fcst: de_residual_load_fcst.parquet
+    be_residual_load_fcst: be_residual_load_fcst.parquet
+    nl_residual_load_fcst: nl_residual_load_fcst.parquet
+    es_residual_load_fcst: es_residual_load_fcst.parquet
+
+outputs:
+  root: runs/challengers/price_regime_shock_v1

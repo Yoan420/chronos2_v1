@@ -1,0 +1,36 @@
+schema_version: 1
+project_root: ..
+registry_path: runs/experiments/chronos2_exogenous/production_registry.json
+runtime_output_root: runs/chronos2_exogenous_operational
+
+# Un bundle invalide doit arreter le preflight. Le fallback ci-dessous est
+# utilise uniquement lorsqu'un mode LoRA est explicitement desactive.
+validation_failure_policy: error
+
+pipelines:
+  autonomous:
+    activated_model: exogenous_residual_corrected
+    fallback_model: residual_corrected
+  kalman:
+    output_model: residual_kalman
+    upstream_model: exogenous_residual_corrected
+    fallback_model: residual_kalman
+    fallback_upstream_model: residual_corrected
+
+# L'artefact POC actuel est seulement shadow: aucune zone ne peut donc etre
+# activee. Apres promotion, renseigner les cinq champs d'identite issus du
+# registre scelle, puis ajouter autonomous et/ou kalman a enabled_modes.
+zones:
+  FR: &inactive
+    enabled_modes: []
+    alias: null
+    candidate_id: null
+    candidate_model: null
+    bundle_manifest_sha256: null
+    artifact_checksums_sha256: null
+    live_source_manifest_path: null
+    live_source_manifest_sha256: null
+  DE: *inactive
+  BE: *inactive
+  NL: *inactive
+  ES: *inactive
