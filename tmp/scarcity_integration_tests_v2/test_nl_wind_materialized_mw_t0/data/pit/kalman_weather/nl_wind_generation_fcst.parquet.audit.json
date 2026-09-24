@@ -1,0 +1,1 @@
+{"sha256": "4ddd8382d1e11596b2ff590941b0a95977a046959a8bb63476c16e09e6ef35d8", "series": "power.nl.prod.total.wind.mw.ecmwf_avg.pointconnect.6h.cache", "cutoff_time": "08:00", "cutoff_timezone": "Europe/Paris", "unit": "GW", "value_scale": 0.001}

@@ -1,0 +1,150 @@
+{
+  "aliases": [
+    "fr_residual_load_fcst",
+    "de_residual_load_fcst",
+    "be_residual_load_fcst",
+    "nl_residual_load_fcst",
+    "es_residual_load_fcst"
+  ],
+  "artifact_type": "kalman_residual_load_market_features_pit_hourly",
+  "causality_violations": 0,
+  "columns": [
+    "value_time_utc",
+    "snapshot_time_utc",
+    "revision_time_utc",
+    "cutoff_time_utc",
+    "fr_residual_load_fcst",
+    "de_residual_load_fcst",
+    "be_residual_load_fcst",
+    "nl_residual_load_fcst",
+    "es_residual_load_fcst"
+  ],
+  "cutoff_time": "08:00",
+  "cutoff_timezone": "Europe/Paris",
+  "days": 736,
+  "delivery_timezones": {
+    "be_residual_load_fcst": "Europe/Brussels",
+    "de_residual_load_fcst": "Europe/Berlin",
+    "es_residual_load_fcst": "Europe/Madrid",
+    "fr_residual_load_fcst": "Europe/Paris",
+    "nl_residual_load_fcst": "Europe/Amsterdam"
+  },
+  "end_day": "2026-09-04",
+  "fill_or_interpolation": "none_except_duplicate_missing_autumn_fold_if_source_is_civil_naive_and_the_strictly_audited_nl_spring_04_and_06_linear_repairs; exact physical-hour coverage required",
+  "first_delivery_utc": "2024-08-29T22:00:00+00:00",
+  "generated_at_utc": "2026-09-03T13:19:25.514452+00:00",
+  "incomplete_dst_policy": {
+    "be_residual_load_fcst": "duplicate",
+    "de_residual_load_fcst": "duplicate",
+    "es_residual_load_fcst": "duplicate",
+    "fr_residual_load_fcst": "duplicate",
+    "nl_residual_load_fcst": "duplicate"
+  },
+  "information_type": "day_ahead_forecasts_known_before_cutoff",
+  "last_delivery_utc": "2026-09-04T21:00:00+00:00",
+  "naive_timezones": {
+    "be_residual_load_fcst": "Europe/Brussels",
+    "de_residual_load_fcst": "Europe/Berlin",
+    "es_residual_load_fcst": "Europe/Madrid",
+    "fr_residual_load_fcst": "Europe/Paris",
+    "nl_residual_load_fcst": "UTC"
+  },
+  "output_sha256": "041ee6f107b4662f3b8345ac4c548e62d3fd63ebf7113479df1f4d92a77d03e1",
+  "provider_revision_timestamp_available": false,
+  "requested_start_day": "2024-09-04",
+  "revision_query": "revision_date=cutoff_time_utc for every delivery day",
+  "revision_time_semantics": "maximum selected source revision per hour",
+  "rows": 17664,
+  "schema_version": 2,
+  "selection_rule": "Saturn state queried independently for each series and delivery day with revision_date=D-1 08:00 Europe/Paris; exact physical 23/24/25-hour delivery grid required",
+  "series": {
+    "be_residual_load_fcst": "power.be.residual.load.hourly.gw.fcst",
+    "de_residual_load_fcst": "power.de.residual.load.hourly.gw.fcst",
+    "es_residual_load_fcst": "power.es.residual.load.hourly.gw.fcst",
+    "fr_residual_load_fcst": "power.fr.residual.load.hourly.gw.fcst",
+    "nl_residual_load_fcst": "power.nl.residual.load.hourly.gw.fcst"
+  },
+  "sha256": "041ee6f107b4662f3b8345ac4c548e62d3fd63ebf7113479df1f4d92a77d03e1",
+  "snapshot_time_semantics": "maximum selected source snapshot per hour",
+  "source_mode": "saturn",
+  "spring_dst_repair_count": {
+    "be_residual_load_fcst": 0,
+    "de_residual_load_fcst": 0,
+    "es_residual_load_fcst": 0,
+    "fr_residual_load_fcst": 0,
+    "nl_residual_load_fcst": 4
+  },
+  "spring_dst_repair_details": {
+    "be_residual_load_fcst": [],
+    "de_residual_load_fcst": [],
+    "es_residual_load_fcst": [],
+    "fr_residual_load_fcst": [],
+    "nl_residual_load_fcst": [
+      {
+        "donor_value_times_local": [
+          "2025-03-30T03:00:00+02:00",
+          "2025-03-30T05:00:00+02:00"
+        ],
+        "donor_value_times_utc": [
+          "2025-03-30T01:00:00+00:00",
+          "2025-03-30T03:00:00+00:00"
+        ],
+        "method": "linear_mean",
+        "same_asof_forecast": true,
+        "value_time_local": "2025-03-30T04:00:00+02:00",
+        "value_time_utc": "2025-03-30T02:00:00+00:00"
+      },
+      {
+        "donor_value_times_local": [
+          "2025-03-30T05:00:00+02:00",
+          "2025-03-30T07:00:00+02:00"
+        ],
+        "donor_value_times_utc": [
+          "2025-03-30T03:00:00+00:00",
+          "2025-03-30T05:00:00+00:00"
+        ],
+        "method": "linear_mean",
+        "same_asof_forecast": true,
+        "value_time_local": "2025-03-30T06:00:00+02:00",
+        "value_time_utc": "2025-03-30T04:00:00+00:00"
+      },
+      {
+        "donor_value_times_local": [
+          "2026-03-29T03:00:00+02:00",
+          "2026-03-29T05:00:00+02:00"
+        ],
+        "donor_value_times_utc": [
+          "2026-03-29T01:00:00+00:00",
+          "2026-03-29T03:00:00+00:00"
+        ],
+        "method": "linear_mean",
+        "same_asof_forecast": true,
+        "value_time_local": "2026-03-29T04:00:00+02:00",
+        "value_time_utc": "2026-03-29T02:00:00+00:00"
+      },
+      {
+        "donor_value_times_local": [
+          "2026-03-29T05:00:00+02:00",
+          "2026-03-29T07:00:00+02:00"
+        ],
+        "donor_value_times_utc": [
+          "2026-03-29T03:00:00+00:00",
+          "2026-03-29T05:00:00+00:00"
+        ],
+        "method": "linear_mean",
+        "same_asof_forecast": true,
+        "value_time_local": "2026-03-29T06:00:00+02:00",
+        "value_time_utc": "2026-03-29T04:00:00+00:00"
+      }
+    ]
+  },
+  "spring_dst_repair_policy": {
+    "be_residual_load_fcst": "none",
+    "de_residual_load_fcst": "none",
+    "es_residual_load_fcst": "none",
+    "fr_residual_load_fcst": "none",
+    "nl_residual_load_fcst": "nl_residual_load_fcst uniquement: grille contractuellement naive UTC d'un jour de passage a l'heure d'ete; si 04:00 et 06:00 locales sont exactement les deux seules heures physiques manquantes, moyenne lineaire des voisins UTC immediats issus du meme etat Saturn as-of; toute autre signature echoue"
+  },
+  "start_day": "2024-08-30",
+  "timezone": "Europe/Paris"
+}

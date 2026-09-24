@@ -1,0 +1,79 @@
+{
+  "alias": "de_wind_generation_fcst",
+  "causal_contract": "Saturn state queried as-of D-1 civil cutoff",
+  "cutoff_time": "08:00",
+  "cutoff_timezone": "Europe/Berlin",
+  "daily_broadcast": false,
+  "days": 815,
+  "dst_duplicate_repair_count": 2,
+  "dst_duplicate_repairs": [
+    {
+      "duplicated_value": 10.54800895,
+      "evidence": "legacy_duplicate_policy_and_equal_cached_folds; raw_singleton_not_requeried",
+      "local_timestamp": "2024-10-27T02:00:00",
+      "physical_hours_utc": [
+        "2024-10-27T00:00:00+00:00",
+        "2024-10-27T01:00:00+00:00"
+      ],
+      "policy": "duplicate"
+    },
+    {
+      "duplicated_value": 39.9148191,
+      "evidence": "legacy_duplicate_policy_and_equal_cached_folds; raw_singleton_not_requeried",
+      "local_timestamp": "2025-10-26T02:00:00",
+      "physical_hours_utc": [
+        "2025-10-26T00:00:00+00:00",
+        "2025-10-26T01:00:00+00:00"
+      ],
+      "policy": "duplicate"
+    }
+  ],
+  "dst_zero_duplicate_repair_count": 0,
+  "dst_zero_duplicate_repairs": [],
+  "end_day": "2026-09-22",
+  "fill_or_interpolation": "duplicate_singleton_autumn_fold_covariate",
+  "first_delivery_utc": "2024-06-29T22:00:00+00:00",
+  "incomplete_dst_policy": "duplicate",
+  "last_delivery_utc": "2026-09-22T21:00:00+00:00",
+  "naive_timezone": "Europe/Berlin",
+  "production_pit_evidence": false,
+  "provider_revision_timestamp_available": false,
+  "request_padding_hours": 8,
+  "requested_days": 7,
+  "requested_end_day": "2026-09-22",
+  "requested_start_day": "2026-09-16",
+  "revision_time_semantics": "query_asof_cutoff; provider insertion timestamp unavailable",
+  "rows": 19560,
+  "scarcity_refresh": {
+    "original_series_unmodified": true,
+    "requested_suffix_only": true,
+    "seed": {
+      "modified_at_utc": "2026-09-14T12:35:57.494193554+00:00",
+      "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T123434626296Z_1168d4aa\\de_wind_generation_fcst.parquet",
+      "sha256": "67d795736cccc9e0723f3ae147381d5de2346f82ba90e3375eeecd3de9ba8c72"
+    },
+    "seed_approximation": null,
+    "seed_audit": {
+      "modified_at_utc": "2026-09-14T12:36:01.438627958+00:00",
+      "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T123434626296Z_1168d4aa\\de_wind_generation_fcst.parquet.audit.json",
+      "sha256": "56b46705e769031984f9b12fc149594192ae77e5dabfc004d7e8f27196ec7f4d"
+    },
+    "seed_fill_or_interpolation": "none_except_duplicate_missing_autumn_fold_if_source_is_civil_naive",
+    "seed_missing_days": []
+  },
+  "schema_version": 1,
+  "seed_provenance": {
+    "audit_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T124822441838Z_9eafc66f\\de_wind_generation_fcst.parquet.audit.json",
+    "audit_sha256": "030e90ca4d11b5c565faa0f26313d8da210a2af4707f0c216ef4fdb94dc3e47b",
+    "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T124822441838Z_9eafc66f\\de_wind_generation_fcst.parquet",
+    "sha256": "67d795736cccc9e0723f3ae147381d5de2346f82ba90e3375eeecd3de9ba8c72"
+  },
+  "series": "power.de.generation.wind.hourly.gw.fcst",
+  "sha256": "5a568ff35f5835a2d1db9bd540fd6cf65fc6f69d41610dbda0aec3cfda095e7c",
+  "snapshot_time_semantics": "query_asof_cutoff",
+  "start_day": "2024-06-30",
+  "timezone": "Europe/Berlin",
+  "unit": "GW",
+  "value_scale": 1.0,
+  "wind_dst_policy": "duplicate"
+}

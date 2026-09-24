@@ -1,0 +1,14 @@
+{
+  "record": {
+    "alias": "nl_nuclear_available_gw",
+    "cutoff_utc": "2026-09-09T06:00:00+00:00",
+    "day": "2026-09-10",
+    "downloaded_at_utc": "2026-09-10T13:48:10.892818+00:00",
+    "forecast_type": "available_capacity_forecast_daily_broadcast",
+    "provider_revision_timestamp_available": false,
+    "schema_version": 1,
+    "series": "power.nrjscan.nl.3mv.availability.pmax.type.nuclear.gw",
+    "value_gw": 0.492
+  },
+  "sha256": "4c5e37e3ca70ce249c6bd4601a34314d1d07eeb189536a68994448e8f91cfa73"
+}

@@ -1,0 +1,12 @@
+{
+  "alias": "da_cap_system_asymmetry",
+  "unit": "GW",
+  "chunk_days": 7,
+  "formula": "ES->FR + IT_NORTH->FR + UK->FR - FR->IT_NORTH - FR->UK",
+  "rows": 36517,
+  "delivery_hours": 35100,
+  "first_delivery_utc": "2022-08-06 10:00:00+00:00",
+  "last_delivery_utc": "2026-08-07 21:00:00+00:00",
+  "first_revision_utc": "2025-11-26 11:28:24.048768+00:00",
+  "last_revision_utc": "2026-08-06 09:06:06.165678+00:00"
+}

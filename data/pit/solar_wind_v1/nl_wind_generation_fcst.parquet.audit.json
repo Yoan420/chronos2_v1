@@ -1,0 +1,96 @@
+{
+  "alias": "nl_wind_generation_fcst",
+  "causal_contract": "Saturn state queried as-of D-1 civil cutoff",
+  "cutoff_time": "08:00",
+  "cutoff_timezone": "Europe/Amsterdam",
+  "daily_broadcast": false,
+  "days": 744,
+  "dst_duplicate_repair_count": 2,
+  "dst_duplicate_repairs": [
+    {
+      "duplicated_value": 0.81234295,
+      "evidence": "raw_Saturn_singleton_at_query_asof",
+      "local_timestamp": "2024-10-27T02:00:00",
+      "physical_hours_utc": [
+        "2024-10-27T00:00:00+00:00",
+        "2024-10-27T01:00:00+00:00"
+      ],
+      "policy": "duplicate"
+    },
+    {
+      "duplicated_value": 8.46783885,
+      "evidence": "raw_Saturn_singleton_at_query_asof",
+      "local_timestamp": "2025-10-26T02:00:00",
+      "physical_hours_utc": [
+        "2025-10-26T00:00:00+00:00",
+        "2025-10-26T01:00:00+00:00"
+      ],
+      "policy": "duplicate"
+    }
+  ],
+  "end_day": "2026-09-22",
+  "fill_or_interpolation": "duplicate_singleton_autumn_fold_covariate",
+  "first_delivery_utc": "2024-09-08T22:00:00+00:00",
+  "incomplete_dst_policy": "duplicate",
+  "last_delivery_utc": "2026-09-22T21:00:00+00:00",
+  "naive_timezone": "Europe/Amsterdam",
+  "production_pit_evidence": false,
+  "provider_revision_timestamp_available": false,
+  "request_padding_hours": 8,
+  "requested_days": 744,
+  "requested_end_day": "2026-09-22",
+  "requested_start_day": "2024-09-09",
+  "revision_time_semantics": "query_asof_cutoff; provider insertion timestamp unavailable",
+  "rows": 17856,
+  "schema_version": 1,
+  "series": "power.nl.generation.wind.hourly.gw.fcst",
+  "sha256": "21680b998a669cc8ffdebe62b5c574a278d9fc7cc6a70858d2e9d4328ad2e17b",
+  "snapshot_time_semantics": "query_asof_cutoff",
+  "source_substitution_count": 2,
+  "source_substitutions": [
+    {
+      "alias": "nl_wind_generation_fcst",
+      "delivery_day": "2025-03-30",
+      "fallback_downloaded_at_utc": "2026-09-21T15:04:16.537686+00:00",
+      "fallback_series": "power.nrjscan.nl.prod.total.wind.mw.ecmwf_avg.pointconnect.6h.cache",
+      "local_time": "2025-03-30T04:00:00+02:00",
+      "native_missing": true,
+      "native_series": "power.nl.generation.wind.hourly.gw.fcst",
+      "policy": "nl_ecmwf_spring_2025_2026",
+      "production_pit_evidence": false,
+      "provenance": "Saturn ECMWF component queried at the identical D-1 08:00 local cutoff; explicit user-approved missing-hour substitution, not the native blend or publication evidence",
+      "provider_revision_timestamp_available": false,
+      "query_cutoff_local": "2025-03-29T08:00:00+01:00",
+      "query_cutoff_utc": "2025-03-29T07:00:00+00:00",
+      "raw_value_mw": 7767.66,
+      "scaled_value_gw": 7.76766,
+      "value_scale": 0.001,
+      "value_time_utc": "2025-03-30T02:00:00+00:00"
+    },
+    {
+      "alias": "nl_wind_generation_fcst",
+      "delivery_day": "2026-03-29",
+      "fallback_downloaded_at_utc": "2026-09-21T15:04:16.339633+00:00",
+      "fallback_series": "power.nrjscan.nl.prod.total.wind.mw.ecmwf_avg.pointconnect.6h.cache",
+      "local_time": "2026-03-29T04:00:00+02:00",
+      "native_missing": true,
+      "native_series": "power.nl.generation.wind.hourly.gw.fcst",
+      "policy": "nl_ecmwf_spring_2025_2026",
+      "production_pit_evidence": false,
+      "provenance": "Saturn ECMWF component queried at the identical D-1 08:00 local cutoff; explicit user-approved missing-hour substitution, not the native blend or publication evidence",
+      "provider_revision_timestamp_available": false,
+      "query_cutoff_local": "2026-03-28T08:00:00+01:00",
+      "query_cutoff_utc": "2026-03-28T07:00:00+00:00",
+      "raw_value_mw": 4049.499,
+      "scaled_value_gw": 4.049499,
+      "value_scale": 0.001,
+      "value_time_utc": "2026-03-29T02:00:00+00:00"
+    }
+  ],
+  "start_day": "2024-09-09",
+  "timezone": "Europe/Amsterdam",
+  "unit": "GW",
+  "value_scale": 1.0,
+  "wind_dst_policy": "duplicate",
+  "wind_gap_policy": "nl_ecmwf_spring_2025_2026"
+}

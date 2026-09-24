@@ -1,0 +1,31 @@
+{
+  "source_structural_file": "C:\\Users\\BQ6757\\chronos2_v1\\data\\derived\\structural_market_features.csv.gz",
+  "calibration_file": "C:\\Users\\BQ6757\\chronos2_v1\\data\\derived\\scarcity_layer_calibration.json",
+  "output_file": "C:\\Users\\BQ6757\\chronos2_v1\\data\\derived\\structural_scarcity_features_c5.csv.gz",
+  "rows": 22751,
+  "first_timestamp": "2024-01-01 23:00:00+00:00",
+  "last_timestamp": "2026-08-08 21:00:00+00:00",
+  "ewm_alpha": 0.65,
+  "feature_columns": [
+    "milp_reserve_pressure",
+    "milp_ramp_pressure",
+    "milp_startup_pressure",
+    "milp_scarcity_probability_feature",
+    "milp_scarcity_adder_feature",
+    "milp_scarcity_probability_ewm",
+    "milp_scarcity_adder_ewm",
+    "milp_scarcity_delta",
+    "milp_reserve_pressure_delta"
+  ],
+  "coverage": {
+    "milp_reserve_pressure": 1.0,
+    "milp_ramp_pressure": 1.0,
+    "milp_startup_pressure": 1.0,
+    "milp_scarcity_probability_feature": 1.0,
+    "milp_scarcity_adder_feature": 1.0,
+    "milp_scarcity_probability_ewm": 1.0,
+    "milp_scarcity_adder_ewm": 1.0,
+    "milp_scarcity_delta": 1.0,
+    "milp_reserve_pressure_delta": 1.0
+  }
+}

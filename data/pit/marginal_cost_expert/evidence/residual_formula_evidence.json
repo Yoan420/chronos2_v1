@@ -1,0 +1,28 @@
+{
+  "endpoint": "https://saturn-energyscan.gem.myengie.com//api/series/formula",
+  "historical_formula_version_attested": false,
+  "retrieved_at_utc": "2026-09-09T13:41:32.087417+00:00",
+  "schema_version": 1,
+  "zones": {
+    "BE": {
+      "formula": "(add (series \"power.be.load.hourly.gw.fcst\") (* -1 (add (series \"power.be.generation.solar.hourly.gw.fcst\") (series \"power.be.generation.wind.hourly.gw.fcst\"))))",
+      "formula_sha256": "82c6caec0a11582dc6293c5759187e94b3efc3436918e7ade917a3c465900554",
+      "series": "power.be.residual.load.hourly.gw.fcst"
+    },
+    "DE": {
+      "formula": "(add (series \"power.de.load.hourly.gw.fcst\") (* -1 (add (series \"power.de.generation.solar.hourly.gw.fcst\") (series \"power.de.generation.wind.hourly.gw.fcst\") (series \"power.de.gma.generation.hydro.ror.hourly.gw.fcst\" #:fill \"ffill\"))))",
+      "formula_sha256": "4033f7c8c12783faaa18149817098b6fb5fc4d78caa482f1c7d242706f76e12a",
+      "series": "power.de.residual.load.hourly.gw.fcst"
+    },
+    "FR": {
+      "formula": "(add (series \"power.fr.load.hourly.gw.fcst\") (* -1 (add (series \"power.fr.generation.solar.hourly.gw.fcst\") (series \"power.fr.generation.wind.hourly.gw.fcst\") (series \"power.fr.generation.hydro.ror.gw.fcst\" #:fill \"ffill\"))))",
+      "formula_sha256": "4e727b1b57f9940a7f9a0de8d1bb4e8eff6586ac8b05e0bcf4aeb125058091e7",
+      "series": "power.fr.residual.load.hourly.gw.fcst"
+    },
+    "NL": {
+      "formula": "(add (series \"power.nl.load.hourly.gw.fcst\") (* -1 (add (series \"power.nl.generation.solar.hourly.gw.fcst\") (series \"power.nl.generation.wind.hourly.gw.fcst\"))))",
+      "formula_sha256": "dc968c9128fefcce8193d5fc91c466331bc71999dc61b3ea3739c9dc4d9f5809",
+      "series": "power.nl.residual.load.hourly.gw.fcst"
+    }
+  }
+}

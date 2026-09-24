@@ -1,0 +1,681 @@
+{
+  "actual_weather_used": false,
+  "additional_sources_snippets": {
+    "auxiliary_lab": {
+      "additional_sources": [
+        {
+          "columns": {
+            "fr_wind_generation_fcst": "value"
+          },
+          "cutoff_column": "snapshot_time_utc",
+          "cutoff_time": "08:00",
+          "origin_column": "snapshot_time_utc",
+          "path": "data/pit/kalman_weather/fr_wind_generation_fcst.parquet",
+          "revision_column": "revision_time_utc",
+          "timestamp_column": "value_time_utc"
+        },
+        {
+          "columns": {
+            "fr_solar_generation_fcst": "value"
+          },
+          "cutoff_column": "snapshot_time_utc",
+          "cutoff_time": "08:00",
+          "origin_column": "snapshot_time_utc",
+          "path": "data/pit/kalman_weather/fr_solar_generation_fcst.parquet",
+          "revision_column": "revision_time_utc",
+          "timestamp_column": "value_time_utc"
+        },
+        {
+          "columns": {
+            "fr_temperature_fcst": "value"
+          },
+          "cutoff_column": "snapshot_time_utc",
+          "cutoff_time": "08:00",
+          "origin_column": "snapshot_time_utc",
+          "path": "data/pit/kalman_weather/fr_temperature_fcst.parquet",
+          "revision_column": "revision_time_utc",
+          "timestamp_column": "value_time_utc"
+        },
+        {
+          "columns": {
+            "de_wind_generation_fcst": "value"
+          },
+          "cutoff_column": "snapshot_time_utc",
+          "cutoff_time": "08:00",
+          "origin_column": "snapshot_time_utc",
+          "path": "data/pit/kalman_weather/de_wind_generation_fcst.parquet",
+          "revision_column": "revision_time_utc",
+          "timestamp_column": "value_time_utc"
+        },
+        {
+          "columns": {
+            "de_solar_generation_fcst": "value"
+          },
+          "cutoff_column": "snapshot_time_utc",
+          "cutoff_time": "08:00",
+          "origin_column": "snapshot_time_utc",
+          "path": "data/pit/kalman_weather/de_solar_generation_fcst.parquet",
+          "revision_column": "revision_time_utc",
+          "timestamp_column": "value_time_utc"
+        },
+        {
+          "columns": {
+            "de_temperature_fcst": "value"
+          },
+          "cutoff_column": "snapshot_time_utc",
+          "cutoff_time": "08:00",
+          "origin_column": "snapshot_time_utc",
+          "path": "data/pit/kalman_weather/de_temperature_fcst.parquet",
+          "revision_column": "revision_time_utc",
+          "timestamp_column": "value_time_utc"
+        },
+        {
+          "columns": {
+            "be_wind_generation_fcst": "value"
+          },
+          "cutoff_column": "snapshot_time_utc",
+          "cutoff_time": "08:00",
+          "origin_column": "snapshot_time_utc",
+          "path": "data/pit/kalman_weather/be_wind_generation_fcst.parquet",
+          "revision_column": "revision_time_utc",
+          "timestamp_column": "value_time_utc"
+        },
+        {
+          "columns": {
+            "be_solar_generation_fcst": "value"
+          },
+          "cutoff_column": "snapshot_time_utc",
+          "cutoff_time": "08:00",
+          "origin_column": "snapshot_time_utc",
+          "path": "data/pit/kalman_weather/be_solar_generation_fcst.parquet",
+          "revision_column": "revision_time_utc",
+          "timestamp_column": "value_time_utc"
+        },
+        {
+          "columns": {
+            "be_temperature_fcst": "value"
+          },
+          "cutoff_column": "snapshot_time_utc",
+          "cutoff_time": "08:00",
+          "origin_column": "snapshot_time_utc",
+          "path": "data/pit/kalman_weather/be_temperature_fcst.parquet",
+          "revision_column": "revision_time_utc",
+          "timestamp_column": "value_time_utc"
+        },
+        {
+          "columns": {
+            "nl_wind_generation_fcst": "value"
+          },
+          "cutoff_column": "snapshot_time_utc",
+          "cutoff_time": "08:00",
+          "origin_column": "snapshot_time_utc",
+          "path": "data/pit/kalman_weather/nl_wind_generation_fcst.parquet",
+          "revision_column": "revision_time_utc",
+          "timestamp_column": "value_time_utc"
+        },
+        {
+          "columns": {
+            "nl_solar_generation_fcst": "value"
+          },
+          "cutoff_column": "snapshot_time_utc",
+          "cutoff_time": "08:00",
+          "origin_column": "snapshot_time_utc",
+          "path": "data/pit/kalman_weather/nl_solar_generation_fcst.parquet",
+          "revision_column": "revision_time_utc",
+          "timestamp_column": "value_time_utc"
+        },
+        {
+          "columns": {
+            "nl_temperature_fcst": "value"
+          },
+          "cutoff_column": "snapshot_time_utc",
+          "cutoff_time": "08:00",
+          "origin_column": "snapshot_time_utc",
+          "path": "data/pit/kalman_weather/nl_temperature_fcst.parquet",
+          "revision_column": "revision_time_utc",
+          "timestamp_column": "value_time_utc"
+        }
+      ]
+    },
+    "operational_live": {
+      "additional_sources": {
+        "be_solar_generation_fcst": {
+          "columns": {
+            "be_solar_generation_fcst": "value"
+          },
+          "cutoff_column": "snapshot_time_utc",
+          "cutoff_policy": "Saturn as-of D-1 08:00 civil",
+          "cutoff_time": "08:00",
+          "information_type": "day_ahead_forecast",
+          "origin_column": "snapshot_time_utc",
+          "path": "data/pit/kalman_weather/be_solar_generation_fcst.parquet",
+          "revision_column": "revision_time_utc",
+          "sha256": "8aac377668b857d78bcb56e3fef27a2a76b6b67059faa109f35f1012756c22f5",
+          "timestamp_column": "value_time_utc"
+        },
+        "be_temperature_fcst": {
+          "columns": {
+            "be_temperature_fcst": "value"
+          },
+          "cutoff_column": "snapshot_time_utc",
+          "cutoff_policy": "Saturn as-of D-1 08:00 civil",
+          "cutoff_time": "08:00",
+          "information_type": "day_ahead_forecast",
+          "origin_column": "snapshot_time_utc",
+          "path": "data/pit/kalman_weather/be_temperature_fcst.parquet",
+          "revision_column": "revision_time_utc",
+          "sha256": "f3a62f59cf471ce0af91587f02dbe1ab164c91c3edb3c2179b63f3dd6ab6c974",
+          "timestamp_column": "value_time_utc"
+        },
+        "be_wind_generation_fcst": {
+          "columns": {
+            "be_wind_generation_fcst": "value"
+          },
+          "cutoff_column": "snapshot_time_utc",
+          "cutoff_policy": "Saturn as-of D-1 08:00 civil",
+          "cutoff_time": "08:00",
+          "information_type": "day_ahead_forecast",
+          "origin_column": "snapshot_time_utc",
+          "path": "data/pit/kalman_weather/be_wind_generation_fcst.parquet",
+          "revision_column": "revision_time_utc",
+          "sha256": "7e2e179a88ecfe6df680f8180be86608bb58c0ef83faa1935a465283c87c9e73",
+          "timestamp_column": "value_time_utc"
+        },
+        "de_solar_generation_fcst": {
+          "columns": {
+            "de_solar_generation_fcst": "value"
+          },
+          "cutoff_column": "snapshot_time_utc",
+          "cutoff_policy": "Saturn as-of D-1 08:00 civil",
+          "cutoff_time": "08:00",
+          "information_type": "day_ahead_forecast",
+          "origin_column": "snapshot_time_utc",
+          "path": "data/pit/kalman_weather/de_solar_generation_fcst.parquet",
+          "revision_column": "revision_time_utc",
+          "sha256": "1f8bfc855ad9963ee8bcb8aa2a6c6c6eb504a9e4d432992f99d81629f95f4b6f",
+          "timestamp_column": "value_time_utc"
+        },
+        "de_temperature_fcst": {
+          "columns": {
+            "de_temperature_fcst": "value"
+          },
+          "cutoff_column": "snapshot_time_utc",
+          "cutoff_policy": "Saturn as-of D-1 08:00 civil",
+          "cutoff_time": "08:00",
+          "information_type": "day_ahead_forecast",
+          "origin_column": "snapshot_time_utc",
+          "path": "data/pit/kalman_weather/de_temperature_fcst.parquet",
+          "revision_column": "revision_time_utc",
+          "sha256": "ce40398af229c66ae0c472fb8ebb3b9771b7fa2eef291f4ace0ff4c8536328b5",
+          "timestamp_column": "value_time_utc"
+        },
+        "de_wind_generation_fcst": {
+          "columns": {
+            "de_wind_generation_fcst": "value"
+          },
+          "cutoff_column": "snapshot_time_utc",
+          "cutoff_policy": "Saturn as-of D-1 08:00 civil",
+          "cutoff_time": "08:00",
+          "information_type": "day_ahead_forecast",
+          "origin_column": "snapshot_time_utc",
+          "path": "data/pit/kalman_weather/de_wind_generation_fcst.parquet",
+          "revision_column": "revision_time_utc",
+          "sha256": "896faef3134099940c0dc6cce914cd584bc62e6429d058dc2fede63f20c51e43",
+          "timestamp_column": "value_time_utc"
+        },
+        "fr_solar_generation_fcst": {
+          "columns": {
+            "fr_solar_generation_fcst": "value"
+          },
+          "cutoff_column": "snapshot_time_utc",
+          "cutoff_policy": "Saturn as-of D-1 08:00 civil",
+          "cutoff_time": "08:00",
+          "information_type": "day_ahead_forecast",
+          "origin_column": "snapshot_time_utc",
+          "path": "data/pit/kalman_weather/fr_solar_generation_fcst.parquet",
+          "revision_column": "revision_time_utc",
+          "sha256": "28c24491805ed07928f62cefb1994f80f06c50f4697575163ae8a65971b81af8",
+          "timestamp_column": "value_time_utc"
+        },
+        "fr_temperature_fcst": {
+          "columns": {
+            "fr_temperature_fcst": "value"
+          },
+          "cutoff_column": "snapshot_time_utc",
+          "cutoff_policy": "Saturn as-of D-1 08:00 civil",
+          "cutoff_time": "08:00",
+          "information_type": "day_ahead_forecast",
+          "origin_column": "snapshot_time_utc",
+          "path": "data/pit/kalman_weather/fr_temperature_fcst.parquet",
+          "revision_column": "revision_time_utc",
+          "sha256": "ec700ccc72e56701223580bcffa41dabb0f9878d5fc0cc5b44ff63d3f32f0685",
+          "timestamp_column": "value_time_utc"
+        },
+        "fr_wind_generation_fcst": {
+          "columns": {
+            "fr_wind_generation_fcst": "value"
+          },
+          "cutoff_column": "snapshot_time_utc",
+          "cutoff_policy": "Saturn as-of D-1 08:00 civil",
+          "cutoff_time": "08:00",
+          "information_type": "day_ahead_forecast",
+          "origin_column": "snapshot_time_utc",
+          "path": "data/pit/kalman_weather/fr_wind_generation_fcst.parquet",
+          "revision_column": "revision_time_utc",
+          "sha256": "d8c9564183a47a27e87a5df160dd0f3ca901180d62eb2ffa9fffc5f1c7a649d5",
+          "timestamp_column": "value_time_utc"
+        },
+        "nl_solar_generation_fcst": {
+          "columns": {
+            "nl_solar_generation_fcst": "value"
+          },
+          "cutoff_column": "snapshot_time_utc",
+          "cutoff_policy": "Saturn as-of D-1 08:00 civil",
+          "cutoff_time": "08:00",
+          "information_type": "day_ahead_forecast",
+          "origin_column": "snapshot_time_utc",
+          "path": "data/pit/kalman_weather/nl_solar_generation_fcst.parquet",
+          "revision_column": "revision_time_utc",
+          "sha256": "88954f1b38b721ad681d28b0ad834f890a206f441e3005782d4f819c10d6378d",
+          "timestamp_column": "value_time_utc"
+        },
+        "nl_temperature_fcst": {
+          "columns": {
+            "nl_temperature_fcst": "value"
+          },
+          "cutoff_column": "snapshot_time_utc",
+          "cutoff_policy": "Saturn as-of D-1 08:00 civil",
+          "cutoff_time": "08:00",
+          "information_type": "day_ahead_forecast",
+          "origin_column": "snapshot_time_utc",
+          "path": "data/pit/kalman_weather/nl_temperature_fcst.parquet",
+          "revision_column": "revision_time_utc",
+          "sha256": "7ae4aee610d0390c57815f30462a306404348b06c5d2b113a0b743fcda7f1154",
+          "timestamp_column": "value_time_utc"
+        },
+        "nl_wind_generation_fcst": {
+          "columns": {
+            "nl_wind_generation_fcst": "value"
+          },
+          "cutoff_column": "snapshot_time_utc",
+          "cutoff_policy": "Saturn as-of D-1 08:00 civil",
+          "cutoff_time": "08:00",
+          "information_type": "day_ahead_forecast",
+          "origin_column": "snapshot_time_utc",
+          "path": "data/pit/kalman_weather/nl_wind_generation_fcst.parquet",
+          "revision_column": "revision_time_utc",
+          "sha256": "6bc062d83680022a29d716d10837423070adb1f92159e41f06b129fae329ee68",
+          "timestamp_column": "value_time_utc"
+        }
+      }
+    }
+  },
+  "causal_contract": "latest series state queried as-of D-1 08:00 civil",
+  "columns": {
+    "cutoff": "snapshot_time_utc",
+    "delivery": "value_time_utc",
+    "origin": "snapshot_time_utc",
+    "revision": "revision_time_utc",
+    "value": "value"
+  },
+  "end_day": "2026-09-04",
+  "generated_at_utc": "2026-09-03T13:18:57.804249+00:00",
+  "parallelism": {
+    "day_workers": 4,
+    "maximum_concurrent_day_requests": 16,
+    "series_workers": 4
+  },
+  "provenance_semantics": {
+    "revision_time_utc": "query_asof_cutoff; not provider insertion timestamp",
+    "snapshot_time_utc": "query_asof_cutoff"
+  },
+  "provider": "Saturn",
+  "requested_end_day": "2026-09-04",
+  "requested_start_day": "2024-06-30",
+  "schema_version": 1,
+  "series": [
+    {
+      "absolute_path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\kalman_weather\\fr_wind_generation_fcst.parquet",
+      "alias": "fr_wind_generation_fcst",
+      "audit_path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\kalman_weather\\fr_wind_generation_fcst.parquet.audit.json",
+      "cutoff_column": "snapshot_time_utc",
+      "cutoff_policy": "Saturn as-of D-1 08:00 civil",
+      "cutoff_time": "08:00",
+      "end_day": "2026-09-04",
+      "fill_or_interpolation": "none_except_duplicate_missing_autumn_fold_if_source_is_civil_naive",
+      "kind": "wind",
+      "naive_timezone": "Europe/Paris",
+      "origin_column": "snapshot_time_utc",
+      "path": "data/pit/kalman_weather/fr_wind_generation_fcst.parquet",
+      "provider_revision_timestamp_available": false,
+      "revision_column": "revision_time_utc",
+      "revision_time_semantics": "query_asof_cutoff; provider insertion timestamp is not returned by Client.get(revision_date=...)",
+      "rows": 19128,
+      "series": "power.fr.generation.wind.hourly.gw.fcst",
+      "sha256": "d8c9564183a47a27e87a5df160dd0f3ca901180d62eb2ffa9fffc5f1c7a649d5",
+      "snapshot_time_semantics": "query_asof_cutoff",
+      "start_day": "2024-06-30",
+      "timestamp_column": "value_time_utc",
+      "timezone": "Europe/Paris",
+      "unit": "GW",
+      "value_column": "value",
+      "value_scale": 1.0,
+      "zone": "FR"
+    },
+    {
+      "absolute_path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\kalman_weather\\fr_solar_generation_fcst.parquet",
+      "alias": "fr_solar_generation_fcst",
+      "audit_path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\kalman_weather\\fr_solar_generation_fcst.parquet.audit.json",
+      "cutoff_column": "snapshot_time_utc",
+      "cutoff_policy": "Saturn as-of D-1 08:00 civil",
+      "cutoff_time": "08:00",
+      "end_day": "2026-09-04",
+      "fill_or_interpolation": "none_except_duplicate_missing_autumn_fold_if_source_is_civil_naive",
+      "kind": "solar",
+      "naive_timezone": "Europe/Paris",
+      "origin_column": "snapshot_time_utc",
+      "path": "data/pit/kalman_weather/fr_solar_generation_fcst.parquet",
+      "provider_revision_timestamp_available": false,
+      "revision_column": "revision_time_utc",
+      "revision_time_semantics": "query_asof_cutoff; provider insertion timestamp is not returned by Client.get(revision_date=...)",
+      "rows": 19128,
+      "series": "power.fr.generation.solar.hourly.gw.fcst",
+      "sha256": "28c24491805ed07928f62cefb1994f80f06c50f4697575163ae8a65971b81af8",
+      "snapshot_time_semantics": "query_asof_cutoff",
+      "start_day": "2024-06-30",
+      "timestamp_column": "value_time_utc",
+      "timezone": "Europe/Paris",
+      "unit": "GW",
+      "value_column": "value",
+      "value_scale": 1.0,
+      "zone": "FR"
+    },
+    {
+      "absolute_path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\kalman_weather\\fr_temperature_fcst.parquet",
+      "alias": "fr_temperature_fcst",
+      "audit_path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\kalman_weather\\fr_temperature_fcst.parquet.audit.json",
+      "cutoff_column": "snapshot_time_utc",
+      "cutoff_policy": "Saturn as-of D-1 08:00 civil",
+      "cutoff_time": "08:00",
+      "end_day": "2026-09-04",
+      "fill_or_interpolation": "daily_value_broadcast_to_physical_hours",
+      "kind": "temperature_2m",
+      "naive_timezone": "Europe/Paris",
+      "origin_column": "snapshot_time_utc",
+      "path": "data/pit/kalman_weather/fr_temperature_fcst.parquet",
+      "provider_revision_timestamp_available": false,
+      "revision_column": "revision_time_utc",
+      "revision_time_semantics": "query_asof_cutoff; provider insertion timestamp is not returned by Client.get(revision_date=...)",
+      "rows": 19128,
+      "series": "meteo.nrjscan.fr.t_2m.index.fcst.d",
+      "sha256": "ec700ccc72e56701223580bcffa41dabb0f9878d5fc0cc5b44ff63d3f32f0685",
+      "snapshot_time_semantics": "query_asof_cutoff",
+      "start_day": "2024-06-30",
+      "timestamp_column": "value_time_utc",
+      "timezone": "Europe/Paris",
+      "unit": "degC",
+      "value_column": "value",
+      "value_scale": 1.0,
+      "zone": "FR"
+    },
+    {
+      "absolute_path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\kalman_weather\\de_wind_generation_fcst.parquet",
+      "alias": "de_wind_generation_fcst",
+      "audit_path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\kalman_weather\\de_wind_generation_fcst.parquet.audit.json",
+      "cutoff_column": "snapshot_time_utc",
+      "cutoff_policy": "Saturn as-of D-1 08:00 civil",
+      "cutoff_time": "08:00",
+      "end_day": "2026-09-04",
+      "fill_or_interpolation": "none_except_duplicate_missing_autumn_fold_if_source_is_civil_naive",
+      "kind": "wind",
+      "naive_timezone": "Europe/Berlin",
+      "origin_column": "snapshot_time_utc",
+      "path": "data/pit/kalman_weather/de_wind_generation_fcst.parquet",
+      "provider_revision_timestamp_available": false,
+      "revision_column": "revision_time_utc",
+      "revision_time_semantics": "query_asof_cutoff; provider insertion timestamp is not returned by Client.get(revision_date=...)",
+      "rows": 19128,
+      "series": "power.de.generation.wind.hourly.gw.fcst",
+      "sha256": "896faef3134099940c0dc6cce914cd584bc62e6429d058dc2fede63f20c51e43",
+      "snapshot_time_semantics": "query_asof_cutoff",
+      "start_day": "2024-06-30",
+      "timestamp_column": "value_time_utc",
+      "timezone": "Europe/Berlin",
+      "unit": "GW",
+      "value_column": "value",
+      "value_scale": 1.0,
+      "zone": "DE"
+    },
+    {
+      "absolute_path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\kalman_weather\\de_solar_generation_fcst.parquet",
+      "alias": "de_solar_generation_fcst",
+      "audit_path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\kalman_weather\\de_solar_generation_fcst.parquet.audit.json",
+      "cutoff_column": "snapshot_time_utc",
+      "cutoff_policy": "Saturn as-of D-1 08:00 civil",
+      "cutoff_time": "08:00",
+      "end_day": "2026-09-04",
+      "fill_or_interpolation": "none_except_duplicate_missing_autumn_fold_if_source_is_civil_naive",
+      "kind": "solar",
+      "naive_timezone": "Europe/Berlin",
+      "origin_column": "snapshot_time_utc",
+      "path": "data/pit/kalman_weather/de_solar_generation_fcst.parquet",
+      "provider_revision_timestamp_available": false,
+      "revision_column": "revision_time_utc",
+      "revision_time_semantics": "query_asof_cutoff; provider insertion timestamp is not returned by Client.get(revision_date=...)",
+      "rows": 19128,
+      "series": "power.de.generation.solar.hourly.gw.fcst",
+      "sha256": "1f8bfc855ad9963ee8bcb8aa2a6c6c6eb504a9e4d432992f99d81629f95f4b6f",
+      "snapshot_time_semantics": "query_asof_cutoff",
+      "start_day": "2024-06-30",
+      "timestamp_column": "value_time_utc",
+      "timezone": "Europe/Berlin",
+      "unit": "GW",
+      "value_column": "value",
+      "value_scale": 1.0,
+      "zone": "DE"
+    },
+    {
+      "absolute_path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\kalman_weather\\de_temperature_fcst.parquet",
+      "alias": "de_temperature_fcst",
+      "audit_path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\kalman_weather\\de_temperature_fcst.parquet.audit.json",
+      "cutoff_column": "snapshot_time_utc",
+      "cutoff_policy": "Saturn as-of D-1 08:00 civil",
+      "cutoff_time": "08:00",
+      "end_day": "2026-09-04",
+      "fill_or_interpolation": "daily_value_broadcast_to_physical_hours",
+      "kind": "temperature_2m",
+      "naive_timezone": "Europe/Berlin",
+      "origin_column": "snapshot_time_utc",
+      "path": "data/pit/kalman_weather/de_temperature_fcst.parquet",
+      "provider_revision_timestamp_available": false,
+      "revision_column": "revision_time_utc",
+      "revision_time_semantics": "query_asof_cutoff; provider insertion timestamp is not returned by Client.get(revision_date=...)",
+      "rows": 19128,
+      "series": "meteo.nrjscan.de.t_2m.index.fcst.d",
+      "sha256": "ce40398af229c66ae0c472fb8ebb3b9771b7fa2eef291f4ace0ff4c8536328b5",
+      "snapshot_time_semantics": "query_asof_cutoff",
+      "start_day": "2024-06-30",
+      "timestamp_column": "value_time_utc",
+      "timezone": "Europe/Berlin",
+      "unit": "degC",
+      "value_column": "value",
+      "value_scale": 1.0,
+      "zone": "DE"
+    },
+    {
+      "absolute_path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\kalman_weather\\be_wind_generation_fcst.parquet",
+      "alias": "be_wind_generation_fcst",
+      "audit_path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\kalman_weather\\be_wind_generation_fcst.parquet.audit.json",
+      "cutoff_column": "snapshot_time_utc",
+      "cutoff_policy": "Saturn as-of D-1 08:00 civil",
+      "cutoff_time": "08:00",
+      "end_day": "2026-09-04",
+      "fill_or_interpolation": "none_except_duplicate_missing_autumn_fold_if_source_is_civil_naive",
+      "kind": "wind",
+      "naive_timezone": "Europe/Brussels",
+      "origin_column": "snapshot_time_utc",
+      "path": "data/pit/kalman_weather/be_wind_generation_fcst.parquet",
+      "provider_revision_timestamp_available": false,
+      "revision_column": "revision_time_utc",
+      "revision_time_semantics": "query_asof_cutoff; provider insertion timestamp is not returned by Client.get(revision_date=...)",
+      "rows": 19128,
+      "series": "power.be.generation.wind.hourly.gw.fcst",
+      "sha256": "7e2e179a88ecfe6df680f8180be86608bb58c0ef83faa1935a465283c87c9e73",
+      "snapshot_time_semantics": "query_asof_cutoff",
+      "start_day": "2024-06-30",
+      "timestamp_column": "value_time_utc",
+      "timezone": "Europe/Brussels",
+      "unit": "GW",
+      "value_column": "value",
+      "value_scale": 1.0,
+      "zone": "BE"
+    },
+    {
+      "absolute_path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\kalman_weather\\be_solar_generation_fcst.parquet",
+      "alias": "be_solar_generation_fcst",
+      "audit_path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\kalman_weather\\be_solar_generation_fcst.parquet.audit.json",
+      "cutoff_column": "snapshot_time_utc",
+      "cutoff_policy": "Saturn as-of D-1 08:00 civil",
+      "cutoff_time": "08:00",
+      "end_day": "2026-09-04",
+      "fill_or_interpolation": "none_except_duplicate_missing_autumn_fold_if_source_is_civil_naive",
+      "kind": "solar",
+      "naive_timezone": "Europe/Brussels",
+      "origin_column": "snapshot_time_utc",
+      "path": "data/pit/kalman_weather/be_solar_generation_fcst.parquet",
+      "provider_revision_timestamp_available": false,
+      "revision_column": "revision_time_utc",
+      "revision_time_semantics": "query_asof_cutoff; provider insertion timestamp is not returned by Client.get(revision_date=...)",
+      "rows": 19128,
+      "series": "power.be.generation.solar.hourly.gw.fcst",
+      "sha256": "8aac377668b857d78bcb56e3fef27a2a76b6b67059faa109f35f1012756c22f5",
+      "snapshot_time_semantics": "query_asof_cutoff",
+      "start_day": "2024-06-30",
+      "timestamp_column": "value_time_utc",
+      "timezone": "Europe/Brussels",
+      "unit": "GW",
+      "value_column": "value",
+      "value_scale": 1.0,
+      "zone": "BE"
+    },
+    {
+      "absolute_path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\kalman_weather\\be_temperature_fcst.parquet",
+      "alias": "be_temperature_fcst",
+      "audit_path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\kalman_weather\\be_temperature_fcst.parquet.audit.json",
+      "cutoff_column": "snapshot_time_utc",
+      "cutoff_policy": "Saturn as-of D-1 08:00 civil",
+      "cutoff_time": "08:00",
+      "end_day": "2026-09-04",
+      "fill_or_interpolation": "daily_value_broadcast_to_physical_hours",
+      "kind": "temperature_2m",
+      "naive_timezone": "Europe/Brussels",
+      "origin_column": "snapshot_time_utc",
+      "path": "data/pit/kalman_weather/be_temperature_fcst.parquet",
+      "provider_revision_timestamp_available": false,
+      "revision_column": "revision_time_utc",
+      "revision_time_semantics": "query_asof_cutoff; provider insertion timestamp is not returned by Client.get(revision_date=...)",
+      "rows": 19128,
+      "series": "meteo.nrjscan.be.t_2m.index.fcst.d",
+      "sha256": "f3a62f59cf471ce0af91587f02dbe1ab164c91c3edb3c2179b63f3dd6ab6c974",
+      "snapshot_time_semantics": "query_asof_cutoff",
+      "start_day": "2024-06-30",
+      "timestamp_column": "value_time_utc",
+      "timezone": "Europe/Brussels",
+      "unit": "degC",
+      "value_column": "value",
+      "value_scale": 1.0,
+      "zone": "BE"
+    },
+    {
+      "absolute_path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\kalman_weather\\nl_wind_generation_fcst.parquet",
+      "alias": "nl_wind_generation_fcst",
+      "audit_path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\kalman_weather\\nl_wind_generation_fcst.parquet.audit.json",
+      "cutoff_column": "snapshot_time_utc",
+      "cutoff_policy": "Saturn as-of D-1 08:00 civil",
+      "cutoff_time": "08:00",
+      "end_day": "2026-09-04",
+      "fill_or_interpolation": "none_except_duplicate_missing_autumn_fold_if_source_is_civil_naive",
+      "kind": "wind",
+      "naive_timezone": "UTC",
+      "origin_column": "snapshot_time_utc",
+      "path": "data/pit/kalman_weather/nl_wind_generation_fcst.parquet",
+      "provider_revision_timestamp_available": false,
+      "revision_column": "revision_time_utc",
+      "revision_time_semantics": "query_asof_cutoff; provider insertion timestamp is not returned by Client.get(revision_date=...)",
+      "rows": 19128,
+      "series": "power.nl.prod.total.wind.mw.ecmwf_avg.pointconnect.6h.cache",
+      "sha256": "6bc062d83680022a29d716d10837423070adb1f92159e41f06b129fae329ee68",
+      "snapshot_time_semantics": "query_asof_cutoff",
+      "start_day": "2024-06-30",
+      "timestamp_column": "value_time_utc",
+      "timezone": "Europe/Amsterdam",
+      "unit": "GW",
+      "value_column": "value",
+      "value_scale": 0.001,
+      "zone": "NL"
+    },
+    {
+      "absolute_path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\kalman_weather\\nl_solar_generation_fcst.parquet",
+      "alias": "nl_solar_generation_fcst",
+      "audit_path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\kalman_weather\\nl_solar_generation_fcst.parquet.audit.json",
+      "cutoff_column": "snapshot_time_utc",
+      "cutoff_policy": "Saturn as-of D-1 08:00 civil",
+      "cutoff_time": "08:00",
+      "end_day": "2026-09-04",
+      "fill_or_interpolation": "none_except_duplicate_missing_autumn_fold_if_source_is_civil_naive",
+      "kind": "solar",
+      "naive_timezone": "Europe/Amsterdam",
+      "origin_column": "snapshot_time_utc",
+      "path": "data/pit/kalman_weather/nl_solar_generation_fcst.parquet",
+      "provider_revision_timestamp_available": false,
+      "revision_column": "revision_time_utc",
+      "revision_time_semantics": "query_asof_cutoff; provider insertion timestamp is not returned by Client.get(revision_date=...)",
+      "rows": 19128,
+      "series": "power.nl.generation.solar.hourly.gw.fcst",
+      "sha256": "88954f1b38b721ad681d28b0ad834f890a206f441e3005782d4f819c10d6378d",
+      "snapshot_time_semantics": "query_asof_cutoff",
+      "start_day": "2024-06-30",
+      "timestamp_column": "value_time_utc",
+      "timezone": "Europe/Amsterdam",
+      "unit": "GW",
+      "value_column": "value",
+      "value_scale": 1.0,
+      "zone": "NL"
+    },
+    {
+      "absolute_path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\kalman_weather\\nl_temperature_fcst.parquet",
+      "alias": "nl_temperature_fcst",
+      "audit_path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\kalman_weather\\nl_temperature_fcst.parquet.audit.json",
+      "cutoff_column": "snapshot_time_utc",
+      "cutoff_policy": "Saturn as-of D-1 08:00 civil",
+      "cutoff_time": "08:00",
+      "end_day": "2026-09-04",
+      "fill_or_interpolation": "daily_value_broadcast_to_physical_hours",
+      "kind": "temperature_2m",
+      "naive_timezone": "Europe/Amsterdam",
+      "origin_column": "snapshot_time_utc",
+      "path": "data/pit/kalman_weather/nl_temperature_fcst.parquet",
+      "provider_revision_timestamp_available": false,
+      "revision_column": "revision_time_utc",
+      "revision_time_semantics": "query_asof_cutoff; provider insertion timestamp is not returned by Client.get(revision_date=...)",
+      "rows": 19128,
+      "series": "meteo.nrjscan.nl.t_2m.index.fcst.d",
+      "sha256": "7ae4aee610d0390c57815f30462a306404348b06c5d2b113a0b743fcda7f1154",
+      "snapshot_time_semantics": "query_asof_cutoff",
+      "start_day": "2024-06-30",
+      "timestamp_column": "value_time_utc",
+      "timezone": "Europe/Amsterdam",
+      "unit": "degC",
+      "value_column": "value",
+      "value_scale": 1.0,
+      "zone": "NL"
+    }
+  ],
+  "start_day": "2024-06-30",
+  "zones": [
+    "FR",
+    "DE",
+    "BE",
+    "NL"
+  ]
+}

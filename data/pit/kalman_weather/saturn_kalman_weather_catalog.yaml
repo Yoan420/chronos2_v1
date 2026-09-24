@@ -1,0 +1,585 @@
+schema_version: 1
+generated_at_utc: '2026-09-03T13:18:57.804249+00:00'
+provider: Saturn
+causal_contract: latest series state queried as-of D-1 08:00 civil
+provenance_semantics:
+  snapshot_time_utc: query_asof_cutoff
+  revision_time_utc: query_asof_cutoff; not provider insertion timestamp
+actual_weather_used: false
+start_day: '2024-06-30'
+end_day: '2026-09-04'
+requested_start_day: '2024-06-30'
+requested_end_day: '2026-09-04'
+zones:
+- FR
+- DE
+- BE
+- NL
+parallelism:
+  series_workers: 4
+  day_workers: 4
+  maximum_concurrent_day_requests: 16
+columns:
+  delivery: value_time_utc
+  value: value
+  origin: snapshot_time_utc
+  revision: revision_time_utc
+  cutoff: snapshot_time_utc
+series:
+- zone: FR
+  kind: wind
+  alias: fr_wind_generation_fcst
+  series: power.fr.generation.wind.hourly.gw.fcst
+  unit: GW
+  value_scale: 1.0
+  timezone: Europe/Paris
+  naive_timezone: Europe/Paris
+  path: data/pit/kalman_weather/fr_wind_generation_fcst.parquet
+  absolute_path: C:\Users\BQ6757\chronos2_v1\data\pit\kalman_weather\fr_wind_generation_fcst.parquet
+  audit_path: C:\Users\BQ6757\chronos2_v1\data\pit\kalman_weather\fr_wind_generation_fcst.parquet.audit.json
+  sha256: d8c9564183a47a27e87a5df160dd0f3ca901180d62eb2ffa9fffc5f1c7a649d5
+  rows: 19128
+  start_day: '2024-06-30'
+  end_day: '2026-09-04'
+  timestamp_column: value_time_utc
+  value_column: value
+  origin_column: snapshot_time_utc
+  revision_column: revision_time_utc
+  cutoff_column: snapshot_time_utc
+  cutoff_time: 08:00
+  cutoff_policy: Saturn as-of D-1 08:00 civil
+  snapshot_time_semantics: query_asof_cutoff
+  revision_time_semantics: query_asof_cutoff; provider insertion timestamp is not
+    returned by Client.get(revision_date=...)
+  provider_revision_timestamp_available: false
+  fill_or_interpolation: none_except_duplicate_missing_autumn_fold_if_source_is_civil_naive
+- zone: FR
+  kind: solar
+  alias: fr_solar_generation_fcst
+  series: power.fr.generation.solar.hourly.gw.fcst
+  unit: GW
+  value_scale: 1.0
+  timezone: Europe/Paris
+  naive_timezone: Europe/Paris
+  path: data/pit/kalman_weather/fr_solar_generation_fcst.parquet
+  absolute_path: C:\Users\BQ6757\chronos2_v1\data\pit\kalman_weather\fr_solar_generation_fcst.parquet
+  audit_path: C:\Users\BQ6757\chronos2_v1\data\pit\kalman_weather\fr_solar_generation_fcst.parquet.audit.json
+  sha256: 28c24491805ed07928f62cefb1994f80f06c50f4697575163ae8a65971b81af8
+  rows: 19128
+  start_day: '2024-06-30'
+  end_day: '2026-09-04'
+  timestamp_column: value_time_utc
+  value_column: value
+  origin_column: snapshot_time_utc
+  revision_column: revision_time_utc
+  cutoff_column: snapshot_time_utc
+  cutoff_time: 08:00
+  cutoff_policy: Saturn as-of D-1 08:00 civil
+  snapshot_time_semantics: query_asof_cutoff
+  revision_time_semantics: query_asof_cutoff; provider insertion timestamp is not
+    returned by Client.get(revision_date=...)
+  provider_revision_timestamp_available: false
+  fill_or_interpolation: none_except_duplicate_missing_autumn_fold_if_source_is_civil_naive
+- zone: FR
+  kind: temperature_2m
+  alias: fr_temperature_fcst
+  series: meteo.nrjscan.fr.t_2m.index.fcst.d
+  unit: degC
+  value_scale: 1.0
+  timezone: Europe/Paris
+  naive_timezone: Europe/Paris
+  path: data/pit/kalman_weather/fr_temperature_fcst.parquet
+  absolute_path: C:\Users\BQ6757\chronos2_v1\data\pit\kalman_weather\fr_temperature_fcst.parquet
+  audit_path: C:\Users\BQ6757\chronos2_v1\data\pit\kalman_weather\fr_temperature_fcst.parquet.audit.json
+  sha256: ec700ccc72e56701223580bcffa41dabb0f9878d5fc0cc5b44ff63d3f32f0685
+  rows: 19128
+  start_day: '2024-06-30'
+  end_day: '2026-09-04'
+  timestamp_column: value_time_utc
+  value_column: value
+  origin_column: snapshot_time_utc
+  revision_column: revision_time_utc
+  cutoff_column: snapshot_time_utc
+  cutoff_time: 08:00
+  cutoff_policy: Saturn as-of D-1 08:00 civil
+  snapshot_time_semantics: query_asof_cutoff
+  revision_time_semantics: query_asof_cutoff; provider insertion timestamp is not
+    returned by Client.get(revision_date=...)
+  provider_revision_timestamp_available: false
+  fill_or_interpolation: daily_value_broadcast_to_physical_hours
+- zone: DE
+  kind: wind
+  alias: de_wind_generation_fcst
+  series: power.de.generation.wind.hourly.gw.fcst
+  unit: GW
+  value_scale: 1.0
+  timezone: Europe/Berlin
+  naive_timezone: Europe/Berlin
+  path: data/pit/kalman_weather/de_wind_generation_fcst.parquet
+  absolute_path: C:\Users\BQ6757\chronos2_v1\data\pit\kalman_weather\de_wind_generation_fcst.parquet
+  audit_path: C:\Users\BQ6757\chronos2_v1\data\pit\kalman_weather\de_wind_generation_fcst.parquet.audit.json
+  sha256: 896faef3134099940c0dc6cce914cd584bc62e6429d058dc2fede63f20c51e43
+  rows: 19128
+  start_day: '2024-06-30'
+  end_day: '2026-09-04'
+  timestamp_column: value_time_utc
+  value_column: value
+  origin_column: snapshot_time_utc
+  revision_column: revision_time_utc
+  cutoff_column: snapshot_time_utc
+  cutoff_time: 08:00
+  cutoff_policy: Saturn as-of D-1 08:00 civil
+  snapshot_time_semantics: query_asof_cutoff
+  revision_time_semantics: query_asof_cutoff; provider insertion timestamp is not
+    returned by Client.get(revision_date=...)
+  provider_revision_timestamp_available: false
+  fill_or_interpolation: none_except_duplicate_missing_autumn_fold_if_source_is_civil_naive
+- zone: DE
+  kind: solar
+  alias: de_solar_generation_fcst
+  series: power.de.generation.solar.hourly.gw.fcst
+  unit: GW
+  value_scale: 1.0
+  timezone: Europe/Berlin
+  naive_timezone: Europe/Berlin
+  path: data/pit/kalman_weather/de_solar_generation_fcst.parquet
+  absolute_path: C:\Users\BQ6757\chronos2_v1\data\pit\kalman_weather\de_solar_generation_fcst.parquet
+  audit_path: C:\Users\BQ6757\chronos2_v1\data\pit\kalman_weather\de_solar_generation_fcst.parquet.audit.json
+  sha256: 1f8bfc855ad9963ee8bcb8aa2a6c6c6eb504a9e4d432992f99d81629f95f4b6f
+  rows: 19128
+  start_day: '2024-06-30'
+  end_day: '2026-09-04'
+  timestamp_column: value_time_utc
+  value_column: value
+  origin_column: snapshot_time_utc
+  revision_column: revision_time_utc
+  cutoff_column: snapshot_time_utc
+  cutoff_time: 08:00
+  cutoff_policy: Saturn as-of D-1 08:00 civil
+  snapshot_time_semantics: query_asof_cutoff
+  revision_time_semantics: query_asof_cutoff; provider insertion timestamp is not
+    returned by Client.get(revision_date=...)
+  provider_revision_timestamp_available: false
+  fill_or_interpolation: none_except_duplicate_missing_autumn_fold_if_source_is_civil_naive
+- zone: DE
+  kind: temperature_2m
+  alias: de_temperature_fcst
+  series: meteo.nrjscan.de.t_2m.index.fcst.d
+  unit: degC
+  value_scale: 1.0
+  timezone: Europe/Berlin
+  naive_timezone: Europe/Berlin
+  path: data/pit/kalman_weather/de_temperature_fcst.parquet
+  absolute_path: C:\Users\BQ6757\chronos2_v1\data\pit\kalman_weather\de_temperature_fcst.parquet
+  audit_path: C:\Users\BQ6757\chronos2_v1\data\pit\kalman_weather\de_temperature_fcst.parquet.audit.json
+  sha256: ce40398af229c66ae0c472fb8ebb3b9771b7fa2eef291f4ace0ff4c8536328b5
+  rows: 19128
+  start_day: '2024-06-30'
+  end_day: '2026-09-04'
+  timestamp_column: value_time_utc
+  value_column: value
+  origin_column: snapshot_time_utc
+  revision_column: revision_time_utc
+  cutoff_column: snapshot_time_utc
+  cutoff_time: 08:00
+  cutoff_policy: Saturn as-of D-1 08:00 civil
+  snapshot_time_semantics: query_asof_cutoff
+  revision_time_semantics: query_asof_cutoff; provider insertion timestamp is not
+    returned by Client.get(revision_date=...)
+  provider_revision_timestamp_available: false
+  fill_or_interpolation: daily_value_broadcast_to_physical_hours
+- zone: BE
+  kind: wind
+  alias: be_wind_generation_fcst
+  series: power.be.generation.wind.hourly.gw.fcst
+  unit: GW
+  value_scale: 1.0
+  timezone: Europe/Brussels
+  naive_timezone: Europe/Brussels
+  path: data/pit/kalman_weather/be_wind_generation_fcst.parquet
+  absolute_path: C:\Users\BQ6757\chronos2_v1\data\pit\kalman_weather\be_wind_generation_fcst.parquet
+  audit_path: C:\Users\BQ6757\chronos2_v1\data\pit\kalman_weather\be_wind_generation_fcst.parquet.audit.json
+  sha256: 7e2e179a88ecfe6df680f8180be86608bb58c0ef83faa1935a465283c87c9e73
+  rows: 19128
+  start_day: '2024-06-30'
+  end_day: '2026-09-04'
+  timestamp_column: value_time_utc
+  value_column: value
+  origin_column: snapshot_time_utc
+  revision_column: revision_time_utc
+  cutoff_column: snapshot_time_utc
+  cutoff_time: 08:00
+  cutoff_policy: Saturn as-of D-1 08:00 civil
+  snapshot_time_semantics: query_asof_cutoff
+  revision_time_semantics: query_asof_cutoff; provider insertion timestamp is not
+    returned by Client.get(revision_date=...)
+  provider_revision_timestamp_available: false
+  fill_or_interpolation: none_except_duplicate_missing_autumn_fold_if_source_is_civil_naive
+- zone: BE
+  kind: solar
+  alias: be_solar_generation_fcst
+  series: power.be.generation.solar.hourly.gw.fcst
+  unit: GW
+  value_scale: 1.0
+  timezone: Europe/Brussels
+  naive_timezone: Europe/Brussels
+  path: data/pit/kalman_weather/be_solar_generation_fcst.parquet
+  absolute_path: C:\Users\BQ6757\chronos2_v1\data\pit\kalman_weather\be_solar_generation_fcst.parquet
+  audit_path: C:\Users\BQ6757\chronos2_v1\data\pit\kalman_weather\be_solar_generation_fcst.parquet.audit.json
+  sha256: 8aac377668b857d78bcb56e3fef27a2a76b6b67059faa109f35f1012756c22f5
+  rows: 19128
+  start_day: '2024-06-30'
+  end_day: '2026-09-04'
+  timestamp_column: value_time_utc
+  value_column: value
+  origin_column: snapshot_time_utc
+  revision_column: revision_time_utc
+  cutoff_column: snapshot_time_utc
+  cutoff_time: 08:00
+  cutoff_policy: Saturn as-of D-1 08:00 civil
+  snapshot_time_semantics: query_asof_cutoff
+  revision_time_semantics: query_asof_cutoff; provider insertion timestamp is not
+    returned by Client.get(revision_date=...)
+  provider_revision_timestamp_available: false
+  fill_or_interpolation: none_except_duplicate_missing_autumn_fold_if_source_is_civil_naive
+- zone: BE
+  kind: temperature_2m
+  alias: be_temperature_fcst
+  series: meteo.nrjscan.be.t_2m.index.fcst.d
+  unit: degC
+  value_scale: 1.0
+  timezone: Europe/Brussels
+  naive_timezone: Europe/Brussels
+  path: data/pit/kalman_weather/be_temperature_fcst.parquet
+  absolute_path: C:\Users\BQ6757\chronos2_v1\data\pit\kalman_weather\be_temperature_fcst.parquet
+  audit_path: C:\Users\BQ6757\chronos2_v1\data\pit\kalman_weather\be_temperature_fcst.parquet.audit.json
+  sha256: f3a62f59cf471ce0af91587f02dbe1ab164c91c3edb3c2179b63f3dd6ab6c974
+  rows: 19128
+  start_day: '2024-06-30'
+  end_day: '2026-09-04'
+  timestamp_column: value_time_utc
+  value_column: value
+  origin_column: snapshot_time_utc
+  revision_column: revision_time_utc
+  cutoff_column: snapshot_time_utc
+  cutoff_time: 08:00
+  cutoff_policy: Saturn as-of D-1 08:00 civil
+  snapshot_time_semantics: query_asof_cutoff
+  revision_time_semantics: query_asof_cutoff; provider insertion timestamp is not
+    returned by Client.get(revision_date=...)
+  provider_revision_timestamp_available: false
+  fill_or_interpolation: daily_value_broadcast_to_physical_hours
+- zone: NL
+  kind: wind
+  alias: nl_wind_generation_fcst
+  series: power.nl.prod.total.wind.mw.ecmwf_avg.pointconnect.6h.cache
+  unit: GW
+  value_scale: 0.001
+  timezone: Europe/Amsterdam
+  naive_timezone: UTC
+  path: data/pit/kalman_weather/nl_wind_generation_fcst.parquet
+  absolute_path: C:\Users\BQ6757\chronos2_v1\data\pit\kalman_weather\nl_wind_generation_fcst.parquet
+  audit_path: C:\Users\BQ6757\chronos2_v1\data\pit\kalman_weather\nl_wind_generation_fcst.parquet.audit.json
+  sha256: 6bc062d83680022a29d716d10837423070adb1f92159e41f06b129fae329ee68
+  rows: 19128
+  start_day: '2024-06-30'
+  end_day: '2026-09-04'
+  timestamp_column: value_time_utc
+  value_column: value
+  origin_column: snapshot_time_utc
+  revision_column: revision_time_utc
+  cutoff_column: snapshot_time_utc
+  cutoff_time: 08:00
+  cutoff_policy: Saturn as-of D-1 08:00 civil
+  snapshot_time_semantics: query_asof_cutoff
+  revision_time_semantics: query_asof_cutoff; provider insertion timestamp is not
+    returned by Client.get(revision_date=...)
+  provider_revision_timestamp_available: false
+  fill_or_interpolation: none_except_duplicate_missing_autumn_fold_if_source_is_civil_naive
+- zone: NL
+  kind: solar
+  alias: nl_solar_generation_fcst
+  series: power.nl.generation.solar.hourly.gw.fcst
+  unit: GW
+  value_scale: 1.0
+  timezone: Europe/Amsterdam
+  naive_timezone: Europe/Amsterdam
+  path: data/pit/kalman_weather/nl_solar_generation_fcst.parquet
+  absolute_path: C:\Users\BQ6757\chronos2_v1\data\pit\kalman_weather\nl_solar_generation_fcst.parquet
+  audit_path: C:\Users\BQ6757\chronos2_v1\data\pit\kalman_weather\nl_solar_generation_fcst.parquet.audit.json
+  sha256: 88954f1b38b721ad681d28b0ad834f890a206f441e3005782d4f819c10d6378d
+  rows: 19128
+  start_day: '2024-06-30'
+  end_day: '2026-09-04'
+  timestamp_column: value_time_utc
+  value_column: value
+  origin_column: snapshot_time_utc
+  revision_column: revision_time_utc
+  cutoff_column: snapshot_time_utc
+  cutoff_time: 08:00
+  cutoff_policy: Saturn as-of D-1 08:00 civil
+  snapshot_time_semantics: query_asof_cutoff
+  revision_time_semantics: query_asof_cutoff; provider insertion timestamp is not
+    returned by Client.get(revision_date=...)
+  provider_revision_timestamp_available: false
+  fill_or_interpolation: none_except_duplicate_missing_autumn_fold_if_source_is_civil_naive
+- zone: NL
+  kind: temperature_2m
+  alias: nl_temperature_fcst
+  series: meteo.nrjscan.nl.t_2m.index.fcst.d
+  unit: degC
+  value_scale: 1.0
+  timezone: Europe/Amsterdam
+  naive_timezone: Europe/Amsterdam
+  path: data/pit/kalman_weather/nl_temperature_fcst.parquet
+  absolute_path: C:\Users\BQ6757\chronos2_v1\data\pit\kalman_weather\nl_temperature_fcst.parquet
+  audit_path: C:\Users\BQ6757\chronos2_v1\data\pit\kalman_weather\nl_temperature_fcst.parquet.audit.json
+  sha256: 7ae4aee610d0390c57815f30462a306404348b06c5d2b113a0b743fcda7f1154
+  rows: 19128
+  start_day: '2024-06-30'
+  end_day: '2026-09-04'
+  timestamp_column: value_time_utc
+  value_column: value
+  origin_column: snapshot_time_utc
+  revision_column: revision_time_utc
+  cutoff_column: snapshot_time_utc
+  cutoff_time: 08:00
+  cutoff_policy: Saturn as-of D-1 08:00 civil
+  snapshot_time_semantics: query_asof_cutoff
+  revision_time_semantics: query_asof_cutoff; provider insertion timestamp is not
+    returned by Client.get(revision_date=...)
+  provider_revision_timestamp_available: false
+  fill_or_interpolation: daily_value_broadcast_to_physical_hours
+additional_sources_snippets:
+  auxiliary_lab:
+    additional_sources:
+    - path: data/pit/kalman_weather/fr_wind_generation_fcst.parquet
+      timestamp_column: value_time_utc
+      columns: &id001
+        fr_wind_generation_fcst: value
+      origin_column: snapshot_time_utc
+      revision_column: revision_time_utc
+      cutoff_column: snapshot_time_utc
+      cutoff_time: 08:00
+    - path: data/pit/kalman_weather/fr_solar_generation_fcst.parquet
+      timestamp_column: value_time_utc
+      columns: &id002
+        fr_solar_generation_fcst: value
+      origin_column: snapshot_time_utc
+      revision_column: revision_time_utc
+      cutoff_column: snapshot_time_utc
+      cutoff_time: 08:00
+    - path: data/pit/kalman_weather/fr_temperature_fcst.parquet
+      timestamp_column: value_time_utc
+      columns: &id003
+        fr_temperature_fcst: value
+      origin_column: snapshot_time_utc
+      revision_column: revision_time_utc
+      cutoff_column: snapshot_time_utc
+      cutoff_time: 08:00
+    - path: data/pit/kalman_weather/de_wind_generation_fcst.parquet
+      timestamp_column: value_time_utc
+      columns: &id004
+        de_wind_generation_fcst: value
+      origin_column: snapshot_time_utc
+      revision_column: revision_time_utc
+      cutoff_column: snapshot_time_utc
+      cutoff_time: 08:00
+    - path: data/pit/kalman_weather/de_solar_generation_fcst.parquet
+      timestamp_column: value_time_utc
+      columns: &id005
+        de_solar_generation_fcst: value
+      origin_column: snapshot_time_utc
+      revision_column: revision_time_utc
+      cutoff_column: snapshot_time_utc
+      cutoff_time: 08:00
+    - path: data/pit/kalman_weather/de_temperature_fcst.parquet
+      timestamp_column: value_time_utc
+      columns: &id006
+        de_temperature_fcst: value
+      origin_column: snapshot_time_utc
+      revision_column: revision_time_utc
+      cutoff_column: snapshot_time_utc
+      cutoff_time: 08:00
+    - path: data/pit/kalman_weather/be_wind_generation_fcst.parquet
+      timestamp_column: value_time_utc
+      columns: &id007
+        be_wind_generation_fcst: value
+      origin_column: snapshot_time_utc
+      revision_column: revision_time_utc
+      cutoff_column: snapshot_time_utc
+      cutoff_time: 08:00
+    - path: data/pit/kalman_weather/be_solar_generation_fcst.parquet
+      timestamp_column: value_time_utc
+      columns: &id008
+        be_solar_generation_fcst: value
+      origin_column: snapshot_time_utc
+      revision_column: revision_time_utc
+      cutoff_column: snapshot_time_utc
+      cutoff_time: 08:00
+    - path: data/pit/kalman_weather/be_temperature_fcst.parquet
+      timestamp_column: value_time_utc
+      columns: &id009
+        be_temperature_fcst: value
+      origin_column: snapshot_time_utc
+      revision_column: revision_time_utc
+      cutoff_column: snapshot_time_utc
+      cutoff_time: 08:00
+    - path: data/pit/kalman_weather/nl_wind_generation_fcst.parquet
+      timestamp_column: value_time_utc
+      columns: &id010
+        nl_wind_generation_fcst: value
+      origin_column: snapshot_time_utc
+      revision_column: revision_time_utc
+      cutoff_column: snapshot_time_utc
+      cutoff_time: 08:00
+    - path: data/pit/kalman_weather/nl_solar_generation_fcst.parquet
+      timestamp_column: value_time_utc
+      columns: &id011
+        nl_solar_generation_fcst: value
+      origin_column: snapshot_time_utc
+      revision_column: revision_time_utc
+      cutoff_column: snapshot_time_utc
+      cutoff_time: 08:00
+    - path: data/pit/kalman_weather/nl_temperature_fcst.parquet
+      timestamp_column: value_time_utc
+      columns: &id012
+        nl_temperature_fcst: value
+      origin_column: snapshot_time_utc
+      revision_column: revision_time_utc
+      cutoff_column: snapshot_time_utc
+      cutoff_time: 08:00
+  operational_live:
+    additional_sources:
+      fr_wind_generation_fcst:
+        path: data/pit/kalman_weather/fr_wind_generation_fcst.parquet
+        timestamp_column: value_time_utc
+        columns: *id001
+        origin_column: snapshot_time_utc
+        revision_column: revision_time_utc
+        cutoff_column: snapshot_time_utc
+        cutoff_time: 08:00
+        information_type: day_ahead_forecast
+        cutoff_policy: Saturn as-of D-1 08:00 civil
+        sha256: d8c9564183a47a27e87a5df160dd0f3ca901180d62eb2ffa9fffc5f1c7a649d5
+      fr_solar_generation_fcst:
+        path: data/pit/kalman_weather/fr_solar_generation_fcst.parquet
+        timestamp_column: value_time_utc
+        columns: *id002
+        origin_column: snapshot_time_utc
+        revision_column: revision_time_utc
+        cutoff_column: snapshot_time_utc
+        cutoff_time: 08:00
+        information_type: day_ahead_forecast
+        cutoff_policy: Saturn as-of D-1 08:00 civil
+        sha256: 28c24491805ed07928f62cefb1994f80f06c50f4697575163ae8a65971b81af8
+      fr_temperature_fcst:
+        path: data/pit/kalman_weather/fr_temperature_fcst.parquet
+        timestamp_column: value_time_utc
+        columns: *id003
+        origin_column: snapshot_time_utc
+        revision_column: revision_time_utc
+        cutoff_column: snapshot_time_utc
+        cutoff_time: 08:00
+        information_type: day_ahead_forecast
+        cutoff_policy: Saturn as-of D-1 08:00 civil
+        sha256: ec700ccc72e56701223580bcffa41dabb0f9878d5fc0cc5b44ff63d3f32f0685
+      de_wind_generation_fcst:
+        path: data/pit/kalman_weather/de_wind_generation_fcst.parquet
+        timestamp_column: value_time_utc
+        columns: *id004
+        origin_column: snapshot_time_utc
+        revision_column: revision_time_utc
+        cutoff_column: snapshot_time_utc
+        cutoff_time: 08:00
+        information_type: day_ahead_forecast
+        cutoff_policy: Saturn as-of D-1 08:00 civil
+        sha256: 896faef3134099940c0dc6cce914cd584bc62e6429d058dc2fede63f20c51e43
+      de_solar_generation_fcst:
+        path: data/pit/kalman_weather/de_solar_generation_fcst.parquet
+        timestamp_column: value_time_utc
+        columns: *id005
+        origin_column: snapshot_time_utc
+        revision_column: revision_time_utc
+        cutoff_column: snapshot_time_utc
+        cutoff_time: 08:00
+        information_type: day_ahead_forecast
+        cutoff_policy: Saturn as-of D-1 08:00 civil
+        sha256: 1f8bfc855ad9963ee8bcb8aa2a6c6c6eb504a9e4d432992f99d81629f95f4b6f
+      de_temperature_fcst:
+        path: data/pit/kalman_weather/de_temperature_fcst.parquet
+        timestamp_column: value_time_utc
+        columns: *id006
+        origin_column: snapshot_time_utc
+        revision_column: revision_time_utc
+        cutoff_column: snapshot_time_utc
+        cutoff_time: 08:00
+        information_type: day_ahead_forecast
+        cutoff_policy: Saturn as-of D-1 08:00 civil
+        sha256: ce40398af229c66ae0c472fb8ebb3b9771b7fa2eef291f4ace0ff4c8536328b5
+      be_wind_generation_fcst:
+        path: data/pit/kalman_weather/be_wind_generation_fcst.parquet
+        timestamp_column: value_time_utc
+        columns: *id007
+        origin_column: snapshot_time_utc
+        revision_column: revision_time_utc
+        cutoff_column: snapshot_time_utc
+        cutoff_time: 08:00
+        information_type: day_ahead_forecast
+        cutoff_policy: Saturn as-of D-1 08:00 civil
+        sha256: 7e2e179a88ecfe6df680f8180be86608bb58c0ef83faa1935a465283c87c9e73
+      be_solar_generation_fcst:
+        path: data/pit/kalman_weather/be_solar_generation_fcst.parquet
+        timestamp_column: value_time_utc
+        columns: *id008
+        origin_column: snapshot_time_utc
+        revision_column: revision_time_utc
+        cutoff_column: snapshot_time_utc
+        cutoff_time: 08:00
+        information_type: day_ahead_forecast
+        cutoff_policy: Saturn as-of D-1 08:00 civil
+        sha256: 8aac377668b857d78bcb56e3fef27a2a76b6b67059faa109f35f1012756c22f5
+      be_temperature_fcst:
+        path: data/pit/kalman_weather/be_temperature_fcst.parquet
+        timestamp_column: value_time_utc
+        columns: *id009
+        origin_column: snapshot_time_utc
+        revision_column: revision_time_utc
+        cutoff_column: snapshot_time_utc
+        cutoff_time: 08:00
+        information_type: day_ahead_forecast
+        cutoff_policy: Saturn as-of D-1 08:00 civil
+        sha256: f3a62f59cf471ce0af91587f02dbe1ab164c91c3edb3c2179b63f3dd6ab6c974
+      nl_wind_generation_fcst:
+        path: data/pit/kalman_weather/nl_wind_generation_fcst.parquet
+        timestamp_column: value_time_utc
+        columns: *id010
+        origin_column: snapshot_time_utc
+        revision_column: revision_time_utc
+        cutoff_column: snapshot_time_utc
+        cutoff_time: 08:00
+        information_type: day_ahead_forecast
+        cutoff_policy: Saturn as-of D-1 08:00 civil
+        sha256: 6bc062d83680022a29d716d10837423070adb1f92159e41f06b129fae329ee68
+      nl_solar_generation_fcst:
+        path: data/pit/kalman_weather/nl_solar_generation_fcst.parquet
+        timestamp_column: value_time_utc
+        columns: *id011
+        origin_column: snapshot_time_utc
+        revision_column: revision_time_utc
+        cutoff_column: snapshot_time_utc
+        cutoff_time: 08:00
+        information_type: day_ahead_forecast
+        cutoff_policy: Saturn as-of D-1 08:00 civil
+        sha256: 88954f1b38b721ad681d28b0ad834f890a206f441e3005782d4f819c10d6378d
+      nl_temperature_fcst:
+        path: data/pit/kalman_weather/nl_temperature_fcst.parquet
+        timestamp_column: value_time_utc
+        columns: *id012
+        origin_column: snapshot_time_utc
+        revision_column: revision_time_utc
+        cutoff_column: snapshot_time_utc
+        cutoff_time: 08:00
+        information_type: day_ahead_forecast
+        cutoff_policy: Saturn as-of D-1 08:00 civil
+        sha256: 7ae4aee610d0390c57815f30462a306404348b06c5d2b113a0b743fcda7f1154

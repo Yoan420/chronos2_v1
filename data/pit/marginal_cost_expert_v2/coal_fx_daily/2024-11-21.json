@@ -1,0 +1,12 @@
+{
+  "api2_usd_t": 124.55,
+  "api2_usd_t_source_time_utc": "2024-11-18T23:00:00+00:00",
+  "cutoff_utc": "2024-11-20T07:00:00+00:00",
+  "day": "2024-11-21",
+  "eurusd_usd_per_eur": 1.0607,
+  "eurusd_usd_per_eur_source_time_utc": "2024-11-18T23:00:00+00:00",
+  "series": {
+    "api2_usd_t": "coal.api2.price.everyday.month.1.ice.usdt",
+    "eurusd_usd_per_eur": "forex.everyday.eurusd.close"
+  }
+}

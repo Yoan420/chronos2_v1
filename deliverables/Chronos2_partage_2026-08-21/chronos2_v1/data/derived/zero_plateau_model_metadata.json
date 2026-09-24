@@ -1,0 +1,86 @@
+{
+  "definition": {
+    "low": -3.0,
+    "high": 3.0,
+    "min_consecutive_hours": 3,
+    "solar_start_hour": 8,
+    "solar_end_hour": 19
+  },
+  "aliases": {
+    "residual_load": "fr_residual_load_fcst",
+    "solar": null,
+    "nuclear": "fr_nuclear_generation_fcst",
+    "export": null
+  },
+  "solar_direct_available": false,
+  "scales": {
+    "spill": 0.25,
+    "reserve": 32.05956554412842
+  },
+  "feature_columns": [
+    "zp_residual_load",
+    "zp_solar_clock_proxy",
+    "zp_hour_sin",
+    "zp_hour_cos",
+    "zp_is_solar_window",
+    "zp_residual_daily_min",
+    "zp_residual_daily_mean",
+    "zp_residual_valley_gap",
+    "zp_residual_valley_flag",
+    "zp_residual_valley_width",
+    "zp_residual_slope_1h",
+    "zp_residual_forward_slope_1h",
+    "zp_milp_price",
+    "zp_milp_reserve_margin_gw",
+    "zp_milp_committed_thermal_gw",
+    "zp_milp_startups",
+    "zp_milp_zero_pressure",
+    "zp_milp_reserve_abundance",
+    "zp_milp_oversupply_pressure"
+  ],
+  "train_start": "2024-08-18 00:00:00+02:00",
+  "train_end": "2025-05-06 23:00:00+02:00",
+  "oos_start": "2025-05-07 00:00:00+02:00",
+  "evaluation_start": "2025-08-08 00:00:00+02:00",
+  "last_history": "2026-08-07 23:00:00+02:00",
+  "backtest_days": 365,
+  "context_buffer_days": 93,
+  "classifier_validation_days": 90,
+  "best_iteration": 199,
+  "catboost_params": {
+    "loss_function": "Logloss",
+    "eval_metric": "AUC",
+    "iterations": 200,
+    "depth": 6,
+    "learning_rate": 0.035,
+    "l2_leaf_reg": 6.0,
+    "random_seed": 42,
+    "auto_class_weights": "SqrtBalanced",
+    "verbose": false,
+    "allow_writing_files": false,
+    "thread_count": -1
+  },
+  "evaluation_classifier_metrics": {
+    "n": 8760,
+    "positive_hours": 721,
+    "positive_rate": 0.08230593607305936,
+    "brier": 0.052587674771035875,
+    "logloss": 0.1595640161462342,
+    "roc_auc": 0.9476282319255349,
+    "average_precision": 0.5278142745046417
+  },
+  "zero_expert_quantiles": {
+    "q10": -0.22500000894069672,
+    "q20": -0.019999999552965164,
+    "q30": -0.009999999776482582,
+    "q40": -0.009999999776482582,
+    "q50": 0.0,
+    "q60": 0.0,
+    "q70": 0.0,
+    "q80": 0.05999999865889549,
+    "q90": 0.4399999976158142
+  },
+  "train_plateau_hours": 216,
+  "output_file": "C:\\Users\\BQ6757\\chronos2_v1\\data\\derived\\zero_plateau_predictions.csv.gz",
+  "model_file": "C:\\Users\\BQ6757\\chronos2_v1\\data\\models\\zero_plateau_catboost.cbm"
+}

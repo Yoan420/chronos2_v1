@@ -1,0 +1,122 @@
+{
+  "schema_version": 1,
+  "artifact_type": "nyx_quarterhour_price_observations",
+  "data_file": "native_prices.parquet",
+  "data_sha256": "79e7954cc1c69a7b67fa7cb00f458c44a7d6275d7e7a7693c5948972edb8f3c0",
+  "sources": [
+    {
+      "zone": "BE",
+      "series": "60451",
+      "kind": "primary",
+      "catalog_source": "power",
+      "unit": "EUR/MWh",
+      "timezone": "UTC",
+      "native_resolution_minutes": 15,
+      "interpolation": "none",
+      "is_forecast": false,
+      "market": "day_ahead",
+      "published_alias": "power.price.be.euromwh.qh.obs.epex",
+      "native_resolution_evidence": "Primary UTC-aware series with null formula, audited 2026-09-16; direct raw quarter-hour grid across autumn DST, without resample or ffill."
+    },
+    {
+      "zone": "DE",
+      "series": "60452",
+      "kind": "primary",
+      "catalog_source": "power",
+      "unit": "EUR/MWh",
+      "timezone": "UTC",
+      "native_resolution_minutes": 15,
+      "interpolation": "none",
+      "is_forecast": false,
+      "market": "day_ahead",
+      "published_alias": "power.price.de.euromwh.qh.obs.epex",
+      "native_resolution_evidence": "Primary UTC-aware series with null formula, audited 2026-09-16; direct raw quarter-hour grid across autumn DST, without resample or ffill."
+    },
+    {
+      "zone": "FR",
+      "series": "60454",
+      "kind": "primary",
+      "catalog_source": "power",
+      "unit": "EUR/MWh",
+      "timezone": "UTC",
+      "native_resolution_minutes": 15,
+      "interpolation": "none",
+      "is_forecast": false,
+      "market": "day_ahead",
+      "published_alias": "power.price.fr.euromwh.qh.obs.epex",
+      "native_resolution_evidence": "Primary UTC-aware series with null formula, audited 2026-09-16; direct raw quarter-hour grid across autumn DST, without resample or ffill."
+    },
+    {
+      "zone": "NL",
+      "series": "60453",
+      "kind": "primary",
+      "catalog_source": "power",
+      "unit": "EUR/MWh",
+      "timezone": "UTC",
+      "native_resolution_minutes": 15,
+      "interpolation": "none",
+      "is_forecast": false,
+      "market": "day_ahead",
+      "published_alias": "power.price.nl.euromwh.qh.obs.epex",
+      "native_resolution_evidence": "Primary UTC-aware series with null formula, audited 2026-09-16; direct raw quarter-hour grid across autumn DST, without resample or ffill."
+    }
+  ],
+  "timezone": "UTC",
+  "unit": "EUR/MWh",
+  "resolution_minutes": 15,
+  "interpolation": "none",
+  "price_vintage": "latest_observations",
+  "status": "complete",
+  "provider_revision_timestamp_available": false,
+  "production_pit_evidence": false,
+  "start_day": "2025-10-01",
+  "end_day": "2026-09-15",
+  "downloaded_at_utc": "2026-09-16T08:43:08.344816+00:00",
+  "summary": {
+    "rows": 134400,
+    "countries": {
+      "BE": {
+        "status": "complete",
+        "returned_quarters": 33600,
+        "expected_quarters": 33600,
+        "complete_hours": 8400,
+        "varying_hours": 8385,
+        "missing_quarters": 0
+      },
+      "DE": {
+        "status": "complete",
+        "returned_quarters": 33600,
+        "expected_quarters": 33600,
+        "complete_hours": 8400,
+        "varying_hours": 8382,
+        "missing_quarters": 0
+      },
+      "FR": {
+        "status": "complete",
+        "returned_quarters": 33600,
+        "expected_quarters": 33600,
+        "complete_hours": 8400,
+        "varying_hours": 8215,
+        "missing_quarters": 0
+      },
+      "NL": {
+        "status": "complete",
+        "returned_quarters": 33600,
+        "expected_quarters": 33600,
+        "complete_hours": 8400,
+        "varying_hours": 8387,
+        "missing_quarters": 0
+      }
+    }
+  },
+  "collection_audit_sha256": "fee35477944ef460b05acd52388cc4a64c2f67fbacb6830b4f675fc8e968e596",
+  "evidence_sha256": {
+    "tmp\\nyx_quarterhour_discovery\\metadata_3c41c8fd91.json": "daee339e8303910afc732786adf4b1ab7318ad876e8acb39ab7dc81f1b0bd928",
+    "tmp\\nyx_quarterhour_discovery\\metadata_7d25cad10f.json": "a0911294795f450b25111c80d7e3d56ada1476bc8cef00989387becd27e779c5",
+    "tmp\\nyx_quarterhour_discovery\\probe_2025-10-25.json": "89906f9dbed556a3d446d3e1c2ee301e7576b9d8066c5fa6ea86c01c8d43b2ec"
+  },
+  "acquisition_code_sha256": {
+    "sources.py": "dc2a2329f48c23d5a3fd6598a2d17f8e0c0635a134290c1792a67101195a8a91",
+    "materialize_nyx_quarterhour.py": "bcfb986b5ac37bb136454e276b94f9010d9fa7ea062642f0461eb4c04db7f899"
+  }
+}

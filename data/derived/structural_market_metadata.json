@@ -1,0 +1,35 @@
+{
+  "rows": 22751,
+  "columns": [
+    "milp_structural_price",
+    "milp_marginal_technology_code",
+    "milp_reserve_margin_gw",
+    "milp_committed_thermal_gw",
+    "milp_online_units",
+    "milp_startups",
+    "milp_startup_cost_eur",
+    "milp_scarcity_gw",
+    "milp_ramp_shadow_eur_mwh",
+    "milp_reserve_shadow_eur_mwh",
+    "milp_spill_gw",
+    "milp_reserve_shortfall_gw"
+  ],
+  "first_timestamp": "2024-01-02 00:00:00+01:00",
+  "last_timestamp": "2026-08-08 23:00:00+02:00",
+  "days_successful": 948,
+  "days_total": 1463,
+  "technology_code_map": {
+    "nuclear": 1,
+    "hydro": 2,
+    "coal": 3,
+    "ccgt": 4,
+    "ocgt": 5,
+    "oil": 6
+  },
+  "residual_price_alias": "milp_structural_price",
+  "solver": {
+    "mip_rel_gap": 0.001,
+    "time_limit_seconds": 30.0,
+    "node_limit": null
+  }
+}

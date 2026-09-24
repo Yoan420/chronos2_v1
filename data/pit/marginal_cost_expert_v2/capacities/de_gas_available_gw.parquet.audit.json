@@ -1,0 +1,93 @@
+{
+  "capacity_scope": "provider natural-gas fuel aggregate; national fleet coverage not attested",
+  "causality_violations": 0,
+  "complete_days": 710,
+  "cutoff_time": "08:00",
+  "cutoff_timezone": "Europe/Paris",
+  "do_not_add": [
+    "type.ccgt",
+    "type.gt",
+    "type.chp"
+  ],
+  "end_day": "2026-09-09",
+  "errors": {},
+  "information_type": "capacity_forecast",
+  "missing_days": [
+    "2024-11-08",
+    "2024-11-09",
+    "2024-11-10",
+    "2024-11-11",
+    "2024-11-12",
+    "2024-11-13",
+    "2024-11-14",
+    "2024-11-15",
+    "2024-11-16",
+    "2024-11-17",
+    "2024-11-18",
+    "2024-11-19",
+    "2024-11-20",
+    "2024-11-21",
+    "2024-11-22",
+    "2024-11-23",
+    "2024-11-24",
+    "2024-11-25",
+    "2024-11-26",
+    "2024-11-27"
+  ],
+  "national_coverage_attested": false,
+  "probes": [
+    {
+      "day": "2024-09-10",
+      "state_value_gw": 17.451700000000002
+    },
+    {
+      "day": "2024-11-15",
+      "state_value_gw": null
+    },
+    {
+      "day": "2025-01-15",
+      "state_value_gw": 18.785033333333335
+    },
+    {
+      "day": "2025-04-01",
+      "state_value_gw": 17.4604
+    },
+    {
+      "day": "2025-09-01",
+      "state_value_gw": 16.4272
+    },
+    {
+      "day": "2025-12-01",
+      "state_value_gw": 19.15426662037037
+    },
+    {
+      "day": "2026-06-24",
+      "state_value_gw": 17.532066666666665
+    },
+    {
+      "day": "2026-06-25",
+      "state_value_gw": 17.496160416666665
+    },
+    {
+      "day": "2026-06-26",
+      "state_value_gw": 17.014566666666667
+    },
+    {
+      "day": "2026-09-09",
+      "state_value_gw": 15.1435
+    }
+  ],
+  "production_pit_evidence": false,
+  "promotion_eligible": false,
+  "provider_revision_timestamp_available": false,
+  "requested_days": 730,
+  "revision_time_semantics": "query_asof_cutoff",
+  "schema_version": 2,
+  "series": "power.nrjscan.de.3mv.availability.pmax.fuel.nat_gas.gw",
+  "sha256": "6a4999900d957e2d4247e8a821e47a83fff3425801945757ff6f95fbfef41b84",
+  "start_day": "2024-09-10",
+  "transformation": "daily Pmax broadcast to each physical hour; no imputation of missing days",
+  "type_split_observed": false,
+  "unit": "GW",
+  "zone": "DE"
+}

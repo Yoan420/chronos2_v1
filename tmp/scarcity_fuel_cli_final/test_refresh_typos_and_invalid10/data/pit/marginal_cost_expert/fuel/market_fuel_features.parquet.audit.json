@@ -1,0 +1,68 @@
+{
+  "artifact_type": "kalman_market_fuel_features_pit_hourly",
+  "causality_violations": 0,
+  "ccgt_assumptions": {
+    "efficiency": 0.58,
+    "emission_tco2_mwh": 0.36,
+    "vom_eur_mwh": 3.0
+  },
+  "columns": [
+    "value_time_utc",
+    "snapshot_time_utc",
+    "revision_time_utc",
+    "ttf_source_value_time_utc",
+    "eua_source_value_time_utc",
+    "market_source_value_time_utc",
+    "ttf_m1_eur_mwh_th",
+    "eua_first_dec_eur_tco2",
+    "ttf_change_1d",
+    "ttf_change_5d",
+    "eua_change_1d",
+    "eua_change_5d",
+    "fuel_volatility_20d",
+    "ccgt_marginal_cost_eur_mwh"
+  ],
+  "cutoff_time": "08:00",
+  "cutoff_timezone": "Europe/Paris",
+  "days": 2,
+  "end_day": "2026-03-28",
+  "feature_definitions": {
+    "ccgt_marginal_cost_eur_mwh": "TTF/efficiency + EUA*emission_factor + variable_O&M",
+    "eua_change_1d": "EUA(D)-EUA(D-1), EUR/tCO2",
+    "eua_change_5d": "EUA(D)-EUA(D-5), EUR/tCO2",
+    "fuel_volatility_20d": "population standard deviation over 20 daily changes of the derived CCGT marginal cost, EUR/MWh_e",
+    "ttf_change_1d": "TTF(D)-TTF(D-1), EUR/MWh_th",
+    "ttf_change_5d": "TTF(D)-TTF(D-5), EUR/MWh_th"
+  },
+  "fill_or_interpolation": "no interpolation; one independently selected last-known value per delivery day, then deterministic broadcast to physical hours",
+  "first_delivery_utc": "2026-03-26T23:00:00+00:00",
+  "generated_at_utc": "2026-09-14T12:49:13.662862+00:00",
+  "information_type": "market_observation_known_before_cutoff",
+  "last_delivery_utc": "2026-03-28T22:00:00+00:00",
+  "maximum_source_age_hours": {
+    "eua_first_dec_eur_tco2": 12.0,
+    "ttf_m1_eur_mwh_th": 10.0
+  },
+  "output_sha256": "598e0968715ee4a589557a04a43b6a2380671469a6f8056140f6cc8062ffde82",
+  "provider_revision_timestamp_available": false,
+  "query_start_day_including_warmup": "2026-03-07",
+  "requested_end_day": "2026-03-28",
+  "requested_start_day": "2026-03-27",
+  "revision_time_semantics": "query_asof_cutoff; provider insertion timestamp unavailable",
+  "rows": 48,
+  "schema_version": 1,
+  "selection_rule": "latest finite value timestamp <= cutoff in Saturn state queried with revision_date=cutoff",
+  "series": {
+    "eua_first_dec_eur_tco2": "carbon.eu.price.everyday.eua.ice.1st.dec",
+    "ttf_m1_eur_mwh_th": "gas.ttf.price.everyday.month.1.ice.eurmwh"
+  },
+  "sha256": "598e0968715ee4a589557a04a43b6a2380671469a6f8056140f6cc8062ffde82",
+  "snapshot_time_semantics": "query_asof_cutoff",
+  "start_day": "2026-03-27",
+  "timezone": "Europe/Paris",
+  "units": {
+    "eua_first_dec_eur_tco2": "EUR/tCO2",
+    "ttf_m1_eur_mwh_th": "EUR/MWh_th"
+  },
+  "warmup_days": 20
+}

@@ -1,0 +1,21 @@
+{
+  "delivery_day": "2026-03-28",
+  "source_alias": "be_solar_elia_fcst",
+  "series": "23259",
+  "cutoff_time_utc": "2026-03-27T07:00:00+00:00",
+  "expected_quarters": 96,
+  "query_from_utc": "2026-03-27T23:00:00+00:00",
+  "query_to_utc": "2026-03-28T22:45:00+00:00",
+  "temporal_evidence": "retrospective_asof",
+  "provider_revision_timestamp_available": false,
+  "timestamp_semantics": "snapshot_time_utc and revision_time_utc equal the requested as-of cutoff, not actual publication timestamps",
+  "downloaded_at_utc": "2026-09-16T08:17:12.636844+00:00",
+  "status": "complete",
+  "returned_quarters": 96,
+  "finite_quarters": 96,
+  "missing_quarters": 0,
+  "nonfinite_quarters": 0,
+  "outside_quarters_excluded": 0,
+  "varying_hours": 14,
+  "data_sha256": "37e8c13e987cd6ad9c4da8990e6fc7cee7d2294ca51e0bcc228f270e784ac90d"
+}

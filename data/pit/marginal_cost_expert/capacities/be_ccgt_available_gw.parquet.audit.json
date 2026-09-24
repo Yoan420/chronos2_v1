@@ -1,0 +1,79 @@
+{
+  "alias": "be_ccgt_available_gw",
+  "approximation": "Daily Pmax forecast applied uniformly to physical hours; not hourly Pmax, not realised generation; provider fleet scope unverified",
+  "block_error": null,
+  "block_staircase_request": {
+    "maturity_offset": {
+      "days": 1
+    },
+    "maturity_time": {
+      "hour": 0
+    },
+    "revision_freq": {
+      "days": 1
+    },
+    "revision_time": {
+      "hour": 8
+    },
+    "revision_tz": "Europe/Paris"
+  },
+  "complete": true,
+  "cutoff_time": "08:00",
+  "cutoff_timezone": "Europe/Paris",
+  "daily_broadcast": true,
+  "days": 730,
+  "elapsed_seconds": 11.016,
+  "end_day": "2026-09-09",
+  "errors": {},
+  "fill_or_interpolation": "daily_capacity_forecast_broadcast; no missing-day substitution",
+  "independent_probes": [
+    {
+      "bulk_value": 1.9572361111111114,
+      "day": "2024-09-10",
+      "state_value": 1.9572361111111114
+    },
+    {
+      "bulk_value": 2.693359027777778,
+      "day": "2024-10-28",
+      "state_value": 2.693359027777778
+    },
+    {
+      "bulk_value": 2.8562999999999996,
+      "day": "2025-03-31",
+      "state_value": 2.8562999999999996
+    },
+    {
+      "bulk_value": 1.9873379166666665,
+      "day": "2025-09-10",
+      "state_value": 1.9873379166666665
+    },
+    {
+      "bulk_value": 2.6996819444444444,
+      "day": "2025-10-27",
+      "state_value": 2.6996819444444444
+    },
+    {
+      "bulk_value": 3.6992999999999996,
+      "day": "2026-03-30",
+      "state_value": 3.6992999999999996
+    },
+    {
+      "bulk_value": 3.3202999999999996,
+      "day": "2026-09-09",
+      "state_value": 3.3202999999999996
+    }
+  ],
+  "information_type": "capacity_forecast",
+  "missing_days": [],
+  "production_pit_evidence": false,
+  "promotion_eligible": false,
+  "provider_revision_timestamp_available": false,
+  "requested_days": 730,
+  "revision_time_semantics": "query_asof_cutoff",
+  "rows": 17520,
+  "schema_version": 1,
+  "series": "power.nrjscan.be.3mv.availability.pmax.type.ccgt.gw",
+  "sha256": "16fcc79b2821c3fc2d72c73ff4c09450a1b19c0976f55c19d2f0883b4c897314",
+  "start_day": "2024-09-10",
+  "unit": "GW"
+}

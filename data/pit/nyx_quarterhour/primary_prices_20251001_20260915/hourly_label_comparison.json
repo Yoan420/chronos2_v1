@@ -1,0 +1,175 @@
+{
+  "purpose": "Label identity comparison only, never a forecast score or gain.",
+  "native_manifest_sha256": "1cadc67e436cc135f82bbf41d66d78397188180e5b71adc6e0ea3835d60621a6",
+  "native_data_sha256": "79e7954cc1c69a7b67fa7cb00f458c44a7d6275d7e7a7693c5948972edb8f3c0",
+  "baseline_delivery_day": "2026-09-16",
+  "baseline_audit": {
+    "delivery_day": "2026-09-16",
+    "identities": [
+      {
+        "zone": "BE",
+        "delivery_day": "2026-09-16",
+        "files": {
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\be\\civil_pit_v2\\report_only\\frozen_result\\audits.json": "fc670e6a8d332777cee9dd4dcfc655b08c6b4c81f8e76d5043f9ab6dd214758c",
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\be\\civil_pit_v2\\report_only\\frozen_result\\covariates.parquet": "7a5da8998f18ed1d54d9f9f91e20d326f45439f37c55e139bffdd5829de29b23",
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\be\\civil_pit_v2\\report_only\\frozen_result\\kalman_backtest.parquet": "c1f2df6c7c9b1c4f27ff952b57f0748395d79d35d584a4cdb14e9ede708e7052",
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\be\\civil_pit_v2\\report_only\\frozen_result\\kalman_forecast.parquet": "cd55f9c5c6cbff4928101270f9380acf066ea5af2581525c7fb80529e01a7316",
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\be\\civil_pit_v2\\report_only\\frozen_result\\manifest.json": "ae78800e7ff031768c0e6c1bf23238d2050fe6a9bd4c71aed894c5d5e7830f4e",
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\be\\civil_pit_v2\\report_only\\frozen_result\\raw_history.parquet": "8a3c1aa2cf27d7a63c7c030f5424ff13fb91496be2bb3dce11f92c4738ccb398",
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\be\\civil_pit_v2\\report_only\\frozen_result\\residual_daily_audit.parquet": "17c3a604442ccc2c2134257da227d1d3d8b17792b00d03bb968f456a6c0b83df",
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\be\\civil_pit_v2\\report_only\\frozen_result\\residual_statistics.parquet": "7027e2aaf38763b2ea44703f099312cf3ab2e625e5b8dbe7df5d1af370091f16",
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\be\\civil_pit_v2\\report_only\\frozen_result\\source_forecast.parquet": "a33c3b076dbce35b801b71d0b85adcb887c681c41d8b2bdc7cf9202befe15d56"
+        },
+        "observations": {
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\be\\civil_pit_v2\\report_only\\sources\\20260915T120522571976Z_ef008299\\statistics_history_audit.json": "ac87d37bec5ac047359b7c22e5d95291e5c8110b2ce8fbfc95c0d36662678be7",
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\be\\civil_pit_v2\\report_only\\sources\\20260915T120522571976Z_ef008299\\inputs\\observed_latest.parquet": "712aba18d4b43adb04689e8c6e4e08efcf0e6337fed166cb683882907d982b18"
+        },
+        "evaluation_label_source": "verified_latest_observed"
+      },
+      {
+        "zone": "DE",
+        "delivery_day": "2026-09-16",
+        "files": {
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\de\\civil_pit_v2\\report_only\\frozen_result\\audits.json": "a31cb919eba6965f4dfbd6ebad0e8a9eacbfa682771e78cb962141fd5f54ef8d",
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\de\\civil_pit_v2\\report_only\\frozen_result\\covariates.parquet": "7a5da8998f18ed1d54d9f9f91e20d326f45439f37c55e139bffdd5829de29b23",
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\de\\civil_pit_v2\\report_only\\frozen_result\\kalman_backtest.parquet": "b6311e468c05b68844c32168e2214eaaf7c85179b34e1abbf9a109f1858a89f2",
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\de\\civil_pit_v2\\report_only\\frozen_result\\kalman_forecast.parquet": "3783b29e96d5c627fc433da6c42e0c6b4e25132454916535216859647bd579da",
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\de\\civil_pit_v2\\report_only\\frozen_result\\manifest.json": "d050824b11486af27096920be85820696cba06fa0d049083538b1cc358e89ecf",
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\de\\civil_pit_v2\\report_only\\frozen_result\\raw_history.parquet": "574f7eac63b80d4824f484777e3faa5051fef7a3def9f48432976d18245bdbb2",
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\de\\civil_pit_v2\\report_only\\frozen_result\\residual_daily_audit.parquet": "17c3a604442ccc2c2134257da227d1d3d8b17792b00d03bb968f456a6c0b83df",
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\de\\civil_pit_v2\\report_only\\frozen_result\\residual_statistics.parquet": "6faa64150a93bcbd773cc3a0f4d1aa8101f1319efbbc575da92702bd8bf7bdbc",
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\de\\civil_pit_v2\\report_only\\frozen_result\\source_forecast.parquet": "66797ce6754d3d635ec97e28929fbaf90ec977f418e9dc32ac2ae85e70ab23e1"
+        },
+        "observations": {
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\de\\civil_pit_v2\\report_only\\sources\\20260915T120607760882Z_f6a6a53e\\statistics_history_audit.json": "e43c2f5d471f48d4043761ad9f85d759543695f59e4a18bd4926b60b5248d403",
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\de\\civil_pit_v2\\report_only\\sources\\20260915T120607760882Z_f6a6a53e\\inputs\\observed_latest.parquet": "f0b86d9d73ae4508651a8d9bab4b0d511178148de0ebeb241fdce846d9e03947"
+        },
+        "evaluation_label_source": "verified_latest_observed"
+      },
+      {
+        "zone": "FR",
+        "delivery_day": "2026-09-16",
+        "files": {
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\fr\\civil_pit_v2\\report_only\\frozen_result\\audits.json": "ca33de8bbcde4f1c9ce6df17fbcf12b8101804d44bea70cfa85f13933cf194a2",
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\fr\\civil_pit_v2\\report_only\\frozen_result\\covariates.parquet": "7a5da8998f18ed1d54d9f9f91e20d326f45439f37c55e139bffdd5829de29b23",
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\fr\\civil_pit_v2\\report_only\\frozen_result\\kalman_backtest.parquet": "589a3ee9bd239672ce1f611c8602ae1b2f0a2f36a037d578b35a8812115bba5b",
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\fr\\civil_pit_v2\\report_only\\frozen_result\\kalman_forecast.parquet": "0231cd8c8c422b4dad8767c98ceb2f261c293221a3769934616fdce91265e6a5",
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\fr\\civil_pit_v2\\report_only\\frozen_result\\manifest.json": "bfa4935d237bd678fd84a69376ae0a6ab40f9b1e3558598c10a90bef9db33d1e",
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\fr\\civil_pit_v2\\report_only\\frozen_result\\raw_history.parquet": "ba43f9ea4abf1566fbfdddda5f1b7d06c665c0889f461442731a3b3b63b7f269",
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\fr\\civil_pit_v2\\report_only\\frozen_result\\residual_daily_audit.parquet": "f586f5a23ff63bd3bfe9d0fcd757f19fb00468214d896eba77eda193034a841a",
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\fr\\civil_pit_v2\\report_only\\frozen_result\\residual_statistics.parquet": "65dfb166d55d8163224e75681a48f6186fb6b037b37e43e78f1e226c2be36b02",
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\fr\\civil_pit_v2\\report_only\\frozen_result\\source_forecast.parquet": "2d990198e8be8e7cafa6da05d8cffaf4d420c2fc63e401a06127c9018cf9c48d"
+        },
+        "observations": {
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\fr\\civil_pit_v2\\report_only\\sources\\20260915T120651322085Z_65a44cc6\\statistics_history_audit.json": "1b1f3e8307d302530582afc0b8369bbf2606f465700dff4db14647bd9906ceb8",
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\fr\\civil_pit_v2\\report_only\\sources\\20260915T120651322085Z_65a44cc6\\inputs\\observed_latest.parquet": "3b42a0fd8f5163f424c7c8aa5a79d7a07a657f73616e13f8e1ca171f3f1a5747"
+        },
+        "evaluation_label_source": "verified_latest_observed"
+      },
+      {
+        "zone": "NL",
+        "delivery_day": "2026-09-16",
+        "files": {
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\nl\\civil_pit_v2\\report_only\\frozen_result\\audits.json": "1c1cd3b20ba57a2f8de208d49888733f35bb50d9f76ff3bef99972cfe388dfa7",
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\nl\\civil_pit_v2\\report_only\\frozen_result\\covariates.parquet": "7a5da8998f18ed1d54d9f9f91e20d326f45439f37c55e139bffdd5829de29b23",
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\nl\\civil_pit_v2\\report_only\\frozen_result\\kalman_backtest.parquet": "6d7b1de83e180976029309c2f68cd05a2558f77c31c2856617b1f732e4c1438a",
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\nl\\civil_pit_v2\\report_only\\frozen_result\\kalman_forecast.parquet": "956956c65fb6014c1a5b5b47a8ec14b8272d98cf59d14c272933049d06fce3de",
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\nl\\civil_pit_v2\\report_only\\frozen_result\\manifest.json": "f325836d8d68dd5ee9a3723716d0de8a13c582920e77d977991baf93dbc05975",
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\nl\\civil_pit_v2\\report_only\\frozen_result\\raw_history.parquet": "1e5b350acd50472bf78bf8a410c93e114d2b0bc2d11e623ed0f2fe7ff8d1c33e",
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\nl\\civil_pit_v2\\report_only\\frozen_result\\residual_daily_audit.parquet": "f586f5a23ff63bd3bfe9d0fcd757f19fb00468214d896eba77eda193034a841a",
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\nl\\civil_pit_v2\\report_only\\frozen_result\\residual_statistics.parquet": "329f15b54cf574d0b42ba2caef66a008cea62ce5d60d4d3e5b07d08809df0188",
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\nl\\civil_pit_v2\\report_only\\frozen_result\\source_forecast.parquet": "e6e122aaddbc20c31764570b2a317e720b35b3cb1096a5972f9bb15db561a765"
+        },
+        "observations": {
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\nl\\civil_pit_v2\\report_only\\sources\\20260915T120734065696Z_6ce38353\\statistics_history_audit.json": "8e6be1771fe73ab23ad85edfa684e602a91bd1cea0d0a62e7ff31ed673c3f6c3",
+          "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-16\\nl\\civil_pit_v2\\report_only\\sources\\20260915T120734065696Z_6ce38353\\inputs\\observed_latest.parquet": "612544648dec1ea5aad2797cb7f0e191dbf5e0bb095910cd5adfa9053423d367"
+        },
+        "evaluation_label_source": "verified_latest_observed"
+      }
+    ],
+    "baseline": "nuclear_forecast_v1/civil_pit_v2/residual_kalman__q50",
+    "production_pit_evidence": false,
+    "label_vintage_warning": "Frozen retrospective labels are not proof of availability at historical origins."
+  },
+  "hourly_rule": "Arithmetic mean of exactly four finite, unique, physical UTC quarters.",
+  "rows": 33600,
+  "results": [
+    {
+      "zone": "BE",
+      "paired_hours": 8400,
+      "nyx_report_only_actual": {
+        "mae_eur_mwh": 0.1592479166666676,
+        "rmse_eur_mwh": 1.3899247905419543,
+        "max_abs_difference_eur_mwh": 37.70250000000001,
+        "hours_over_1e_9": 155,
+        "hours_over_0_01": 155
+      },
+      "nyx_frozen_actual": {
+        "mae_eur_mwh": 0.15814228281321754,
+        "rmse_eur_mwh": 1.38621192612044,
+        "max_abs_difference_eur_mwh": 37.70249908447266,
+        "hours_over_1e_9": 7866,
+        "hours_over_0_01": 154
+      }
+    },
+    {
+      "zone": "DE",
+      "paired_hours": 8400,
+      "nyx_report_only_actual": {
+        "mae_eur_mwh": 0.1664946428571439,
+        "rmse_eur_mwh": 1.3971650825357549,
+        "max_abs_difference_eur_mwh": 30.84250000000001,
+        "hours_over_1e_9": 155,
+        "hours_over_0_01": 155
+      },
+      "nyx_frozen_actual": {
+        "mae_eur_mwh": 0.16541856661307217,
+        "rmse_eur_mwh": 1.393665625767046,
+        "max_abs_difference_eur_mwh": 30.842501678466803,
+        "hours_over_1e_9": 7840,
+        "hours_over_0_01": 154
+      }
+    },
+    {
+      "zone": "FR",
+      "paired_hours": 8400,
+      "nyx_report_only_actual": {
+        "mae_eur_mwh": 0.14903630952381022,
+        "rmse_eur_mwh": 1.360532429808097,
+        "max_abs_difference_eur_mwh": 36.4125,
+        "hours_over_1e_9": 155,
+        "hours_over_0_01": 155
+      },
+      "nyx_frozen_actual": {
+        "mae_eur_mwh": 0.1482099147815035,
+        "rmse_eur_mwh": 1.3584144946422323,
+        "max_abs_difference_eur_mwh": 36.4125,
+        "hours_over_1e_9": 7477,
+        "hours_over_0_01": 154
+      }
+    },
+    {
+      "zone": "NL",
+      "paired_hours": 8400,
+      "nyx_report_only_actual": {
+        "mae_eur_mwh": 0.15976398809523912,
+        "rmse_eur_mwh": 1.3653124732285908,
+        "max_abs_difference_eur_mwh": 33.72749999999999,
+        "hours_over_1e_9": 155,
+        "hours_over_0_01": 155
+      },
+      "nyx_frozen_actual": {
+        "mae_eur_mwh": 0.1586601422090371,
+        "rmse_eur_mwh": 1.3615446462294996,
+        "max_abs_difference_eur_mwh": 33.72749923706054,
+        "hours_over_1e_9": 7752,
+        "hours_over_0_01": 154
+      }
+    }
+  ],
+  "pairs_file": "hourly_label_pairs.parquet",
+  "pairs_sha256": "49de47f1071b91125e8276c9fb045d02025a02079a551ce6e7af67898705584b",
+  "decision": "Score both future candidate and NYX predictions against these same native hourly means; keep report-only label differences visible.",
+  "price_vintage": "latest_observations",
+  "production_pit_evidence": false
+}

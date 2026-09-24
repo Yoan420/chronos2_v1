@@ -1,0 +1,27 @@
+{
+  "causality_violations": 0,
+  "conversion": "API2 M1 USD/t / previous-close EURUSD USD/EUR / MWh_th/t",
+  "cutoff_time": "08:00",
+  "cutoff_timezone": "Europe/Paris",
+  "days": 730,
+  "end_day": "2026-09-09",
+  "energy_content_basis": "6000 kcal/kg NAR, using international-table calorie 4186.8 J; proxy not plant-specific",
+  "energy_content_source": "https://www.globalcoal.com/coaltrading/financialcoaltrading.cfm",
+  "errors": {},
+  "lignite_not_mapped_to_api2": true,
+  "maximum_source_age_hours": 176,
+  "missing_days": [],
+  "net_calorific_mwh_t": 6.978,
+  "production_pit_evidence": false,
+  "promotion_eligible": false,
+  "provider_revision_timestamp_available": false,
+  "revision_time_semantics": "query_asof_cutoff, not provider insertion timestamp",
+  "same_day_market_closes_excluded": true,
+  "schema_version": 2,
+  "series": {
+    "api2_usd_t": "coal.api2.price.everyday.month.1.ice.usdt",
+    "eurusd_usd_per_eur": "forex.everyday.eurusd.close"
+  },
+  "sha256": "bf73a451aa2d1a5ab5c32903ab606ea97b3a63c382c8a14bc37111d87edf4eda",
+  "start_day": "2024-09-10"
+}

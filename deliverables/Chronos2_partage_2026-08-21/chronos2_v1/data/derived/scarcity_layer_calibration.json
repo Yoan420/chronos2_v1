@@ -1,0 +1,70 @@
+{
+  "method": "scarcity_adder_v1",
+  "formula": "P_adjusted = P_LP + probability * max(alpha*exp(-max(reserve_margin,0)/tau) + beta_ramp*ramp_pressure + gamma_startup*startup_pressure, 0)",
+  "config": {
+    "holdout_days": 365,
+    "extreme_threshold": 150.0,
+    "extreme_weight": 2.0,
+    "bias_penalty": 0.2,
+    "maxiter": 100,
+    "seed": 42
+  },
+  "train": {
+    "start": "2024-01-01 23:00:00+00:00",
+    "end": "2025-08-07 23:00:00+00:00",
+    "n": 13969,
+    "raw": {
+      "n": 13969,
+      "mae": 43.74976412055265,
+      "rmse": 54.79673780234952,
+      "bias": -39.51440725893049,
+      "extreme_n": 361,
+      "extreme_mae": 92.23470914127422,
+      "extreme_bias": -92.20728531855956
+    },
+    "adjusted": {
+      "n": 13969,
+      "mae": 37.94147877644413,
+      "rmse": 49.05721948895616,
+      "bias": -22.286142020654637,
+      "extreme_n": 361,
+      "extreme_mae": 63.84177223195905,
+      "extreme_bias": 5.950711314870445
+    }
+  },
+  "holdout": {
+    "start": "2025-08-08 00:00:00+00:00",
+    "end": "2026-08-07 21:00:00+00:00",
+    "n": 8758,
+    "raw": {
+      "n": 8758,
+      "mae": 50.62696156371318,
+      "rmse": 66.75265451798131,
+      "bias": -44.740828171386156,
+      "extreme_n": 355,
+      "extreme_mae": 150.86069014084507,
+      "extreme_bias": -132.40557746478873
+    },
+    "adjusted": {
+      "n": 8758,
+      "mae": 46.24690894047463,
+      "rmse": 62.27899560232287,
+      "bias": -29.165323700954296,
+      "extreme_n": 355,
+      "extreme_mae": 136.9331602321883,
+      "extreme_bias": -102.60835510258266
+    }
+  },
+  "params": {
+    "alpha": 270.149679516478,
+    "tau_gw": 15.0,
+    "beta_ramp": 0.0,
+    "gamma_startup": 0.0,
+    "ramp_scale": 5.0,
+    "startup_scale": 1.0,
+    "probability_slope": 3.0,
+    "probability_center": 1.0
+  },
+  "features_file": "C:\\Users\\BQ6757\\chronos2_v1\\data\\derived\\structural_market_features.csv.gz",
+  "backup_file": "C:\\Users\\BQ6757\\chronos2_v1\\data\\derived\\structural_market_features_pre_scarcity.csv.gz"
+}

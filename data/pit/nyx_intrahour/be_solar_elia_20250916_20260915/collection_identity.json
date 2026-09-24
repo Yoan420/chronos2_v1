@@ -1,0 +1,17 @@
+{
+  "source": {
+    "alias": "be_solar_elia_fcst",
+    "zone": "BE",
+    "driver": "solar",
+    "unit": "MW",
+    "series": "23259",
+    "native_resolution_minutes": 15,
+    "is_forecast": true,
+    "interpolation": "none",
+    "native_resolution_evidence": "Saturn primary 23259, UTC-aware metadata and null formula; underlying source of power.stp.da_solar_production.be.mw.qh.fcst.elia. Raw as-of D-1 08:00 Europe/Paris samples on 2025-10-15, 2026-01-15, 2026-04-15, 2026-07-15 and 2026-09-15 each contain 96 consecutive 900-second values and within-hour variation. Read raw primary directly, never the wrapper's resample/ffill."
+  },
+  "start_day": "2025-09-16",
+  "end_day": "2026-09-15",
+  "cutoff": "D-1 08:00 Europe/Paris",
+  "interpolation": "none"
+}

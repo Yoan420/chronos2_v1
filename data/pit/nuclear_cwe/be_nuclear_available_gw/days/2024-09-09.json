@@ -1,0 +1,14 @@
+{
+  "record": {
+    "alias": "be_nuclear_available_gw",
+    "cutoff_utc": "2024-09-08T06:00:00+00:00",
+    "day": "2024-09-09",
+    "downloaded_at_utc": "2026-09-10T13:48:06.945923+00:00",
+    "forecast_type": "available_capacity_forecast_daily_broadcast",
+    "provider_revision_timestamp_available": false,
+    "schema_version": 1,
+    "series": "power.nrjscan.be.3mv.availability.pmax.type.nuclear.gw",
+    "value_gw": 2.8737999999999992
+  },
+  "sha256": "de938d04457199a201aaaf5a3ae81d0b08b4f9ab53f4e02c1ef805625a62d317"
+}

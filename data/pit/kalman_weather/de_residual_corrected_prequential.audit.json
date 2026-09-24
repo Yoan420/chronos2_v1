@@ -1,0 +1,29 @@
+{
+  "audit_csv": "kalman_upstream_prequential_audit.csv",
+  "causality_violations": 0,
+  "cold_start_policy": "identity_chronos_q10_q50_q90",
+  "fit_label_rule": "local_delivery_day < block_start_day",
+  "generated_prequential_days": 558,
+  "hours": 23279,
+  "identity_cold_start_days": 30,
+  "local_days": 970,
+  "minimum_training_rows": 720,
+  "protocol": "blocked_prequential_residual_then_issued_evaluation_overlay",
+  "published_max_origin_utc": "2026-08-27T06:00:00+00:00",
+  "published_origin_causality_violations": 0,
+  "published_origin_column": "forecast_origin_utc",
+  "published_origin_contract_mismatches": 0,
+  "published_origin_rule": "forecast_origin_utc == civil cutoff D-1 08:00",
+  "published_overlay_days": 382,
+  "published_overlay_hours": 9168,
+  "published_overlay_requires_complete_physical_day": true,
+  "published_overlay_scope": [
+    "validation",
+    "test"
+  ],
+  "refit_cadence_days": 28,
+  "refits": 20,
+  "schema_version": 1,
+  "selected_recipe_is_frozen": true,
+  "training_lookback_days": 365
+}

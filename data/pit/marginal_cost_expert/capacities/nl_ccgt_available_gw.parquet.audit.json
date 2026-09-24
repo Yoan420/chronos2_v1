@@ -1,0 +1,79 @@
+{
+  "alias": "nl_ccgt_available_gw",
+  "approximation": "Daily Pmax forecast applied uniformly to physical hours; not hourly Pmax, not realised generation; provider fleet scope unverified",
+  "block_error": null,
+  "block_staircase_request": {
+    "maturity_offset": {
+      "days": 1
+    },
+    "maturity_time": {
+      "hour": 0
+    },
+    "revision_freq": {
+      "days": 1
+    },
+    "revision_time": {
+      "hour": 8
+    },
+    "revision_tz": "Europe/Paris"
+  },
+  "complete": true,
+  "cutoff_time": "08:00",
+  "cutoff_timezone": "Europe/Paris",
+  "daily_broadcast": true,
+  "days": 730,
+  "elapsed_seconds": 11.281,
+  "end_day": "2026-09-09",
+  "errors": {},
+  "fill_or_interpolation": "daily_capacity_forecast_broadcast; no missing-day substitution",
+  "independent_probes": [
+    {
+      "bulk_value": 7.159,
+      "day": "2024-09-10",
+      "state_value": 7.159
+    },
+    {
+      "bulk_value": 6.572,
+      "day": "2024-10-28",
+      "state_value": 6.572
+    },
+    {
+      "bulk_value": 7.015,
+      "day": "2025-03-31",
+      "state_value": 7.015
+    },
+    {
+      "bulk_value": 7.001770833333333,
+      "day": "2025-09-10",
+      "state_value": 7.001770833333333
+    },
+    {
+      "bulk_value": 6.3379375,
+      "day": "2025-10-27",
+      "state_value": 6.3379375
+    },
+    {
+      "bulk_value": 8.730770833333334,
+      "day": "2026-03-30",
+      "state_value": 8.730770833333334
+    },
+    {
+      "bulk_value": 7.8345,
+      "day": "2026-09-09",
+      "state_value": 7.8345
+    }
+  ],
+  "information_type": "capacity_forecast",
+  "missing_days": [],
+  "production_pit_evidence": false,
+  "promotion_eligible": false,
+  "provider_revision_timestamp_available": false,
+  "requested_days": 730,
+  "revision_time_semantics": "query_asof_cutoff",
+  "rows": 17520,
+  "schema_version": 1,
+  "series": "power.nrjscan.nl.3mv.availability.pmax.type.ccgt.gw",
+  "sha256": "7bb4546115a2f5b21f1e6d7d5952a801031397b0d63e2a0199a2d224b43b444d",
+  "start_day": "2024-09-10",
+  "unit": "GW"
+}

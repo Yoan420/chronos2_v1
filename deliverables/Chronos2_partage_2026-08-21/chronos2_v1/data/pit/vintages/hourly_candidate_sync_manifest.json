@@ -1,0 +1,21 @@
+{
+  "generated_at_utc": "2026-08-12 10:21:27.395641+00:00",
+  "revision_end_utc": "2026-08-12 08:00:00+00:00",
+  "value_end_utc": "2026-08-14 22:00:00+00:00",
+  "series": [
+    {
+      "zone": "FR",
+      "alias": "fr_solar_generation_fcst",
+      "series": "power.fr.generation.solar.hourly.gw.fcst",
+      "kind": "forecast_vintages",
+      "path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\vintages\\fr_solar_generation_fcst.parquet",
+      "status": "updated",
+      "rows_before": 0,
+      "rows_downloaded": 346628,
+      "rows_after": 595,
+      "first_revision_utc": "2026-08-10 05:29:38.558475+00:00",
+      "last_revision_utc": "2026-08-12 07:30:55.033834+00:00",
+      "sync_as_of_utc": "2026-08-12 08:00:00+00:00"
+    }
+  ]
+}

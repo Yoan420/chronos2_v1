@@ -22,3 +22,6 @@ runs/
 Thumbs.db
 *.backup
 *.bak
+!data/
+!data/**
+

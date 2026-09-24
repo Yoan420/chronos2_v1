@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "artifact_type": "nyx_intrahour_forecast_vintages",
+  "data_file": "native_forecasts.parquet",
+  "data_sha256": "264ec36a410265a682f20b4c4e36a27d0b45f4497d254a9460693a8e70756ac0",
+  "sources": [
+    {
+      "alias": "be_solar_elia_fcst",
+      "zone": "BE",
+      "driver": "solar",
+      "unit": "MW",
+      "series": "23259",
+      "native_resolution_minutes": 15,
+      "is_forecast": true,
+      "interpolation": "none",
+      "native_resolution_evidence": "Saturn primary 23259, UTC-aware metadata and null formula; underlying source of power.stp.da_solar_production.be.mw.qh.fcst.elia. Raw as-of D-1 08:00 Europe/Paris samples on 2025-10-15, 2026-01-15, 2026-04-15, 2026-07-15 and 2026-09-15 each contain 96 consecutive 900-second values and within-hour variation. Read raw primary directly, never the wrapper's resample/ffill."
+    }
+  ],
+  "temporal_evidence": "retrospective_asof",
+  "provider_revision_timestamp_available": false,
+  "production_pit_evidence": false,
+  "start_day": "2025-09-16",
+  "end_day": "2026-09-15",
+  "cutoff": "D-1 08:00 Europe/Paris",
+  "timestamp_semantics": "Both snapshot and revision are requested query cutoff times, not provider publication timestamps.",
+  "scope": "Belgian solar fundamental only; no claim of four-country native-quarter-hour coverage.",
+  "interpolation": "none",
+  "summary": {
+    "days": 365,
+    "complete_days": 365,
+    "incomplete_days": 0,
+    "empty_days": 0,
+    "error_days": 0,
+    "expected_quarters": 35040,
+    "returned_quarters": 35040,
+    "varying_hours": 4851
+  },
+  "evidence_sha256": {
+    "tmp\\nyx_intrahour_discovery\\metadata.json": "65068215eabf0585262618c1ed30329066eee4fbfe06bffd65295478b76360c7",
+    "tmp\\nyx_intrahour_discovery\\metadata_0e558918bb.json": "582eb2f9ffeed3e6030d24d454e8998f347bc56da09378b2bea5c38c41689ab3",
+    "tmp\\nyx_intrahour_discovery\\metadata_270d53a72c.json": "1a73eb680182e5af482fa6ec138ba79be9d0c37dc826412a3fb1df9dfb6608d5",
+    "tmp\\nyx_intrahour_discovery\\metadata_ba96bbd29f.json": "f0d23ff37d1935d6e3f00fe45df3aa96c340a9c379fb40d1f74012611694a242",
+    "tmp\\nyx_intrahour_discovery\\probe_9b6cc85c4c.json": "2540bcfeb97d97df3df25ba800c46a8f2c6b07dcecdd09b0421714d7753ac235",
+    "tmp\\nyx_intrahour_discovery\\probe_dd6b997ea6.json": "f09a1425b0291797e19316e09da3b124fc3251a9247bd4b13bdb9c23b1d7fde6"
+  },
+  "collection_audit_sha256": "dc22527a68f9c34a212bd904511f4619b6c8c435178b1df1ea494b0522540044",
+  "acquisition_code_sha256": {
+    "materialize_nyx_intrahour.py": "34a29571788c3fe69de1ba6f6e9660ba807985c6de2c91fd1a2662b9b18e290a",
+    "nyx_intrahour/saturn_sources.py": "a595bb8b3f716708d1b9ca5d2edb81660fbb6d8587c08c32a60e1ab8433e8261"
+  }
+}

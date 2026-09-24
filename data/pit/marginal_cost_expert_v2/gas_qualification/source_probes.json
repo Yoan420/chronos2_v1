@@ -1,0 +1,963 @@
+{
+  "days": [
+    "2024-09-10",
+    "2024-11-15",
+    "2025-01-15",
+    "2025-04-01",
+    "2025-09-01",
+    "2025-12-01",
+    "2026-06-24",
+    "2026-06-25",
+    "2026-06-26",
+    "2026-09-09"
+  ],
+  "production_pit_evidence": false,
+  "records": {
+    "be_gas_pmax": {
+      "alias": "be_gas_pmax",
+      "kind": "daily",
+      "metadata": {
+        "index_dtype": "<M8[ns]",
+        "index_type": "datetime64[ns]",
+        "supervision_status": "unsupervised",
+        "tzaware": false,
+        "value_dtype": "<f8",
+        "value_type": "float64"
+      },
+      "national_coverage_attested": false,
+      "probes": [
+        {
+          "count": 1,
+          "cutoff_utc": "2024-09-09T06:00:00+00:00",
+          "day": "2024-09-10",
+          "finite": 1,
+          "max": 2.3162361111111114,
+          "mean": 2.3162361111111114,
+          "min": 2.3162361111111114,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2024-11-14T07:00:00+00:00",
+          "day": "2024-11-15",
+          "finite": 1,
+          "max": 3.724813888888889,
+          "mean": 3.724813888888889,
+          "min": 3.724813888888889,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2025-01-14T07:00:00+00:00",
+          "day": "2025-01-15",
+          "finite": 1,
+          "max": 3.791063888888889,
+          "mean": 3.791063888888889,
+          "min": 3.791063888888889,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2025-03-31T06:00:00+00:00",
+          "day": "2025-04-01",
+          "finite": 1,
+          "max": 3.2152999999999996,
+          "mean": 3.2152999999999996,
+          "min": 3.2152999999999996,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2025-08-31T06:00:00+00:00",
+          "day": "2025-09-01",
+          "finite": 1,
+          "max": 2.877,
+          "mean": 2.877,
+          "min": 2.877,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2025-11-30T07:00:00+00:00",
+          "day": "2025-12-01",
+          "finite": 1,
+          "max": 4.1853,
+          "mean": 4.1853,
+          "min": 4.1853,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2026-06-23T06:00:00+00:00",
+          "day": "2026-06-24",
+          "finite": 1,
+          "max": 3.7933,
+          "mean": 3.7933,
+          "min": 3.7933,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2026-06-24T06:00:00+00:00",
+          "day": "2026-06-25",
+          "finite": 1,
+          "max": 3.7933,
+          "mean": 3.7933,
+          "min": 3.7933,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2026-06-25T06:00:00+00:00",
+          "day": "2026-06-26",
+          "finite": 1,
+          "max": 3.7933,
+          "mean": 3.7933,
+          "min": 3.7933,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2026-09-08T06:00:00+00:00",
+          "day": "2026-09-09",
+          "finite": 1,
+          "max": 3.6792999999999996,
+          "mean": 3.6792999999999996,
+          "min": 3.6792999999999996,
+          "source_value_time_utc": null
+        }
+      ],
+      "provider_revision_timestamp_available": false,
+      "series": "power.nrjscan.be.3mv.availability.pmax.fuel.nat_gas.gw",
+      "unit": "GW"
+    },
+    "be_gas_pnom": {
+      "alias": "be_gas_pnom",
+      "kind": "daily",
+      "metadata": {
+        "index_dtype": "<M8[ns]",
+        "index_type": "datetime64[ns]",
+        "supervision_status": "unsupervised",
+        "tzaware": false,
+        "value_dtype": "<f8",
+        "value_type": "float64"
+      },
+      "national_coverage_attested": false,
+      "probes": [
+        {
+          "count": 1,
+          "cutoff_utc": "2024-09-09T06:00:00+00:00",
+          "day": "2024-09-10",
+          "finite": 1,
+          "max": 4.4153,
+          "mean": 4.4153,
+          "min": 4.4153,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2024-11-14T07:00:00+00:00",
+          "day": "2024-11-15",
+          "finite": 1,
+          "max": 4.4153,
+          "mean": 4.4153,
+          "min": 4.4153,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2025-01-14T07:00:00+00:00",
+          "day": "2025-01-15",
+          "finite": 1,
+          "max": 4.4153,
+          "mean": 4.4153,
+          "min": 4.4153,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2025-03-31T06:00:00+00:00",
+          "day": "2025-04-01",
+          "finite": 1,
+          "max": 4.4153,
+          "mean": 4.4153,
+          "min": 4.4153,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2025-08-31T06:00:00+00:00",
+          "day": "2025-09-01",
+          "finite": 1,
+          "max": 4.4153,
+          "mean": 4.4153,
+          "min": 4.4153,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2025-11-30T07:00:00+00:00",
+          "day": "2025-12-01",
+          "finite": 1,
+          "max": 4.4153,
+          "mean": 4.4153,
+          "min": 4.4153,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2026-06-23T06:00:00+00:00",
+          "day": "2026-06-24",
+          "finite": 1,
+          "max": 4.4153,
+          "mean": 4.4153,
+          "min": 4.4153,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2026-06-24T06:00:00+00:00",
+          "day": "2026-06-25",
+          "finite": 1,
+          "max": 4.4153,
+          "mean": 4.4153,
+          "min": 4.4153,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2026-06-25T06:00:00+00:00",
+          "day": "2026-06-26",
+          "finite": 1,
+          "max": 4.4153,
+          "mean": 4.4153,
+          "min": 4.4153,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2026-09-08T06:00:00+00:00",
+          "day": "2026-09-09",
+          "finite": 1,
+          "max": 4.4153,
+          "mean": 4.4153,
+          "min": 4.4153,
+          "source_value_time_utc": null
+        }
+      ],
+      "provider_revision_timestamp_available": false,
+      "series": "power.nrjscan.be.3mv.installedcapacity.pnom.fuel.nat_gas.gw",
+      "unit": "GW"
+    },
+    "de_gas_pmax": {
+      "alias": "de_gas_pmax",
+      "kind": "daily",
+      "metadata": {
+        "index_dtype": "<M8[ns]",
+        "index_type": "datetime64[ns]",
+        "supervision_status": "unsupervised",
+        "tzaware": false,
+        "value_dtype": "<f8",
+        "value_type": "float64"
+      },
+      "national_coverage_attested": false,
+      "probes": [
+        {
+          "count": 1,
+          "cutoff_utc": "2024-09-09T06:00:00+00:00",
+          "day": "2024-09-10",
+          "finite": 1,
+          "max": 17.451700000000002,
+          "mean": 17.451700000000002,
+          "min": 17.451700000000002,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 0,
+          "cutoff_utc": "2024-11-14T07:00:00+00:00",
+          "day": "2024-11-15",
+          "finite": 0,
+          "max": null,
+          "mean": null,
+          "min": null,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2025-01-14T07:00:00+00:00",
+          "day": "2025-01-15",
+          "finite": 1,
+          "max": 18.785033333333335,
+          "mean": 18.785033333333335,
+          "min": 18.785033333333335,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2025-03-31T06:00:00+00:00",
+          "day": "2025-04-01",
+          "finite": 1,
+          "max": 17.4604,
+          "mean": 17.4604,
+          "min": 17.4604,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2025-08-31T06:00:00+00:00",
+          "day": "2025-09-01",
+          "finite": 1,
+          "max": 16.4272,
+          "mean": 16.4272,
+          "min": 16.4272,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2025-11-30T07:00:00+00:00",
+          "day": "2025-12-01",
+          "finite": 1,
+          "max": 19.15426662037037,
+          "mean": 19.15426662037037,
+          "min": 19.15426662037037,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2026-06-23T06:00:00+00:00",
+          "day": "2026-06-24",
+          "finite": 1,
+          "max": 17.532066666666665,
+          "mean": 17.532066666666665,
+          "min": 17.532066666666665,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2026-06-24T06:00:00+00:00",
+          "day": "2026-06-25",
+          "finite": 1,
+          "max": 17.496160416666665,
+          "mean": 17.496160416666665,
+          "min": 17.496160416666665,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2026-06-25T06:00:00+00:00",
+          "day": "2026-06-26",
+          "finite": 1,
+          "max": 17.014566666666667,
+          "mean": 17.014566666666667,
+          "min": 17.014566666666667,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2026-09-08T06:00:00+00:00",
+          "day": "2026-09-09",
+          "finite": 1,
+          "max": 15.1435,
+          "mean": 15.1435,
+          "min": 15.1435,
+          "source_value_time_utc": null
+        }
+      ],
+      "provider_revision_timestamp_available": false,
+      "series": "power.nrjscan.de.3mv.availability.pmax.fuel.nat_gas.gw",
+      "unit": "GW"
+    },
+    "de_gas_pnom": {
+      "alias": "de_gas_pnom",
+      "kind": "daily",
+      "metadata": {
+        "index_dtype": "<M8[ns]",
+        "index_type": "datetime64[ns]",
+        "supervision_status": "unsupervised",
+        "tzaware": false,
+        "value_dtype": "<f8",
+        "value_type": "float64"
+      },
+      "national_coverage_attested": false,
+      "probes": [
+        {
+          "count": 1,
+          "cutoff_utc": "2024-09-09T06:00:00+00:00",
+          "day": "2024-09-10",
+          "finite": 1,
+          "max": 20.6907,
+          "mean": 20.6907,
+          "min": 20.6907,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 0,
+          "cutoff_utc": "2024-11-14T07:00:00+00:00",
+          "day": "2024-11-15",
+          "finite": 0,
+          "max": null,
+          "mean": null,
+          "min": null,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2025-01-14T07:00:00+00:00",
+          "day": "2025-01-15",
+          "finite": 1,
+          "max": 20.6907,
+          "mean": 20.6907,
+          "min": 20.6907,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2025-03-31T06:00:00+00:00",
+          "day": "2025-04-01",
+          "finite": 1,
+          "max": 20.6907,
+          "mean": 20.6907,
+          "min": 20.6907,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2025-08-31T06:00:00+00:00",
+          "day": "2025-09-01",
+          "finite": 1,
+          "max": 20.6907,
+          "mean": 20.6907,
+          "min": 20.6907,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2025-11-30T07:00:00+00:00",
+          "day": "2025-12-01",
+          "finite": 1,
+          "max": 20.6907,
+          "mean": 20.6907,
+          "min": 20.6907,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2026-06-23T06:00:00+00:00",
+          "day": "2026-06-24",
+          "finite": 1,
+          "max": 20.6907,
+          "mean": 20.6907,
+          "min": 20.6907,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2026-06-24T06:00:00+00:00",
+          "day": "2026-06-25",
+          "finite": 1,
+          "max": 20.6907,
+          "mean": 20.6907,
+          "min": 20.6907,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2026-06-25T06:00:00+00:00",
+          "day": "2026-06-26",
+          "finite": 1,
+          "max": 20.6907,
+          "mean": 20.6907,
+          "min": 20.6907,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2026-09-08T06:00:00+00:00",
+          "day": "2026-09-09",
+          "finite": 1,
+          "max": 20.6907,
+          "mean": 20.6907,
+          "min": 20.6907,
+          "source_value_time_utc": null
+        }
+      ],
+      "provider_revision_timestamp_available": false,
+      "series": "power.nrjscan.de.3mv.installedcapacity.pnom.fuel.nat_gas.gw",
+      "unit": "GW"
+    },
+    "fr_gas_pmax": {
+      "alias": "fr_gas_pmax",
+      "kind": "daily",
+      "metadata": {
+        "index_dtype": "<M8[ns]",
+        "index_type": "datetime64[ns]",
+        "supervision_status": "unsupervised",
+        "tzaware": false,
+        "value_dtype": "<f8",
+        "value_type": "float64"
+      },
+      "national_coverage_attested": false,
+      "probes": [
+        {
+          "count": 1,
+          "cutoff_utc": "2024-09-09T06:00:00+00:00",
+          "day": "2024-09-10",
+          "finite": 1,
+          "max": 4.536,
+          "mean": 4.536,
+          "min": 4.536,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2024-11-14T07:00:00+00:00",
+          "day": "2024-11-15",
+          "finite": 1,
+          "max": 5.389,
+          "mean": 5.389,
+          "min": 5.389,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2025-01-14T07:00:00+00:00",
+          "day": "2025-01-15",
+          "finite": 1,
+          "max": 5.548354166666667,
+          "mean": 5.548354166666667,
+          "min": 5.548354166666667,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2025-03-31T06:00:00+00:00",
+          "day": "2025-04-01",
+          "finite": 1,
+          "max": 5.698027777777777,
+          "mean": 5.698027777777777,
+          "min": 5.698027777777777,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2025-08-31T06:00:00+00:00",
+          "day": "2025-09-01",
+          "finite": 1,
+          "max": 6.154,
+          "mean": 6.154,
+          "min": 6.154,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2025-11-30T07:00:00+00:00",
+          "day": "2025-12-01",
+          "finite": 1,
+          "max": 6.167,
+          "mean": 6.167,
+          "min": 6.167,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2026-06-23T06:00:00+00:00",
+          "day": "2026-06-24",
+          "finite": 1,
+          "max": 4.74,
+          "mean": 4.74,
+          "min": 4.74,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2026-06-24T06:00:00+00:00",
+          "day": "2026-06-25",
+          "finite": 1,
+          "max": 5.473416666666667,
+          "mean": 5.473416666666667,
+          "min": 5.473416666666667,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2026-06-25T06:00:00+00:00",
+          "day": "2026-06-26",
+          "finite": 1,
+          "max": 5.713,
+          "mean": 5.713,
+          "min": 5.713,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2026-09-08T06:00:00+00:00",
+          "day": "2026-09-09",
+          "finite": 1,
+          "max": 4.728,
+          "mean": 4.728,
+          "min": 4.728,
+          "source_value_time_utc": null
+        }
+      ],
+      "provider_revision_timestamp_available": false,
+      "series": "power.nrjscan.fr.3mv.availability.pmax.fuel.nat_gas.gw",
+      "unit": "GW"
+    },
+    "fr_gas_pnom": {
+      "alias": "fr_gas_pnom",
+      "kind": "daily",
+      "metadata": {
+        "index_dtype": "<M8[ns]",
+        "index_type": "datetime64[ns]",
+        "supervision_status": "unsupervised",
+        "tzaware": false,
+        "value_dtype": "<f8",
+        "value_type": "float64"
+      },
+      "national_coverage_attested": false,
+      "probes": [
+        {
+          "count": 1,
+          "cutoff_utc": "2024-09-09T06:00:00+00:00",
+          "day": "2024-09-10",
+          "finite": 1,
+          "max": 6.579,
+          "mean": 6.579,
+          "min": 6.579,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2024-11-14T07:00:00+00:00",
+          "day": "2024-11-15",
+          "finite": 1,
+          "max": 6.579,
+          "mean": 6.579,
+          "min": 6.579,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2025-01-14T07:00:00+00:00",
+          "day": "2025-01-15",
+          "finite": 1,
+          "max": 6.579,
+          "mean": 6.579,
+          "min": 6.579,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2025-03-31T06:00:00+00:00",
+          "day": "2025-04-01",
+          "finite": 1,
+          "max": 6.579,
+          "mean": 6.579,
+          "min": 6.579,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2025-08-31T06:00:00+00:00",
+          "day": "2025-09-01",
+          "finite": 1,
+          "max": 6.579,
+          "mean": 6.579,
+          "min": 6.579,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2025-11-30T07:00:00+00:00",
+          "day": "2025-12-01",
+          "finite": 1,
+          "max": 6.579,
+          "mean": 6.579,
+          "min": 6.579,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2026-06-23T06:00:00+00:00",
+          "day": "2026-06-24",
+          "finite": 1,
+          "max": 6.579,
+          "mean": 6.579,
+          "min": 6.579,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2026-06-24T06:00:00+00:00",
+          "day": "2026-06-25",
+          "finite": 1,
+          "max": 6.579,
+          "mean": 6.579,
+          "min": 6.579,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2026-06-25T06:00:00+00:00",
+          "day": "2026-06-26",
+          "finite": 1,
+          "max": 6.579,
+          "mean": 6.579,
+          "min": 6.579,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2026-09-08T06:00:00+00:00",
+          "day": "2026-09-09",
+          "finite": 1,
+          "max": 6.579,
+          "mean": 6.579,
+          "min": 6.579,
+          "source_value_time_utc": null
+        }
+      ],
+      "provider_revision_timestamp_available": false,
+      "series": "power.nrjscan.fr.3mv.installedcapacity.pnom.fuel.nat_gas.gw",
+      "unit": "GW"
+    },
+    "nl_gas_pmax": {
+      "alias": "nl_gas_pmax",
+      "kind": "daily",
+      "metadata": {
+        "index_dtype": "<M8[ns]",
+        "index_type": "datetime64[ns]",
+        "supervision_status": "unsupervised",
+        "tzaware": false,
+        "value_dtype": "<f8",
+        "value_type": "float64"
+      },
+      "national_coverage_attested": false,
+      "probes": [
+        {
+          "count": 1,
+          "cutoff_utc": "2024-09-09T06:00:00+00:00",
+          "day": "2024-09-10",
+          "finite": 1,
+          "max": 9.399666666666667,
+          "mean": 9.399666666666667,
+          "min": 9.399666666666667,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2024-11-14T07:00:00+00:00",
+          "day": "2024-11-15",
+          "finite": 1,
+          "max": 11.117195138888889,
+          "mean": 11.117195138888889,
+          "min": 11.117195138888889,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2025-01-14T07:00:00+00:00",
+          "day": "2025-01-15",
+          "finite": 1,
+          "max": 12.234,
+          "mean": 12.234,
+          "min": 12.234,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2025-03-31T06:00:00+00:00",
+          "day": "2025-04-01",
+          "finite": 1,
+          "max": 9.908364583333334,
+          "mean": 9.908364583333334,
+          "min": 9.908364583333334,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2025-08-31T06:00:00+00:00",
+          "day": "2025-09-01",
+          "finite": 1,
+          "max": 10.121,
+          "mean": 10.121,
+          "min": 10.121,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2025-11-30T07:00:00+00:00",
+          "day": "2025-12-01",
+          "finite": 1,
+          "max": 11.158877083333334,
+          "mean": 11.158877083333334,
+          "min": 11.158877083333334,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2026-06-23T06:00:00+00:00",
+          "day": "2026-06-24",
+          "finite": 1,
+          "max": 10.167,
+          "mean": 10.167,
+          "min": 10.167,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2026-06-24T06:00:00+00:00",
+          "day": "2026-06-25",
+          "finite": 1,
+          "max": 10.167,
+          "mean": 10.167,
+          "min": 10.167,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2026-06-25T06:00:00+00:00",
+          "day": "2026-06-26",
+          "finite": 1,
+          "max": 10.29125,
+          "mean": 10.29125,
+          "min": 10.29125,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2026-09-08T06:00:00+00:00",
+          "day": "2026-09-09",
+          "finite": 1,
+          "max": 10.2955,
+          "mean": 10.2955,
+          "min": 10.2955,
+          "source_value_time_utc": null
+        }
+      ],
+      "provider_revision_timestamp_available": false,
+      "series": "power.nrjscan.nl.3mv.availability.pmax.fuel.nat_gas.gw",
+      "unit": "GW"
+    },
+    "nl_gas_pnom": {
+      "alias": "nl_gas_pnom",
+      "kind": "daily",
+      "metadata": {
+        "index_dtype": "<M8[ns]",
+        "index_type": "datetime64[ns]",
+        "supervision_status": "unsupervised",
+        "tzaware": false,
+        "value_dtype": "<f8",
+        "value_type": "float64"
+      },
+      "national_coverage_attested": false,
+      "probes": [
+        {
+          "count": 1,
+          "cutoff_utc": "2024-09-09T06:00:00+00:00",
+          "day": "2024-09-10",
+          "finite": 1,
+          "max": 13.076,
+          "mean": 13.076,
+          "min": 13.076,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2024-11-14T07:00:00+00:00",
+          "day": "2024-11-15",
+          "finite": 1,
+          "max": 13.076,
+          "mean": 13.076,
+          "min": 13.076,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2025-01-14T07:00:00+00:00",
+          "day": "2025-01-15",
+          "finite": 1,
+          "max": 13.076,
+          "mean": 13.076,
+          "min": 13.076,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2025-03-31T06:00:00+00:00",
+          "day": "2025-04-01",
+          "finite": 1,
+          "max": 13.076,
+          "mean": 13.076,
+          "min": 13.076,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2025-08-31T06:00:00+00:00",
+          "day": "2025-09-01",
+          "finite": 1,
+          "max": 13.076,
+          "mean": 13.076,
+          "min": 13.076,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2025-11-30T07:00:00+00:00",
+          "day": "2025-12-01",
+          "finite": 1,
+          "max": 13.076,
+          "mean": 13.076,
+          "min": 13.076,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2026-06-23T06:00:00+00:00",
+          "day": "2026-06-24",
+          "finite": 1,
+          "max": 13.076,
+          "mean": 13.076,
+          "min": 13.076,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2026-06-24T06:00:00+00:00",
+          "day": "2026-06-25",
+          "finite": 1,
+          "max": 13.076,
+          "mean": 13.076,
+          "min": 13.076,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2026-06-25T06:00:00+00:00",
+          "day": "2026-06-26",
+          "finite": 1,
+          "max": 13.076,
+          "mean": 13.076,
+          "min": 13.076,
+          "source_value_time_utc": null
+        },
+        {
+          "count": 1,
+          "cutoff_utc": "2026-09-08T06:00:00+00:00",
+          "day": "2026-09-09",
+          "finite": 1,
+          "max": 13.076,
+          "mean": 13.076,
+          "min": 13.076,
+          "source_value_time_utc": null
+        }
+      ],
+      "provider_revision_timestamp_available": false,
+      "series": "power.nrjscan.nl.3mv.installedcapacity.pnom.fuel.nat_gas.gw",
+      "unit": "GW"
+    }
+  },
+  "retrieved_at_utc": "2026-09-09T14:17:28.581071+00:00",
+  "schema_version": 2
+}
