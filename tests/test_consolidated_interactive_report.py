@@ -308,6 +308,7 @@ def test_report_is_offline_and_exposes_all_interactive_controls(
     )
 
     expected_controls = {
+        "theme-toggle": "button",
         "forecast-comparison-chart": "div",
         "forecast-zone-select": "div",
         "forecast-start-date": "input",
@@ -369,6 +370,14 @@ def test_report_is_offline_and_exposes_all_interactive_controls(
     assert "groupclick:'togglegroup'" in html
     assert "#forecast-zone-select input:checked" in html
     assert "i.type='checkbox'" in html
+    assert 'data-theme="light"' in html
+    assert "chronos2-report-theme" in html
+    assert "localStorage.getItem" in html
+    assert "localStorage.setItem" in html
+    assert "☾ Mode nuit" in html
+    assert "☀ Mode clair" in html
+    assert "aria-pressed" in html
+    assert 'font:{color:dark?' in html
 
     referenced_ids = set(re.findall(r"\$\(['\"]([^'\"]+)['\"]\)", html))
     plot_targets = set(

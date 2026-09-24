@@ -175,7 +175,7 @@ def _fake_ready_bundle(tmp_path: Path) -> dict:
             "zone": "BE",
             "timezone": "Europe/Brussels",
             "evaluation_only_comparators": [
-                "power.price.be.euromwh.h.fcst.3mv.storm"
+                "power.price.be.euromwh.h.fcst.3mv.storm.da.cache"
             ],
         },
     )
@@ -249,9 +249,13 @@ def _fake_ready_bundle(tmp_path: Path) -> dict:
                 "price_unit": "EUR/MWh",
                 "primary_series": "be-primary",
                 "primary_status": "audited_primary",
-                "storm_series": "power.price.be.euromwh.h.fcst.3mv.storm",
-                "storm_status": "audited_native_dashboard",
-                "storm_primary_series": "41378_native",
+                "storm_series": (
+                    "power.price.be.euromwh.h.fcst.3mv.storm.da.cache"
+                ),
+                "storm_status": "audited_day_ahead_cache",
+                "storm_primary_series": (
+                    "power.price.be.euromwh.h.fcst.3mv.storm.da.cache"
+                ),
                 "storm_naive_timezone": "Europe/Brussels",
                 "storm_strict_08_series": (
                     "power.price.be.euromwh.h.fcst.3mv.storm.da.basecase"
@@ -275,6 +279,55 @@ def test_audit_ready_bundle_and_build_command(tmp_path: Path) -> None:
     assert command[1] == str((tmp_path / "runner.py").resolve())
     assert command[2:4] == ["--config", str((tmp_path / "live.yaml").resolve())]
     assert command[-3:] == ["--delivery-day", "2026-08-14", "--local-files-only"]
+
+
+def test_build_command_keeps_default_saturn_argv_unchanged(tmp_path: Path) -> None:
+    registry = _fake_ready_bundle(tmp_path)
+    audit = audit_zone_live_bundle(registry, zone="BE", registry_dir=tmp_path)
+
+    default_command = build_zone_runner_command(
+        audit,
+        delivery_day="2026-08-14",
+        local_files_only=True,
+    )
+    explicit_saturn_command = build_zone_runner_command(
+        audit,
+        delivery_day="2026-08-14",
+        local_files_only=True,
+        residual_load_source="saturn",
+        residual_load_bundle_manifest=tmp_path / "ignored.json",
+    )
+
+    assert explicit_saturn_command == default_command
+    assert "--residual-load-source" not in default_command
+    assert "--residual-load-bundle-manifest" not in default_command
+
+
+def test_build_command_transmits_chronos2_bundle_manifest(tmp_path: Path) -> None:
+    registry = _fake_ready_bundle(tmp_path)
+    audit = audit_zone_live_bundle(registry, zone="BE", registry_dir=tmp_path)
+    manifest = tmp_path / "chronos2_residual_load_bundle.json"
+
+    command = build_zone_runner_command(
+        audit,
+        residual_load_source="Chronos2",
+        residual_load_bundle_manifest=manifest,
+    )
+
+    assert command[-4:] == [
+        "--residual-load-source",
+        "chronos2",
+        "--residual-load-bundle-manifest",
+        str(manifest),
+    ]
+
+
+def test_build_command_requires_manifest_for_chronos2(tmp_path: Path) -> None:
+    registry = _fake_ready_bundle(tmp_path)
+    audit = audit_zone_live_bundle(registry, zone="BE", registry_dir=tmp_path)
+
+    with pytest.raises(ZoneBundleError, match="manifest est obligatoire"):
+        build_zone_runner_command(audit, residual_load_source="chronos2")
 
 
 def test_audit_ready_autonomous_bundle_needs_no_primary_or_dependency(
@@ -347,7 +400,10 @@ def test_audit_rejects_unavailable_status_when_native_storm_is_verified(
     audit = audit_zone_live_bundle(registry, zone="BE", registry_dir=tmp_path)
 
     assert not audit.ready
-    assert any("serie Storm dashboard native" in item for item in audit.blockers)
+    assert any(
+        "cache Storm day-ahead dashboard" in item
+        for item in audit.blockers
+    )
     assert "storm_strict_08:pit_unavailable_optional" in audit.checks
 
 

@@ -345,7 +345,10 @@ def _statistics_payload(comparison: ForecastComparison) -> dict[str, Any]:
                 "views": {},
             }
             continue
-        dataset = load_statistics_history(statistics_path)
+        dataset = load_statistics_history(
+            statistics_path,
+            variant=comparison.variant,
+        )
         history = dataset.frame.copy()
         history["local_date"] = (
             history["timestamp"]
@@ -409,6 +412,7 @@ def _report_payload(
         "initial_include_intervals": bool(include_intervals),
         "timeline_aligned": bool(comparison.timeline_aligned),
         "mixed_delivery_days": bool(comparison.mixed_delivery_days),
+        "forecast_variant": comparison.variant,
         "zones": [archive.zone for archive in comparison.archives],
         "metrics": metrics,
         "archives": archives,
@@ -441,7 +445,12 @@ def consolidated_report_filename(comparison: ForecastComparison) -> str:
     zones = "-".join(archive.zone.lower() for archive in comparison.archives)
     days = sorted({archive.delivery_day for archive in comparison.archives})
     day_token = days[0] if len(days) == 1 else f"{days[0]}_to_{days[-1]}"
-    return f"chronos2_forecasts_{zones}_{day_token}.html"
+    variant = (
+        ""
+        if comparison.variant == "production"
+        else comparison.variant.replace("_", "-") + "_"
+    )
+    return f"chronos2_forecasts_{variant}{zones}_{day_token}.html"
 
 
 def _render_static_consolidated_forecast_report(
@@ -494,6 +503,13 @@ def _render_static_consolidated_forecast_report(
         if include_intervals
         else "Les bandes P10–P90 sont masquées dans cette exportation."
     )
+    variant_label = (
+        "Autonome · sans MKOnline"
+        if comparison.variant == "autonomous"
+        else "Blend MKOnline validé"
+        if comparison.variant == "mkonline_blend"
+        else "Production actuelle"
+    )
     svg = _svg_chart(comparison, include_intervals=include_intervals)
     html = f"""<!doctype html>
 <html lang="fr">
@@ -518,7 +534,7 @@ table {{ width: 100%; border-collapse: collapse; font-size: 13px; }} th, td {{ b
 </head>
 <body><main>
 <h1>Forecasts day-ahead multi-pays</h1>
-<p class="muted">Généré le {escape(generated)} · {len(comparison.archives)} pays · {escape(date_map)}</p>
+<p class="muted">Généré le {escape(generated)} · {len(comparison.archives)} pays · {escape(date_map)} · {escape(variant_label)}</p>
 <div class="safe"><strong>Intégrité vérifiée.</strong> Toutes les archives et leurs checksums SHA-256 ont été revalidés avant l'export. Storm n'est ni une entrée de prédiction ni une série de ce rapport.</div>
 {mixed_banner}
 <section class="card"><h2>Comparaison P50</h2><p class="muted">{escape(interval_note)}</p><div class="chart">{svg}</div></section>
@@ -548,6 +564,13 @@ def render_consolidated_forecast_report(
         if comparison.mixed_delivery_days
         else ""
     )
+    variant_label = (
+        "Autonome · sans MKOnline"
+        if comparison.variant == "autonomous"
+        else "Blend MKOnline validé"
+        if comparison.variant == "mkonline_blend"
+        else "Production actuelle"
+    )
     template = r'''<!doctype html>
 <html lang="fr" data-theme="light">
 <head>
@@ -555,6 +578,7 @@ def render_consolidated_forecast_report(
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src 'none'; object-src 'none'; base-uri 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; font-src data:">
 <title>Chronos-2 · Rapport consolidé interactif</title>
+<script>(()=>{let t='light';try{const s=localStorage.getItem('chronos2-report-theme');if(s==='light'||s==='dark')t=s}catch(_e){}document.documentElement.dataset.theme=t})();</script>
 <style>
 :root{color-scheme:light;font-family:Inter,"Segoe UI",Arial,sans-serif;--bg:#f5f7fb;--surface:#fff;--surface2:#f8fafc;--text:#0f172a;--muted:#526174;--line:#dbe3ed;--brand:#2563eb;--good:#047857;--bad:#b91c1c;--warn:#9a5b0a;--shadow:0 8px 28px rgba(15,23,42,.07)}
 html[data-theme="dark"]{color-scheme:dark;--bg:#0b1220;--surface:#111b2e;--surface2:#172338;--text:#e7edf6;--muted:#aab7ca;--line:#2b3b52;--brand:#60a5fa;--good:#34d399;--bad:#fb7185;--warn:#fbbf24;--shadow:0 8px 28px rgba(0,0,0,.28)}
@@ -562,7 +586,7 @@ html[data-theme="dark"]{color-scheme:dark;--bg:#0b1220;--surface:#111b2e;--surfa
 </style>
 </head>
 <body><main>
-<header class="topbar"><div><h1>Forecasts day-ahead · vue multi-pays</h1><div class="muted">Généré le __GENERATED__ · __DATES__</div></div><button id="theme-toggle" type="button" aria-label="Changer le thème">◐ Thème</button></header>
+<header class="topbar"><div><h1>Forecasts day-ahead · vue multi-pays</h1><div class="muted">Généré le __GENERATED__ · __DATES__ · __VARIANT__</div></div><button id="theme-toggle" type="button" aria-pressed="false" aria-label="Activer le mode nuit">☾ Mode nuit</button></header>
 <nav class="toolbar" aria-label="Sections"><a class="button navlink" href="#forecast">Forecasts</a><a class="button navlink" href="#overview">Synthèse</a><a class="button navlink" href="#history">Historique</a><a class="button navlink" href="#metrics">Statistics</a><a class="button navlink" href="#hourly-values">Valeurs</a><a class="button navlink" href="#provenance">Audit</a><button id="print-report" type="button">Imprimer / PDF</button></nav>
 <div class="banner safe"><strong>Rapport autonome et audité.</strong> Les archives et leurs SHA-256 ont été revérifiés avant l'export. Plotly, les forecasts et Statistics sont embarqués : aucune requête réseau à l'ouverture. Storm est uniquement un comparateur d'évaluation.</div>
 __MIXED_BANNER__
@@ -588,6 +612,7 @@ const R=JSON.parse(document.getElementById('consolidated-report-data').textConte
 const $=id=>document.getElementById(id),color=z=>COLORS[R.zones.indexOf(z)%COLORS.length],alpha=(hex,a)=>{const n=parseInt(hex.slice(1),16);return `rgba(${n>>16},${(n>>8)&255},${n&255},${a})`},finite=v=>v!==null&&v!==undefined&&Number.isFinite(Number(v));
 const fmt=(v,d=3)=>finite(v)?Number(v).toLocaleString('fr-FR',{minimumFractionDigits:d,maximumFractionDigits:d}):'N/A',pct=v=>finite(v)?`${(100*Number(v)).toLocaleString('fr-FR',{minimumFractionDigits:1,maximumFractionDigits:1})} %`:'N/A';
 const cfg={responsive:true,displaylogo:false,scrollZoom:true,toImageButtonOptions:{format:'png',scale:2},locale:'fr'};
+function setTheme(theme,persist){const t=theme==='dark'?'dark':'light',b=$('theme-toggle');document.documentElement.dataset.theme=t;b.textContent=t==='dark'?'☀ Mode clair':'☾ Mode nuit';b.setAttribute('aria-pressed',String(t==='dark'));b.setAttribute('aria-label',t==='dark'?'Activer le mode clair':'Activer le mode nuit');if(persist){try{localStorage.setItem('chronos2-report-theme',t)}catch(_e){}}}
 function layout(title,y){const dark=document.documentElement.dataset.theme==='dark';return{title:{text:title,x:.01,xanchor:'left',font:{size:15}},paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',font:{color:dark?'#e7edf6':'#0f172a'},margin:{l:62,r:25,t:48,b:55},hovermode:'x unified',dragmode:'zoom',legend:{orientation:'h',y:1.11},xaxis:{gridcolor:dark?'#2b3b52':'#e5eaf1'},yaxis:{title:y,gridcolor:dark?'#2b3b52':'#e5eaf1',zerolinecolor:dark?'#43536a':'#cbd5e1'}}}
 function option(s,v,l){const o=document.createElement('option');o.value=v;o.textContent=l;s.appendChild(o)}function td(v,c=''){const x=document.createElement('td');x.textContent=v;if(c)x.className=c;return x}function span(v){const x=document.createElement('span');x.textContent=v;return x}
 function csvCell(v){const s=v==null?'':String(v);return /[",\n]/.test(s)?`"${s.replaceAll('"','""')}"`:s}function download(name,rows,cols){const blob=new Blob(['\ufeff'+[cols.join(','),...rows.map(r=>cols.map(c=>csvCell(r[c])).join(','))].join('\n')],{type:'text/csv;charset=utf-8'}),u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),500)}
@@ -605,13 +630,14 @@ function renderHeat(){const s=$('stats-sample').value,f=$('statistics-metric-sel
 function renderTrend(){const z=$('trend-zone').value,k=$('trend-metric').value,sample=$('stats-sample').value,s=R.statistics[z],rows=s?.views?.[sample]?.periods||[],m=R.metrics.find(x=>x.key===k),x=rows.map(r=>r.period),tr=[{x,y:rows.map(r=>r[`candidate_${k}`]),name:s?.candidate_label||'Notre modèle',mode:'lines+markers',line:{color:color(z)}},{x,y:rows.map(r=>r[`benchmark_${k}`]),name:s?.benchmark_label||'Storm',mode:'lines+markers',connectgaps:false,line:{color:'#f59e0b',dash:'dot'}}],l=layout(`${z} · ${m?.label||k} ${SAMPLES[sample].toLowerCase()}`,m?.label||k);l.uirevision=`trend-${z}-${k}-${sample}`;Plotly.react('statistics-period-chart',tr,l,cfg);const body=$('statistics-period-table').tBodies[0];body.replaceChildren();rows.forEach(r=>{const row=document.createElement('tr');[r.period,String(r.n||0),fmt(r[`candidate_${k}`]),fmt(r[`benchmark_${k}`]),r[`outcome_${k}`]||'N/A'].forEach(v=>row.appendChild(td(v)));body.appendChild(row)})}
 function forecastRows(){const z=$('values-zone').value,q=$('values-search').value.trim().toLowerCase();return R.forecast.filter(r=>(z==='all'||r.zone===z)&&(!q||`${r.zone} ${r.delivery_day} ${r.local_delivery} ${r.timestamp_utc}`.toLowerCase().includes(q)))}function renderValues(){const b=$('forecast-table-body');b.replaceChildren();forecastRows().forEach(r=>{const tr=document.createElement('tr');[r.zone,r.delivery_day,r.local_delivery,r.timestamp_utc,fmt(r.P10),fmt(r.P50),fmt(r.P90)].forEach(v=>tr.appendChild(td(v)));b.appendChild(tr)})}
 function renderProvenance(){$('provenance-grid').replaceChildren();R.archives.forEach(a=>{const c=document.createElement('article');c.className='kpi';const h=document.createElement('h3');h.textContent=`${a.zone} · ${a.delivery_day}`;c.appendChild(h);const g=document.createElement('div');g.className='details-grid';[['Timezone',a.timezone],['Heures',a.hours],['Forecast SHA-256',a.forecast_sha256],['Manifest SHA-256',a.checksum_manifest_sha256],['Archive',a.archive_path]].forEach(([k,v])=>{const b=document.createElement('strong'),x=document.createElement('code');b.textContent=k;x.textContent=String(v);g.append(b,x)});c.appendChild(g);$('provenance-grid').appendChild(c)})}
-$('forecast-interval-toggle').checked=R.initial_include_intervals;$('forecast-interval-toggle').addEventListener('change',renderForecast);for(const id of ['forecast-start-date','forecast-end-date'])$(id).addEventListener('change',renderForecast);$('forecast-normalize').addEventListener('change',renderForecast);$('forecast-reset').addEventListener('click',()=>{document.querySelectorAll('#forecast-zone-select input').forEach(x=>x.checked=true);$('forecast-start-date').value=forecastDays[0];$('forecast-end-date').value=forecastDays.at(-1);$('forecast-normalize').checked=false;$('forecast-interval-toggle').checked=R.initial_include_intervals;renderForecast()});$('statistics-zone-select').addEventListener('change',()=>{setRange();renderHistory()});for(const id of ['history-mode','history-start','history-end'])$(id).addEventListener('change',renderHistory);$('history-full-range').addEventListener('click',()=>{setRange();renderHistory()});document.querySelectorAll('.history-range').forEach(button=>button.addEventListener('click',()=>{const end=new Date(`${R.statistics[$('statistics-zone-select').value].history_end.slice(0,10)}T00:00:00Z`),start=new Date(end);start.setUTCDate(end.getUTCDate()-Number(button.dataset.days)+1);$('history-start').value=start.toISOString().slice(0,10);$('history-end').value=end.toISOString().slice(0,10);renderHistory()}));for(const id of ['stats-sample','statistics-metric-select'])$(id).addEventListener('change',buildStats);for(const id of ['trend-zone','trend-metric'])$(id).addEventListener('change',renderTrend);document.querySelectorAll('#statistics-summary-table th').forEach(h=>h.addEventListener('click',()=>{const k=h.dataset.sort;if(sortKey===k)sortAsc=!sortAsc;else{sortKey=k;sortAsc=true}renderTable()}));$('values-zone').addEventListener('change',renderValues);$('values-search').addEventListener('input',renderValues);$('download-forecast').addEventListener('click',()=>download('forecasts_consolides.csv',forecastRows(),['zone','delivery_day','local_delivery','timestamp_utc','P10','P50','P90']));$('download-stats').addEventListener('click',()=>download(`statistics_${$('stats-sample').value}.csv`,statsRows,['zone','metric','label','candidate','benchmark','delta','wins','ties','losses','comparable_periods','win_rate','history_hours','status']));$('theme-toggle').addEventListener('click',()=>{document.documentElement.dataset.theme=document.documentElement.dataset.theme==='dark'?'light':'dark';renderForecast();if(AZ.length)renderHistory();renderHeat();renderTrend()});$('print-report').addEventListener('click',()=>window.print());
+$('forecast-interval-toggle').checked=R.initial_include_intervals;$('forecast-interval-toggle').addEventListener('change',renderForecast);for(const id of ['forecast-start-date','forecast-end-date'])$(id).addEventListener('change',renderForecast);$('forecast-normalize').addEventListener('change',renderForecast);$('forecast-reset').addEventListener('click',()=>{document.querySelectorAll('#forecast-zone-select input').forEach(x=>x.checked=true);$('forecast-start-date').value=forecastDays[0];$('forecast-end-date').value=forecastDays.at(-1);$('forecast-normalize').checked=false;$('forecast-interval-toggle').checked=R.initial_include_intervals;renderForecast()});$('statistics-zone-select').addEventListener('change',()=>{setRange();renderHistory()});for(const id of ['history-mode','history-start','history-end'])$(id).addEventListener('change',renderHistory);$('history-full-range').addEventListener('click',()=>{setRange();renderHistory()});document.querySelectorAll('.history-range').forEach(button=>button.addEventListener('click',()=>{const end=new Date(`${R.statistics[$('statistics-zone-select').value].history_end.slice(0,10)}T00:00:00Z`),start=new Date(end);start.setUTCDate(end.getUTCDate()-Number(button.dataset.days)+1);$('history-start').value=start.toISOString().slice(0,10);$('history-end').value=end.toISOString().slice(0,10);renderHistory()}));for(const id of ['stats-sample','statistics-metric-select'])$(id).addEventListener('change',buildStats);for(const id of ['trend-zone','trend-metric'])$(id).addEventListener('change',renderTrend);document.querySelectorAll('#statistics-summary-table th').forEach(h=>h.addEventListener('click',()=>{const k=h.dataset.sort;if(sortKey===k)sortAsc=!sortAsc;else{sortKey=k;sortAsc=true}renderTable()}));$('values-zone').addEventListener('change',renderValues);$('values-search').addEventListener('input',renderValues);$('download-forecast').addEventListener('click',()=>download('forecasts_consolides.csv',forecastRows(),['zone','delivery_day','local_delivery','timestamp_utc','P10','P50','P90']));$('download-stats').addEventListener('click',()=>download(`statistics_${$('stats-sample').value}.csv`,statsRows,['zone','metric','label','candidate','benchmark','delta','wins','ties','losses','comparable_periods','win_rate','history_hours','status']));setTheme(document.documentElement.dataset.theme,false);$('theme-toggle').addEventListener('click',()=>{setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark',true);renderForecast();if(AZ.length)renderHistory();renderHeat();renderTrend()});$('print-report').addEventListener('click',()=>window.print());
 renderKpis();renderProvenance();renderValues();renderForecast();if(AZ.length){setRange();renderHistory();buildStats()}else{$('history-note').textContent='Aucun historique Statistics disponible.'}
 })();
 </script></body></html>'''
     html = (
         template.replace("__GENERATED__", escape(generated))
         .replace("__DATES__", escape(date_map))
+        .replace("__VARIANT__", escape(variant_label))
         .replace("__MIXED_BANNER__", mixed_banner)
         .replace("__PLOTLY__", _embedded_plotly())
         .replace("__REPORT_DATA__", data)

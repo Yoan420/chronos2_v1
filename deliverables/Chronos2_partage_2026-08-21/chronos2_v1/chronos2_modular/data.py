@@ -1,0 +1,1637 @@
+from __future__ import annotations
+
+import re
+from pathlib import Path
+from typing import Any, Mapping, Sequence
+
+import numpy as np
+import pandas as pd
+
+from .common import (
+    CALENDAR_COLUMNS,
+    LOGGER,
+    SeriesSpec,
+    ZoneConfig,
+    ZoneData,
+    deep_get,
+    parse_future_lag_hours,
+    resolve_path,
+)
+from .saturn import (
+    cache_path_for_series,
+    fetch_saturn_series,
+    is_pit_spec,
+    resolve_pit_path,
+)
+
+
+PIT_DELIVERY_ALIASES = (
+    "value_time_utc",
+    "delivery_utc",
+    "delivery_timestamp",
+    "delivery_time",
+    "delivery_datetime",
+    "value_date",
+    "value_datetime",
+    "target_timestamp",
+    "target_time",
+    "timestamp",
+    "datetime",
+    "date_time",
+    "date",
+)
+
+PIT_AVAILABILITY_ALIASES = (
+    "snapshot_time_utc",
+    "availability_utc",
+    "as_of",
+    "asof",
+    "snapshot_as_of",
+    "snapshot_time",
+    "snapshot_timestamp",
+    "query_as_of",
+    "available_at",
+    "availability_timestamp",
+    "retrieved_at",
+    "ingested_at",
+)
+
+PIT_REVISION_ALIASES = (
+    "revision_time_utc",
+    "revision_utc",
+    "revision",
+    "revision_date",
+    "revision_time",
+    "revision_timestamp",
+    "revision_datetime",
+    "issue_time",
+    "issued_at",
+    "publication_time",
+    "insertion_date",
+)
+
+PIT_VALUE_ALIASES = (
+    "value",
+    "forecast",
+    "prediction",
+    "residual_load",
+    "observation",
+    "y",
+)
+
+
+def first_matching_column(
+    frame: pd.DataFrame,
+    explicit: str | None,
+    aliases: Sequence[str],
+) -> str | None:
+    if explicit:
+        if explicit not in frame.columns:
+            raise KeyError(f"Colonne absente : {explicit}")
+        return explicit
+
+    normalized = {
+        re.sub(r"[^a-z0-9]", "", str(column).lower()): str(column)
+        for column in frame.columns
+    }
+
+    for alias in aliases:
+        match = normalized.get(
+            re.sub(r"[^a-z0-9]", "", alias.lower())
+        )
+        if match is not None:
+            return match
+
+    return None
+
+
+def parse_timestamp_series(
+    values: pd.Series,
+    timezone: str,
+) -> pd.DatetimeIndex:
+    sample = values.dropna().astype(str).head(300)
+    aware = bool(
+        not sample.empty
+        and sample.str.contains(
+            r"(?:Z|[+-]\d{2}:?\d{2})$",
+            regex=True,
+        ).mean()
+        >= 0.5
+    )
+
+    if aware:
+        return pd.DatetimeIndex(
+            pd.to_datetime(values, errors="coerce", utc=True)
+        ).tz_convert(timezone)
+
+    parsed = pd.DatetimeIndex(
+        pd.to_datetime(values, errors="coerce")
+    )
+
+    if parsed.tz is not None:
+        return parsed.tz_convert(timezone)
+
+    try:
+        return parsed.tz_localize(
+            timezone,
+            ambiguous="infer",
+            nonexistent="shift_forward",
+        )
+    except Exception:
+        return parsed.tz_localize(
+            timezone,
+            ambiguous="NaT",
+            nonexistent="shift_forward",
+        )
+
+
+def read_series_file(
+    path: Path,
+    spec: SeriesSpec,
+    timezone: str,
+) -> pd.Series:
+    if path.suffix.lower() in {".parquet", ".pq"}:
+        frame = pd.read_parquet(path)
+    else:
+        frame = pd.read_csv(path, low_memory=False)
+
+    if not isinstance(frame.index, pd.RangeIndex):
+        frame = frame.reset_index()
+
+    timestamp_col = first_matching_column(
+        frame,
+        spec.timestamp_col,
+        (
+            "timestamp",
+            "datetime",
+            "date_time",
+            "date",
+            "time",
+            "index",
+            "unnamed: 0",
+        ),
+    )
+    if timestamp_col is None:
+        raise KeyError(
+            f"{path}: colonne temporelle non identifiée."
+        )
+
+    value_col = first_matching_column(
+        frame,
+        spec.value_col,
+        (
+            spec.alias,
+            "value",
+            "price",
+            "target",
+            "observation",
+            "actual",
+        ),
+    )
+
+    if value_col is None:
+        numeric = [
+            str(column)
+            for column in frame.columns
+            if column != timestamp_col
+            and pd.to_numeric(
+                frame[column],
+                errors="coerce",
+            ).notna().mean()
+            > 0.8
+        ]
+        if len(numeric) == 1:
+            value_col = numeric[0]
+
+    if value_col is None:
+        raise KeyError(
+            f"{path}: colonne de valeur non identifiée."
+        )
+
+    index = parse_timestamp_series(
+        frame[timestamp_col],
+        timezone,
+    )
+    values = pd.to_numeric(
+        frame[value_col],
+        errors="coerce",
+    ).to_numpy()
+
+    series = pd.Series(
+        values,
+        index=index,
+        name=spec.alias,
+    )
+    series = series.loc[
+        ~series.index.isna()
+    ].sort_index()
+
+    if series.index.duplicated().any():
+        series = series.groupby(level=0).mean()
+
+    return series
+
+
+def _parse_utc(values: pd.Series) -> pd.Series:
+    """
+    Les timestamps naïfs des fichiers PIT sont supposés être en UTC.
+    """
+    return pd.to_datetime(
+        values,
+        errors="coerce",
+        utc=True,
+    )
+
+
+def _origin_clock(
+    config: Mapping[str, Any],
+) -> tuple[int, int]:
+    raw = str(
+        deep_get(
+            config,
+            "data.forecast_origin_local_time",
+            "08:00",
+        )
+    )
+    match = re.fullmatch(r"(\d{1,2}):(\d{2})", raw.strip())
+    if not match:
+        raise ValueError(
+            "data.forecast_origin_local_time doit être au format HH:MM."
+        )
+
+    hour = int(match.group(1))
+    minute = int(match.group(2))
+
+    if not 0 <= hour <= 23 or not 0 <= minute <= 59:
+        raise ValueError(
+            "data.forecast_origin_local_time est invalide."
+        )
+
+    return hour, minute
+
+
+def resolve_runtime_as_of(
+    zone: ZoneConfig,
+    config: Mapping[str, Any],
+) -> pd.Timestamp:
+    raw = deep_get(config, "data.runtime_as_of")
+    if raw in (None, ""):
+        return pd.Timestamp.now(tz=zone.timezone)
+
+    timestamp = pd.Timestamp(raw)
+    if timestamp.tzinfo is None:
+        timestamp = timestamp.tz_localize("UTC")
+    return timestamp.tz_convert(zone.timezone)
+
+
+def resolve_live_target_cutoff(
+    zone: ZoneConfig,
+    config: Mapping[str, Any],
+) -> pd.Timestamp | None:
+    """
+    Retourne la dernière heure de prix déjà connue à utiliser comme contexte
+    pour le forecast opérationnel.
+
+    Avec target_end_policy=current_day_end, un run effectué le jour J utilise
+    la cible jusqu'à J 23:00, puis Chronos prévoit J+1 00:00 à 23:00.
+    """
+    policy = str(
+        deep_get(
+            config,
+            "data.target_end_policy",
+            "current_day_end",
+        )
+    ).strip().lower()
+
+    if policy in {"none", "disabled", "full_series"}:
+        return None
+
+    if policy == "configured":
+        configured_end = deep_get(config, "data.end")
+        if not configured_end:
+            raise ValueError(
+                "data.target_end_policy=configured exige data.end."
+            )
+        cutoff = pd.Timestamp(configured_end)
+        return (
+            cutoff.tz_localize(zone.timezone)
+            if cutoff.tzinfo is None
+            else cutoff.tz_convert(zone.timezone)
+        )
+
+    if policy == "now":
+        frequency = str(deep_get(config, "data.frequency", "h"))
+        return resolve_runtime_as_of(zone, config).floor(frequency)
+
+    if policy != "current_day_end":
+        raise ValueError(
+            "data.target_end_policy inconnu : "
+            f"{policy}. Valeurs admises : current_day_end, now, "
+            "configured, full_series."
+        )
+
+    frequency = str(deep_get(config, "data.frequency", "h"))
+    offset = pd.tseries.frequencies.to_offset(frequency)
+    today_start = resolve_runtime_as_of(zone, config).normalize()
+    next_midnight = today_start + pd.DateOffset(days=1)
+    return next_midnight - offset
+
+
+def _clip_target_to_operational_cutoff(
+    series: pd.Series,
+    zone: ZoneConfig,
+    spec: SeriesSpec,
+    config: Mapping[str, Any],
+    *,
+    require_complete: bool,
+) -> pd.Series:
+    if spec.alias != "target":
+        return series
+
+    cutoff = resolve_live_target_cutoff(zone, config)
+    if cutoff is None:
+        return series
+
+    resolution = str(
+        deep_get(config, "data.target_input_resolution", "hourly")
+    ).strip().lower()
+    if resolution not in {"hourly", "quarter_hour", "auto"}:
+        raise ValueError(
+            "data.target_input_resolution doit être hourly, quarter_hour "
+            "ou auto."
+        )
+    is_quarter_hour = resolution == "quarter_hour" or (
+        resolution == "auto"
+        and isinstance(series.index, pd.DatetimeIndex)
+        and bool((series.index.minute != 0).any())
+    )
+    source_cutoff = (
+        cutoff + pd.Timedelta(minutes=45)
+        if is_quarter_hour
+        else cutoff
+    )
+
+    clipped = series.loc[series.index <= source_cutoff]
+
+    if clipped.empty:
+        raise ValueError(
+            f"{zone.zone}: aucune valeur cible avant le cutoff {source_cutoff}."
+        )
+
+    last_timestamp = clipped.index.max()
+    if require_complete and last_timestamp < source_cutoff:
+        raise ValueError(
+            f"{zone.zone}: la cible s'arrête à {last_timestamp}, "
+            f"mais le forecast J+1 exige les prix connus jusqu'à "
+            f"{source_cutoff}. "
+            "Relance avec --refresh-data et vérifie que la série Day-Ahead "
+            "contient bien toutes les heures de J."
+        )
+
+    return clipped
+
+
+def read_pit_vintage_series(
+    path: Path,
+    spec: SeriesSpec,
+    timezone: str,
+    config: Mapping[str, Any],
+) -> tuple[pd.Series, dict[str, Any]]:
+    """
+    Matérialise une série point-in-time pour un run day-ahead à J-1 HH:MM.
+
+    Pour chaque timestamp de livraison D, la valeur retenue est issue du
+    dernier snapshot disponible avant D-1 à forecast_origin_local_time.
+    """
+    revision_policy = str(
+        deep_get(
+            config,
+            "data.revision_policy",
+            "latest_before_asof",
+        )
+    ).lower()
+    if revision_policy != "latest_before_asof":
+        raise ValueError(
+            "Seule data.revision_policy=latest_before_asof est "
+            f"supportée, reçu : {revision_policy}."
+        )
+
+    if not path.exists():
+        raise FileNotFoundError(
+            f"Fichier PIT introuvable : {path}"
+        )
+
+    frame = pd.read_parquet(path)
+
+    if not isinstance(frame.index, pd.RangeIndex):
+        frame = frame.reset_index()
+
+    delivery_col = first_matching_column(
+        frame,
+        spec.timestamp_col,
+        PIT_DELIVERY_ALIASES,
+    )
+    if delivery_col is None:
+        raise KeyError(
+            f"{path.name}: colonne de livraison introuvable. "
+            f"Colonnes : {list(frame.columns)}"
+        )
+
+    availability_col = first_matching_column(
+        frame,
+        spec.availability_col,
+        PIT_AVAILABILITY_ALIASES,
+    )
+    revision_col = first_matching_column(
+        frame,
+        spec.revision_col,
+        PIT_REVISION_ALIASES,
+    )
+
+    if availability_col is None and revision_col is None:
+        raise KeyError(
+            f"{path.name}: aucune colonne as-of/révision identifiée. "
+            f"Colonnes : {list(frame.columns)}"
+        )
+
+    excluded = {
+        column
+        for column in (
+            delivery_col,
+            availability_col,
+            revision_col,
+        )
+        if column is not None
+    }
+
+    value_col = first_matching_column(
+        frame,
+        spec.value_col,
+        (spec.alias, *PIT_VALUE_ALIASES),
+    )
+
+    if value_col is None:
+        numeric_candidates = [
+            str(column)
+            for column in frame.columns
+            if column not in excluded
+            and pd.to_numeric(
+                frame[column],
+                errors="coerce",
+            ).notna().mean()
+            > 0.8
+        ]
+
+        if len(numeric_candidates) == 1:
+            value_col = numeric_candidates[0]
+
+    if value_col is None:
+        raise KeyError(
+            f"{path.name}: colonne de valeur introuvable. "
+            f"Colonnes : {list(frame.columns)}"
+        )
+
+    normalized = pd.DataFrame(
+        {
+            "value_time_utc": _parse_utc(frame[delivery_col]),
+            "value": pd.to_numeric(
+                frame[value_col],
+                errors="coerce",
+            ),
+        }
+    )
+
+    if availability_col is not None:
+        normalized["snapshot_time_utc"] = _parse_utc(
+            frame[availability_col]
+        )
+    else:
+        normalized["snapshot_time_utc"] = _parse_utc(
+            frame[revision_col]
+        )
+
+    if revision_col is not None:
+        normalized["revision_time_utc"] = _parse_utc(
+            frame[revision_col]
+        )
+    else:
+        normalized["revision_time_utc"] = normalized[
+            "snapshot_time_utc"
+        ]
+
+    normalized = normalized.dropna(
+        subset=[
+            "value_time_utc",
+            "snapshot_time_utc",
+            "revision_time_utc",
+        ]
+    )
+
+    delivery_local = normalized[
+        "value_time_utc"
+    ].dt.tz_convert(timezone)
+
+    hour, minute = _origin_clock(config)
+
+    cutoff_local = (
+        delivery_local.dt.normalize()
+        - pd.Timedelta(days=1)
+        + pd.Timedelta(hours=hour, minutes=minute)
+    )
+    normalized["cutoff_utc"] = cutoff_local.dt.tz_convert(
+        "UTC"
+    )
+    runtime_raw = deep_get(config, "data.runtime_as_of")
+    runtime_as_of_utc = (
+        pd.Timestamp.now(tz="UTC")
+        if runtime_raw in (None, "")
+        else pd.Timestamp(runtime_raw)
+    )
+    if runtime_as_of_utc.tzinfo is None:
+        runtime_as_of_utc = runtime_as_of_utc.tz_localize("UTC")
+    else:
+        runtime_as_of_utc = runtime_as_of_utc.tz_convert("UTC")
+    # A live run before its nominal auction-origin clock must not see a
+    # snapshot that will only be published later that same morning.  For old
+    # backtest rows the delivery-specific D-1 cutoff remains the tighter one.
+    normalized["cutoff_utc"] = normalized["cutoff_utc"].where(
+        normalized["cutoff_utc"] <= runtime_as_of_utc,
+        runtime_as_of_utc,
+    )
+
+    eligible = normalized.loc[
+        (
+            normalized["snapshot_time_utc"]
+            <= normalized["cutoff_utc"]
+        )
+        & (
+            normalized["revision_time_utc"]
+            <= normalized["cutoff_utc"]
+        )
+    ].copy()
+
+    selected = (
+        eligible.sort_values(
+            [
+                "value_time_utc",
+                "snapshot_time_utc",
+                "revision_time_utc",
+            ]
+        )
+        .drop_duplicates(
+            subset=["value_time_utc"],
+            keep="last",
+        )
+    )
+
+    snapshot_cutoff_violations = int(
+        (
+            selected["snapshot_time_utc"]
+            > selected["cutoff_utc"]
+        ).sum()
+    )
+    revision_cutoff_violations = int(
+        (
+            selected["revision_time_utc"]
+            > selected["cutoff_utc"]
+        ).sum()
+    )
+    cutoff_violations = (
+        snapshot_cutoff_violations
+        + revision_cutoff_violations
+    )
+    if cutoff_violations:
+        raise AssertionError(
+            f"{spec.alias}: {cutoff_violations} révisions postérieures "
+            "au cutoff point-in-time ont été sélectionnées."
+        )
+
+    index = pd.DatetimeIndex(
+        selected["value_time_utc"]
+    ).tz_convert(timezone)
+
+    series = pd.Series(
+        selected["value"].to_numpy(dtype=float),
+        index=index,
+        name=spec.alias,
+    ).sort_index()
+
+    if series.index.duplicated().any():
+        series = series.groupby(level=0).last()
+
+    metadata = {
+        "source": "pit_parquet",
+        "input": str(path),
+        "delivery_column": delivery_col,
+        "availability_column": availability_col,
+        "revision_column": revision_col,
+        "value_column": value_col,
+        "forecast_origin_local_time": (
+            f"{hour:02d}:{minute:02d}"
+        ),
+        "runtime_as_of_utc": str(runtime_as_of_utc),
+        "raw_rows": int(len(frame)),
+        "eligible_rows": int(len(eligible)),
+        "selected_rows": int(len(selected)),
+        "selected_null_values": int(selected["value"].isna().sum()),
+        "cutoff_violations": cutoff_violations,
+        "snapshot_cutoff_violations": snapshot_cutoff_violations,
+        "revision_cutoff_violations": revision_cutoff_violations,
+        "first_selected_revision": (
+            str(selected["revision_time_utc"].min())
+            if not selected.empty
+            else None
+        ),
+        "last_selected_revision": (
+            str(selected["revision_time_utc"].max())
+            if not selected.empty
+            else None
+        ),
+        "materialized_values": int(series.notna().sum()),
+        "first_delivery": (
+            str(series.index.min()) if not series.empty else None
+        ),
+        "last_delivery": (
+            str(series.index.max()) if not series.empty else None
+        ),
+    }
+
+    LOGGER.info(
+        "[PIT] %s | fichier=%s | valeurs=%s | livraison=%s -> %s",
+        spec.alias,
+        path.name,
+        metadata["materialized_values"],
+        metadata["first_delivery"],
+        metadata["last_delivery"],
+    )
+
+    return series, metadata
+
+
+def load_input_series(
+    zone: ZoneConfig,
+    spec: SeriesSpec,
+    config: Mapping[str, Any],
+    config_dir: Path,
+    refresh: bool,
+) -> tuple[pd.Series, dict[str, Any]]:
+    if (
+        spec.alias == "target"
+        and spec.incomplete_dst_policy != "raise"
+    ):
+        raise ValueError(
+            f"{zone.zone}/target: incomplete_dst_policy=duplicate est "
+            "interdit pour la cible."
+        )
+
+    project_root = resolve_path(
+        deep_get(
+            config,
+            "data.project_root",
+            ".",
+        ),
+        config_dir,
+    )
+    cache_root = resolve_path(
+        deep_get(
+            config,
+            "data.cache_dir",
+            "data/chronos2_modular",
+        ),
+        project_root,
+    )
+    cache_path = cache_path_for_series(
+        cache_root,
+        zone.zone,
+        spec,
+    )
+
+    source = (
+        spec.source
+        if spec.source != "auto"
+        else str(
+            deep_get(
+                config,
+                "data.source",
+                "auto",
+            )
+        ).lower()
+    )
+
+    if spec.file:
+        file_path = resolve_path(
+            spec.file,
+            config_dir,
+        )
+        series = read_series_file(
+            file_path,
+            spec,
+            zone.timezone,
+        )
+        series = _clip_target_to_operational_cutoff(
+            series,
+            zone,
+            spec,
+            config,
+            require_complete=bool(
+                deep_get(
+                    config,
+                    "data.require_complete_target_day",
+                    True,
+                )
+            ),
+        )
+        return series.rename(spec.alias), {
+            "source": "file",
+            "input": str(file_path),
+            "target_cutoff": (
+                str(resolve_live_target_cutoff(zone, config))
+                if spec.alias == "target"
+                else None
+            ),
+        }
+
+    if is_pit_spec(spec, config):
+        pit_path = resolve_pit_path(
+            spec,
+            config,
+            config_dir,
+        )
+        series, metadata = read_pit_vintage_series(
+            pit_path,
+            spec,
+            zone.timezone,
+            config,
+        )
+        return series.rename(spec.alias), metadata
+
+    cache_is_usable = False
+    cached_series: pd.Series | None = None
+
+    if (
+        source in {"auto", "cache"}
+        and cache_path.exists()
+        and not refresh
+    ):
+        cache_spec = SeriesSpec(
+            alias=spec.alias,
+            timestamp_col="timestamp",
+            value_col="value",
+        )
+        cached_series = read_series_file(
+            cache_path,
+            cache_spec,
+            zone.timezone,
+        )
+
+        if spec.alias == "target":
+            cutoff = resolve_live_target_cutoff(zone, config)
+            cached_series = _clip_target_to_operational_cutoff(
+                cached_series,
+                zone,
+                spec,
+                config,
+                require_complete=False,
+            )
+            input_resolution = str(
+                deep_get(
+                    config,
+                    "data.target_input_resolution",
+                    "hourly",
+                )
+            ).strip().lower()
+            cached_is_qh = input_resolution == "quarter_hour" or (
+                input_resolution == "auto"
+                and bool((cached_series.index.minute != 0).any())
+            )
+            expected_cache_end = (
+                cutoff + pd.Timedelta(minutes=45)
+                if cutoff is not None and cached_is_qh
+                else cutoff
+            )
+            cache_is_usable = bool(
+                expected_cache_end is None
+                or (
+                    not cached_series.empty
+                    and cached_series.index.max() >= expected_cache_end
+                )
+            )
+
+            if not cache_is_usable:
+                LOGGER.info(
+                    "[%s] Cache cible incomplet jusqu'à %s ; "
+                    "actualisation Saturn automatique.",
+                    zone.zone,
+                    cutoff,
+                )
+        else:
+            cache_is_usable = True
+
+        if cache_is_usable:
+            return cached_series.rename(spec.alias), {
+                "source": "cache",
+                "input": str(cache_path),
+                "target_cutoff": (
+                    str(resolve_live_target_cutoff(zone, config))
+                    if spec.alias == "target"
+                    else None
+                ),
+            }
+
+    if source == "cache":
+        if cache_path.exists():
+            raise ValueError(
+                f"Cache cible incomplet pour le forecast J+1 : {cache_path}"
+            )
+        raise FileNotFoundError(
+            f"Cache absent : {cache_path}"
+        )
+
+    if not spec.series:
+        raise ValueError(
+            f"{zone.zone}/{spec.alias}: série Saturn absente."
+        )
+
+    historical_years = int(
+        deep_get(
+            config,
+            "data.historical_years",
+            4,
+        )
+    )
+    now = resolve_runtime_as_of(zone, config)
+
+    start_raw = deep_get(config, "data.start")
+    end_raw = deep_get(config, "data.end")
+
+    start = (
+        pd.Timestamp(start_raw)
+        if start_raw
+        else now - pd.DateOffset(years=historical_years)
+    )
+
+    target_cutoff = (
+        resolve_live_target_cutoff(zone, config)
+        if spec.alias == "target"
+        else None
+    )
+
+    if spec.alias == "target" and target_cutoff is not None:
+        # On demande explicitement tous les prix déjà connus de J,
+        # même s'ils sont postérieurs à l'heure d'exécution.
+        input_resolution = str(
+            deep_get(
+                config,
+                "data.target_input_resolution",
+                "hourly",
+            )
+        ).strip().lower()
+        end = (
+            target_cutoff + pd.Timedelta(minutes=45)
+            if input_resolution in {"quarter_hour", "auto"}
+            else target_cutoff
+        )
+    else:
+        end = (
+            pd.Timestamp(end_raw)
+            if end_raw
+            else now.ceil(
+                str(deep_get(config, "data.frequency", "h"))
+            )
+        )
+
+    start = (
+        start.tz_localize(zone.timezone)
+        if start.tzinfo is None
+        else start.tz_convert(zone.timezone)
+    )
+    end = (
+        end.tz_localize(zone.timezone)
+        if end.tzinfo is None
+        else end.tz_convert(zone.timezone)
+    )
+
+    series = fetch_saturn_series(
+        spec.series,
+        start,
+        end,
+        zone.timezone,
+        str(
+            deep_get(
+                config,
+                "data.saturn_url",
+                "",
+            )
+        ),
+        str(
+            deep_get(
+                config,
+                "data.saturn_author",
+                "",
+            )
+        ),
+        revision_date=(
+            pd.Timestamp(
+                deep_get(config, "data.runtime_as_of")
+            )
+            if deep_get(config, "data.runtime_as_of")
+            else None
+        ),
+        naive_timezone=spec.naive_timezone,
+        incomplete_dst_policy=spec.incomplete_dst_policy,
+    ).rename(spec.alias)
+
+    series = _clip_target_to_operational_cutoff(
+        series,
+        zone,
+        spec,
+        config,
+        require_complete=bool(
+            deep_get(
+                config,
+                "data.require_complete_target_day",
+                True,
+            )
+        ),
+    )
+
+    cache_path.parent.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+    (
+        series.rename("value")
+        .to_frame()
+        .reset_index(names="timestamp")
+        .to_csv(
+            cache_path,
+            index=False,
+            compression="gzip",
+        )
+    )
+
+    return series, {
+        "source": "saturn",
+        "input": spec.series,
+        "cache": str(cache_path),
+        "target_cutoff": (
+            str(resolve_live_target_cutoff(zone, config))
+            if spec.alias == "target"
+            else None
+        ),
+    }
+
+
+def infer_frequency(
+    index: pd.DatetimeIndex,
+    configured: str | None,
+) -> str:
+    if configured:
+        return pd.tseries.frequencies.to_offset(
+            configured
+        ).freqstr
+
+    inferred = pd.infer_freq(index)
+    if inferred:
+        return pd.tseries.frequencies.to_offset(
+            inferred
+        ).freqstr
+
+    deltas = index.to_series().diff().dropna()
+    deltas = deltas[deltas > pd.Timedelta(0)]
+
+    if deltas.empty:
+        raise ValueError(
+            "Fréquence impossible à inférer."
+        )
+
+    mode = deltas.mode()
+    delta = (
+        mode.iloc[0]
+        if not mode.empty
+        else deltas.median()
+    )
+    return pd.tseries.frequencies.to_offset(
+        delta
+    ).freqstr
+
+
+def regularize_target(
+    raw: pd.Series,
+    timezone: str,
+    frequency: str | None,
+    interpolation_limit: int,
+) -> tuple[pd.Series, str, dict[str, Any]]:
+    series = pd.to_numeric(
+        raw,
+        errors="coerce",
+    ).sort_index()
+    series = series.loc[
+        ~series.index.isna()
+    ]
+
+    duplicates = int(
+        series.index.duplicated(
+            keep=False
+        ).sum()
+    )
+    if duplicates:
+        series = series.groupby(level=0).mean()
+
+    first = series.first_valid_index()
+    last = series.last_valid_index()
+
+    if first is None or last is None:
+        raise ValueError(
+            "La cible ne contient aucune valeur numérique."
+        )
+
+    series = series.loc[first:last]
+    freq = infer_frequency(
+        series.index,
+        frequency,
+    )
+
+    full_index = pd.date_range(
+        series.index.min().tz_convert("UTC"),
+        series.index.max().tz_convert("UTC"),
+        freq=freq,
+        tz="UTC",
+    ).tz_convert(timezone)
+    series = series.reindex(full_index)
+
+    missing_before = int(
+        series.isna().sum()
+    )
+
+    if interpolation_limit > 0:
+        series = series.interpolate(
+            method="time",
+            limit=interpolation_limit,
+            limit_area="inside",
+        )
+
+    missing_after = int(
+        series.isna().sum()
+    )
+
+    if missing_after:
+        missing_timestamps = [
+            str(value)
+            for value in series[
+                series.isna()
+            ].index[:20]
+        ]
+        raise ValueError(
+            f"La cible contient encore {missing_after} "
+            f"valeurs manquantes. Exemples : "
+            f"{missing_timestamps}"
+        )
+
+    series = series.astype(np.float32)
+    series.name = "target"
+
+    return series, freq, {
+        "duplicates_aggregated": duplicates,
+        "missing_before_interpolation": missing_before,
+        "missing_after_interpolation": missing_after,
+    }
+
+
+def align_covariate(
+    raw: pd.Series,
+    target_index: pd.DatetimeIndex,
+    spec: SeriesSpec,
+) -> tuple[pd.Series, dict[str, Any]]:
+    series = pd.to_numeric(
+        raw,
+        errors="coerce",
+    ).sort_index()
+
+    if series.index.duplicated().any():
+        series = series.groupby(level=0).mean()
+
+    aligned = series.reindex(target_index)
+    exact_coverage = float(
+        aligned.notna().mean()
+    )
+
+    if (
+        spec.fill_method == "ffill"
+        and spec.fill_limit > 0
+    ):
+        aligned = aligned.ffill(
+            limit=spec.fill_limit
+        )
+    elif spec.fill_method == "zero":
+        aligned = aligned.fillna(0.0)
+    elif spec.fill_method not in {
+        "none",
+        "ffill",
+    }:
+        raise ValueError(
+            f"{spec.alias}: fill_method inconnu : "
+            f"{spec.fill_method}"
+        )
+
+    coverage = float(
+        aligned.notna().mean()
+    )
+
+    return aligned.astype(np.float32), {
+        "coverage_exact": exact_coverage,
+        "coverage_after_fill": coverage,
+        "missing_after_fill": int(
+            aligned.isna().sum()
+        ),
+    }
+
+
+def calendar_frame(
+    index: pd.DatetimeIndex,
+) -> pd.DataFrame:
+    hour = index.hour.to_numpy(
+        dtype=np.float64
+    )
+    dow = index.dayofweek.to_numpy(
+        dtype=np.float64
+    )
+    doy = index.dayofyear.to_numpy(
+        dtype=np.float64
+    )
+
+    return pd.DataFrame(
+        {
+            "known_hour_sin": np.sin(
+                2 * np.pi * hour / 24
+            ),
+            "known_hour_cos": np.cos(
+                2 * np.pi * hour / 24
+            ),
+            "known_dow_sin": np.sin(
+                2 * np.pi * dow / 7
+            ),
+            "known_dow_cos": np.cos(
+                2 * np.pi * dow / 7
+            ),
+            "known_doy_sin": np.sin(
+                2 * np.pi * doy / 365.25
+            ),
+            "known_doy_cos": np.cos(
+                2 * np.pi * doy / 365.25
+            ),
+            "known_is_weekend": (
+                dow >= 5
+            ).astype(np.float32),
+        },
+        index=index,
+        dtype=np.float32,
+    )
+
+
+def prepare_zone_data(
+    zone: ZoneConfig,
+    config: Mapping[str, Any],
+    config_dir: Path,
+    refresh: bool,
+    output_dir: Path,
+) -> ZoneData:
+    target_raw, target_meta = load_input_series(
+        zone,
+        zone.target,
+        config,
+        config_dir,
+        refresh,
+    )
+
+    from chronos2_hourly.hourly_contract import coerce_hourly_target
+
+    target_raw = coerce_hourly_target(
+        target_raw,
+        input_resolution=str(
+            deep_get(
+                config,
+                "data.target_input_resolution",
+                "hourly",
+            )
+        ).strip().lower(),
+        incomplete=str(
+            deep_get(
+                config,
+                "data.quarter_hour_incomplete",
+                "raise",
+            )
+        ).strip().lower(),
+        name="target",
+    ).tz_convert(zone.timezone)
+
+    target, frequency, cleaning = regularize_target(
+        target_raw,
+        zone.timezone,
+        deep_get(
+            config,
+            "data.frequency",
+            "h",
+        ),
+        int(
+            deep_get(
+                config,
+                "data.target_interpolation_limit",
+                3,
+            )
+        ),
+    )
+
+    target_cutoff = resolve_live_target_cutoff(zone, config)
+    if target_cutoff is not None:
+        target = target.loc[target.index <= target_cutoff]
+        if target.empty or target.index.max() != target_cutoff:
+            raise ValueError(
+                f"{zone.zone}: dernière heure cible={target.index.max() if not target.empty else None}; "
+                f"heure attendue={target_cutoff}. Impossible de produire "
+                "J+1 00:00–23:00 sans les prix de J jusqu'à 23:00."
+            )
+
+    offset = pd.tseries.frequencies.to_offset(
+        frequency
+    )
+    if bool(
+        deep_get(
+            config,
+            "data.dynamic_delivery_day_horizon",
+            False,
+        )
+    ):
+        if offset != pd.tseries.frequencies.to_offset("h"):
+            raise ValueError(
+                "data.dynamic_delivery_day_horizon exige une cible "
+                "strictement horaire."
+            )
+        from chronos2_hourly.hourly_contract import (
+            local_delivery_day_index,
+        )
+
+        next_delivery_date = (
+            target.index[-1] + offset
+        ).tz_convert(zone.timezone).date()
+        live_future_index = local_delivery_day_index(
+            next_delivery_date,
+            timezone=zone.timezone,
+        ).tz_convert(zone.timezone)
+    else:
+        horizon = int(
+            deep_get(
+                config,
+                "model.horizon",
+                24,
+            )
+        )
+        live_future_index = pd.date_range(
+            start=target.index[-1] + offset,
+            periods=horizon,
+            freq=frequency,
+            tz=zone.timezone,
+        )
+    if target_cutoff is not None:
+        LOGGER.info(
+            "[%s] Contexte live fixé à %s ; forecast attendu du %s au %s "
+            "(%d heures).",
+            zone.zone,
+            target_cutoff,
+            live_future_index[0],
+            live_future_index[-1],
+            len(live_future_index),
+        )
+    model_index = target.index.union(
+        live_future_index
+    ).sort_values()
+
+    covariates = pd.DataFrame(
+        index=target.index
+    )
+    model_base_covariates = pd.DataFrame(
+        index=model_index
+    )
+
+    coverage_rows: list[dict[str, Any]] = []
+    manifest_rows: list[dict[str, Any]] = [
+        {
+            "alias": "target",
+            "role": "target",
+            "series": (
+                zone.target.series
+                or zone.target.file
+            ),
+            "description": zone.target.description,
+            "future_strategies": "",
+            "known_future": False,
+            "source": target_meta.get("source"),
+        }
+    ]
+
+    diagnostics: dict[str, Any] = {
+        "target": {
+            **target_meta,
+            **cleaning,
+        },
+        "covariates": {},
+    }
+    usable_specs: dict[str, SeriesSpec] = {}
+
+    for alias, spec in zone.covariates.items():
+        try:
+            raw, metadata = load_input_series(
+                zone,
+                spec,
+                config,
+                config_dir,
+                refresh,
+            )
+
+            aligned_history, stats = align_covariate(
+                raw,
+                target.index,
+                spec,
+            )
+
+            if (
+                stats["coverage_after_fill"]
+                < spec.minimum_coverage
+            ):
+                message = (
+                    f"[{zone.zone}] {alias}: couverture "
+                    f"{100 * stats['coverage_after_fill']:.1f}% < "
+                    f"{100 * spec.minimum_coverage:.1f}%."
+                )
+                if bool(
+                    deep_get(
+                        config,
+                        "data.fail_below_minimum_coverage",
+                        deep_get(
+                            config,
+                            "data.require_all_covariates",
+                            False,
+                        ),
+                    )
+                ):
+                    raise ValueError(message)
+                LOGGER.warning("%s Covariable ignorée.", message)
+                continue
+
+            aligned_model, model_stats = align_covariate(
+                raw,
+                model_index,
+                spec,
+            )
+
+            covariates[alias] = aligned_history
+            model_base_covariates[
+                alias
+            ] = aligned_model
+
+            usable_specs[alias] = spec
+            diagnostics["covariates"][alias] = {
+                **metadata,
+                **stats,
+                "model_missing_after_fill": (
+                    model_stats[
+                        "missing_after_fill"
+                    ]
+                ),
+            }
+
+            coverage_rows.append(
+                {
+                    "zone": zone.zone,
+                    "alias": alias,
+                    "series": (
+                        spec.series or spec.file
+                    ),
+                    **stats,
+                }
+            )
+
+            manifest_rows.append(
+                {
+                    "alias": alias,
+                    "role": (
+                        "known_future_covariate"
+                        if spec.known_future
+                        else "past_covariate"
+                    ),
+                    "series": (
+                        spec.series
+                        or spec.file
+                        or spec.pit_file
+                    ),
+                    "description": spec.description,
+                    "future_strategies": (
+                        ", ".join(
+                            spec.future_strategies
+                        )
+                        or "past-only"
+                    ),
+                    "known_future": spec.known_future,
+                    "source": metadata.get(
+                        "source"
+                    ),
+                }
+            )
+
+        except Exception as exc:
+            LOGGER.exception(
+                "[%s] Échec de la covariable %s : %s",
+                zone.zone,
+                alias,
+                exc,
+            )
+            if bool(
+                deep_get(
+                    config,
+                    "data.require_all_covariates",
+                    False,
+                )
+            ):
+                raise
+
+    base_context_columns = [
+        alias
+        for alias, spec in usable_specs.items()
+        if spec.include_base_context
+    ]
+    model_covariates = model_base_covariates[
+        base_context_columns
+    ].copy()
+    known_future_columns: list[str] = []
+
+    if zone.include_calendar:
+        model_covariates = pd.concat(
+            [
+                model_covariates,
+                calendar_frame(model_index),
+            ],
+            axis=1,
+        )
+        known_future_columns.extend(
+            CALENDAR_COLUMNS
+        )
+
+    for alias, spec in usable_specs.items():
+        base = model_base_covariates[alias]
+
+        for strategy in spec.future_strategies:
+            lag_hours = parse_future_lag_hours(strategy)
+            if lag_hours is not None:
+                name = f"known_{alias}_lag{lag_hours}"
+                model_covariates[name] = base.shift(
+                    lag_hours
+                )
+
+            elif strategy == "persistence":
+                name = (
+                    f"known_{alias}_persistence"
+                )
+                model_covariates[name] = (
+                    base.shift(1).ffill()
+                )
+
+            elif strategy == "oracle":
+                if not spec.known_future:
+                    raise ValueError(
+                        f"{alias}: oracle interdit sans "
+                        "future.known_future: true."
+                    )
+
+                name = f"known_{alias}_oracle"
+                model_covariates[name] = base
+
+            else:
+                continue
+
+            known_future_columns.append(name)
+
+    model_covariates = model_covariates.astype(
+        np.float32
+    )
+
+    future_coverage_rows = []
+
+    for column in known_future_columns:
+        future_values = model_covariates.loc[
+            live_future_index,
+            column,
+        ]
+        future_coverage_rows.append(
+            {
+                "zone": zone.zone,
+                "column": column,
+                "future_non_missing": int(
+                    future_values.notna().sum()
+                ),
+                "future_expected": int(
+                    len(live_future_index)
+                ),
+                "future_coverage": float(
+                    future_values.notna().mean()
+                ),
+            }
+        )
+
+    future_coverage = pd.DataFrame(
+        future_coverage_rows
+    )
+
+    if (
+        not future_coverage.empty
+        and bool(
+            deep_get(
+                config,
+                "data.require_complete_future_covariates",
+                deep_get(
+                    config,
+                    "data.require_all_covariates",
+                    False,
+                ),
+            )
+        )
+    ):
+        minimum_future_coverage = float(
+            deep_get(
+                config,
+                "data.minimum_future_coverage",
+                1.0,
+            )
+        )
+        incomplete = future_coverage.loc[
+            future_coverage["future_coverage"]
+            < minimum_future_coverage
+        ]
+        if not incomplete.empty:
+            details = ", ".join(
+                f"{row.column}={100 * row.future_coverage:.1f}%"
+                for row in incomplete.itertuples()
+            )
+            raise ValueError(
+                "Couverture future insuffisante pour le forecast live "
+                f"(minimum={100 * minimum_future_coverage:.1f}%): "
+                f"{details}."
+            )
+
+    coverage = pd.DataFrame(
+        coverage_rows
+    )
+    manifest = pd.DataFrame(
+        manifest_rows
+    )
+
+    output_dir.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+    coverage.to_csv(
+        output_dir / "input_coverage.csv",
+        index=False,
+    )
+    manifest.to_csv(
+        output_dir / "input_manifest.csv",
+        index=False,
+    )
+    future_coverage.to_csv(
+        output_dir / "future_input_coverage.csv",
+        index=False,
+    )
+
+    pd.concat(
+        [
+            target.rename("target"),
+            covariates,
+        ],
+        axis=1,
+    ).reset_index(
+        names="timestamp"
+    ).to_csv(
+        output_dir / "aligned_inputs.csv.gz",
+        index=False,
+        compression="gzip",
+    )
+
+    model_covariates.reset_index(
+        names="timestamp"
+    ).to_csv(
+        output_dir / "model_covariates_with_future.csv.gz",
+        index=False,
+        compression="gzip",
+    )
+
+    return ZoneData(
+        zone=zone.zone,
+        timezone=zone.timezone,
+        frequency=frequency,
+        target=target,
+        covariates=covariates,
+        model_context_covariates=model_covariates,
+        known_future_columns=known_future_columns,
+        coverage=coverage,
+        input_manifest=manifest,
+        diagnostics=diagnostics,
+    )

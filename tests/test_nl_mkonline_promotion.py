@@ -155,7 +155,7 @@ def test_nl_live_contract_promotes_primary_and_uses_versioned_output_root() -> N
     assert contract.paths.sealed_benchmark_run == BENCHMARK.resolve()
 
 
-def test_nl_d12_migration_replay_leaves_exact_bounded_suffix() -> None:
+def test_nl_migration_replays_cover_the_initial_suffix() -> None:
     forecasts, audits = discover_archived_forecasts(
         live_output_root=NEW_ROOT,
         replay_output_root=NEW_ROOT / "_replays",
@@ -198,7 +198,7 @@ def test_nl_d12_migration_replay_leaves_exact_bounded_suffix() -> None:
         target_series="power.price.da.nl.bzn.hourly.entsoe.utc.cdh.eurmwh",
         prediction_mode="mkonline_blend",
     )
-    assert missing == [date(2026, 8, 13), date(2026, 8, 14), date(2026, 8, 15)]
+    assert missing == []
 
 
 def test_nl_autonomous_benchmark_and_replay_remain_immutable() -> None:

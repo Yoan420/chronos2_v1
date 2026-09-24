@@ -39,6 +39,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--local-files-only", action="store_true")
     parser.add_argument("--pit-replay", action="store_true")
     parser.add_argument(
+        "--residual-load-source",
+        choices=("saturn", "chronos2"),
+        default="saturn",
+    )
+    parser.add_argument("--residual-load-bundle-manifest", default=None)
+    parser.add_argument(
         "--no-rolling365-capture",
         action="store_true",
         help=(
@@ -47,11 +53,29 @@ def parse_args() -> argparse.Namespace:
             "officiel puis alimente runs/rolling365_shadow."
         ),
     )
-    return parser.parse_args()
+    args = parser.parse_args()
+    if (
+        args.residual_load_source == "chronos2"
+        and not args.residual_load_bundle_manifest
+    ):
+        parser.error(
+            "--residual-load-bundle-manifest est obligatoire avec "
+            "--residual-load-source chronos2"
+        )
+    return args
 
 
 def main() -> int:
     args = parse_args()
+    residual_load_bundle_manifest = getattr(
+        args,
+        "residual_load_bundle_manifest",
+        None,
+    )
+    if residual_load_bundle_manifest is not None:
+        residual_load_bundle_manifest = str(
+            Path(residual_load_bundle_manifest).expanduser().resolve()
+        )
     registry, registry_dir = load_zone_registry(args.registry)
     audit = audit_zone_live_bundle(
         registry,
@@ -76,11 +100,17 @@ def main() -> int:
         workers=args.workers,
         local_files_only=args.local_files_only,
         pit_replay=args.pit_replay,
+        residual_load_source=getattr(args, "residual_load_source", "saturn"),
+        residual_load_bundle_manifest=residual_load_bundle_manifest,
     )
     runner = Path(command[1]).resolve()
     if runner.name == "run_mkonline_live_model.py":
         command.extend(["--registry", str(Path(args.registry).expanduser().resolve())])
-    if not args.no_rolling365_capture and not args.pit_replay:
+    if (
+        not args.no_rolling365_capture
+        and not args.pit_replay
+        and getattr(args, "residual_load_source", "saturn") == "saturn"
+    ):
         command.extend(
             [
                 "--rolling365-capture-root",

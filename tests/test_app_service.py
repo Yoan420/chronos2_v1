@@ -17,11 +17,13 @@ from chronos2_hourly.app_service import (
     ExistingForecastArchiveError,
     ForecastProcess,
     ForecastSkip,
+    PerformanceArtifact,
     StatisticsDataset,
     ZoneStatus,
     build_dispatch_command,
     build_statistics_view,
     list_run_artifacts,
+    load_best_statistics_history,
     load_forecast_curve,
     load_statistics_history,
     validate_existing_forecast_archive,
@@ -49,18 +51,28 @@ def _write_existing_live_archive(
     tmp_path: Path,
     *,
     day: str = "2026-08-15",
+    zone: str = "DE",
+    timezone_name: str = "Europe/Berlin",
 ) -> tuple[ZoneStatus, Path]:
-    config = tmp_path / "de_live.yaml"
+    code = zone.upper()
+    zone_lower = code.lower()
+    config = tmp_path / f"{zone_lower}_live.yaml"
     config.write_text(
         "live:\n"
-        "  output_root: runs/live/de\n"
-        "  forecast_filename: forecast_hourly_de.csv\n",
+        f"  output_root: runs/live/{zone_lower}\n"
+        f"  forecast_filename: forecast_hourly_{zone_lower}.csv\n",
         encoding="utf-8",
     )
-    archive = tmp_path / "runs" / "live" / "de" / f"de_day_ahead_{day}"
+    archive = (
+        tmp_path
+        / "runs"
+        / "live"
+        / zone_lower
+        / f"{zone_lower}_day_ahead_{day}"
+    )
     archive.mkdir(parents=True)
     delivery = pd.date_range(
-        pd.Timestamp(day, tz="Europe/Berlin"),
+        pd.Timestamp(day, tz=timezone_name),
         periods=24,
         freq="h",
     ).tz_convert("UTC")
@@ -71,14 +83,14 @@ def _write_existing_live_archive(
             "q50": np.arange(24, dtype=float) + 1.0,
             "q90": np.arange(24, dtype=float) + 2.0,
         }
-    ).to_csv(archive / "forecast_hourly_de.csv", index=False)
+    ).to_csv(archive / f"forecast_hourly_{zone_lower}.csv", index=False)
     (archive / "run_manifest.json").write_text(
         json.dumps(
             {
                 "run_type": "live_day_ahead",
                 "forecast_status": "issued_live",
-                "zone": "DE",
-                "timezone": "Europe/Berlin",
+                "zone": code,
+                "timezone": timezone_name,
                 "delivery_day_local": day,
                 "sha256_manifest": "artifact_checksums.json",
             }
@@ -90,10 +102,10 @@ def _write_existing_live_archive(
             {
                 "status": "complete",
                 "run_type": "live_day_ahead",
-                "zone": "DE",
+                "zone": code,
                 "delivery_day_local": day,
                 "hours": 24,
-                "forecast_path": "forecast_hourly_de.csv",
+                "forecast_path": f"forecast_hourly_{zone_lower}.csv",
             }
         ),
         encoding="utf-8",
@@ -120,8 +132,8 @@ def _write_existing_live_archive(
         encoding="utf-8",
     )
     status = ZoneStatus(
-        code="DE",
-        timezone="Europe/Berlin",
+        code=code,
+        timezone=timezone_name,
         enabled=True,
         production_ready=True,
         ready=True,
@@ -131,6 +143,104 @@ def _write_existing_live_archive(
         blockers=(),
     )
     return status, archive
+
+
+def _reseal_archive(archive: Path) -> None:
+    artifacts = []
+    for path in sorted(
+        item
+        for item in archive.rglob("*")
+        if item.is_file() and item.name != "artifact_checksums.json"
+    ):
+        artifacts.append(
+            {
+                "path": path.relative_to(archive).as_posix(),
+                "role": "run_artifact",
+                "size_bytes": path.stat().st_size,
+                "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+            }
+        )
+    (archive / "artifact_checksums.json").write_text(
+        json.dumps(
+            {
+                "algorithm": "sha256",
+                "output_directory": str(archive.resolve()),
+                "artifacts": artifacts,
+            }
+        ),
+        encoding="utf-8",
+    )
+
+
+def _convert_archive_to_replay(archive: Path) -> Path:
+    replay = archive.parent / "_replays" / archive.name
+    replay.parent.mkdir(parents=True, exist_ok=True)
+    archive.rename(replay)
+    manifest_path = replay / "run_manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["run_type"] = "pit_replay"
+    manifest["forecast_status"] = "pit_reconstruction"
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    summary_path = replay / "live_run_summary.json"
+    summary = json.loads(summary_path.read_text(encoding="utf-8"))
+    summary["run_type"] = "pit_replay"
+    summary_path.write_text(json.dumps(summary), encoding="utf-8")
+    _reseal_archive(replay)
+    return replay
+
+
+def _add_statistics_history(
+    archive: Path,
+    *,
+    timezone_name: str,
+    history_end_local: str,
+    include_prefix: bool = True,
+    include_storm: bool = True,
+    internal_sha: str | None = None,
+) -> None:
+    timeline = pd.date_range(
+        pd.Timestamp(history_end_local, tz=timezone_name),
+        periods=24,
+        freq="h",
+    ).tz_convert("UTC")
+    statistics = pd.DataFrame(
+        {
+            "delivery_start_utc": timeline,
+            "actual": np.linspace(50.0, 73.0, len(timeline)),
+            "residual_corrected__q50": np.linspace(51.0, 74.0, len(timeline)),
+        }
+    )
+    if include_storm:
+        statistics["storm_dashboard_official__q50"] = np.linspace(
+            52.0,
+            75.0,
+            len(timeline),
+        )
+    statistics_path = archive / "statistics_history_hourly.csv.gz"
+    statistics.to_csv(statistics_path, index=False, compression="gzip")
+    delivery_day = archive.name.rsplit("_", 1)[-1]
+    audit = {
+        "status": "complete",
+        "statistics_history_path": statistics_path.name,
+        "statistics_history_sha256": internal_sha
+        or hashlib.sha256(statistics_path.read_bytes()).hexdigest(),
+        "statistics_audit_path": "statistics_history_audit.json",
+        "current_delivery_day_local": delivery_day,
+        "n_total_statistics_hours": len(statistics),
+        "statistics_complete": True,
+        "missing_realized_days": [],
+    }
+    if include_prefix:
+        audit["statistics_prefix_end_local"] = history_end_local
+    if include_storm:
+        audit["storm_primary_report_benchmark"] = (
+            "storm_dashboard_official__q50"
+        )
+    (archive / "statistics_history_audit.json").write_text(
+        json.dumps(audit),
+        encoding="utf-8",
+    )
+    _reseal_archive(archive)
 
 
 def test_dispatch_command_is_an_argv_list_and_refuses_unready_zone(
@@ -167,6 +277,42 @@ def test_dispatch_command_is_an_argv_list_and_refuses_unready_zone(
             registry_path=registry,
             python_executable=executable,
         )
+
+
+def test_dispatch_command_adds_only_the_opt_in_chronos2_bundle_flags(
+    tmp_path: Path,
+) -> None:
+    (tmp_path / "run_mkonline_live_zone.py").write_text("pass\n", encoding="utf-8")
+    registry = tmp_path / "zones.yaml"
+    registry.write_text("schema_version: 1\nzones: {}\n", encoding="utf-8")
+    executable = tmp_path / "python.exe"
+    executable.write_bytes(b"")
+    bundle = tmp_path / "runs" / "experiments" / "bundle" / "manifest.json"
+
+    production = build_dispatch_command(
+        _status(),
+        project_root=tmp_path,
+        registry_path=registry,
+        python_executable=executable,
+        local_files_only=True,
+    )
+    challenger = build_dispatch_command(
+        _status(),
+        project_root=tmp_path,
+        registry_path=registry,
+        python_executable=executable,
+        local_files_only=True,
+        residual_load_source="chronos2",
+        residual_load_bundle_manifest=bundle,
+    )
+
+    assert "--residual-load-source" not in production
+    assert challenger[-4:] == [
+        "--residual-load-source",
+        "chronos2",
+        "--residual-load-bundle-manifest",
+        str(bundle.resolve()),
+    ]
 
 
 def test_start_process_forces_shell_false_and_redirects_to_project_log(
@@ -315,6 +461,290 @@ def test_existing_complete_archive_is_verified_and_skipped_without_process(
     starter.assert_not_called()
 
 
+def test_chronos2_launch_rejects_missing_upstream_before_process_start(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    status = _status()
+    registry = tmp_path / "registry.yaml"
+    registry.write_text("schema_version: 1\nzones: {}\n", encoding="utf-8")
+    (tmp_path / "live.yaml").write_text(
+        "live:\n"
+        "  output_root: runs/live/de\n"
+        "  forecast_filename: forecast_hourly_de.csv\n",
+        encoding="utf-8",
+    )
+    starter = Mock(side_effect=AssertionError("subprocess interdit"))
+    monkeypatch.setattr(
+        app_service,
+        "inspect_zone_statuses",
+        lambda *_args, **_kwargs: [status],
+    )
+    monkeypatch.setattr(app_service, "start_dispatch_process", starter)
+
+    missing = tmp_path / "runs" / "experiments" / "missing_manifest.json"
+    with pytest.raises(FileNotFoundError, match="doit exister avant le lancement"):
+        app_service.launch_zone_forecast(
+            zone="DE",
+            project_root=tmp_path,
+            registry_path=registry,
+            log_dir=tmp_path / "logs",
+            delivery_day="2026-08-15",
+            residual_load_source="chronos2",
+            residual_load_bundle_manifest=missing,
+        )
+
+    starter.assert_not_called()
+
+
+def test_shadow_archive_is_autonomous_after_upstream_manifest_removal(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from chronos2_hourly import chronos_residual_load as residual_provider
+
+    status, production_archive = _write_existing_live_archive(tmp_path)
+    shadow = (
+        production_archive.parent
+        / "_challengers"
+        / "residual_load_chronos2"
+        / (production_archive.name + "_residual_load_chronos2")
+    )
+    shadow.parent.mkdir(parents=True)
+    production_archive.rename(shadow)
+    bundle = tmp_path / "runs" / "experiments" / "upstream" / "manifest.json"
+    bundle.parent.mkdir(parents=True)
+    inputs = shadow / "inputs"
+    overlay_root = inputs / "residual_load_pit_overlay"
+    overlay_root.mkdir(parents=True)
+    archived_bundle_root = inputs / "residual_load_bundle"
+    archived_bundle_root.mkdir()
+    composite_manifest = overlay_root / "composite_manifest.json"
+    composite_manifest.write_text("{}\n", encoding="utf-8")
+    composite_sha = hashlib.sha256(composite_manifest.read_bytes()).hexdigest()
+    validated_files: dict[str, dict[str, object]] = {}
+    provenance_files: dict[str, dict[str, object]] = {}
+    upstream_declarations: list[dict[str, object]] = []
+    for alias in residual_provider.EXPECTED_ALIASES:
+        artifact = overlay_root / f"{alias}.parquet"
+        artifact.write_bytes(alias.encode("utf-8"))
+        artifact_sha = hashlib.sha256(artifact.read_bytes()).hexdigest()
+        validated_files[alias] = {
+            "path": artifact.resolve(),
+            "sha256": artifact_sha,
+            "historical_rows": 100,
+            "delivery_day_rows": 24,
+        }
+        provenance_files[alias] = {
+            "path": artifact.relative_to(inputs).as_posix(),
+            "sha256": artifact_sha,
+            "historical_rows": 100,
+            "delivery_day_rows": 24,
+        }
+        upstream_artifact = archived_bundle_root / f"{alias}.parquet"
+        upstream_artifact.write_bytes(f"upstream-{alias}".encode("utf-8"))
+        upstream_sha = hashlib.sha256(upstream_artifact.read_bytes()).hexdigest()
+        upstream_declarations.append(
+            {
+                "alias": alias,
+                "path": upstream_artifact.name,
+                "sha256": upstream_sha,
+            }
+        )
+        provenance_files[alias].update(
+            {
+                "upstream_forecast_path": str(
+                    (bundle.parent / upstream_artifact.name).resolve()
+                ),
+                "upstream_forecast_sha256": upstream_sha,
+                "archived_upstream_forecast_path": (
+                    f"residual_load_bundle/{upstream_artifact.name}"
+                ),
+            }
+        )
+    bundle_payload = {
+        "provider": "chronos2",
+        "runtime_cutoff_utc": None,
+        "model_id": None,
+        "model_revision": None,
+        "artifacts": upstream_declarations,
+    }
+    bundle.write_text(json.dumps(bundle_payload) + "\n", encoding="utf-8")
+    archived_bundle = archived_bundle_root / "manifest.json"
+    archived_bundle.write_bytes(bundle.read_bytes())
+    bundle_sha = hashlib.sha256(bundle.read_bytes()).hexdigest()
+
+    def fake_validate_overlay(
+        archive_inputs_dir,
+        *,
+        upstream_manifest_path,
+        upstream_origin_manifest_path,
+        expected_delivery_day,
+        expected_runtime_cutoff,
+    ):
+        assert Path(archive_inputs_dir).resolve() == inputs.resolve()
+        assert Path(upstream_manifest_path).resolve() == archived_bundle.resolve()
+        assert Path(upstream_origin_manifest_path).resolve() == bundle.resolve()
+        assert expected_delivery_day == "2026-08-15"
+        assert pd.Timestamp(expected_runtime_cutoff) == pd.Timestamp(
+            "2026-08-14T06:00:00Z"
+        )
+        return {
+            "manifest_path": composite_manifest.resolve(),
+            "manifest_sha256": composite_sha,
+            "files": validated_files,
+        }
+
+    monkeypatch.setattr(
+        residual_provider,
+        "validate_archived_residual_load_overlay",
+        fake_validate_overlay,
+    )
+
+    manifest_path = shadow / "run_manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest.update(
+        {
+            "run_type": "shadow_live_day_ahead",
+            "forecast_status": "shadow_challenger",
+            "residual_load_source": "chronos2",
+            "production_eligible": False,
+            "residual_load_bundle_manifest_path": (
+                "inputs/residual_load_bundle/manifest.json"
+            ),
+            "residual_load_bundle_origin_manifest_path": str(bundle.resolve()),
+            "residual_load_bundle_manifest_sha256": bundle_sha,
+            "forecast_cutoff_utc": "2026-08-14T06:00:00Z",
+            "input_diagnostics": {
+                "residual_load_provider": {
+                    "provider": "chronos2",
+                    "target_source_kind": "observed_entsoe",
+                    "saturn_forecast_series_used": False,
+                    "historical_context_source": "production_pit_unchanged",
+                    "delivery_day_values_source": "chronos2",
+                    "manifest_path": str(bundle.resolve()),
+                    "manifest_sha256": bundle_sha,
+                    "archived_manifest_path": (
+                        "residual_load_bundle/manifest.json"
+                    ),
+                    "archived_manifest_sha256": bundle_sha,
+                    "composite_path_base": "runtime_inputs_directory",
+                    "composite_manifest_path": composite_manifest.relative_to(
+                        inputs
+                    ).as_posix(),
+                    "composite_manifest_sha256": composite_sha,
+                    "delivery_day_local": "2026-08-15",
+                    "runtime_cutoff_utc": None,
+                    "model_id": None,
+                    "model_revision": None,
+                    "files": provenance_files,
+                }
+            },
+        }
+    )
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    summary_path = shadow / "live_run_summary.json"
+    summary = json.loads(summary_path.read_text(encoding="utf-8"))
+    summary.update(
+        {
+            "run_type": "shadow_live_day_ahead",
+            "forecast_status": "shadow_challenger",
+            "residual_load_source": "chronos2",
+            "production_eligible": False,
+        }
+    )
+    summary_path.write_text(json.dumps(summary), encoding="utf-8")
+    _reseal_archive(shadow)
+
+    assert shadow.parent == (
+        tmp_path
+        / "runs"
+        / "live"
+        / "de"
+        / "_challengers"
+        / "residual_load_chronos2"
+    ).resolve()
+    assert production_archive.parent == (
+        tmp_path / "runs" / "live" / "de"
+    ).resolve()
+
+    assert (
+        validate_existing_forecast_archive(
+            status,
+            project_root=tmp_path,
+            delivery_day="2026-08-15",
+        )
+        is None
+    )
+    assert validate_existing_forecast_archive(
+        status,
+        project_root=tmp_path,
+        delivery_day="2026-08-15",
+        residual_load_source="chronos2",
+        residual_load_bundle_manifest=bundle,
+    ) == shadow.resolve()
+
+    bundle.unlink()
+    assert validate_existing_forecast_archive(
+        status,
+        project_root=tmp_path,
+        delivery_day="2026-08-15",
+        residual_load_source="chronos2",
+    ) == shadow.resolve()
+
+    starter = Mock(side_effect=AssertionError("subprocess interdit pour un skip"))
+    monkeypatch.setattr(
+        app_service,
+        "inspect_zone_statuses",
+        lambda *_args, **_kwargs: [status],
+    )
+    monkeypatch.setattr(app_service, "start_dispatch_process", starter)
+    reused = app_service.launch_zone_forecast(
+        zone="DE",
+        project_root=tmp_path,
+        registry_path=tmp_path / "unused-registry.yaml",
+        log_dir=tmp_path / "logs",
+        delivery_day="2026-08-15",
+        residual_load_source="chronos2",
+    )
+    assert isinstance(reused, ForecastSkip)
+    assert reused.archive_path == shadow.resolve()
+    starter.assert_not_called()
+
+    archived_bundle.write_text('{"provider":"tampered"}\n', encoding="utf-8")
+    with pytest.raises(ExistingForecastArchiveError, match="archive divergent"):
+        validate_existing_forecast_archive(
+            status,
+            project_root=tmp_path,
+            delivery_day="2026-08-15",
+            residual_load_source="chronos2",
+        )
+
+
+def test_shadow_validator_rejects_a_challenger_junction_escape(
+    tmp_path: Path,
+) -> None:
+    status, production_archive = _write_existing_live_archive(tmp_path)
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    junction = production_archive.parent / "_challengers"
+    try:
+        junction.symlink_to(outside, target_is_directory=True)
+    except OSError as exc:
+        pytest.skip(f"Liens de dossier indisponibles: {exc}")
+
+    with pytest.raises(
+        ExistingForecastArchiveError,
+        match="racine challenger hors output_root",
+    ):
+        validate_existing_forecast_archive(
+            status,
+            project_root=tmp_path,
+            delivery_day="2026-08-15",
+            residual_load_source="chronos2",
+        )
+
+
 @pytest.mark.parametrize("corruption", ("incomplete", "tampered"))
 def test_existing_invalid_archive_is_an_explicit_blocker(
     tmp_path: Path,
@@ -449,6 +879,39 @@ def test_artifact_listing_finds_reports_and_statistics(tmp_path: Path) -> None:
     assert artifacts[0].statistics_path == run / "statistics_history_hourly.csv.gz"
 
 
+def test_artifact_listing_labels_residual_load_shadow_as_prospective(
+    tmp_path: Path,
+) -> None:
+    run = (
+        tmp_path
+        / "de"
+        / "_challengers"
+        / "residual_load_chronos2"
+        / "de_day_ahead_2026-08-25_residual_load_chronos2"
+    )
+    run.mkdir(parents=True)
+    (run / "live_run_summary.json").write_text(
+        json.dumps(
+            {
+                "zone": "DE",
+                "forecast_status": "shadow_challenger",
+                "production_eligible": False,
+            }
+        ),
+        encoding="utf-8",
+    )
+    (run / "forecast_hourly_de.csv").write_text(
+        "delivery_start_utc,q50\n2026-08-24T22:00:00Z,50\n",
+        encoding="utf-8",
+    )
+
+    artifacts = list_run_artifacts(tmp_path, zones=("DE",))
+
+    assert len(artifacts) == 1
+    assert artifacts[0].kind == "challenger prospectif"
+    assert artifacts[0].directory == run
+
+
 def test_artifact_listing_exposes_explicit_sealed_benchmark(tmp_path: Path) -> None:
     live_root = tmp_path / "live"
     live_root.mkdir()
@@ -536,6 +999,105 @@ def test_statistics_load_requires_official_storm_audit_and_computes_all_win_rate
     assert len(view.time_series) == 48
 
 
+def test_best_statistics_history_prefers_freshest_scored_replay(
+    tmp_path: Path,
+) -> None:
+    status, live_archive = _write_existing_live_archive(
+        tmp_path,
+        day="2026-08-20",
+    )
+    _add_statistics_history(
+        live_archive,
+        timezone_name=status.timezone,
+        history_end_local="2026-08-15",
+    )
+    _same_status, replay_source = _write_existing_live_archive(
+        tmp_path,
+        day="2026-08-19",
+    )
+    replay_archive = _convert_archive_to_replay(replay_source)
+    _add_statistics_history(
+        replay_archive,
+        timezone_name=status.timezone,
+        history_end_local="2026-08-18",
+    )
+
+    artifact, dataset = load_best_statistics_history(
+        status,
+        project_root=tmp_path,
+    )
+
+    assert isinstance(artifact, PerformanceArtifact)
+    assert artifact.archive_kind == "pit_replay"
+    assert artifact.delivery_day == "2026-08-19"
+    assert artifact.archive_path == replay_archive.resolve()
+    assert artifact.statistics_prefix_end_local == "2026-08-18"
+    assert artifact.n_total_statistics_hours == 24
+    assert dataset.benchmark_column == "storm_dashboard_official__q50"
+
+
+def test_best_statistics_history_uses_timestamp_fallback_and_allows_es_without_storm(
+    tmp_path: Path,
+) -> None:
+    status, archive = _write_existing_live_archive(
+        tmp_path,
+        day="2026-08-19",
+        zone="ES",
+        timezone_name="Europe/Madrid",
+    )
+    _add_statistics_history(
+        archive,
+        timezone_name=status.timezone,
+        history_end_local="2026-08-18",
+        include_prefix=False,
+        include_storm=False,
+    )
+
+    artifact, dataset = load_best_statistics_history(
+        status,
+        project_root=tmp_path,
+        variant="autonomous",
+    )
+
+    assert artifact.zone == "ES"
+    assert artifact.statistics_prefix_end_local == "2026-08-18"
+    assert dataset.candidate_column == "residual_corrected__q50"
+    assert dataset.benchmark_column is None
+    assert dataset.benchmark_label is None
+    assert dataset.frame["benchmark"].isna().all()
+
+
+def test_best_statistics_history_rejects_fresher_bad_internal_checksum(
+    tmp_path: Path,
+) -> None:
+    status, live_archive = _write_existing_live_archive(
+        tmp_path,
+        day="2026-08-20",
+    )
+    _add_statistics_history(
+        live_archive,
+        timezone_name=status.timezone,
+        history_end_local="2026-08-15",
+    )
+    _same_status, replay_source = _write_existing_live_archive(
+        tmp_path,
+        day="2026-08-19",
+    )
+    replay_archive = _convert_archive_to_replay(replay_source)
+    _add_statistics_history(
+        replay_archive,
+        timezone_name=status.timezone,
+        history_end_local="2026-08-18",
+        internal_sha="0" * 64,
+    )
+
+    with pytest.raises(
+        ExistingForecastArchiveError,
+        match="statistics_history_sha256 divergent",
+    ):
+        load_best_statistics_history(status, project_root=tmp_path)
+
+
 def test_mape_uses_absolute_actual_and_excludes_only_near_zero_values() -> None:
     timestamps = pd.date_range("2026-08-01", periods=3, freq="h", tz="UTC")
     dataset = StatisticsDataset(
@@ -594,6 +1156,48 @@ def test_forecast_curve_is_causal_ordered_and_renders_p10_p90_band(
     crossed.to_csv(path, index=False)
     with pytest.raises(ValueError, match="quantiles croisés"):
         load_forecast_curve(path, timezone_name="Europe/Berlin")
+
+
+def test_forecast_curve_switches_between_autonomous_and_mkonline_without_mutation(
+    tmp_path: Path,
+) -> None:
+    delivery = pd.date_range("2026-08-20", periods=24, freq="h", tz="UTC")
+    path = tmp_path / "forecast_hourly_fr.csv"
+    frame = pd.DataFrame(
+        {
+            "delivery_start_utc": delivery,
+            "forecast_origin_utc": delivery - pd.Timedelta(days=1),
+            "q10": np.full(24, 90.0),
+            "q50": np.full(24, 100.0),
+            "q90": np.full(24, 110.0),
+            "residual_corrected__q10": np.full(24, 40.0),
+            "residual_corrected__q50": np.full(24, 50.0),
+            "residual_corrected__q90": np.full(24, 60.0),
+            "mkonline_blend__q10": np.full(24, 90.0),
+            "mkonline_blend__q50": np.full(24, 100.0),
+            "mkonline_blend__q90": np.full(24, 110.0),
+        }
+    )
+    frame.to_csv(path, index=False)
+    before = path.read_bytes()
+
+    autonomous = load_forecast_curve(
+        path,
+        timezone_name="Europe/Paris",
+        variant="autonomous",
+    )
+    blend = load_forecast_curve(
+        path,
+        timezone_name="Europe/Paris",
+        variant="mkonline_blend",
+    )
+
+    assert autonomous.frame["P50"].tolist() == [50.0] * 24
+    assert blend.frame["P50"].tolist() == [100.0] * 24
+    assert path.read_bytes() == before
+
+    with pytest.raises(ValueError, match="variant"):
+        load_forecast_curve(path, timezone_name="Europe/Paris", variant="Storm")
 
 
 def test_statistics_view_rejects_unknown_sample() -> None:

@@ -46,6 +46,9 @@ def load_model(
             or deep_get(config, "model.local_files_only", False)
         ),
     }
+    revision = str(deep_get(config, "model.revision", "") or "").strip()
+    if revision:
+        kwargs["revision"] = revision
     attn = str(deep_get(config, "model.attn_implementation", "auto"))
     if attn != "auto":
         kwargs["attn_implementation"] = attn
@@ -205,7 +208,20 @@ def future_proxy_frame(
             )
             frame[column] = value
         elif strategy == "oracle":
-            frame[column] = series.reindex(future_index).to_numpy()
+            # ``prepare_zone_data`` deliberately keeps ``data.covariates``
+            # on the observed target history only.  The explicitly declared
+            # known-future values live in ``model_context_covariates`` and are
+            # already point-in-time materialized there.  Read only the named
+            # oracle column and only on the requested future index; lag and
+            # persistence strategies keep their history-only construction
+            # above so this cannot turn an ordinary covariate into an oracle.
+            model_context = data.model_context_covariates
+            if column in model_context.columns:
+                frame[column] = model_context[column].reindex(
+                    future_index
+                ).to_numpy()
+            else:
+                frame[column] = series.reindex(future_index).to_numpy()
     for column in data.known_future_columns:
         if column not in frame.columns:
             frame[column] = np.nan

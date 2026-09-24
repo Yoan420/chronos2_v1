@@ -187,7 +187,9 @@ def test_writes_separate_strict_history_with_scopes_and_provenance(
     }
     monkeypatch.setattr(live_history, "_load_storm_evaluation_only", _fake_storm)
     realized_index = local_delivery_day_index(
-        date(2026, 1, 2), timezone="Europe/Paris"
+        date(2026, 1, 1), timezone="Europe/Paris"
+    ).append(
+        local_delivery_day_index(date(2026, 1, 2), timezone="Europe/Paris")
     ).append(
         local_delivery_day_index(date(2026, 1, 3), timezone="Europe/Paris")
     )
@@ -233,6 +235,138 @@ def test_writes_separate_strict_history_with_scopes_and_provenance(
     assert replay["actual"].notna().all() and live["actual"].notna().all()
     assert replay["storm_evaluation_only__q50"].eq(55.0).all()
     assert live["storm_evaluation_only__q50"].eq(55.0).all()
+
+
+def test_latest_actuals_refresh_sealed_history_and_include_complete_current_day(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    sealed = tmp_path / "sealed"
+    live_root = tmp_path / "live"
+    replay_root = tmp_path / "replays"
+    staging = tmp_path / "staging"
+    _write_sealed_run(sealed, date(2026, 1, 1))
+    _write_forecast_run(
+        live_root / "fr_day_ahead_2026-01-02",
+        date(2026, 1, 2),
+        run_type="live_day_ahead",
+    )
+    replay_root.mkdir()
+    monkeypatch.setattr(live_history, "_load_storm_evaluation_only", _fake_storm)
+    expected = local_delivery_day_index(
+        date(2026, 1, 1), timezone="Europe/Paris"
+    ).append(
+        local_delivery_day_index(date(2026, 1, 2), timezone="Europe/Paris")
+    )
+    latest_actual = pd.Series(
+        np.arange(len(expected), dtype=float) + 900.0,
+        index=expected,
+    )
+
+    audit = live_history.update_live_statistics_history(
+        staging_run_dir=staging,
+        sealed_benchmark_run=sealed,
+        live_output_root=live_root,
+        replay_output_root=replay_root,
+        current_delivery_day=date(2026, 1, 2),
+        statistics_through_day=date(2026, 1, 2),
+        canonical_target=latest_actual,
+        canonical_target_source={
+            "kind": "saturn_target_latest_extraction",
+            "extracted_at_utc": "2026-01-01T12:30:00+00:00",
+            "last_available_observation_utc": str(expected[-1]),
+            "used_for_prediction": False,
+        },
+        storm_pit_path=tmp_path / "storm.parquet",
+    )
+
+    history = pd.read_csv(staging / live_history.STATISTICS_HISTORY_NAME)
+    np.testing.assert_allclose(history["actual"], latest_actual.to_numpy())
+    assert audit["statistics_prefix_end_local"] == "2026-01-02"
+    assert audit["evaluated_realized_days"] == ["2026-01-02"]
+    assert audit["canonical_actuals"]["refresh_mode"] == (
+        "full_history_latest_snapshot"
+    )
+    assert audit["canonical_actuals"]["source"]["used_for_prediction"] is False
+
+
+@pytest.mark.parametrize(
+    ("delivery_day", "expected_hours"),
+    [
+        (date(2026, 3, 29), 23),
+        (date(2026, 10, 25), 25),
+    ],
+)
+def test_current_delivery_is_kept_as_empty_actual_placeholder_across_dst(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    delivery_day: date,
+    expected_hours: int,
+) -> None:
+    previous_day = delivery_day - pd.Timedelta(days=1)
+    sealed = tmp_path / "sealed"
+    live_root = tmp_path / "live"
+    replay_root = tmp_path / "replays"
+    staging = tmp_path / "staging"
+    _write_sealed_run(sealed, previous_day)
+    _write_forecast_run(
+        live_root / f"fr_day_ahead_{delivery_day.isoformat()}",
+        delivery_day,
+        run_type="live_day_ahead",
+    )
+    replay_root.mkdir()
+    monkeypatch.setattr(live_history, "_load_storm_evaluation_only", _fake_storm)
+    previous_index = local_delivery_day_index(
+        previous_day, timezone="Europe/Paris"
+    )
+    actual = pd.Series(75.0, index=previous_index)
+    current_index = local_delivery_day_index(
+        delivery_day, timezone="Europe/Paris"
+    )
+    storm_dashboard = pd.Series(
+        80.0,
+        index=previous_index.append(current_index),
+    )
+
+    audit = live_history.update_live_statistics_history(
+        staging_run_dir=staging,
+        sealed_benchmark_run=sealed,
+        live_output_root=live_root,
+        replay_output_root=replay_root,
+        current_delivery_day=delivery_day,
+        statistics_through_day=delivery_day,
+        canonical_target=actual,
+        canonical_target_source={
+            "kind": "saturn_target_latest_extraction",
+            "extracted_at_utc": "2026-01-01T12:30:00+00:00",
+            "used_for_prediction": False,
+        },
+        storm_pit_path=tmp_path / "storm.parquet",
+        storm_dashboard_native=storm_dashboard,
+        allow_current_day_placeholder=True,
+    )
+
+    history = pd.read_csv(staging / live_history.STATISTICS_HISTORY_NAME)
+    delivery = pd.to_datetime(history["delivery_start_utc"], utc=True)
+    current = history.loc[
+        delivery.dt.tz_convert("Europe/Paris").dt.date == delivery_day
+    ]
+    assert len(current) == expected_hours
+    assert current["actual"].isna().all()
+    assert current["mkonline_blend__q50"].notna().all()
+    assert audit["statistics_prefix_end_local"] == delivery_day.isoformat()
+    assert audit["statistics_complete"] is True
+    assert audit["canonical_actuals_complete"] is False
+    assert audit["current_delivery_actual_placeholder"] is True
+    assert audit["canonical_actuals"]["status"] == "current_delivery_pending"
+    assert audit["canonical_actuals"]["missing_hours"] == expected_hours
+    assert audit["canonical_actuals"]["latest_complete_day_local"] == (
+        previous_day.isoformat()
+    )
+    assert audit["storm_dashboard"]["actual_missing_hours"] == expected_hours
+    assert audit["storm_dashboard"]["allowed_missing_actual_hours"] == (
+        expected_hours
+    )
 
 
 def test_strict_contiguity_requires_every_post_benchmark_day(

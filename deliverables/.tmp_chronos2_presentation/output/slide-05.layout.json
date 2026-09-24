@@ -1,0 +1,2855 @@
+{
+  "schema": "openai.presentation.layout/v4",
+  "unit": "px",
+  "slide": {
+    "aid": "sl/9sbxwl",
+    "id": "9sbxwl",
+    "slide": 5,
+    "layoutId": "361c6468-63aa-4667-a7e8-8e66124bf345",
+    "layoutName": "Title Slide",
+    "layoutType": "title",
+    "masterLayoutId": "b1459424-789e-43a4-aa63-c2dbccf14f3a",
+    "masterLayoutName": "Master",
+    "backgroundColor": "#FFFFFF",
+    "frame": {
+      "left": 0,
+      "top": 0,
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "theme": {
+    "colorSchemeName": "ChatGPT",
+    "colors": {
+      "accent1": "#156082",
+      "accent2": "#E97132",
+      "accent3": "#196B24",
+      "accent4": "#0F9ED5",
+      "accent5": "#A02B93",
+      "accent6": "#4EA72E",
+      "bg1": "#FFFFFF",
+      "bg2": "#000000",
+      "tx1": "#1F1F1F",
+      "tx2": "#FFFFFF",
+      "dk1": "#000000",
+      "lt1": "#FFFFFF",
+      "dk2": "#0E2841",
+      "lt2": "#E8E8E8",
+      "hlink": "#467886",
+      "folHlink": "#96607D"
+    },
+    "typefaces": [
+      "Helvetica Neue"
+    ]
+  },
+  "inheritedLayers": [
+    {
+      "scope": "layout",
+      "id": "361c6468-63aa-4667-a7e8-8e66124bf345",
+      "name": "Title Slide",
+      "type": "title",
+      "parentLayoutId": "b1459424-789e-43a4-aa63-c2dbccf14f3a",
+      "elements": []
+    },
+    {
+      "scope": "master",
+      "id": "b1459424-789e-43a4-aa63-c2dbccf14f3a",
+      "name": "Master",
+      "type": "master",
+      "elements": []
+    }
+  ],
+  "elements": [
+    {
+      "order": 1,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/9knalor6",
+      "id": "1",
+      "bbox": [
+        41,
+        36,
+        1197,
+        66
+      ],
+      "composeSource": {
+        "run": 1,
+        "path": "0.0"
+      },
+      "geometry": "rect",
+      "text": "Ce que montrent les résultats historiques",
+      "textPreview": "Ce que montrent les résultats historiques",
+      "resolvedFontSize": 39,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 39,
+        "typeface": "Helvetica Neue",
+        "color": "#000000",
+        "bold": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "wrap": "square",
+        "autoFit": "shrinkText",
+        "autoFitScale": 1,
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Ce que montrent les résultats historiques"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Ce que montrent les résultats historiques",
+          "resolvedTextStyle": {
+            "anchor": 1,
+            "fontSize": 39,
+            "typeface": "Helvetica Neue",
+            "color": "#000000",
+            "bold": true,
+            "alignment": "left",
+            "verticalAlignment": "top",
+            "wrap": "square",
+            "autoFit": "shrinkText",
+            "insets": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Ce que montrent les résultats historiques",
+              "anchor": 1,
+              "fontSize": 39,
+              "typeface": "Helvetica Neue",
+              "color": "#000000",
+              "bold": true,
+              "alignment": "left",
+              "verticalAlignment": "top",
+              "wrap": "square",
+              "autoFit": "shrinkText",
+              "insets": {
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              }
+            }
+          ],
+          "marginLeft": 0
+        }
+      ]
+    },
+    {
+      "order": 2,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/mxwbqtsv",
+      "id": "2",
+      "bbox": [
+        41,
+        105,
+        1197,
+        35
+      ],
+      "composeSource": {
+        "run": 1,
+        "path": "0.1"
+      },
+      "geometry": "rect",
+      "text": "Le correcteur améliore Chronos-2 brut ; Storm reste légèrement devant sur la fenêtre complète.",
+      "textPreview": "Le correcteur améliore Chronos-2 brut ; Storm reste légèrement devant sur la fenêtre complète.",
+      "resolvedFontSize": 21,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 21,
+        "typeface": "Helvetica Neue",
+        "color": "#4D5158",
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "wrap": "square",
+        "autoFit": "shrinkText",
+        "autoFitScale": 1,
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Le correcteur améliore Chronos-2 brut ; Storm reste légèrement devant sur la fenêtre complète."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Le correcteur améliore Chronos-2 brut ; Storm reste légèrement devant sur la fenêtre complète.",
+          "resolvedTextStyle": {
+            "anchor": 1,
+            "fontSize": 21,
+            "typeface": "Helvetica Neue",
+            "color": "#4D5158",
+            "alignment": "left",
+            "verticalAlignment": "top",
+            "wrap": "square",
+            "autoFit": "shrinkText",
+            "insets": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Le correcteur améliore Chronos-2 brut ; Storm reste légèrement devant sur la fenêtre complète.",
+              "anchor": 1,
+              "fontSize": 21,
+              "typeface": "Helvetica Neue",
+              "color": "#4D5158",
+              "alignment": "left",
+              "verticalAlignment": "top",
+              "wrap": "square",
+              "autoFit": "shrinkText",
+              "insets": {
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              }
+            }
+          ],
+          "marginLeft": 0
+        }
+      ]
+    },
+    {
+      "order": 3,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/7y5sjy9g",
+      "id": "3",
+      "bbox": [
+        41,
+        184,
+        500,
+        31
+      ],
+      "composeSource": {
+        "run": 1,
+        "path": "0.2"
+      },
+      "geometry": "rect",
+      "text": "MAE  •  plus bas = meilleur",
+      "textPreview": "MAE  •  plus bas = meilleur",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 18,
+        "typeface": "Helvetica Neue",
+        "color": "#000000",
+        "bold": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "wrap": "square",
+        "autoFit": "shrinkText",
+        "autoFitScale": 1,
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "MAE  •  plus bas = meilleur"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "MAE  •  plus bas = meilleur",
+          "resolvedTextStyle": {
+            "anchor": 1,
+            "fontSize": 18,
+            "typeface": "Helvetica Neue",
+            "color": "#000000",
+            "bold": true,
+            "alignment": "left",
+            "verticalAlignment": "top",
+            "wrap": "square",
+            "autoFit": "shrinkText",
+            "insets": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "MAE  •  plus bas = meilleur",
+              "anchor": 1,
+              "fontSize": 18,
+              "typeface": "Helvetica Neue",
+              "color": "#000000",
+              "bold": true,
+              "alignment": "left",
+              "verticalAlignment": "top",
+              "wrap": "square",
+              "autoFit": "shrinkText",
+              "insets": {
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              }
+            }
+          ],
+          "marginLeft": 0
+        }
+      ]
+    },
+    {
+      "order": 4,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/kvutojap",
+      "id": "4",
+      "bbox": [
+        41,
+        247,
+        165,
+        28
+      ],
+      "composeSource": {
+        "run": 1,
+        "path": "0.3"
+      },
+      "geometry": "rect",
+      "text": "Chronos-2",
+      "textPreview": "Chronos-2",
+      "resolvedFontSize": 19,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 19,
+        "typeface": "Helvetica Neue",
+        "color": "#000000",
+        "bold": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "wrap": "square",
+        "autoFit": "shrinkText",
+        "autoFitScale": 1,
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Chronos-2"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Chronos-2",
+          "resolvedTextStyle": {
+            "anchor": 1,
+            "fontSize": 19,
+            "typeface": "Helvetica Neue",
+            "color": "#000000",
+            "bold": true,
+            "alignment": "left",
+            "verticalAlignment": "top",
+            "wrap": "square",
+            "autoFit": "shrinkText",
+            "insets": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Chronos-2",
+              "anchor": 1,
+              "fontSize": 19,
+              "typeface": "Helvetica Neue",
+              "color": "#000000",
+              "bold": true,
+              "alignment": "left",
+              "verticalAlignment": "top",
+              "wrap": "square",
+              "autoFit": "shrinkText",
+              "insets": {
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              }
+            }
+          ],
+          "marginLeft": 0
+        }
+      ]
+    },
+    {
+      "order": 5,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/lw3ahora",
+      "id": "5",
+      "name": "bar-chronos",
+      "bbox": [
+        220,
+        245,
+        430,
+        32
+      ],
+      "composeSource": {
+        "run": 1,
+        "path": "0.4"
+      },
+      "geometry": "roundRect",
+      "fillColor": "#D7D9DE",
+      "lineColor": "#D7D9DE",
+      "lineWidth": 0
+    },
+    {
+      "order": 6,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ytcbm9sj",
+      "id": "6",
+      "bbox": [
+        665,
+        244,
+        82,
+        31
+      ],
+      "composeSource": {
+        "run": 1,
+        "path": "0.5"
+      },
+      "geometry": "rect",
+      "text": "13,11",
+      "textPreview": "13,11",
+      "resolvedFontSize": 20,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 20,
+        "typeface": "Helvetica Neue",
+        "color": "#000000",
+        "bold": true,
+        "alignment": "right",
+        "verticalAlignment": "top",
+        "wrap": "square",
+        "autoFit": "shrinkText",
+        "autoFitScale": 1,
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "13,11"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "13,11",
+          "resolvedTextStyle": {
+            "anchor": 1,
+            "fontSize": 20,
+            "typeface": "Helvetica Neue",
+            "color": "#000000",
+            "bold": true,
+            "alignment": "right",
+            "verticalAlignment": "top",
+            "wrap": "square",
+            "autoFit": "shrinkText",
+            "insets": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "13,11",
+              "anchor": 1,
+              "fontSize": 20,
+              "typeface": "Helvetica Neue",
+              "color": "#000000",
+              "bold": true,
+              "alignment": "right",
+              "verticalAlignment": "top",
+              "wrap": "square",
+              "autoFit": "shrinkText",
+              "insets": {
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              }
+            }
+          ],
+          "marginLeft": 0
+        }
+      ]
+    },
+    {
+      "order": 7,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/zulsfe94",
+      "id": "7",
+      "bbox": [
+        41,
+        319,
+        165,
+        28
+      ],
+      "composeSource": {
+        "run": 1,
+        "path": "0.6"
+      },
+      "geometry": "rect",
+      "text": "Corrigé",
+      "textPreview": "Corrigé",
+      "resolvedFontSize": 19,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 19,
+        "typeface": "Helvetica Neue",
+        "color": "#3D8DFF",
+        "bold": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "wrap": "square",
+        "autoFit": "shrinkText",
+        "autoFitScale": 1,
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Corrigé"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Corrigé",
+          "resolvedTextStyle": {
+            "anchor": 1,
+            "fontSize": 19,
+            "typeface": "Helvetica Neue",
+            "color": "#3D8DFF",
+            "bold": true,
+            "alignment": "left",
+            "verticalAlignment": "top",
+            "wrap": "square",
+            "autoFit": "shrinkText",
+            "insets": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Corrigé",
+              "anchor": 1,
+              "fontSize": 19,
+              "typeface": "Helvetica Neue",
+              "color": "#3D8DFF",
+              "bold": true,
+              "alignment": "left",
+              "verticalAlignment": "top",
+              "wrap": "square",
+              "autoFit": "shrinkText",
+              "insets": {
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              }
+            }
+          ],
+          "marginLeft": 0
+        }
+      ]
+    },
+    {
+      "order": 8,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/crutkzat",
+      "id": "8",
+      "name": "bar-corrected",
+      "bbox": [
+        220,
+        317,
+        408,
+        32
+      ],
+      "composeSource": {
+        "run": 1,
+        "path": "0.7"
+      },
+      "geometry": "roundRect",
+      "fillColor": "#3D8DFF",
+      "lineColor": "#3D8DFF",
+      "lineWidth": 0
+    },
+    {
+      "order": 9,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/xs3ad4re",
+      "id": "9",
+      "bbox": [
+        665,
+        316,
+        82,
+        31
+      ],
+      "composeSource": {
+        "run": 1,
+        "path": "0.8"
+      },
+      "geometry": "rect",
+      "text": "12,44",
+      "textPreview": "12,44",
+      "resolvedFontSize": 20,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 20,
+        "typeface": "Helvetica Neue",
+        "color": "#3D8DFF",
+        "bold": true,
+        "alignment": "right",
+        "verticalAlignment": "top",
+        "wrap": "square",
+        "autoFit": "shrinkText",
+        "autoFitScale": 1,
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "12,44"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "12,44",
+          "resolvedTextStyle": {
+            "anchor": 1,
+            "fontSize": 20,
+            "typeface": "Helvetica Neue",
+            "color": "#3D8DFF",
+            "bold": true,
+            "alignment": "right",
+            "verticalAlignment": "top",
+            "wrap": "square",
+            "autoFit": "shrinkText",
+            "insets": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "12,44",
+              "anchor": 1,
+              "fontSize": 20,
+              "typeface": "Helvetica Neue",
+              "color": "#3D8DFF",
+              "bold": true,
+              "alignment": "right",
+              "verticalAlignment": "top",
+              "wrap": "square",
+              "autoFit": "shrinkText",
+              "insets": {
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              }
+            }
+          ],
+          "marginLeft": 0
+        }
+      ]
+    },
+    {
+      "order": 10,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/1cvi5o7y",
+      "id": "10",
+      "bbox": [
+        41,
+        391,
+        165,
+        28
+      ],
+      "composeSource": {
+        "run": 1,
+        "path": "0.9"
+      },
+      "geometry": "rect",
+      "text": "Storm",
+      "textPreview": "Storm",
+      "resolvedFontSize": 19,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 19,
+        "typeface": "Helvetica Neue",
+        "color": "#000000",
+        "bold": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "wrap": "square",
+        "autoFit": "shrinkText",
+        "autoFitScale": 1,
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Storm"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Storm",
+          "resolvedTextStyle": {
+            "anchor": 1,
+            "fontSize": 19,
+            "typeface": "Helvetica Neue",
+            "color": "#000000",
+            "bold": true,
+            "alignment": "left",
+            "verticalAlignment": "top",
+            "wrap": "square",
+            "autoFit": "shrinkText",
+            "insets": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Storm",
+              "anchor": 1,
+              "fontSize": 19,
+              "typeface": "Helvetica Neue",
+              "color": "#000000",
+              "bold": true,
+              "alignment": "left",
+              "verticalAlignment": "top",
+              "wrap": "square",
+              "autoFit": "shrinkText",
+              "insets": {
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              }
+            }
+          ],
+          "marginLeft": 0
+        }
+      ]
+    },
+    {
+      "order": 11,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/0bmhcjqd",
+      "id": "11",
+      "name": "bar-storm",
+      "bbox": [
+        220,
+        389,
+        383,
+        32
+      ],
+      "composeSource": {
+        "run": 1,
+        "path": "0.10"
+      },
+      "geometry": "roundRect",
+      "fillColor": "#000000",
+      "lineColor": "#000000",
+      "lineWidth": 0
+    },
+    {
+      "order": 12,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/fad03yps",
+      "id": "12",
+      "bbox": [
+        665,
+        388,
+        82,
+        31
+      ],
+      "composeSource": {
+        "run": 1,
+        "path": "0.11"
+      },
+      "geometry": "rect",
+      "text": "11,67",
+      "textPreview": "11,67",
+      "resolvedFontSize": 20,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 20,
+        "typeface": "Helvetica Neue",
+        "color": "#000000",
+        "bold": true,
+        "alignment": "right",
+        "verticalAlignment": "top",
+        "wrap": "square",
+        "autoFit": "shrinkText",
+        "autoFitScale": 1,
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "11,67"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "11,67",
+          "resolvedTextStyle": {
+            "anchor": 1,
+            "fontSize": 20,
+            "typeface": "Helvetica Neue",
+            "color": "#000000",
+            "bold": true,
+            "alignment": "right",
+            "verticalAlignment": "top",
+            "wrap": "square",
+            "autoFit": "shrinkText",
+            "insets": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "11,67",
+              "anchor": 1,
+              "fontSize": 20,
+              "typeface": "Helvetica Neue",
+              "color": "#000000",
+              "bold": true,
+              "alignment": "right",
+              "verticalAlignment": "top",
+              "wrap": "square",
+              "autoFit": "shrinkText",
+              "insets": {
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              }
+            }
+          ],
+          "marginLeft": 0
+        }
+      ]
+    },
+    {
+      "order": 13,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/e94zat87",
+      "id": "13",
+      "name": "evidence-separator",
+      "bbox": [
+        790,
+        184,
+        0.03,
+        321
+      ],
+      "composeSource": {
+        "run": 1,
+        "path": "0.12"
+      },
+      "geometry": "straightConnector1",
+      "lineColor": "#B8BCC4",
+      "lineWidth": 1
+    },
+    {
+      "order": 14,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/d8vi1o7m",
+      "id": "14",
+      "bbox": [
+        841,
+        210,
+        355,
+        82
+      ],
+      "composeSource": {
+        "run": 1,
+        "path": "0.13"
+      },
+      "geometry": "rect",
+      "text": "−5,1 %",
+      "textPreview": "−5,1 %",
+      "resolvedFontSize": 58,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 58,
+        "typeface": "Helvetica Neue",
+        "color": "#3D8DFF",
+        "bold": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "wrap": "square",
+        "autoFit": "shrinkText",
+        "autoFitScale": 1,
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "−5,1 %"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "−5,1 %",
+          "resolvedTextStyle": {
+            "anchor": 1,
+            "fontSize": 58,
+            "typeface": "Helvetica Neue",
+            "color": "#3D8DFF",
+            "bold": true,
+            "alignment": "left",
+            "verticalAlignment": "top",
+            "wrap": "square",
+            "autoFit": "shrinkText",
+            "insets": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "−5,1 %",
+              "anchor": 1,
+              "fontSize": 58,
+              "typeface": "Helvetica Neue",
+              "color": "#3D8DFF",
+              "bold": true,
+              "alignment": "left",
+              "verticalAlignment": "top",
+              "wrap": "square",
+              "autoFit": "shrinkText",
+              "insets": {
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              }
+            }
+          ],
+          "marginLeft": 0
+        }
+      ]
+    },
+    {
+      "order": 15,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/s72h8jqh",
+      "id": "15",
+      "bbox": [
+        841,
+        299,
+        355,
+        56
+      ],
+      "composeSource": {
+        "run": 1,
+        "path": "0.14"
+      },
+      "geometry": "rect",
+      "text": "de MAE par rapport à Chronos-2 brut",
+      "textPreview": "de MAE par rapport à Chronos-2 brut",
+      "resolvedFontSize": 23,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 23,
+        "typeface": "Helvetica Neue",
+        "color": "#000000",
+        "bold": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "wrap": "square",
+        "autoFit": "shrinkText",
+        "autoFitScale": 1,
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "de MAE par rapport à Chronos-2 brut"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "de MAE par rapport à Chronos-2 brut",
+          "resolvedTextStyle": {
+            "anchor": 1,
+            "fontSize": 23,
+            "typeface": "Helvetica Neue",
+            "color": "#000000",
+            "bold": true,
+            "alignment": "left",
+            "verticalAlignment": "top",
+            "wrap": "square",
+            "autoFit": "shrinkText",
+            "insets": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "de MAE par rapport à Chronos-2 brut",
+              "anchor": 1,
+              "fontSize": 23,
+              "typeface": "Helvetica Neue",
+              "color": "#000000",
+              "bold": true,
+              "alignment": "left",
+              "verticalAlignment": "top",
+              "wrap": "square",
+              "autoFit": "shrinkText",
+              "insets": {
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              }
+            }
+          ],
+          "marginLeft": 0
+        }
+      ]
+    },
+    {
+      "order": 16,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/r6t0zepw",
+      "id": "16",
+      "bbox": [
+        841,
+        382,
+        355,
+        34
+      ],
+      "composeSource": {
+        "run": 1,
+        "path": "0.15"
+      },
+      "geometry": "rect",
+      "text": "Corrélation : 0,93",
+      "textPreview": "Corrélation : 0,93",
+      "resolvedFontSize": 22,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 22,
+        "typeface": "Helvetica Neue",
+        "color": "#000000",
+        "bold": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "wrap": "square",
+        "autoFit": "shrinkText",
+        "autoFitScale": 1,
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Corrélation : 0,93"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Corrélation : 0,93",
+          "resolvedTextStyle": {
+            "anchor": 1,
+            "fontSize": 22,
+            "typeface": "Helvetica Neue",
+            "color": "#000000",
+            "bold": true,
+            "alignment": "left",
+            "verticalAlignment": "top",
+            "wrap": "square",
+            "autoFit": "shrinkText",
+            "insets": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Corrélation : 0,93",
+              "anchor": 1,
+              "fontSize": 22,
+              "typeface": "Helvetica Neue",
+              "color": "#000000",
+              "bold": true,
+              "alignment": "left",
+              "verticalAlignment": "top",
+              "wrap": "square",
+              "autoFit": "shrinkText",
+              "insets": {
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              }
+            }
+          ],
+          "marginLeft": 0
+        }
+      ]
+    },
+    {
+      "order": 17,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/q5kz698b",
+      "id": "17",
+      "bbox": [
+        841,
+        434,
+        355,
+        34
+      ],
+      "composeSource": {
+        "run": 1,
+        "path": "0.16"
+      },
+      "geometry": "rect",
+      "text": "Win rate face à Storm : 47,56 %",
+      "textPreview": "Win rate face à Storm : 47,56 %",
+      "resolvedFontSize": 22,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 22,
+        "typeface": "Helvetica Neue",
+        "color": "#000000",
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "wrap": "square",
+        "autoFit": "shrinkText",
+        "autoFitScale": 1,
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Win rate face à Storm : 47,56 %"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Win rate face à Storm : 47,56 %",
+          "resolvedTextStyle": {
+            "anchor": 1,
+            "fontSize": 22,
+            "typeface": "Helvetica Neue",
+            "color": "#000000",
+            "alignment": "left",
+            "verticalAlignment": "top",
+            "wrap": "square",
+            "autoFit": "shrinkText",
+            "insets": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Win rate face à Storm : 47,56 %",
+              "anchor": 1,
+              "fontSize": 22,
+              "typeface": "Helvetica Neue",
+              "color": "#000000",
+              "alignment": "left",
+              "verticalAlignment": "top",
+              "wrap": "square",
+              "autoFit": "shrinkText",
+              "insets": {
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              }
+            }
+          ],
+          "marginLeft": 0
+        }
+      ]
+    },
+    {
+      "order": 18,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/54bix47q",
+      "id": "18",
+      "name": "storm-note",
+      "bbox": [
+        841,
+        493,
+        355,
+        66
+      ],
+      "composeSource": {
+        "run": 1,
+        "path": "0.17"
+      },
+      "geometry": "roundRect",
+      "fillColor": "#F2F2F2",
+      "lineColor": "#F2F2F2",
+      "lineWidth": 0
+    },
+    {
+      "order": 19,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/432h4zq5",
+      "id": "19",
+      "bbox": [
+        864,
+        508,
+        310,
+        41
+      ],
+      "composeSource": {
+        "run": 1,
+        "path": "0.18"
+      },
+      "geometry": "rect",
+      "text": "Storm = benchmark après coup,\njamais une entrée du modèle",
+      "textPreview": "Storm = benchmark après coup, | jamais une entrée du modèle",
+      "resolvedFontSize": 17.08,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 18,
+        "typeface": "Helvetica Neue",
+        "color": "#000000",
+        "bold": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "wrap": "square",
+        "autoFit": "shrinkText",
+        "autoFitScale": 0.95,
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 2,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Storm = benchmark après coup,"
+          },
+          {
+            "index": 2,
+            "text": "jamais une entrée du modèle"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Storm = benchmark après coup,\njamais une entrée du modèle",
+          "resolvedTextStyle": {
+            "anchor": 1,
+            "fontSize": 18,
+            "typeface": "Helvetica Neue",
+            "color": "#000000",
+            "bold": true,
+            "alignment": "left",
+            "verticalAlignment": "top",
+            "wrap": "square",
+            "autoFit": "shrinkText",
+            "insets": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Storm = benchmark après coup,\njamais une entrée du modèle",
+              "anchor": 1,
+              "fontSize": 18,
+              "typeface": "Helvetica Neue",
+              "color": "#000000",
+              "bold": true,
+              "alignment": "left",
+              "verticalAlignment": "top",
+              "wrap": "square",
+              "autoFit": "shrinkText",
+              "insets": {
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              }
+            }
+          ],
+          "marginLeft": 0
+        }
+      ]
+    },
+    {
+      "order": 20,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/wn6hkjy1",
+      "id": "20",
+      "name": "takeaway",
+      "bbox": [
+        41,
+        595,
+        1198,
+        70
+      ],
+      "composeSource": {
+        "run": 1,
+        "path": "0.19"
+      },
+      "geometry": "roundRect",
+      "fillColor": "#D0EDFA",
+      "lineColor": "#D0EDFA",
+      "lineWidth": 0
+    },
+    {
+      "order": 21,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/hofidofm",
+      "id": "21",
+      "bbox": [
+        70,
+        615,
+        1138,
+        31
+      ],
+      "composeSource": {
+        "run": 1,
+        "path": "0.20"
+      },
+      "geometry": "rect",
+      "text": "À retenir : lire P50 avec P10–P90 comme une estimation encadrée — pas comme une valeur certaine.",
+      "textPreview": "À retenir : lire P50 avec P10–P90 comme une estimation encadrée — pas comme une valeur certaine.",
+      "resolvedFontSize": 21,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 21,
+        "typeface": "Helvetica Neue",
+        "color": "#000000",
+        "bold": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "wrap": "square",
+        "autoFit": "shrinkText",
+        "autoFitScale": 1,
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "À retenir : lire P50 avec P10–P90 comme une estimation encadrée — pas comme une valeur certaine."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "À retenir : lire P50 avec P10–P90 comme une estimation encadrée — pas comme une valeur certaine.",
+          "resolvedTextStyle": {
+            "anchor": 1,
+            "fontSize": 21,
+            "typeface": "Helvetica Neue",
+            "color": "#000000",
+            "bold": true,
+            "alignment": "left",
+            "verticalAlignment": "top",
+            "wrap": "square",
+            "autoFit": "shrinkText",
+            "insets": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "À retenir : lire P50 avec P10–P90 comme une estimation encadrée — pas comme une valeur certaine.",
+              "anchor": 1,
+              "fontSize": 21,
+              "typeface": "Helvetica Neue",
+              "color": "#000000",
+              "bold": true,
+              "alignment": "left",
+              "verticalAlignment": "top",
+              "wrap": "square",
+              "autoFit": "shrinkText",
+              "insets": {
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              }
+            }
+          ],
+          "marginLeft": 0
+        }
+      ]
+    },
+    {
+      "order": 22,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/al4zi9gv",
+      "id": "22",
+      "bbox": [
+        1184,
+        659,
+        55,
+        25
+      ],
+      "composeSource": {
+        "run": 1,
+        "path": "0.21"
+      },
+      "geometry": "rect",
+      "text": "05",
+      "textPreview": "05",
+      "resolvedFontSize": 13,
+      "resolvedTextStyle": {
+        "anchor": 3,
+        "fontSize": 13,
+        "typeface": "Helvetica Neue",
+        "color": "#000000",
+        "alignment": "right",
+        "verticalAlignment": "bottom",
+        "wrap": "square",
+        "autoFit": "shrinkText",
+        "autoFitScale": 1,
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "05"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "05",
+          "resolvedTextStyle": {
+            "anchor": 3,
+            "fontSize": 13,
+            "typeface": "Helvetica Neue",
+            "color": "#000000",
+            "alignment": "right",
+            "verticalAlignment": "bottom",
+            "wrap": "square",
+            "autoFit": "shrinkText",
+            "insets": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "05",
+              "anchor": 3,
+              "fontSize": 13,
+              "typeface": "Helvetica Neue",
+              "color": "#000000",
+              "alignment": "right",
+              "verticalAlignment": "bottom",
+              "wrap": "square",
+              "autoFit": "shrinkText",
+              "insets": {
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              }
+            }
+          ],
+          "marginLeft": 0
+        }
+      ]
+    }
+  ],
+  "composeRuns": [
+    {
+      "index": 1,
+      "frame": {
+        "left": 0,
+        "top": 0,
+        "width": 1280,
+        "height": 720
+      },
+      "baseUnit": 1,
+      "root": {
+        "path": "0",
+        "kind": "layers",
+        "name": "chronos-evidence",
+        "requestedSize": {
+          "width": {
+            "mode": "fill",
+            "value": 1
+          },
+          "height": {
+            "mode": "fill",
+            "value": 1
+          }
+        },
+        "intrinsicSize": {
+          "width": 1239,
+          "height": 684
+        },
+        "frame": {
+          "left": 0,
+          "top": 0,
+          "width": 1280,
+          "height": 720
+        },
+        "children": [
+          {
+            "path": "0.0",
+            "kind": "text",
+            "position": {
+              "left": 41,
+              "top": 36
+            },
+            "requestedSize": {
+              "width": {
+                "mode": "fixed",
+                "value": 1197
+              },
+              "height": {
+                "mode": "fixed",
+                "value": 66
+              }
+            },
+            "intrinsicSize": {
+              "width": 1197,
+              "height": 66
+            },
+            "frame": {
+              "left": 41,
+              "top": 36,
+              "width": 1197,
+              "height": 66
+            },
+            "snappedFrame": {
+              "left": 41,
+              "top": 36,
+              "width": 1197,
+              "height": 66
+            },
+            "children": [],
+            "text": "Ce que montrent les résultats historiques",
+            "transform": "none",
+            "element": {
+              "aid": "sh/9knalor6",
+              "id": "1",
+              "kind": "shape"
+            }
+          },
+          {
+            "path": "0.1",
+            "kind": "text",
+            "position": {
+              "left": 41,
+              "top": 105
+            },
+            "requestedSize": {
+              "width": {
+                "mode": "fixed",
+                "value": 1197
+              },
+              "height": {
+                "mode": "fixed",
+                "value": 35
+              }
+            },
+            "intrinsicSize": {
+              "width": 1197,
+              "height": 35
+            },
+            "frame": {
+              "left": 41,
+              "top": 105,
+              "width": 1197,
+              "height": 35
+            },
+            "snappedFrame": {
+              "left": 41,
+              "top": 105,
+              "width": 1197,
+              "height": 35
+            },
+            "children": [],
+            "text": "Le correcteur améliore Chronos-2 brut ; Storm reste légèrement devant sur la fenêtre complète.",
+            "transform": "none",
+            "element": {
+              "aid": "sh/mxwbqtsv",
+              "id": "2",
+              "kind": "shape"
+            }
+          },
+          {
+            "path": "0.2",
+            "kind": "text",
+            "position": {
+              "left": 41,
+              "top": 184
+            },
+            "requestedSize": {
+              "width": {
+                "mode": "fixed",
+                "value": 500
+              },
+              "height": {
+                "mode": "fixed",
+                "value": 31
+              }
+            },
+            "intrinsicSize": {
+              "width": 500,
+              "height": 31
+            },
+            "frame": {
+              "left": 41,
+              "top": 184,
+              "width": 500,
+              "height": 31
+            },
+            "snappedFrame": {
+              "left": 41,
+              "top": 184,
+              "width": 500,
+              "height": 31
+            },
+            "children": [],
+            "text": "MAE  •  plus bas = meilleur",
+            "transform": "none",
+            "element": {
+              "aid": "sh/7y5sjy9g",
+              "id": "3",
+              "kind": "shape"
+            }
+          },
+          {
+            "path": "0.3",
+            "kind": "text",
+            "position": {
+              "left": 41,
+              "top": 247
+            },
+            "requestedSize": {
+              "width": {
+                "mode": "fixed",
+                "value": 165
+              },
+              "height": {
+                "mode": "fixed",
+                "value": 28
+              }
+            },
+            "intrinsicSize": {
+              "width": 165,
+              "height": 28
+            },
+            "frame": {
+              "left": 41,
+              "top": 247,
+              "width": 165,
+              "height": 28
+            },
+            "snappedFrame": {
+              "left": 41,
+              "top": 247,
+              "width": 165,
+              "height": 28
+            },
+            "children": [],
+            "text": "Chronos-2",
+            "transform": "none",
+            "element": {
+              "aid": "sh/kvutojap",
+              "id": "4",
+              "kind": "shape"
+            }
+          },
+          {
+            "path": "0.4",
+            "kind": "shape",
+            "name": "bar-chronos",
+            "position": {
+              "left": 220,
+              "top": 245
+            },
+            "requestedSize": {
+              "width": {
+                "mode": "fixed",
+                "value": 430
+              },
+              "height": {
+                "mode": "fixed",
+                "value": 32
+              }
+            },
+            "intrinsicSize": {
+              "width": 430,
+              "height": 32
+            },
+            "frame": {
+              "left": 220,
+              "top": 245,
+              "width": 430,
+              "height": 32
+            },
+            "snappedFrame": {
+              "left": 220,
+              "top": 245,
+              "width": 430,
+              "height": 32
+            },
+            "children": [],
+            "geometry": "roundRect",
+            "element": {
+              "aid": "sh/lw3ahora",
+              "id": "5",
+              "kind": "shape"
+            }
+          },
+          {
+            "path": "0.5",
+            "kind": "text",
+            "position": {
+              "left": 665,
+              "top": 244
+            },
+            "requestedSize": {
+              "width": {
+                "mode": "fixed",
+                "value": 82
+              },
+              "height": {
+                "mode": "fixed",
+                "value": 31
+              }
+            },
+            "intrinsicSize": {
+              "width": 82,
+              "height": 31
+            },
+            "frame": {
+              "left": 665,
+              "top": 244,
+              "width": 82,
+              "height": 31
+            },
+            "snappedFrame": {
+              "left": 665,
+              "top": 244,
+              "width": 82,
+              "height": 31
+            },
+            "children": [],
+            "text": "13,11",
+            "transform": "none",
+            "element": {
+              "aid": "sh/ytcbm9sj",
+              "id": "6",
+              "kind": "shape"
+            }
+          },
+          {
+            "path": "0.6",
+            "kind": "text",
+            "position": {
+              "left": 41,
+              "top": 319
+            },
+            "requestedSize": {
+              "width": {
+                "mode": "fixed",
+                "value": 165
+              },
+              "height": {
+                "mode": "fixed",
+                "value": 28
+              }
+            },
+            "intrinsicSize": {
+              "width": 165,
+              "height": 28
+            },
+            "frame": {
+              "left": 41,
+              "top": 319,
+              "width": 165,
+              "height": 28
+            },
+            "snappedFrame": {
+              "left": 41,
+              "top": 319,
+              "width": 165,
+              "height": 28
+            },
+            "children": [],
+            "text": "Corrigé",
+            "transform": "none",
+            "element": {
+              "aid": "sh/zulsfe94",
+              "id": "7",
+              "kind": "shape"
+            }
+          },
+          {
+            "path": "0.7",
+            "kind": "shape",
+            "name": "bar-corrected",
+            "position": {
+              "left": 220,
+              "top": 317
+            },
+            "requestedSize": {
+              "width": {
+                "mode": "fixed",
+                "value": 408
+              },
+              "height": {
+                "mode": "fixed",
+                "value": 32
+              }
+            },
+            "intrinsicSize": {
+              "width": 408,
+              "height": 32
+            },
+            "frame": {
+              "left": 220,
+              "top": 317,
+              "width": 408,
+              "height": 32
+            },
+            "snappedFrame": {
+              "left": 220,
+              "top": 317,
+              "width": 408,
+              "height": 32
+            },
+            "children": [],
+            "geometry": "roundRect",
+            "element": {
+              "aid": "sh/crutkzat",
+              "id": "8",
+              "kind": "shape"
+            }
+          },
+          {
+            "path": "0.8",
+            "kind": "text",
+            "position": {
+              "left": 665,
+              "top": 316
+            },
+            "requestedSize": {
+              "width": {
+                "mode": "fixed",
+                "value": 82
+              },
+              "height": {
+                "mode": "fixed",
+                "value": 31
+              }
+            },
+            "intrinsicSize": {
+              "width": 82,
+              "height": 31
+            },
+            "frame": {
+              "left": 665,
+              "top": 316,
+              "width": 82,
+              "height": 31
+            },
+            "snappedFrame": {
+              "left": 665,
+              "top": 316,
+              "width": 82,
+              "height": 31
+            },
+            "children": [],
+            "text": "12,44",
+            "transform": "none",
+            "element": {
+              "aid": "sh/xs3ad4re",
+              "id": "9",
+              "kind": "shape"
+            }
+          },
+          {
+            "path": "0.9",
+            "kind": "text",
+            "position": {
+              "left": 41,
+              "top": 391
+            },
+            "requestedSize": {
+              "width": {
+                "mode": "fixed",
+                "value": 165
+              },
+              "height": {
+                "mode": "fixed",
+                "value": 28
+              }
+            },
+            "intrinsicSize": {
+              "width": 165,
+              "height": 28
+            },
+            "frame": {
+              "left": 41,
+              "top": 391,
+              "width": 165,
+              "height": 28
+            },
+            "snappedFrame": {
+              "left": 41,
+              "top": 391,
+              "width": 165,
+              "height": 28
+            },
+            "children": [],
+            "text": "Storm",
+            "transform": "none",
+            "element": {
+              "aid": "sh/1cvi5o7y",
+              "id": "10",
+              "kind": "shape"
+            }
+          },
+          {
+            "path": "0.10",
+            "kind": "shape",
+            "name": "bar-storm",
+            "position": {
+              "left": 220,
+              "top": 389
+            },
+            "requestedSize": {
+              "width": {
+                "mode": "fixed",
+                "value": 383
+              },
+              "height": {
+                "mode": "fixed",
+                "value": 32
+              }
+            },
+            "intrinsicSize": {
+              "width": 383,
+              "height": 32
+            },
+            "frame": {
+              "left": 220,
+              "top": 389,
+              "width": 383,
+              "height": 32
+            },
+            "snappedFrame": {
+              "left": 220,
+              "top": 389,
+              "width": 383,
+              "height": 32
+            },
+            "children": [],
+            "geometry": "roundRect",
+            "element": {
+              "aid": "sh/0bmhcjqd",
+              "id": "11",
+              "kind": "shape"
+            }
+          },
+          {
+            "path": "0.11",
+            "kind": "text",
+            "position": {
+              "left": 665,
+              "top": 388
+            },
+            "requestedSize": {
+              "width": {
+                "mode": "fixed",
+                "value": 82
+              },
+              "height": {
+                "mode": "fixed",
+                "value": 31
+              }
+            },
+            "intrinsicSize": {
+              "width": 82,
+              "height": 31
+            },
+            "frame": {
+              "left": 665,
+              "top": 388,
+              "width": 82,
+              "height": 31
+            },
+            "snappedFrame": {
+              "left": 665,
+              "top": 388,
+              "width": 82,
+              "height": 31
+            },
+            "children": [],
+            "text": "11,67",
+            "transform": "none",
+            "element": {
+              "aid": "sh/fad03yps",
+              "id": "12",
+              "kind": "shape"
+            }
+          },
+          {
+            "path": "0.12",
+            "kind": "shape",
+            "name": "evidence-separator",
+            "position": {
+              "left": 790,
+              "top": 184
+            },
+            "requestedSize": {
+              "width": {
+                "mode": "fixed",
+                "value": 0.03
+              },
+              "height": {
+                "mode": "fixed",
+                "value": 321
+              }
+            },
+            "intrinsicSize": {
+              "width": 0.03,
+              "height": 321
+            },
+            "frame": {
+              "left": 790,
+              "top": 184,
+              "width": 0.03,
+              "height": 321
+            },
+            "snappedFrame": {
+              "left": 790,
+              "top": 184,
+              "width": 0.03,
+              "height": 321
+            },
+            "children": [],
+            "geometry": "straightConnector1",
+            "element": {
+              "aid": "sh/e94zat87",
+              "id": "13",
+              "kind": "shape"
+            }
+          },
+          {
+            "path": "0.13",
+            "kind": "text",
+            "position": {
+              "left": 841,
+              "top": 210
+            },
+            "requestedSize": {
+              "width": {
+                "mode": "fixed",
+                "value": 355
+              },
+              "height": {
+                "mode": "fixed",
+                "value": 82
+              }
+            },
+            "intrinsicSize": {
+              "width": 355,
+              "height": 82
+            },
+            "frame": {
+              "left": 841,
+              "top": 210,
+              "width": 355,
+              "height": 82
+            },
+            "snappedFrame": {
+              "left": 841,
+              "top": 210,
+              "width": 355,
+              "height": 82
+            },
+            "children": [],
+            "text": "−5,1 %",
+            "transform": "none",
+            "element": {
+              "aid": "sh/d8vi1o7m",
+              "id": "14",
+              "kind": "shape"
+            }
+          },
+          {
+            "path": "0.14",
+            "kind": "text",
+            "position": {
+              "left": 841,
+              "top": 299
+            },
+            "requestedSize": {
+              "width": {
+                "mode": "fixed",
+                "value": 355
+              },
+              "height": {
+                "mode": "fixed",
+                "value": 56
+              }
+            },
+            "intrinsicSize": {
+              "width": 355,
+              "height": 56
+            },
+            "frame": {
+              "left": 841,
+              "top": 299,
+              "width": 355,
+              "height": 56
+            },
+            "snappedFrame": {
+              "left": 841,
+              "top": 299,
+              "width": 355,
+              "height": 56
+            },
+            "children": [],
+            "text": "de MAE par rapport à Chronos-2 brut",
+            "transform": "none",
+            "element": {
+              "aid": "sh/s72h8jqh",
+              "id": "15",
+              "kind": "shape"
+            }
+          },
+          {
+            "path": "0.15",
+            "kind": "text",
+            "position": {
+              "left": 841,
+              "top": 382
+            },
+            "requestedSize": {
+              "width": {
+                "mode": "fixed",
+                "value": 355
+              },
+              "height": {
+                "mode": "fixed",
+                "value": 34
+              }
+            },
+            "intrinsicSize": {
+              "width": 355,
+              "height": 34
+            },
+            "frame": {
+              "left": 841,
+              "top": 382,
+              "width": 355,
+              "height": 34
+            },
+            "snappedFrame": {
+              "left": 841,
+              "top": 382,
+              "width": 355,
+              "height": 34
+            },
+            "children": [],
+            "text": "Corrélation : 0,93",
+            "transform": "none",
+            "element": {
+              "aid": "sh/r6t0zepw",
+              "id": "16",
+              "kind": "shape"
+            }
+          },
+          {
+            "path": "0.16",
+            "kind": "text",
+            "position": {
+              "left": 841,
+              "top": 434
+            },
+            "requestedSize": {
+              "width": {
+                "mode": "fixed",
+                "value": 355
+              },
+              "height": {
+                "mode": "fixed",
+                "value": 34
+              }
+            },
+            "intrinsicSize": {
+              "width": 355,
+              "height": 34
+            },
+            "frame": {
+              "left": 841,
+              "top": 434,
+              "width": 355,
+              "height": 34
+            },
+            "snappedFrame": {
+              "left": 841,
+              "top": 434,
+              "width": 355,
+              "height": 34
+            },
+            "children": [],
+            "text": "Win rate face à Storm : 47,56 %",
+            "transform": "none",
+            "element": {
+              "aid": "sh/q5kz698b",
+              "id": "17",
+              "kind": "shape"
+            }
+          },
+          {
+            "path": "0.17",
+            "kind": "shape",
+            "name": "storm-note",
+            "position": {
+              "left": 841,
+              "top": 493
+            },
+            "requestedSize": {
+              "width": {
+                "mode": "fixed",
+                "value": 355
+              },
+              "height": {
+                "mode": "fixed",
+                "value": 66
+              }
+            },
+            "intrinsicSize": {
+              "width": 355,
+              "height": 66
+            },
+            "frame": {
+              "left": 841,
+              "top": 493,
+              "width": 355,
+              "height": 66
+            },
+            "snappedFrame": {
+              "left": 841,
+              "top": 493,
+              "width": 355,
+              "height": 66
+            },
+            "children": [],
+            "geometry": "roundRect",
+            "element": {
+              "aid": "sh/54bix47q",
+              "id": "18",
+              "kind": "shape"
+            }
+          },
+          {
+            "path": "0.18",
+            "kind": "text",
+            "position": {
+              "left": 864,
+              "top": 508
+            },
+            "requestedSize": {
+              "width": {
+                "mode": "fixed",
+                "value": 310
+              },
+              "height": {
+                "mode": "fixed",
+                "value": 41
+              }
+            },
+            "intrinsicSize": {
+              "width": 310,
+              "height": 41
+            },
+            "frame": {
+              "left": 864,
+              "top": 508,
+              "width": 310,
+              "height": 41
+            },
+            "snappedFrame": {
+              "left": 864,
+              "top": 508,
+              "width": 310,
+              "height": 41
+            },
+            "children": [],
+            "text": "Storm = benchmark après coup,\njamais une entrée du modèle",
+            "transform": "none",
+            "element": {
+              "aid": "sh/432h4zq5",
+              "id": "19",
+              "kind": "shape"
+            }
+          },
+          {
+            "path": "0.19",
+            "kind": "shape",
+            "name": "takeaway",
+            "position": {
+              "left": 41,
+              "top": 595
+            },
+            "requestedSize": {
+              "width": {
+                "mode": "fixed",
+                "value": 1198
+              },
+              "height": {
+                "mode": "fixed",
+                "value": 70
+              }
+            },
+            "intrinsicSize": {
+              "width": 1198,
+              "height": 70
+            },
+            "frame": {
+              "left": 41,
+              "top": 595,
+              "width": 1198,
+              "height": 70
+            },
+            "snappedFrame": {
+              "left": 41,
+              "top": 595,
+              "width": 1198,
+              "height": 70
+            },
+            "children": [],
+            "geometry": "roundRect",
+            "element": {
+              "aid": "sh/wn6hkjy1",
+              "id": "20",
+              "kind": "shape"
+            }
+          },
+          {
+            "path": "0.20",
+            "kind": "text",
+            "position": {
+              "left": 70,
+              "top": 615
+            },
+            "requestedSize": {
+              "width": {
+                "mode": "fixed",
+                "value": 1138
+              },
+              "height": {
+                "mode": "fixed",
+                "value": 31
+              }
+            },
+            "intrinsicSize": {
+              "width": 1138,
+              "height": 31
+            },
+            "frame": {
+              "left": 70,
+              "top": 615,
+              "width": 1138,
+              "height": 31
+            },
+            "snappedFrame": {
+              "left": 70,
+              "top": 615,
+              "width": 1138,
+              "height": 31
+            },
+            "children": [],
+            "text": "À retenir : lire P50 avec P10–P90 comme une estimation encadrée — pas comme une valeur certaine.",
+            "transform": "none",
+            "element": {
+              "aid": "sh/hofidofm",
+              "id": "21",
+              "kind": "shape"
+            }
+          },
+          {
+            "path": "0.21",
+            "kind": "text",
+            "position": {
+              "left": 1184,
+              "top": 659
+            },
+            "requestedSize": {
+              "width": {
+                "mode": "fixed",
+                "value": 55
+              },
+              "height": {
+                "mode": "fixed",
+                "value": 25
+              }
+            },
+            "intrinsicSize": {
+              "width": 55,
+              "height": 25
+            },
+            "frame": {
+              "left": 1184,
+              "top": 659,
+              "width": 55,
+              "height": 25
+            },
+            "snappedFrame": {
+              "left": 1184,
+              "top": 659,
+              "width": 55,
+              "height": 25
+            },
+            "children": [],
+            "text": "05",
+            "transform": "none",
+            "element": {
+              "aid": "sh/al4zi9gv",
+              "id": "22",
+              "kind": "shape"
+            }
+          }
+        ],
+        "padding": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "alignItems": "stretch",
+        "justifyItems": "stretch",
+        "contentFrame": {
+          "left": 0,
+          "top": 0,
+          "width": 1280,
+          "height": 720
+        },
+        "items": [
+          {
+            "path": "0.0",
+            "frame": {
+              "left": 41,
+              "top": 36,
+              "width": 1197,
+              "height": 66
+            }
+          },
+          {
+            "path": "0.1",
+            "frame": {
+              "left": 41,
+              "top": 105,
+              "width": 1197,
+              "height": 35
+            }
+          },
+          {
+            "path": "0.2",
+            "frame": {
+              "left": 41,
+              "top": 184,
+              "width": 500,
+              "height": 31
+            }
+          },
+          {
+            "path": "0.3",
+            "frame": {
+              "left": 41,
+              "top": 247,
+              "width": 165,
+              "height": 28
+            }
+          },
+          {
+            "path": "0.4",
+            "frame": {
+              "left": 220,
+              "top": 245,
+              "width": 430,
+              "height": 32
+            }
+          },
+          {
+            "path": "0.5",
+            "frame": {
+              "left": 665,
+              "top": 244,
+              "width": 82,
+              "height": 31
+            }
+          },
+          {
+            "path": "0.6",
+            "frame": {
+              "left": 41,
+              "top": 319,
+              "width": 165,
+              "height": 28
+            }
+          },
+          {
+            "path": "0.7",
+            "frame": {
+              "left": 220,
+              "top": 317,
+              "width": 408,
+              "height": 32
+            }
+          },
+          {
+            "path": "0.8",
+            "frame": {
+              "left": 665,
+              "top": 316,
+              "width": 82,
+              "height": 31
+            }
+          },
+          {
+            "path": "0.9",
+            "frame": {
+              "left": 41,
+              "top": 391,
+              "width": 165,
+              "height": 28
+            }
+          },
+          {
+            "path": "0.10",
+            "frame": {
+              "left": 220,
+              "top": 389,
+              "width": 383,
+              "height": 32
+            }
+          },
+          {
+            "path": "0.11",
+            "frame": {
+              "left": 665,
+              "top": 388,
+              "width": 82,
+              "height": 31
+            }
+          },
+          {
+            "path": "0.12",
+            "frame": {
+              "left": 790,
+              "top": 184,
+              "width": 0.03,
+              "height": 321
+            }
+          },
+          {
+            "path": "0.13",
+            "frame": {
+              "left": 841,
+              "top": 210,
+              "width": 355,
+              "height": 82
+            }
+          },
+          {
+            "path": "0.14",
+            "frame": {
+              "left": 841,
+              "top": 299,
+              "width": 355,
+              "height": 56
+            }
+          },
+          {
+            "path": "0.15",
+            "frame": {
+              "left": 841,
+              "top": 382,
+              "width": 355,
+              "height": 34
+            }
+          },
+          {
+            "path": "0.16",
+            "frame": {
+              "left": 841,
+              "top": 434,
+              "width": 355,
+              "height": 34
+            }
+          },
+          {
+            "path": "0.17",
+            "frame": {
+              "left": 841,
+              "top": 493,
+              "width": 355,
+              "height": 66
+            }
+          },
+          {
+            "path": "0.18",
+            "frame": {
+              "left": 864,
+              "top": 508,
+              "width": 310,
+              "height": 41
+            }
+          },
+          {
+            "path": "0.19",
+            "frame": {
+              "left": 41,
+              "top": 595,
+              "width": 1198,
+              "height": 70
+            }
+          },
+          {
+            "path": "0.20",
+            "frame": {
+              "left": 70,
+              "top": 615,
+              "width": 1138,
+              "height": 31
+            }
+          },
+          {
+            "path": "0.21",
+            "frame": {
+              "left": 1184,
+              "top": 659,
+              "width": 55,
+              "height": 25
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

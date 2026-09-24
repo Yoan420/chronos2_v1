@@ -7,7 +7,7 @@ there is no France default and no implicit fallback from MKOnline to the
 autonomous model.
 
 Storm is deliberately outside the candidate-building API.  The optional
-native dashboard curve is fetched only after the forecast CSV has been
+day-ahead dashboard curve is fetched only after the forecast CSV has been
 written to the private staging directory, and is used for reporting only.
 """
 
@@ -25,6 +25,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 from typing import Any, Callable, Mapping, Sequence
 
 import numpy as np
@@ -35,10 +36,19 @@ from chronos2_hourly.chronos_adapter import (
     run_existing_live_forecast,
 )
 from chronos2_hourly.hourly_contract import (
+    HourlyTargetContractError,
     build_delivery_metadata,
     local_delivery_day_index,
 )
+from chronos2_hourly.live_target_context import audit_live_target_context
 from chronos2_hourly.multizone_contract import ZoneModelContract
+from chronos2_hourly.shadow_reporting import (
+    write_forecast_only_shadow_report,
+)
+from chronos2_hourly.variable_attribution import (
+    remove_variable_attribution_artifacts,
+    write_variable_attribution,
+)
 from chronos2_modular.common import (
     build_zone_configs,
     deep_get,
@@ -48,12 +58,19 @@ from chronos2_modular.common import (
 
 
 LOGGER = logging.getLogger("multizone_live")
-SCRIPT_VERSION = "1.1.0-strict-multizone-live"
+SCRIPT_VERSION = "1.1.1-strict-multizone-live"
 QUANTILES = ("q10", "q50", "q90")
 EXPECTED_META_FEATURES = 175
 LIVE_SYNC_LOOKBACK_HOURS = 48
 MAX_AUTOMATIC_REPLAY_DAYS = 3
 PREDICTION_MODES = frozenset({"mkonline_blend", "autonomous_only"})
+RESIDUAL_LOAD_SOURCES = frozenset({"saturn", "chronos2"})
+CHRONOS2_RESIDUAL_ARCHIVE_SUFFIX = "_residual_load_chronos2"
+CHRONOS2_RESIDUAL_ARCHIVE_SUBDIR = Path(
+    "_challengers/residual_load_chronos2"
+)
+ATOMIC_PUBLISH_ATTEMPTS = 5
+ATOMIC_PUBLISH_RETRY_SECONDS = 0.25
 
 BENCHMARK_REPORT_FILES = (
     "backtest_hourly_oof.csv.gz",
@@ -76,6 +93,35 @@ BENCHMARK_REPORT_FILES = (
 
 class ZoneLiveExecutionError(ValueError):
     """Raised when a verified bundle violates the live runtime contract."""
+
+
+def _publish_staging_atomically(
+    staging: Path,
+    output: Path,
+    *,
+    attempts: int = ATOMIC_PUBLISH_ATTEMPTS,
+    retry_seconds: float = ATOMIC_PUBLISH_RETRY_SECONDS,
+) -> None:
+    """Publish one immutable run, tolerating only transient Windows locks."""
+
+    if attempts < 1:
+        raise ValueError("attempts must be at least one")
+    for attempt in range(1, attempts + 1):
+        try:
+            staging.replace(output)
+            return
+        except PermissionError:
+            # Never turn a real archive collision into an overwrite attempt.
+            if output.exists() or attempt == attempts:
+                raise
+            LOGGER.warning(
+                "Atomic publish temporarily locked (%s/%s): %s -> %s",
+                attempt,
+                attempts,
+                staging,
+                output,
+            )
+            time.sleep(retry_seconds * attempt)
 
 
 @dataclass(frozen=True)
@@ -110,6 +156,7 @@ class CandidateArtifacts:
     data_config: Mapping[str, Any]
     rolling_capture_features: pd.DataFrame | None = None
     rolling_capture_chronos: pd.DataFrame | None = None
+    attribution_kwargs: dict[str, Any] | None = None
 
 
 @dataclass(frozen=True)
@@ -122,6 +169,8 @@ class LiveRuntimeOptions:
     local_files_only: bool = False
     refresh_data: bool = True
     rolling365_capture_root: Path | None = None
+    residual_load_source: str = "saturn"
+    residual_load_bundle_manifest: Path | None = None
 
 
 CandidateBuilder = Callable[
@@ -152,6 +201,34 @@ def _mapping(value: Any, *, name: str) -> Mapping[str, Any]:
     if not isinstance(value, Mapping):
         raise ZoneLiveExecutionError(f"{name} must be an explicit mapping")
     return value
+
+
+def _residual_runtime(options: LiveRuntimeOptions) -> tuple[str, Path | None]:
+    source = str(options.residual_load_source or "saturn").strip().lower()
+    if source not in RESIDUAL_LOAD_SOURCES:
+        raise ZoneLiveExecutionError(
+            "residual_load_source must be saturn or chronos2"
+        )
+    manifest = options.residual_load_bundle_manifest
+    if source == "chronos2":
+        if manifest is None:
+            raise ZoneLiveExecutionError(
+                "Chronos-2 residual load requires a bundle manifest"
+            )
+        manifest = Path(manifest).expanduser().resolve()
+        if not manifest.is_file():
+            raise ZoneLiveExecutionError(
+                f"Chronos-2 residual-load bundle manifest is missing: {manifest}"
+            )
+        if options.rolling365_capture_root is not None:
+            raise ZoneLiveExecutionError(
+                "rolling-365 capture is reserved for the production Saturn run"
+            )
+    elif manifest is not None:
+        raise ZoneLiveExecutionError(
+            "a residual-load bundle cannot be supplied with source=saturn"
+        )
+    return source, manifest
 
 
 def _sha256(path: Path) -> str:
@@ -773,6 +850,9 @@ def _build_dynamic_data(
     inputs_dir: Path,
     sync_manifest_path: Path,
     refresh_data: bool,
+    residual_load_source: str = "saturn",
+    residual_load_bundle_manifest: Path | None = None,
+    saturn_control_archive: Path | None = None,
 ) -> tuple[dict[str, Any], Any, pd.DataFrame]:
     """Refresh and reconstruct exactly one declared zone's causal inputs."""
 
@@ -785,6 +865,30 @@ def _build_dynamic_data(
     if not isinstance(data_config, dict):
         raise ZoneLiveExecutionError("base_config.data must be a mapping")
     data_config["runtime_as_of"] = schedule.cutoff_origin_local.isoformat()
+    residual_load_provenance: dict[str, Any] | None = None
+    if residual_load_source == "chronos2":
+        if residual_load_bundle_manifest is None:
+            raise ZoneLiveExecutionError(
+                "Chronos-2 residual load requires a bundle manifest"
+            )
+        if saturn_control_archive is None:
+            raise ZoneLiveExecutionError(
+                "Chronos-2 residual load requires the paired sealed Saturn archive"
+            )
+        from chronos2_hourly.chronos_residual_load import (
+            apply_residual_load_bundle,
+        )
+
+        residual_load_provenance = apply_residual_load_bundle(
+            config,
+            manifest_path=residual_load_bundle_manifest,
+            expected_delivery_index=schedule.delivery_index,
+            expected_cutoff_utc=schedule.cutoff_origin_local.tz_convert("UTC"),
+            config_dir=contract.paths.base_config.parent,
+            overlay_dir=inputs_dir / "residual_load_pit_overlay",
+            saturn_control_archive=saturn_control_archive,
+            expected_zone=contract.zone,
+        )
     overrides = _mapping(
         live.get("naive_timezone_overrides", {}),
         name="live.naive_timezone_overrides",
@@ -841,20 +945,55 @@ def _build_dynamic_data(
         False,
         inputs_dir,
     )
+    if residual_load_provenance is not None:
+        diagnostics = getattr(data, "diagnostics", None)
+        if isinstance(diagnostics, dict):
+            diagnostics["residual_load_provider"] = residual_load_provenance
+        from chronos2_hourly.chronos_residual_load import (
+            seal_challenger_zone_data_from_saturn_control,
+        )
+
+        control_provenance = seal_challenger_zone_data_from_saturn_control(
+            data,
+            saturn_archive_dir=saturn_control_archive,
+            archive_inputs_dir=inputs_dir,
+            expected_delivery_index=schedule.delivery_index,
+            expected_zone=contract.zone,
+        )
+        residual_load_provenance["effective_input_control"] = control_provenance
     target, _history_covariates, future_covariates, all_features = (
         _feature_inputs(data, config)
     )
-    fresh = all_features.loc[future_covariates.index].copy()
+    target_context = audit_live_target_context(
+        target,
+        schedule.delivery_index,
+    )
+    diagnostics = getattr(data, "diagnostics", None)
+    if isinstance(diagnostics, dict):
+        target_diagnostics = diagnostics.setdefault("target", {})
+        if isinstance(target_diagnostics, dict):
+            target_diagnostics["live_context"] = target_context.as_dict()
+    try:
+        target_context.raise_if_not_exact(zone=contract.zone)
+    except HourlyTargetContractError as exc:
+        raise ZoneLiveExecutionError(str(exc)) from exc
+
+    future_index = pd.DatetimeIndex(future_covariates.index).tz_convert("UTC")
+    missing_delivery = schedule.delivery_index.difference(future_index)
+    unexpected_future = future_index.difference(schedule.delivery_index)
+    if len(missing_delivery) or len(unexpected_future):
+        raise ZoneLiveExecutionError(
+            f"{contract.zone}: future PIT covariates must cover only the "
+            "declared J+1 schedule; "
+            f"missing={len(missing_delivery)}, "
+            f"unexpected={len(unexpected_future)}"
+        )
+    fresh = all_features.loc[schedule.delivery_index].copy()
     fresh.index = fresh.index.tz_convert("UTC")
     fresh.index.name = "delivery_start_utc"
     if not fresh.index.equals(schedule.delivery_index):
         raise ZoneLiveExecutionError(
             f"{contract.zone}: fresh PIT features do not cover exact J+1"
-        )
-    expected_target_end = schedule.delivery_index[0] - pd.Timedelta(hours=1)
-    if target.index[-1] != expected_target_end:
-        raise ZoneLiveExecutionError(
-            f"{contract.zone}: target does not end exactly before J+1"
         )
     return config, data, fresh
 
@@ -991,7 +1130,7 @@ def _train_and_predict_autonomous(
     fresh_future: pd.DataFrame,
     chronos_live: pd.DataFrame,
     threads: int,
-) -> tuple[pd.DataFrame, dict[str, Any]]:
+) -> tuple[pd.DataFrame, dict[str, Any], Any]:
     from run_extended_residual_hourly import (
         _base_and_experts,
         _fit_inputs,
@@ -1068,7 +1207,7 @@ def _train_and_predict_autonomous(
             "latest_allowed_training_delivery_day_local": str(latest_allowed.date()),
         },
         "model": model.diagnostics(),
-    }
+    }, model
 
 
 def build_candidate_default(
@@ -1092,6 +1231,14 @@ def build_candidate_default(
         inputs_dir=inputs_dir,
         sync_manifest_path=staging / "saturn_sync_manifest.csv",
         refresh_data=options.refresh_data,
+        residual_load_source=options.residual_load_source,
+        residual_load_bundle_manifest=options.residual_load_bundle_manifest,
+        saturn_control_archive=(
+            contract.paths.output_root
+            / f"{contract.zone.lower()}_day_ahead_{schedule.delivery_day.isoformat()}"
+            if options.residual_load_source == "chronos2"
+            else None
+        ),
     )
     _validate_live_input_audit(
         contract=contract,
@@ -1115,17 +1262,19 @@ def build_candidate_default(
         options.device,
         options.local_files_only,
     )
+    context_length = int(deep_get(config, "model.context_length", 2048))
+    model_batch_size = int(deep_get(config, "model.model_batch_size", 128))
     chronos = run_existing_live_forecast(
         plan,
         data=data,
         runtime=runtime,
-        context_length=int(deep_get(config, "model.context_length", 2048)),
-        model_batch_size=int(deep_get(config, "model.model_batch_size", 128)),
+        context_length=context_length,
+        model_batch_size=model_batch_size,
         with_covariates=True,
         variant=f"hourly_live_dynamic_{contract.zone.lower()}",
     )
     chronos.reset_index().to_csv(staging / "chronos_live_hourly.csv", index=False)
-    autonomous, fit_audit = _train_and_predict_autonomous(
+    autonomous, fit_audit, corrector = _train_and_predict_autonomous(
         contract=contract,
         fresh_future=fresh_future,
         chronos_live=chronos,
@@ -1136,27 +1285,50 @@ def build_candidate_default(
     source_paths: dict[str, Path] = {}
     if policy.mkonline_enabled:
         primary_path = inputs_dir / "mkonline_primary_live.parquet"
-        command = materialize_primary(
-            project_root=Path(__file__).resolve().parent.parent,
-            contract=contract,
-            schedule=schedule,
-            output=primary_path,
-            workers=options.workers,
-        )
+        if options.residual_load_source == "chronos2":
+            from chronos2_hourly.chronos_residual_load import (
+                copy_sealed_saturn_primary,
+            )
+
+            primary_control = copy_sealed_saturn_primary(
+                contract.paths.output_root
+                / f"{contract.zone.lower()}_day_ahead_{schedule.delivery_day.isoformat()}",
+                destination=primary_path,
+                expected_delivery_day=schedule.delivery_day,
+                expected_zone=contract.zone,
+            )
+            command = [
+                "sealed_saturn_control_copy",
+                "inputs/mkonline_primary_live.parquet",
+            ]
+        else:
+            primary_control = None
+            command = materialize_primary(
+                project_root=Path(__file__).resolve().parent.parent,
+                contract=contract,
+                schedule=schedule,
+                output=primary_path,
+                workers=options.workers,
+            )
         primary, cutoff, primary_audit = load_primary_materialization(
             primary_path,
             contract=contract,
             schedule=schedule,
         )
         fit_audit["mkonline_primary"] = primary_audit
+        if primary_control is not None:
+            fit_audit["mkonline_primary"]["sealed_saturn_control"] = (
+                primary_control
+            )
         fit_audit["mkonline_primary"]["path"] = (
             "inputs/mkonline_primary_live.parquet"
         )
         command_for_manifest = list(command)
-        output_index = command_for_manifest.index("--output") + 1
-        command_for_manifest[output_index] = (
-            "inputs/mkonline_primary_live.parquet"
-        )
+        if "--output" in command_for_manifest:
+            output_index = command_for_manifest.index("--output") + 1
+            command_for_manifest[output_index] = (
+                "inputs/mkonline_primary_live.parquet"
+            )
         fit_audit["mkonline_materialization_command"] = command_for_manifest
     forecast = _forecast_frame(
         contract=contract,
@@ -1177,6 +1349,30 @@ def build_candidate_default(
         data_config=_mapping(config.get("data", {}), name="base_config.data"),
         rolling_capture_features=fresh_future.copy(),
         rolling_capture_chronos=chronos.copy(),
+        attribution_kwargs={
+            "data": data,
+            "runtime": runtime,
+            "fresh_future": fresh_future,
+            "corrector": corrector,
+            "official_autonomous": autonomous,
+            "required_covariates": contract.required_covariates,
+            "context_length": context_length,
+            "model_batch_size": model_batch_size,
+            "zone": contract.zone,
+            "timezone": contract.delivery_timezone,
+            "delivery_day": schedule.delivery_day.isoformat(),
+            "official_blend": (
+                pd.Series(
+                    forecast["q50"].to_numpy(dtype=float),
+                    index=schedule.delivery_index,
+                )
+                if policy.mkonline_enabled
+                else None
+            ),
+            "primary": primary,
+            "autonomous_weight": contract.weights.autonomous,
+            "mkonline_weight": contract.weights.mkonline_primary,
+        },
     )
 
 
@@ -1185,7 +1381,7 @@ def fetch_dashboard_default(
     schedule: LiveSchedule,
     data_config: Mapping[str, Any],
 ) -> tuple[pd.Series | None, Mapping[str, Any] | None]:
-    """Fetch native Storm for reporting only, after candidate freeze."""
+    """Fetch Storm day-ahead cache for reporting after candidate freeze."""
 
     if contract.storm_dashboard_series is None:
         return None, {
@@ -1215,7 +1411,7 @@ def fetch_dashboard_default(
     )
     expected = pd.date_range(start=first[0], end=last[-1], freq="h")
     # If there is no realized live/replay gap after the sealed benchmark, its
-    # immutable native Storm artifact already covers Statistics. Reuse it in
+    # immutable dashboard Storm artifact already covers Statistics. Reuse it in
     # the reporting phase without a network call; the candidate is frozen by
     # the caller before this function runs.
     end_value = diagnostics.get("evaluation_end_local_date")
@@ -1242,7 +1438,7 @@ def fetch_dashboard_default(
                     ).to_numpy(dtype=float),
                     index=delivery,
                 )
-                # Reconstruct the exact native-naive civil curve. The missing
+                # Reconstruct the normalized civil curve. The missing
                 # autumn fold remains absent; no interpolation is introduced.
                 finite = values.notna()
                 raw = pd.Series(
@@ -1252,7 +1448,7 @@ def fetch_dashboard_default(
                     .tz_localize(None),
                 )
                 return raw, {
-                    "kind": "sealed_benchmark_native_exact",
+                    "kind": "sealed_benchmark_dashboard_cache",
                     "path": str(native_path),
                     "sha256": _sha256(native_path),
                     "series": contract.storm_dashboard_series,
@@ -1384,6 +1580,17 @@ def _write_artifact_checksums(
                 "sha256": _sha256(path),
             }
         )
+    runtime_source = Path(__file__).resolve()
+    entries.append(
+        {
+            "path": runtime_source.relative_to(
+                runtime_source.parent.parent
+            ).as_posix(),
+            "role": "source_code",
+            "size_bytes": int(runtime_source.stat().st_size),
+            "sha256": _sha256(runtime_source),
+        }
+    )
     checksum_path = staging / "artifact_checksums.json"
     for path in sorted(staging.rglob("*")):
         if path.is_file() and path != checksum_path:
@@ -1411,19 +1618,54 @@ def _validated_output(
     *,
     output_dir: str | Path | None,
     pit_replay: bool,
+    residual_load_source: str = "saturn",
 ) -> tuple[Path, Path]:
-    root = contract.paths.output_root / "_replays" if pit_replay else contract.paths.output_root
+    source = str(residual_load_source).strip().lower()
+    if source not in RESIDUAL_LOAD_SOURCES:
+        raise ZoneLiveExecutionError(
+            "residual_load_source must be saturn or chronos2"
+        )
+    if pit_replay and source != "saturn":
+        raise ZoneLiveExecutionError(
+            "live Chronos-2 bundles cannot be reused for historical PIT replay"
+        )
+    root = (
+        contract.paths.output_root / CHRONOS2_RESIDUAL_ARCHIVE_SUBDIR
+        if source == "chronos2"
+        else (
+            contract.paths.output_root / "_replays"
+            if pit_replay
+            else contract.paths.output_root
+        )
+    )
+    resolved_root = root.resolve()
+    if source == "chronos2":
+        try:
+            resolved_root.relative_to(contract.paths.output_root.resolve())
+        except ValueError as exc:
+            raise ZoneLiveExecutionError(
+                "Chronos-2 challenger root resolves outside zone output_root"
+            ) from exc
+    source_suffix = (
+        CHRONOS2_RESIDUAL_ARCHIVE_SUFFIX if source == "chronos2" else ""
+    )
     default_name = (
         f"{contract.zone.lower()}_day_ahead_{schedule.delivery_day.isoformat()}"
+        f"{source_suffix}"
     )
     output = (
         Path(output_dir).expanduser().resolve()
         if output_dir not in (None, "")
         else root / default_name
     )
-    if output.parent.resolve() != root.resolve():
+    if output.parent.resolve() != resolved_root:
         raise ZoneLiveExecutionError(
             f"output must remain directly under zone root {root.resolve()}"
+        )
+    if source == "chronos2" and output.name != default_name:
+        raise ZoneLiveExecutionError(
+            "Chronos-2 residual-load challengers require their canonical "
+            "source-specific archive name"
         )
     if output.exists():
         raise FileExistsError(f"published live archive is immutable: {output}")
@@ -1438,7 +1680,7 @@ def _validated_output(
         for source in frozen_inputs
     ):
         raise ZoneLiveExecutionError("live output overlaps a frozen model input")
-    return root.resolve(), output.resolve()
+    return resolved_root, output.resolve()
 
 
 def _run_zone_archive(
@@ -1462,6 +1704,15 @@ def _run_zone_archive(
             "the generic runner is for independent non-FR bundles; use the "
             "sealed France runner for FR"
         )
+    runtime = options or LiveRuntimeOptions(
+        threads=int(live_settings.get("threads", -1)),
+        workers=int(live_settings.get("workers", 8)),
+    )
+    residual_load_source, residual_bundle_manifest = _residual_runtime(runtime)
+    if pit_replay and residual_load_source != "saturn":
+        raise ZoneLiveExecutionError(
+            "a live Chronos-2 residual bundle is invalid for PIT replay"
+        )
     policy = load_prediction_policy(contract, live_settings)
     _validate_benchmark_candidate(contract, policy)
     schedule = resolve_live_schedule(
@@ -1481,7 +1732,11 @@ def _run_zone_archive(
                 "historical delivery must use --pit-replay; current live day "
                 f"is {expected_live_day}"
             )
-        run_type = "live_day_ahead"
+        run_type = (
+            "shadow_live_day_ahead"
+            if residual_load_source == "chronos2"
+            else "live_day_ahead"
+        )
     if defer_reporting and not pit_replay:
         raise ZoneLiveExecutionError(
             "deferred reporting is reserved for automatic PIT replay archives"
@@ -1502,10 +1757,7 @@ def _run_zone_archive(
         schedule,
         output_dir=output_dir,
         pit_replay=pit_replay,
-    )
-    runtime = options or LiveRuntimeOptions(
-        threads=int(live_settings.get("threads", -1)),
-        workers=int(live_settings.get("workers", 8)),
+        residual_load_source=residual_load_source,
     )
     root.mkdir(parents=True, exist_ok=True)
     staging = Path(tempfile.mkdtemp(prefix=f".{output.name}.tmp-", dir=root))
@@ -1518,6 +1770,23 @@ def _run_zone_archive(
             runtime,
             staging,
         )
+        archived_residual_bundle: dict[str, Any] | None = None
+        if residual_bundle_manifest is not None:
+            from chronos2_hourly.chronos_residual_load import (
+                archive_live_residual_load_bundle,
+            )
+
+            archived_residual_bundle = archive_live_residual_load_bundle(
+                residual_bundle_manifest,
+                archive_inputs_dir=staging / "inputs",
+                expected_delivery_day=schedule.delivery_day,
+                expected_runtime_cutoff=(
+                    schedule.cutoff_origin_local.tz_convert("UTC")
+                ),
+            )
+            candidate.source_paths["residual_load_bundle_manifest"] = (
+                residual_bundle_manifest
+            )
         candidate.forecast = validate_live_forecast(
             candidate.forecast,
             schedule=schedule,
@@ -1528,8 +1797,52 @@ def _run_zone_archive(
         # Candidate is now frozen locally.  No comparator may enter any
         # prediction function beyond this point.
         frozen_candidate_sha256 = _sha256(forecast_path)
+        attribution_status: dict[str, Any]
+        if candidate.attribution_kwargs is None:
+            attribution_status = {
+                "status": "not_available",
+                "reason": "candidate builder did not expose attribution inputs",
+                "used_for_prediction": False,
+            }
+        else:
+            try:
+                attribution_audit = write_variable_attribution(
+                    output_dir=staging,
+                    forecast_path=forecast_path,
+                    **candidate.attribution_kwargs,
+                )
+            except Exception as exc:
+                remove_variable_attribution_artifacts(staging)
+                attribution_status = {
+                    "status": "failed_optional",
+                    "error_type": type(exc).__name__,
+                    "error": str(exc),
+                    "used_for_prediction": False,
+                    "forecast_modified": False,
+                }
+                LOGGER.warning(
+                    "%s: variable attribution failed after candidate freeze: %s",
+                    contract.zone,
+                    exc,
+                )
+            else:
+                attribution_status = {
+                    "status": "complete",
+                    "method": attribution_audit["method"],
+                    "scenario_count": attribution_audit["scenario_count"],
+                    "variants": attribution_audit["variants"],
+                    "hourly_artifact": "variable_attribution_hourly.csv.gz",
+                    "audit_artifact": "variable_attribution_audit.json",
+                    "used_for_prediction": False,
+                    "forecast_modified": False,
+                }
+        if _sha256(forecast_path) != frozen_candidate_sha256:
+            raise ZoneLiveExecutionError(
+                "variable attribution modified the frozen candidate"
+            )
 
-        _copy_benchmark(contract, staging)
+        if residual_load_source == "saturn":
+            _copy_benchmark(contract, staging)
         source_manifest = json.loads(
             (contract.paths.sealed_benchmark_run / "run_manifest.json").read_text(
                 encoding="utf-8"
@@ -1562,7 +1875,13 @@ def _run_zone_archive(
                 "script_version": SCRIPT_VERSION,
                 "run_type": run_type,
                 "forecast_status": (
-                    "pit_reconstruction" if pit_replay else "issued_live"
+                    "pit_reconstruction"
+                    if pit_replay
+                    else (
+                        "shadow_challenger"
+                        if residual_load_source == "chronos2"
+                        else "issued_live"
+                    )
                 ),
                 "zone": contract.zone,
                 "timezone": contract.delivery_timezone,
@@ -1611,11 +1930,34 @@ def _run_zone_archive(
                 "live_fit": candidate.fit_audit,
                 "input_diagnostics": candidate.input_diagnostics,
                 "fundamental_pit_freshness": candidate.pit_freshness,
+                "variable_attribution": attribution_status,
                 "storm_dashboard_series": contract.storm_dashboard_series,
                 "storm_strict_08_series": contract.storm_strict_08_series,
                 "sha256_manifest": "artifact_checksums.json",
             }
         )
+        if residual_load_source == "chronos2":
+            if archived_residual_bundle is None:  # pragma: no cover - guarded above
+                raise ZoneLiveExecutionError(
+                    "the archived Chronos-2 residual bundle is missing"
+                )
+            manifest.update(
+                {
+                    "residual_load_source": "chronos2",
+                    "residual_load_bundle_manifest_path": (
+                        "inputs/"
+                        + str(archived_residual_bundle["archived_manifest_path"])
+                    ),
+                    "residual_load_bundle_origin_manifest_path": str(
+                        archived_residual_bundle["origin_manifest_path"]
+                    ),
+                    "residual_load_bundle_manifest_sha256": str(
+                        archived_residual_bundle["archived_manifest_sha256"]
+                    ),
+                    "production_eligible": False,
+                    "comparison_design": "prospective_paired_same_downstream",
+                }
+            )
         _write_json(staging / "run_manifest.json", manifest)
         summary_payload: dict[str, Any] = {
             "status": "complete",
@@ -1630,8 +1972,17 @@ def _run_zone_archive(
                 "mkonline_primary": contract.weights.mkonline_primary,
             },
             "storm_loaded_for_prediction": False,
+            "variable_attribution": attribution_status,
             "forecast_path": contract.forecast_filename,
         }
+        if residual_load_source == "chronos2":
+            summary_payload.update(
+                {
+                    "forecast_status": "shadow_challenger",
+                    "residual_load_source": "chronos2",
+                    "production_eligible": False,
+                }
+            )
         _write_json(
             staging / "live_run_summary.json",
             summary_payload,
@@ -1645,6 +1996,64 @@ def _run_zone_archive(
                 contract.paths.dependency_manifest,
                 staging / "mkonline_primary_dependency.json",
             )
+
+        if residual_load_source == "chronos2":
+            prospective_statistics = {
+                "status": "prospective_only",
+                "historical_performance_eligible": False,
+                "residual_load_source": "chronos2",
+                "comparison_reason": (
+                    "Aucun historique causal Chronos-2 n'est substitue aux "
+                    "archives Saturn de production. Le scoring se fait "
+                    "uniquement sur les paires prospectives publiees."
+                ),
+            }
+            manifest.update(
+                {
+                    "statistics_history": prospective_statistics,
+                    "candidate_forecast_sha256_at_freeze": (
+                        frozen_candidate_sha256
+                    ),
+                    "storm_dashboard_loaded_after_candidate_frozen_for_statistics": (
+                        False
+                    ),
+                    "reporting_status": "forecast_only",
+                    "reporting_errors": [],
+                }
+            )
+            summary_payload.update(
+                {
+                    "statistics_history": prospective_statistics,
+                    "storm_dashboard_loaded_for_statistics_after_candidate_frozen": (
+                        False
+                    ),
+                    "reporting_status": "forecast_only",
+                }
+            )
+            write_forecast_only_shadow_report(
+                forecast_path,
+                output_path=staging / str(report_settings["filename"]),
+                zone=contract.zone,
+                delivery_day=schedule.delivery_day.isoformat(),
+                candidate_model=policy.candidate_model,
+            )
+            if _sha256(forecast_path) != frozen_candidate_sha256:
+                raise ZoneLiveExecutionError(
+                    "forecast-only reporting modified the frozen candidate"
+                )
+            _write_json(staging / "run_manifest.json", manifest)
+            _write_json(
+                staging / "live_run_summary.json",
+                summary_payload,
+            )
+            _write_artifact_checksums(
+                staging,
+                output=output,
+                contract=contract,
+                source_paths=candidate.source_paths,
+            )
+            _publish_staging_atomically(staging, output)
+            return output
 
         if defer_reporting:
             deferred_statistics = {
@@ -1673,7 +2082,7 @@ def _run_zone_archive(
                 contract=contract,
                 source_paths=candidate.source_paths,
             )
-            staging.replace(output)
+            _publish_staging_atomically(staging, output)
             return output
 
         reporting_errors: list[dict[str, str]] = []
@@ -1707,11 +2116,16 @@ def _run_zone_archive(
             if storm_pit_setting not in (None, "")
             else staging / "inputs" / "storm_strict_08_unavailable.parquet"
         )
+        statistics_live_root = (
+            contract.paths.output_root
+            if residual_load_source == "saturn"
+            else contract.paths.output_root / "_residual_load_chronos2_statistics"
+        )
         statistics_kwargs: dict[str, Any] = {
             "staging_run_dir": staging,
             "sealed_benchmark_run": contract.paths.sealed_benchmark_run,
-            "live_output_root": contract.paths.output_root,
-            "replay_output_root": contract.paths.output_root / "_replays",
+            "live_output_root": statistics_live_root,
+            "replay_output_root": statistics_live_root / "_replays",
             "current_delivery_day": schedule.delivery_day,
             "canonical_target": candidate.canonical_target,
             "storm_pit_path": storm_pit_path,
@@ -1874,7 +2288,7 @@ def _run_zone_archive(
             contract=contract,
             source_paths=candidate.source_paths,
         )
-        staging.replace(output)
+        _publish_staging_atomically(staging, output)
     except Exception:
         shutil.rmtree(staging, ignore_errors=True)
         raise
@@ -2006,6 +2420,12 @@ def run_zone_live(
             wall_clock=wall_clock,
         )
 
+    runtime = options or LiveRuntimeOptions(
+        threads=int(live_settings.get("threads", -1)),
+        workers=int(live_settings.get("workers", 8)),
+    )
+    residual_load_source, _residual_bundle_manifest = _residual_runtime(runtime)
+
     if contract.zone == "FR":
         raise ZoneLiveExecutionError(
             "the generic runner is for independent non-FR bundles; use the "
@@ -2032,10 +2452,16 @@ def run_zone_live(
         schedule,
         output_dir=output_dir,
         pit_replay=False,
+        residual_load_source=residual_load_source,
     )
 
     missing_days: list[date] = []
-    if hooks.plan_statistics_gaps is not None:
+    if residual_load_source == "chronos2":
+        # The challenger starts a new prospective evidence chain. Reusing or
+        # rebuilding production/Saturn archives would make its score look
+        # historical when no causal Chronos-2 residual inputs existed then.
+        missing_days = []
+    elif hooks.plan_statistics_gaps is not None:
         planned = hooks.plan_statistics_gaps(
             sealed_benchmark_run=contract.paths.sealed_benchmark_run,
             live_output_root=contract.paths.output_root,
@@ -2077,7 +2503,23 @@ def run_zone_live(
             f"cap {MAX_AUTOMATIC_REPLAY_DAYS}"
         )
     completed_replays: list[date] = []
-    statistics_blocker: dict[str, Any] | None = None
+    statistics_blocker: dict[str, Any] | None = (
+        {
+            "status": "blocked_prospective_challenger",
+            "reason": (
+                "Chronos-2 residual-load evidence starts with this issued "
+                "shadow run; production Statistics are not reused"
+            ),
+            "missing_realized_days": [],
+            "completed_automatic_replay_days": [],
+            "candidate_forecast_publication": "continued_as_shadow",
+            "statistics_scope": "sealed_benchmark_only",
+            "residual_load_source": "chronos2",
+            "storm_used_for_prediction": False,
+        }
+        if residual_load_source == "chronos2"
+        else None
+    )
     automatic_replay_days = list(missing_days)
     expected_recent_suffix = (
         [
@@ -2143,7 +2585,7 @@ def run_zone_live(
                 delivery_day=replay_day,
                 output_dir=None,
                 pit_replay=True,
-                options=options,
+                options=runtime,
                 hooks=hooks,
                 wall_clock=now,
                 defer_reporting=True,
@@ -2187,7 +2629,7 @@ def run_zone_live(
         delivery_day=delivery_day,
         output_dir=output_dir,
         pit_replay=False,
-        options=options,
+        options=runtime,
         hooks=hooks,
         wall_clock=now,
         statistics_blocker=statistics_blocker,

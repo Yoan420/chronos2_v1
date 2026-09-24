@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+import shutil
 from typing import Any
 
 import numpy as np
@@ -22,6 +23,7 @@ from chronos2_hourly.multizone_live import (
     PredictionPolicy,
     ZoneLiveExecutionError,
     ZoneLiveHooks,
+    _publish_staging_atomically,
     blend_quantiles,
     load_prediction_policy,
     load_primary_materialization,
@@ -47,6 +49,58 @@ def _sha(path: Path) -> str:
 def _write_json(path: Path, payload: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload), encoding="utf-8")
+
+
+def test_atomic_publish_retries_a_transient_permission_lock(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    staging = tmp_path / ".run.tmp"
+    output = tmp_path / "run"
+    staging.mkdir()
+    (staging / "forecast.csv").write_text("sealed", encoding="utf-8")
+    real_replace = Path.replace
+    attempts = 0
+
+    def flaky_replace(path: Path, target: Path) -> Path:
+        nonlocal attempts
+        attempts += 1
+        if attempts < 3:
+            raise PermissionError("transient Windows lock")
+        return real_replace(path, target)
+
+    monkeypatch.setattr(Path, "replace", flaky_replace)
+    monkeypatch.setattr("chronos2_hourly.multizone_live.time.sleep", lambda _delay: None)
+
+    _publish_staging_atomically(staging, output)
+
+    assert attempts == 3
+    assert (output / "forecast.csv").read_text(encoding="utf-8") == "sealed"
+    assert not staging.exists()
+
+
+def test_atomic_publish_never_retries_an_existing_archive(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    staging = tmp_path / ".run.tmp"
+    output = tmp_path / "run"
+    staging.mkdir()
+    output.mkdir()
+    monkeypatch.setattr(
+        Path,
+        "replace",
+        lambda _path, _target: (_ for _ in ()).throw(PermissionError("locked")),
+    )
+    sleeps: list[float] = []
+    monkeypatch.setattr("chronos2_hourly.multizone_live.time.sleep", sleeps.append)
+
+    with pytest.raises(PermissionError, match="locked"):
+        _publish_staging_atomically(staging, output)
+
+    assert sleeps == []
+    assert staging.is_dir()
+    assert output.is_dir()
 
 
 def _contract(
@@ -476,6 +530,14 @@ def test_mocked_end_to_end_freezes_candidate_before_report_only_storm(
     assert output.name == f"{zone.lower()}_day_ahead_{delivery}"
     assert (output / contract.forecast_filename).is_file()
     assert (output / "artifact_checksums.json").is_file()
+    checksum_payload = json.loads(
+        (output / "artifact_checksums.json").read_text(encoding="utf-8")
+    )
+    assert any(
+        item.get("role") == "source_code"
+        and item.get("path") == "chronos2_hourly/multizone_live.py"
+        for item in checksum_payload["artifacts"]
+    )
     manifest = json.loads((output / "run_manifest.json").read_text(encoding="utf-8"))
     assert manifest["zone"] == zone
     assert manifest["prediction_mode"] == mode
@@ -486,6 +548,127 @@ def test_mocked_end_to_end_freezes_candidate_before_report_only_storm(
     )
     prediction_inputs = manifest["prediction_inputs"]
     assert (contract.primary_series in prediction_inputs) == (mode == "mkonline_blend")
+
+
+def test_chronos2_shadow_archive_is_forecast_only(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    contract, live = _contract(tmp_path, zone="BE", mode="mkonline_blend")
+    delivery = "2026-08-14"
+    bundle_manifest = tmp_path / "residual_load_bundle_manifest.json"
+    _write_json(bundle_manifest, {"source": "chronos2"})
+    events: list[str] = []
+
+    from chronos2_hourly import chronos_residual_load as residual_provider
+
+    def fake_archive_bundle(
+        manifest_path: Path,
+        *,
+        archive_inputs_dir: Path,
+        expected_delivery_day: Any,
+        expected_runtime_cutoff: Any,
+    ) -> dict[str, Any]:
+        del expected_delivery_day, expected_runtime_cutoff
+        inputs = Path(archive_inputs_dir)
+        archived_root = inputs / "residual_load_bundle"
+        archived_root.mkdir(parents=True)
+        archived_manifest = archived_root / "manifest.json"
+        shutil.copy2(manifest_path, archived_manifest)
+        files: dict[str, dict[str, str]] = {}
+        for position, alias in enumerate(
+            residual_provider.EXPECTED_ALIASES
+        ):
+            artifact = archived_root / f"a{position}.parquet"
+            artifact.write_bytes(alias.encode("utf-8"))
+            files[alias] = {
+                "origin_path": str(Path(manifest_path).parent / artifact.name),
+                "archived_path": f"residual_load_bundle/{artifact.name}",
+                "sha256": _sha(artifact),
+            }
+        return {
+            "origin_manifest_path": str(Path(manifest_path).resolve()),
+            "origin_manifest_sha256": _sha(Path(manifest_path)),
+            "archived_manifest_path": "residual_load_bundle/manifest.json",
+            "archived_manifest_sha256": _sha(archived_manifest),
+            "files": files,
+        }
+
+    monkeypatch.setattr(
+        residual_provider,
+        "archive_live_residual_load_bundle",
+        fake_archive_bundle,
+    )
+
+    def build(
+        _contract_value: ZoneModelContract,
+        schedule: LiveSchedule,
+        policy: PredictionPolicy,
+        _live: Any,
+        _options: Any,
+        _staging: Path,
+    ) -> CandidateArtifacts:
+        events.append("candidate")
+        return CandidateArtifacts(
+            forecast=_forecast(schedule, policy.candidate_model),
+            canonical_target=pd.Series(50.0, index=schedule.delivery_index),
+            fit_audit={},
+            input_diagnostics={"target": {}},
+            pit_freshness={},
+            source_paths={},
+            data_config={},
+        )
+
+    def forbidden(*_args: Any, **_kwargs: Any):
+        pytest.fail("Le chemin shadow ne doit appeler aucun reporting historique.")
+
+    output = run_zone_live(
+        contract,
+        live_settings=live,
+        data_as_of="2026-08-13T08:00:00+02:00",
+        delivery_day=delivery,
+        options=LiveRuntimeOptions(
+            threads=1,
+            workers=1,
+            residual_load_source="chronos2",
+            residual_load_bundle_manifest=bundle_manifest,
+        ),
+        hooks=ZoneLiveHooks(build, forbidden, forbidden, forbidden),
+        wall_clock=pd.Timestamp("2026-08-13T09:00:00+02:00"),
+    )
+
+    assert events == ["candidate"]
+    assert output == (
+        contract.paths.output_root
+        / "_challengers"
+        / "residual_load_chronos2"
+        / f"be_day_ahead_{delivery}_residual_load_chronos2"
+    ).resolve()
+    assert not (output / "backtest_hourly_oof.csv.gz").exists()
+    assert not (output / "metrics_hourly.json").exists()
+    assert not (output / "statistics_history_hourly.csv.gz").exists()
+    report_path = output / f"report_be_{delivery}.html"
+    assert report_path.is_file()
+    assert "Aucune performance historique Saturn" in report_path.read_text(
+        encoding="utf-8"
+    )
+    manifest = json.loads((output / "run_manifest.json").read_text(encoding="utf-8"))
+    summary = json.loads(
+        (output / "live_run_summary.json").read_text(encoding="utf-8")
+    )
+    assert manifest["run_type"] == "shadow_live_day_ahead"
+    assert manifest["reporting_status"] == "forecast_only"
+    assert manifest["statistics_history"]["status"] == "prospective_only"
+    assert manifest["statistics_history"]["historical_performance_eligible"] is False
+    archived_bundle_root = output / "inputs" / "residual_load_bundle"
+    assert (archived_bundle_root / "manifest.json").is_file()
+    assert len(list(archived_bundle_root.glob("*.parquet"))) == 5
+    assert summary["reporting_status"] == "forecast_only"
+    assert (
+        summary["storm_dashboard_loaded_for_statistics_after_candidate_frozen"]
+        is False
+    )
+    assert (output / "artifact_checksums.json").is_file()
 
 
 def test_run_rejects_fr_and_output_escape(tmp_path: Path) -> None:
@@ -506,6 +689,70 @@ def test_run_rejects_fr_and_output_escape(tmp_path: Path) -> None:
             schedule,
             output_dir=tmp_path / "escaped",
             pit_replay=False,
+        )
+
+    production_root, production_output = _validated_output(
+        contract,
+        schedule,
+        output_dir=None,
+        pit_replay=False,
+    )
+    shadow_root, shadow_output = _validated_output(
+        contract,
+        schedule,
+        output_dir=None,
+        pit_replay=False,
+        residual_load_source="chronos2",
+    )
+    assert production_root == contract.paths.output_root.resolve()
+    assert production_output == (
+        contract.paths.output_root / "be_day_ahead_2026-08-14"
+    ).resolve()
+    assert shadow_root == (
+        contract.paths.output_root
+        / "_challengers"
+        / "residual_load_chronos2"
+    ).resolve()
+    assert shadow_output.parent == shadow_root
+    assert shadow_output.name == (
+        "be_day_ahead_2026-08-14_residual_load_chronos2"
+    )
+    with pytest.raises(ZoneLiveExecutionError, match="source-specific"):
+        _validated_output(
+            contract,
+            schedule,
+            output_dir=shadow_root / "unsafe_challenger_name",
+            pit_replay=False,
+            residual_load_source="chronos2",
+        )
+
+
+def test_validated_output_rejects_a_challenger_junction_escape(
+    tmp_path: Path,
+) -> None:
+    contract, _live = _contract(tmp_path)
+    schedule = resolve_live_schedule(
+        contract,
+        as_of="2026-08-13T08:00:00+02:00",
+        delivery_day="2026-08-14",
+    )
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    junction = contract.paths.output_root / "_challengers"
+    try:
+        junction.symlink_to(outside, target_is_directory=True)
+    except OSError as exc:
+        pytest.skip(f"Directory links unavailable: {exc}")
+
+    from chronos2_hourly.multizone_live import _validated_output
+
+    with pytest.raises(ZoneLiveExecutionError, match="outside zone output_root"):
+        _validated_output(
+            contract,
+            schedule,
+            output_dir=None,
+            pit_replay=False,
+            residual_load_source="chronos2",
         )
 
 

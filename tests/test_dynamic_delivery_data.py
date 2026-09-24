@@ -20,6 +20,7 @@ from chronos2_modular.data import (
     _clip_target_to_operational_cutoff,
     prepare_zone_data,
 )
+from chronos2_modular.forecasting import future_proxy_frame
 
 
 class DynamicDeliveryDataTests(unittest.TestCase):
@@ -135,6 +136,19 @@ class DynamicDeliveryDataTests(unittest.TestCase):
         future = data.model_context_covariates.index.difference(data.target.index)
         self.assertEqual(len(future), 25)
         self.assertEqual(future.tz_convert("Europe/Paris").hour.tolist().count(2), 2)
+
+    def test_normal_delivery_day_has_24_known_future_oracle_values(self) -> None:
+        data = self._prepare_for_last_day("2024-04-01")
+        future = data.model_context_covariates.index.difference(data.target.index)
+
+        proxy = future_proxy_frame(data, future, len(data.target))
+
+        self.assertEqual(len(future), 24)
+        self.assertEqual(proxy["known_forecast_oracle"].notna().sum(), 24)
+        np.testing.assert_array_equal(
+            proxy["known_forecast_oracle"].to_numpy(),
+            np.ones(24, dtype=np.float32),
+        )
 
 
 if __name__ == "__main__":

@@ -3,12 +3,15 @@
 
 from __future__ import annotations
 
-from datetime import date, timedelta
+from dataclasses import replace
+from datetime import date, datetime, time, timedelta
 from pathlib import Path
 import sys
 from typing import Any
+from zoneinfo import ZoneInfo
 
 import altair as alt
+import numpy as np
 import pandas as pd
 
 from chronos2_hourly.app_service import (
@@ -21,6 +24,7 @@ from chronos2_hourly.app_service import (
     inspect_zone_statuses,
     launch_zone_forecast,
     list_run_artifacts,
+    load_best_statistics_history,
     load_forecast_curve,
     load_latest_forecast_comparison,
     load_statistics_history,
@@ -30,20 +34,35 @@ from chronos2_hourly.consolidated_report import (
     consolidated_report_filename,
     render_consolidated_forecast_report,
 )
-from chronos2_hourly.market_coupling import (
-    MarketCouplingDataError,
-    render_market_coupling_panel,
-)
-
-
 PROJECT_ROOT = Path(__file__).resolve().parent
 REGISTRY_PATH = PROJECT_ROOT / "chronos2_hourly_live_zones.yaml"
 LIVE_ROOT = PROJECT_ROOT / "runs" / "live"
 SEALED_BENCHMARK_ROOT = PROJECT_ROOT / "runs"
 LOG_ROOT = LIVE_ROOT / "_app_logs"
-# Conserved for a later iteration, but intentionally hidden while model
-# performance and the Storm win-rate are the product priority.
-ENABLE_MARKET_COUPLING = False
+
+PERFORMANCE_FREQUENCIES = {
+    "H": "Horaire",
+    "D": "Journalier",
+    "W": "Hebdomadaire",
+    "M": "Mensuel",
+}
+STATISTIC_LABELS = {
+    "mae": "Mean Absolute Error",
+    "rmse": "Root Mean Squared Error",
+    "mape": "Mean Absolute Percentage Error",
+    "explained_variance": "Explained Variance",
+    "r2": "R²",
+    "std_error": "Standard Deviation of Error",
+    "correlation": "Correlation",
+}
+HIGHER_IS_BETTER = {"explained_variance", "r2", "correlation"}
+ZONE_NAMES = {
+    "FR": "France",
+    "DE": "Allemagne",
+    "BE": "Belgique",
+    "NL": "Pays-Bas",
+    "ES": "Espagne",
+}
 
 
 def _streamlit() -> Any:
@@ -123,6 +142,7 @@ def _refresh_results_after_queue(
     cached_artifacts: Any,
     cached_statistics: Any,
     cached_comparison: Any | None = None,
+    cached_performance: Any | None = None,
 ) -> bool:
     """Refresh report views once after the last queued process finishes.
 
@@ -142,6 +162,8 @@ def _refresh_results_after_queue(
     cached_statistics.clear()
     if cached_comparison is not None:
         cached_comparison.clear()
+    if cached_performance is not None:
+        cached_performance.clear()
     st.rerun(scope="app")
     return True
 
@@ -248,6 +270,630 @@ def _comparison_chart(
     return (interval + median).properties(height=390, title=title).interactive()
 
 
+def _filter_statistics_dataset(
+    dataset: Any,
+    *,
+    timezone_name: str,
+    start_day: date,
+    end_day: date,
+) -> Any:
+    """Return an immutable Statistics view restricted to local civil days."""
+
+    local_day = dataset.frame["timestamp"].dt.tz_convert(timezone_name).dt.date
+    selected = dataset.frame.loc[
+        (local_day >= start_day) & (local_day <= end_day)
+    ].copy()
+    return replace(dataset, frame=selected.reset_index(drop=True))
+
+
+def _performance_series(
+    dataset: Any,
+    *,
+    timezone_name: str,
+    start_day: date,
+    end_day: date,
+    frequency: str,
+) -> pd.DataFrame:
+    """Build the outright series shown in the daily-performance workspace."""
+
+    selected = _filter_statistics_dataset(
+        dataset,
+        timezone_name=timezone_name,
+        start_day=start_day,
+        end_day=end_day,
+    ).frame.copy()
+    if selected.empty:
+        return selected
+    local = selected["timestamp"].dt.tz_convert(timezone_name)
+    selected["local_timestamp"] = local
+    selected["local_label"] = local.dt.strftime("%d/%m/%Y %H:%M %z")
+    if frequency == "H":
+        selected["plot_timestamp"] = selected["timestamp"]
+        return selected
+
+    local_naive = local.dt.tz_localize(None)
+    if frequency == "D":
+        selected["period_start_local"] = local_naive.dt.normalize()
+    elif frequency == "W":
+        selected["period_start_local"] = local_naive.dt.to_period("W-SUN").dt.start_time
+    elif frequency == "M":
+        selected["period_start_local"] = local_naive.dt.to_period("M").dt.start_time
+    else:
+        raise ValueError(f"Fréquence inconnue : {frequency}")
+
+    grouped = (
+        selected.groupby("period_start_local", sort=True)[
+            ["actual", "candidate", "benchmark"]
+        ]
+        .mean()
+        .reset_index()
+    )
+    localized = pd.DatetimeIndex(grouped["period_start_local"]).tz_localize(
+        timezone_name,
+        ambiguous="raise",
+        nonexistent="raise",
+    )
+    grouped["plot_timestamp"] = localized.tz_convert("UTC")
+    grouped["local_label"] = grouped["period_start_local"].dt.strftime("%d/%m/%Y")
+    return grouped
+
+
+def _weekend_bands(
+    *,
+    start_day: date,
+    end_day: date,
+    timezone_name: str,
+) -> pd.DataFrame:
+    """Build exact UTC bounds for weekend shading, including DST days."""
+
+    zone = ZoneInfo(timezone_name)
+    rows: list[dict[str, datetime]] = []
+    current = start_day
+    while current <= end_day:
+        if current.weekday() >= 5:
+            start_local = datetime.combine(current, time.min, tzinfo=zone)
+            end_local = datetime.combine(
+                current + timedelta(days=1), time.min, tzinfo=zone
+            )
+            rows.append(
+                {
+                    "start": start_local.astimezone(ZoneInfo("UTC")),
+                    "end": end_local.astimezone(ZoneInfo("UTC")),
+                }
+            )
+        current += timedelta(days=1)
+    return pd.DataFrame(rows, columns=["start", "end"])
+
+
+def _performance_chart(
+    frame: pd.DataFrame,
+    *,
+    candidate_label: str,
+    benchmark_label: str | None,
+    weekend_bands: pd.DataFrame,
+) -> alt.LayerChart:
+    """Compare realised prices, our model and Storm with trading-style cues."""
+
+    labels = {
+        "actual": "Prix réalisé",
+        "candidate": candidate_label,
+        "benchmark": benchmark_label or "Storm",
+    }
+    value_columns = ["actual", "candidate"]
+    if benchmark_label and bool(frame["benchmark"].notna().any()):
+        value_columns.append("benchmark")
+    long = frame.melt(
+        id_vars=["plot_timestamp", "local_label"],
+        value_vars=value_columns,
+        var_name="series_key",
+        value_name="value",
+    )
+    long["Série"] = long["series_key"].map(labels)
+    ordered_labels = [labels[key] for key in value_columns]
+    colors = ["#25313A", "#159DE4", "#64748B"][: len(ordered_labels)]
+    dashes = [[1, 0], [1, 0], [5, 3]][: len(ordered_labels)]
+
+    line = (
+        alt.Chart(long)
+        .mark_line(strokeWidth=2.4)
+        .encode(
+            x=alt.X(
+                "plot_timestamp:T",
+                title="Période de livraison",
+                axis=alt.Axis(format="%d %b", labelOverlap=True),
+            ),
+            y=alt.Y("value:Q", title="Prix (EUR/MWh)", scale=alt.Scale(zero=False)),
+            color=alt.Color(
+                "Série:N",
+                title=None,
+                scale=alt.Scale(domain=ordered_labels, range=colors),
+                sort=ordered_labels,
+            ),
+            strokeDash=alt.StrokeDash(
+                "Série:N",
+                title=None,
+                scale=alt.Scale(domain=ordered_labels, range=dashes),
+                sort=ordered_labels,
+            ),
+            tooltip=(
+                alt.Tooltip("local_label:N", title="Livraison locale"),
+                alt.Tooltip("Série:N", title="Série"),
+                alt.Tooltip("value:Q", title="EUR/MWh", format=".2f"),
+            ),
+        )
+    )
+    zero = alt.Chart(pd.DataFrame({"value": [0.0]})).mark_rule(
+        color="#475569", opacity=0.55, strokeWidth=1
+    ).encode(y="value:Q")
+    layers: list[alt.Chart] = []
+    if not weekend_bands.empty:
+        layers.append(
+            alt.Chart(weekend_bands)
+            .mark_rect(color="#D9EFFB", opacity=0.55)
+            .encode(x="start:T", x2="end:T")
+        )
+    layers.extend([zero, line])
+    return alt.layer(*layers).properties(height=470).interactive()
+
+
+def _overall_performance(
+    dataset: Any,
+    *,
+    timezone_name: str,
+    start_day: date,
+    end_day: date,
+    sample: str = "daily",
+) -> dict[str, Any]:
+    """Compute dashboard KPIs without changing the reporting metric contract."""
+
+    selected = _filter_statistics_dataset(
+        dataset,
+        timezone_name=timezone_name,
+        start_day=start_day,
+        end_day=end_day,
+    )
+    frame = selected.frame
+    paired_candidate = frame.dropna(subset=["actual", "candidate"])
+    benchmark_mae = np.nan
+    paired_benchmark = pd.DataFrame()
+    if dataset.benchmark_column is not None:
+        paired_benchmark = frame.dropna(subset=["actual", "candidate", "benchmark"])
+        comparison_frame = paired_benchmark
+        if not comparison_frame.empty:
+            benchmark_mae = float(
+                np.mean(
+                    np.abs(comparison_frame["benchmark"] - comparison_frame["actual"])
+                )
+            )
+    else:
+        comparison_frame = paired_candidate
+    candidate_mae = (
+        float(
+            np.mean(
+                np.abs(comparison_frame["candidate"] - comparison_frame["actual"])
+            )
+        )
+        if not comparison_frame.empty
+        else np.nan
+    )
+    view = build_statistics_view(
+        selected,
+        timezone_name=timezone_name,
+        sample=sample,
+    )
+    mae_row = view.summary.loc[view.summary["metric"] == "mae"]
+    raw_win_rate = mae_row.iloc[0]["win_rate"] if not mae_row.empty else None
+    win_rate = (
+        float(raw_win_rate)
+        if raw_win_rate is not None and np.isfinite(float(raw_win_rate))
+        else np.nan
+    )
+    local = frame["timestamp"].dt.tz_convert(timezone_name) if not frame.empty else None
+    return {
+        "candidate_mae": candidate_mae,
+        "benchmark_mae": benchmark_mae,
+        "advantage": benchmark_mae - candidate_mae,
+        "win_rate": win_rate,
+        "hours": int(len(comparison_frame)),
+        "start": local.min().date() if local is not None else None,
+        "end": local.max().date() if local is not None else None,
+        "view": view,
+        "dataset": selected,
+    }
+
+
+def _zone_performance_table(
+    datasets: dict[str, Any],
+    *,
+    timezone_by_zone: dict[str, str],
+    start_day: date,
+    end_day: date,
+) -> pd.DataFrame:
+    rows: list[dict[str, Any]] = []
+    for zone in APP_ZONES:
+        dataset = datasets.get(zone)
+        if dataset is None:
+            continue
+        overview = _overall_performance(
+            dataset,
+            timezone_name=timezone_by_zone[zone],
+            start_day=start_day,
+            end_day=end_day,
+        )
+        scope = "Partiel" if dataset.scope_note and "parti" in dataset.scope_note.lower() else "Complet"
+        rows.append(
+            {
+                "Pays": f"{zone} · {ZONE_NAMES.get(zone, zone)}",
+                "Modèle": dataset.candidate_label,
+                "MAE modèle": overview["candidate_mae"],
+                "MAE Storm": overview["benchmark_mae"],
+                "Avantage modèle": overview["advantage"],
+                "Win rate quotidien": overview["win_rate"],
+                "Heures": overview["hours"],
+                "Périmètre": scope,
+            }
+        )
+    return pd.DataFrame(rows)
+
+
+def _statistics_period_table(
+    overview: dict[str, Any],
+    *,
+    metric: str,
+    sample: str,
+    timezone_name: str,
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    view = build_statistics_view(
+        overview["dataset"],
+        timezone_name=timezone_name,
+        sample=sample,
+    )
+    candidate_col = f"candidate_{metric}"
+    benchmark_col = f"benchmark_{metric}"
+    outcome_col = f"outcome_{metric}"
+    table = view.periods.loc[
+        :, ["period", "n", candidate_col, benchmark_col, outcome_col]
+    ].copy()
+    if metric in HIGHER_IS_BETTER:
+        table["advantage"] = table[candidate_col] - table[benchmark_col]
+    else:
+        table["advantage"] = table[benchmark_col] - table[candidate_col]
+    table[outcome_col] = table[outcome_col].map(
+        {"win": "Gagné", "tie": "Égalité", "loss": "Perdu"}
+    )
+    table = table.rename(
+        columns={
+            "period": "Période",
+            "n": "N",
+            candidate_col: "Modèle",
+            benchmark_col: "Storm",
+            "advantage": "Avantage modèle",
+            outcome_col: "Résultat",
+        }
+    )
+    summary = view.summary.rename(
+        columns={
+            "label": "Statistic",
+            "candidate": "Modèle",
+            "benchmark": "Storm",
+            "wins": "Wins",
+            "ties": "Ties",
+            "losses": "Losses",
+            "comparable_periods": "Périodes comparables",
+            "win_rate": "Win rate vs Storm",
+        }
+    ).drop(columns=["metric"])
+    return table.iloc[::-1].reset_index(drop=True), summary
+
+
+def _render_performance_workspace(
+    st: Any,
+    *,
+    statuses: list[Any],
+    cached_best_statistics: Any,
+) -> None:
+    """Render the Storm-inspired daily model-performance workspace."""
+
+    status_by_zone = {status.code: status for status in statuses}
+    zones = [zone for zone in APP_ZONES if status_by_zone[zone].launchable]
+    st.subheader("Performance quotidienne des modèles", anchor=False)
+    st.caption(
+        "Même logique de lecture que le dashboard Storm : filtres compacts, "
+        "courbe outright, puis Statistics détaillées. Storm reste chargé "
+        "uniquement après gel du forecast candidat."
+    )
+
+    with st.container(border=True):
+        st.markdown("**FILTERING**")
+        filter_cols = st.columns([1.25, 1.05, 1.0])
+        variant = filter_cols[0].segmented_control(
+            "Modèle",
+            options=("autonomous", "production"),
+            default="autonomous",
+            format_func={
+                "autonomous": "Autonome",
+                "production": "Production",
+            }.get,
+            help="Production utilise le blend MKOnline validé uniquement pour FR/NL.",
+            key="performance_variant",
+        ) or "autonomous"
+        focus_zone = filter_cols[1].selectbox(
+            "Zone",
+            options=zones,
+            format_func=lambda zone: f"{zone} · {ZONE_NAMES.get(zone, zone)}",
+            key="performance_zone",
+        )
+        frequency = filter_cols[2].segmented_control(
+            "Fréquence du graphe",
+            options=tuple(PERFORMANCE_FREQUENCIES),
+            default="H",
+            format_func=lambda value: value,
+            key="performance_frequency",
+        ) or "H"
+
+        datasets: dict[str, Any] = {}
+        performance_artifacts: dict[str, Any] = {}
+        load_errors: list[str] = []
+        for zone in zones:
+            try:
+                artifact, dataset = cached_best_statistics(
+                    str(REGISTRY_PATH),
+                    REGISTRY_PATH.stat().st_mtime_ns,
+                    str(PROJECT_ROOT),
+                    zone,
+                    variant,
+                )
+            except Exception as exc:
+                load_errors.append(f"{zone}: {exc}")
+                continue
+            performance_artifacts[zone] = artifact
+            datasets[zone] = dataset
+        if load_errors:
+            st.warning(
+                "Certaines zones sont temporairement indisponibles ; les autres restent "
+                "consultables. " + " · ".join(load_errors)
+            )
+        if not datasets:
+            st.error("Aucune archive Statistics auditée n'est disponible.")
+            return
+        if focus_zone not in datasets:
+            replacement_zone = next(zone for zone in zones if zone in datasets)
+            st.warning(
+                f"Aucune Statistics exploitable pour {focus_zone}; affichage de "
+                f"{replacement_zone} à la place."
+            )
+            focus_zone = replacement_zone
+
+        local_days = datasets[focus_zone].frame["timestamp"].dt.tz_convert(
+            status_by_zone[focus_zone].timezone
+        ).dt.date
+        minimum_day = min(local_days)
+        maximum_day = max(local_days)
+        requested_day: date | None = None
+        raw_requested_day = st.query_params.get("date")
+        if raw_requested_day:
+            try:
+                requested_day = date.fromisoformat(str(raw_requested_day))
+            except ValueError:
+                st.warning("Le paramètre URL 'date' est invalide ; la dernière date disponible est utilisée.")
+        default_end = (
+            min(maximum_day, max(minimum_day, requested_day))
+            if requested_day is not None
+            else maximum_day
+        )
+        default_start = max(minimum_day, default_end - timedelta(days=69))
+        period = st.date_input(
+            "Période",
+            value=(default_start, default_end),
+            min_value=minimum_day,
+            max_value=maximum_day,
+            key=f"performance_period_{focus_zone}",
+        )
+        if not isinstance(period, (tuple, list)) or len(period) != 2:
+            st.info("Sélectionnez une date de début et une date de fin.")
+            return
+        start_day, end_day = period
+        source_label = {
+            "live_day_ahead": "forecast publié",
+            "pit_replay": "reconstitution causale",
+        }.get(
+            performance_artifacts[focus_zone].archive_kind,
+            performance_artifacts[focus_zone].archive_kind,
+        )
+        st.caption(
+            f"Données disponibles pour {focus_zone} : {minimum_day.isoformat()} → "
+            f"{maximum_day.isoformat()} · source : {source_label} "
+            f"· graphe {PERFORMANCE_FREQUENCIES[frequency].lower()}."
+        )
+        if requested_day is not None and requested_day > maximum_day:
+            st.caption(
+                f"La date demandée ({requested_day.isoformat()}) n'est pas encore entièrement "
+                f"réalisée ; affichage arrêté au {maximum_day.isoformat()}."
+            )
+
+    focus_dataset = datasets[focus_zone]
+    focus_timezone = status_by_zone[focus_zone].timezone
+    overview = _overall_performance(
+        focus_dataset,
+        timezone_name=focus_timezone,
+        start_day=start_day,
+        end_day=end_day,
+    )
+    if not overview["hours"]:
+        st.warning("La période sélectionnée ne contient aucune observation exploitable.")
+        return
+
+    with st.container(horizontal=True):
+        st.metric(
+            "MAE modèle",
+            f"{overview['candidate_mae']:.2f} EUR/MWh",
+            border=True,
+        )
+        st.metric(
+            "MAE Storm",
+            (
+                f"{overview['benchmark_mae']:.2f} EUR/MWh"
+                if np.isfinite(overview["benchmark_mae"])
+                else "N/A"
+            ),
+            border=True,
+        )
+        st.metric(
+            "Avantage modèle",
+            (
+                f"{overview['advantage']:+.2f} EUR/MWh"
+                if np.isfinite(overview["advantage"])
+                else "N/A"
+            ),
+            help="Valeur positive : le modèle a une MAE inférieure à Storm.",
+            border=True,
+        )
+        st.metric(
+            "Win rate quotidien",
+            (
+                f"{100.0 * overview['win_rate']:.1f}%"
+                if np.isfinite(overview["win_rate"])
+                else "N/A"
+            ),
+            border=True,
+        )
+        st.metric("Heures évaluées", f"{overview['hours']:,}".replace(",", " "), border=True)
+
+    st.markdown("**Vue d’ensemble multi-pays**")
+    zone_table = _zone_performance_table(
+        datasets,
+        timezone_by_zone={zone: status_by_zone[zone].timezone for zone in datasets},
+        start_day=start_day,
+        end_day=end_day,
+    )
+    st.dataframe(
+        zone_table,
+        hide_index=True,
+        width="stretch",
+        column_config={
+            "MAE modèle": st.column_config.NumberColumn(format="%.2f EUR/MWh"),
+            "MAE Storm": st.column_config.NumberColumn(format="%.2f EUR/MWh"),
+            "Avantage modèle": st.column_config.NumberColumn(format="%+.2f EUR/MWh"),
+            "Win rate quotidien": st.column_config.ProgressColumn(
+                min_value=0.0, max_value=1.0, format="percent"
+            ),
+            "Heures": st.column_config.NumberColumn(format="%d"),
+        },
+    )
+
+    with st.container(border=True):
+        st.subheader("Outright graph", anchor=False)
+        chart_frame = _performance_series(
+            focus_dataset,
+            timezone_name=focus_timezone,
+            start_day=start_day,
+            end_day=end_day,
+            frequency=frequency,
+        )
+        st.altair_chart(
+            _performance_chart(
+                chart_frame,
+                candidate_label=focus_dataset.candidate_label,
+                benchmark_label=focus_dataset.benchmark_label,
+                weekend_bands=_weekend_bands(
+                    start_day=start_day,
+                    end_day=end_day,
+                    timezone_name=focus_timezone,
+                ),
+            ),
+            width="stretch",
+        )
+        st.caption(
+            "Zones bleutées : samedis et dimanches. Survolez les courbes pour "
+            "obtenir les valeurs ; utilisez la molette et le glisser-déposer pour zoomer."
+        )
+
+    with st.container(border=True):
+        st.subheader("Statistics", anchor=False)
+        controls = st.columns([1.6, 1.0])
+        metric = controls[0].selectbox(
+            "Statistic",
+            options=tuple(STATISTIC_LABELS),
+            format_func=STATISTIC_LABELS.get,
+            key="performance_statistic",
+        )
+        sample = controls[1].selectbox(
+            "Sample",
+            options=("daily", "weekly", "monthly"),
+            format_func={
+                "daily": "Daily",
+                "weekly": "Weekly",
+                "monthly": "Monthly",
+            }.get,
+            key="performance_sample",
+        )
+        period_table, statistics_summary = _statistics_period_table(
+            overview,
+            metric=metric,
+            sample=sample,
+            timezone_name=focus_timezone,
+        )
+        metric_label = STATISTIC_LABELS[metric]
+        period_table = period_table.rename(
+            columns={
+                "Modèle": f"{focus_dataset.candidate_label} · {metric_label}",
+                "Storm": f"Storm · {metric_label}",
+            }
+        )
+        value_columns = [
+            f"{focus_dataset.candidate_label} · {metric_label}",
+            f"Storm · {metric_label}",
+        ]
+        value_style_columns = [
+            column
+            for column in value_columns
+            if column in period_table
+            and bool(pd.to_numeric(period_table[column], errors="coerce").notna().any())
+        ]
+        styled = period_table.style
+        if value_style_columns:
+            styled = styled.background_gradient(
+                subset=value_style_columns,
+                cmap="RdYlBu" if metric in HIGHER_IS_BETTER else "RdYlBu_r",
+            )
+        if bool(
+            pd.to_numeric(period_table["Avantage modèle"], errors="coerce")
+            .notna()
+            .any()
+        ):
+            styled = styled.background_gradient(
+                subset=["Avantage modèle"],
+                cmap="RdYlBu",
+            )
+        st.dataframe(
+            styled,
+            hide_index=True,
+            width="stretch",
+            column_config={
+                "N": st.column_config.NumberColumn(format="%d"),
+            },
+        )
+        st.caption(
+            "Avantage modèle > 0 signifie que le modèle bat Storm sur la période. "
+            "Les égalités restent dans le dénominateur du win rate."
+        )
+        all_stats = st.expander("Toutes les Statistics", on_change="rerun")
+        if all_stats.open:
+            with all_stats:
+                st.dataframe(
+                    statistics_summary,
+                    hide_index=True,
+                    width="stretch",
+                    column_config={
+                        "Win rate vs Storm": st.column_config.ProgressColumn(
+                            min_value=0.0, max_value=1.0, format="percent"
+                        )
+                    },
+                )
+    if focus_dataset.scope_note:
+        st.info(focus_dataset.scope_note, icon=":material/info:")
+
+
 def main() -> None:
     st = _streamlit()
     st.set_page_config(
@@ -271,14 +917,41 @@ def main() -> None:
         )
 
     @st.cache_data(ttl=30, show_spinner=False)
-    def cached_statistics(path: str, modified_ns: int) -> Any:
+    def cached_statistics(path: str, modified_ns: int, variant: str) -> Any:
         del modified_ns
-        return load_statistics_history(path)
+        return load_statistics_history(path, variant=variant)
+
+    @st.cache_data(ttl=60, max_entries=32, show_spinner=False)
+    def cached_best_statistics(
+        registry: str,
+        registry_modified_ns: int,
+        project_root: str,
+        zone: str,
+        variant: str,
+    ) -> Any:
+        del registry_modified_ns
+        zone_statuses = inspect_zone_statuses(registry, zones=(zone,))
+        if len(zone_statuses) != 1:
+            raise ValueError(f"Statut de zone introuvable : {zone}")
+        return load_best_statistics_history(
+            zone_statuses[0],
+            project_root=project_root,
+            variant=variant,
+        )
 
     @st.cache_data(ttl=30, show_spinner=False)
-    def cached_forecast(path: str, modified_ns: int, timezone_name: str) -> Any:
+    def cached_forecast(
+        path: str,
+        modified_ns: int,
+        timezone_name: str,
+        variant: str,
+    ) -> Any:
         del modified_ns
-        return load_forecast_curve(path, timezone_name=timezone_name)
+        return load_forecast_curve(
+            path,
+            timezone_name=timezone_name,
+            variant=variant,
+        )
 
     @st.cache_data(ttl=15, max_entries=32, show_spinner=False)
     def cached_comparison(
@@ -287,6 +960,7 @@ def main() -> None:
         project_root: str,
         zones: tuple[str, ...],
         allow_mixed_delivery_days: bool,
+        variant: str,
     ) -> Any:
         del registry_modified_ns
         comparison_statuses = inspect_zone_statuses(registry, zones=zones)
@@ -295,6 +969,7 @@ def main() -> None:
             project_root=project_root,
             zones=zones,
             allow_mixed_delivery_days=allow_mixed_delivery_days,
+            variant=variant,
         )
 
     @st.cache_data(max_entries=16, show_spinner=False)
@@ -302,19 +977,20 @@ def main() -> None:
         _comparison: Any,
         archive_fingerprints: tuple[tuple[str, str, str, str], ...],
         include_intervals: bool,
+        variant: str,
     ) -> bytes:
         # ``archive_fingerprints`` is the cache key.  The comparison itself is
         # deliberately excluded from Streamlit hashing: every miss still goes
         # through the renderer's complete archive/SHA-256 revalidation.
-        del archive_fingerprints
+        del archive_fingerprints, variant
         return render_consolidated_forecast_report(
             _comparison,
             include_intervals=include_intervals,
         )
 
-    st.title(":material/bolt: Forecast control room")
+    st.title(":material/bolt: Chronos-2 · Day-ahead")
     st.caption(
-        "Prévisions day-ahead multi-pays · Storm reste un benchmark "
+        "Prévisions et performance multi-pays · Storm reste un benchmark "
         "d'évaluation uniquement et n'entre jamais dans les features du modèle."
     )
 
@@ -326,6 +1002,43 @@ def main() -> None:
         st.error(f"Le registre multi-zone ne peut pas être audité : {exc}")
         st.stop()
     status_by_zone = {status.code: status for status in statuses}
+
+    workspace = st.segmented_control(
+        "Espace",
+        options=("performance", "operations"),
+        default="performance",
+        format_func={
+            "performance": "Performance des modèles",
+            "operations": "Runs et rapports",
+        }.get,
+        label_visibility="collapsed",
+        key="main_workspace",
+    ) or "performance"
+    if workspace == "performance":
+        @st.fragment(run_every="2s")
+        def poll_hidden_forecast_queue() -> None:
+            if not (
+                st.session_state.active_forecast
+                or st.session_state.forecast_queue
+                or st.session_state.results_refresh_pending
+            ):
+                return
+            _advance_queue(st)
+            _refresh_results_after_queue(
+                st,
+                cached_artifacts=cached_artifacts,
+                cached_statistics=cached_statistics,
+                cached_comparison=cached_comparison,
+                cached_performance=cached_best_statistics,
+            )
+
+        poll_hidden_forecast_queue()
+        _render_performance_workspace(
+            st,
+            statuses=statuses,
+            cached_best_statistics=cached_best_statistics,
+        )
+        return
 
     st.subheader("État des pays et garde-fous", anchor=False)
     st.dataframe(
@@ -416,6 +1129,7 @@ def main() -> None:
             cached_artifacts=cached_artifacts,
             cached_statistics=cached_statistics,
             cached_comparison=cached_comparison,
+            cached_performance=cached_best_statistics,
         )
         if active is None and not pending and not st.session_state.forecast_jobs:
             st.info("Aucun forecast lancé depuis cette session.")
@@ -473,6 +1187,19 @@ def main() -> None:
     comparison_options = [
         zone for zone in APP_ZONES if status_by_zone[zone].launchable
     ]
+    comparison_variant = st.segmented_control(
+        "Version du modèle",
+        options=("autonomous", "production"),
+        default="autonomous",
+        format_func={
+            "autonomous": "Autonome · sans MKOnline",
+            "production": "Production · blend validé FR/NL",
+        }.get,
+        help=(
+            "La version autonome utilise uniquement Chronos-2 et son correcteur. "
+            "La version Production ajoute le blend MKOnline uniquement pour FR/NL."
+        ),
+    ) or "autonomous"
     comparison_left, comparison_right = st.columns([2, 1])
     with comparison_left:
         comparison_zones = st.pills(
@@ -511,6 +1238,7 @@ def main() -> None:
                 str(PROJECT_ROOT),
                 tuple(comparison_zones),
                 allow_mixed_delivery_days,
+                comparison_variant,
             )
         except MixedForecastDeliveryDaysError as exc:
             mapping = " · ".join(
@@ -559,7 +1287,8 @@ def main() -> None:
                     width="stretch",
                 )
                 st.caption(
-                    "Axe commun en UTC ; le tooltip conserve l'heure locale et "
+                    ("Version autonome sans MKOnline. " if comparison.variant == "autonomous" else "Version de production. ")
+                    + "Axe commun en UTC ; le tooltip conserve l'heure locale et "
                     "la timezone de chaque marché. Les archives, identités, dates, "
                     "timelines DST et checksums sont validés avant affichage."
                 )
@@ -577,6 +1306,7 @@ def main() -> None:
                         comparison,
                         archive_fingerprints,
                         include_intervals,
+                        comparison.variant,
                     )
                 except Exception as exc:
                     st.error(f"Export HTML consolidé refusé : {exc}")
@@ -589,27 +1319,6 @@ def main() -> None:
                         mime="text/html",
                         key="download_consolidated_forecasts",
                     )
-
-    if ENABLE_MARKET_COUPLING:
-        st.subheader("Convergence des prix prévus entre marchés", anchor=False)
-        st.caption(
-            "Cette vue compare les prix P50 des pays voisins. Les traits montrent "
-            "l'importance des écarts de prix ; ils ne représentent pas des échanges "
-            "d'électricité. Les flux physiques ne seront affichés que lorsqu'une "
-            "source causale complète et vérifiée sera disponible."
-        )
-        try:
-            render_market_coupling_panel(
-                st,
-                PROJECT_ROOT,
-                delivery_day=None,
-                border_signals=None,
-                key_prefix="market_coupling",
-            )
-        except MarketCouplingDataError as exc:
-            st.warning(f"Carte de couplage indisponible : {exc}")
-        except Exception as exc:
-            st.error(f"La carte de couplage ne peut pas être rendue : {exc}")
 
     st.subheader("Derniers runs et rapports", anchor=False)
     artifacts = cached_artifacts(str(LIVE_ROOT), str(SEALED_BENCHMARK_ROOT))
@@ -629,10 +1338,20 @@ def main() -> None:
         artifact.modified_at.astimezone().strftime("%d/%m/%Y %H:%M"),
     )
     st.code(str(artifact.directory), language="text")
+    artifact_variant = st.segmented_control(
+        "Version consultée",
+        options=("autonomous", "production"),
+        default="autonomous",
+        format_func={
+            "autonomous": "Autonome · sans MKOnline",
+            "production": "Production",
+        }.get,
+        key="artifact_forecast_variant",
+    ) or "autonomous"
     if artifact.report_path is not None:
         with artifact.report_path.open("rb") as report_stream:
             st.download_button(
-                "Télécharger le rapport HTML",
+                "Télécharger le rapport archivé (production)",
                 icon=":material/download:",
                 data=report_stream.read(),
                 file_name=artifact.report_path.name,
@@ -646,6 +1365,7 @@ def main() -> None:
                 str(artifact.forecast_path),
                 artifact.forecast_path.stat().st_mtime_ns,
                 status_by_zone[artifact.zone].timezone,
+                artifact_variant,
             ).frame
         except Exception as exc:
             st.error(f"Forecast illisible : {exc}")
@@ -670,6 +1390,7 @@ def main() -> None:
         dataset = cached_statistics(
             str(artifact.statistics_path),
             artifact.statistics_path.stat().st_mtime_ns,
+            artifact_variant,
         )
     except Exception as exc:
         st.error(f"Statistics illisible : {exc}")

@@ -30,6 +30,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--local-files-only", action="store_true")
     parser.add_argument("--pit-replay", action="store_true")
     parser.add_argument(
+        "--residual-load-source",
+        choices=("saturn", "chronos2"),
+        default="saturn",
+    )
+    parser.add_argument("--residual-load-bundle-manifest", default=None)
+    parser.add_argument(
         "--rolling365-capture-root",
         default=None,
         help=(
@@ -77,6 +83,12 @@ def main() -> int:
         rolling365_capture_root=(
             Path(args.rolling365_capture_root).expanduser().resolve()
             if args.rolling365_capture_root
+            else None
+        ),
+        residual_load_source=args.residual_load_source,
+        residual_load_bundle_manifest=(
+            Path(args.residual_load_bundle_manifest).expanduser().resolve()
+            if args.residual_load_bundle_manifest
             else None
         ),
     )

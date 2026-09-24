@@ -6,10 +6,12 @@ history, aligns a separately materialized dashboard comparator to it and
 publishes a *copy* of the report snapshot.  The original strict D-1 08:00
 comparator is retained under its own explicit column and audit contract.
 
-The dashboard contract is the current extraction of the exact native Saturn
-series supplied by the dashboard owners. It is not a per-delivery-day PIT
-selection. Each extraction is normalized, materialized and checksummed so a
-report remains reproducible if Saturn later revises the native curve.
+The dashboard contract is the frozen day-ahead Saturn cache used by GEMS
+(``...storm.da.cache``).  A few historical delivery days are absent from that
+cache; only for those holes we use the verified native curve, which is equal
+to the last ``.da.basecase`` vintage before civil delivery-day midnight.  The
+cache always wins when both sources contain a value.  Each merged extraction
+is normalized, materialized and checksummed so a report remains reproducible.
 """
 
 from __future__ import annotations
@@ -27,10 +29,17 @@ import pandas as pd
 
 
 TIMEZONE = "Europe/Paris"
+STORM_DASHBOARD_CACHE_SERIES_BY_ZONE: dict[str, str] = {
+    zone: f"power.price.{zone.lower()}.euromwh.h.fcst.3mv.storm.da.cache"
+    for zone in ("FR", "DE", "BE", "NL")
+}
 STORM_DASHBOARD_NATIVE_SERIES_BY_ZONE: dict[str, str] = {
     zone: f"power.price.{zone.lower()}.euromwh.h.fcst.3mv.storm"
     for zone in ("FR", "DE", "BE", "NL")
 }
+STORM_DASHBOARD_PRIMARY_SERIES_BY_ZONE: dict[str, str] = dict(
+    STORM_DASHBOARD_CACHE_SERIES_BY_ZONE
+)
 STORM_DASHBOARD_NATIVE_PRIMARY_BY_ZONE: dict[str, str] = {
     "FR": "41377_native",
     "DE": "41376_native",
@@ -46,16 +55,16 @@ STORM_DASHBOARD_NATIVE_NAIVE_TIMEZONE_BY_ZONE: dict[str, str] = {
 
 
 def storm_dashboard_series(zone: str = "FR") -> str:
-    """Return the verified native dashboard identifier for one zone."""
+    """Return the verified frozen day-ahead dashboard identifier."""
 
     zone_key = str(zone).strip().upper()
     try:
-        return STORM_DASHBOARD_NATIVE_SERIES_BY_ZONE[zone_key]
+        return STORM_DASHBOARD_CACHE_SERIES_BY_ZONE[zone_key]
     except KeyError as exc:
         raise ValueError(
-            "No verified native Storm dashboard series for zone "
+            "No verified Storm day-ahead dashboard series for zone "
             f"{zone_key!r}; verified zones are "
-            f"{sorted(STORM_DASHBOARD_NATIVE_SERIES_BY_ZONE)}"
+            f"{sorted(STORM_DASHBOARD_CACHE_SERIES_BY_ZONE)}"
         ) from exc
 
 
@@ -66,15 +75,18 @@ def fetch_native_dashboard_snapshot(
     expected_index: pd.DatetimeIndex,
     extracted_at_utc: pd.Timestamp | None = None,
 ) -> tuple[pd.Series, dict[str, Any]]:
-    """Fetch one auditable latest snapshot of the exact native series.
+    """Fetch the frozen GEMS day-ahead cache with an audited gap fallback.
 
-    The raw timezone-naive civil index is preserved here. Its sole timezone
-    conversion belongs to :func:`normalize_native_dashboard_series`, keeping
-    the DST policy identical for live runs and report-only refreshes.
+    The primary ``.da.cache`` is UTC-aware and wins on every available hour.
+    The native civil-time curve only fills whole historical cache holes.  The
+    result is UTC-aware, so a future cache containing both autumn folds can be
+    represented without duplication; the normalizer still audits any fold
+    absent from both sources.
     """
 
     zone_key = str(zone).strip().upper()
     series = storm_dashboard_series(zone_key)
+    fallback_series = STORM_DASHBOARD_NATIVE_SERIES_BY_ZONE[zone_key]
     timezone = STORM_DASHBOARD_NATIVE_NAIVE_TIMEZONE_BY_ZONE[zone_key]
     expected = _utc_index(expected_index, name="expected_index")
     if expected.empty:
@@ -89,38 +101,111 @@ def fetch_native_dashboard_snapshot(
     if extracted.tzinfo is None:
         raise ValueError("extracted_at_utc must be timezone-aware")
     extracted = extracted.tz_convert("UTC")
-    raw = client.get(
+    cache = client.get(
         series,
-        from_value_date=start_local - pd.Timedelta(hours=2),
-        to_value_date=end_local + pd.Timedelta(hours=2),
+        from_value_date=expected[0],
+        to_value_date=expected[-1],
+        nocache=True,
+        live=False,
         _keep_nans=True,
     )
+    raw = client.get(
+        fallback_series,
+        from_value_date=start_local - pd.Timedelta(hours=2),
+        to_value_date=end_local + pd.Timedelta(hours=2),
+        nocache=True,
+        live=True,
+        _keep_nans=True,
+    )
+    if not isinstance(cache, pd.Series):
+        raise TypeError("Saturn Storm day-ahead cache response must be a pandas Series")
     if not isinstance(raw, pd.Series):
-        raise TypeError("Saturn native Storm response must be a pandas Series")
+        raise TypeError("Saturn native Storm fallback must be a pandas Series")
+    cache_index = pd.DatetimeIndex(cache.index)
+    if cache_index.tz is None:
+        raise ValueError("Storm day-ahead cache index must be timezone-aware")
+    raw_index = pd.DatetimeIndex(raw.index)
+    if raw_index.tz is not None:
+        raise ValueError("native Storm fallback index must be timezone-naive")
+    fallback_values = pd.Series(
+        pd.to_numeric(raw, errors="coerce").to_numpy(dtype=float),
+        index=raw_index,
+    )
+    if cache_index.has_duplicates or fallback_values.index.has_duplicates:
+        raise ValueError("Storm dashboard sources contain duplicate timestamps")
+    cache_utc = pd.Series(
+        pd.to_numeric(cache, errors="coerce").to_numpy(dtype=float),
+        index=cache_index.tz_convert("UTC"),
+    )
+    fallback_localized = raw_index.tz_localize(
+        timezone,
+        ambiguous=False,
+        nonexistent="NaT",
+    )
+    fallback_valid = ~fallback_localized.isna()
+    fallback_utc = pd.Series(
+        fallback_values.to_numpy(dtype=float)[fallback_valid],
+        index=fallback_localized[fallback_valid].tz_convert("UTC"),
+    )
+    finite_cache = cache_utc[np.isfinite(cache_utc.to_numpy(dtype=float))]
+    merged = fallback_utc.reindex(fallback_utc.index.union(finite_cache.index))
+    merged.loc[finite_cache.index] = finite_cache.to_numpy(dtype=float)
+    merged = merged.sort_index()
+    cache_on_expected = cache_utc.reindex(expected)
+    fallback_on_expected = fallback_utc.reindex(expected)
+    cache_available = np.isfinite(cache_on_expected.to_numpy(dtype=float))
+    fallback_available = np.isfinite(fallback_on_expected.to_numpy(dtype=float))
+    fallback_used = (~cache_available) & fallback_available
+    fallback_days = sorted(
+        {
+            str(value.date())
+            for value in expected.tz_convert(timezone)[fallback_used]
+        }
+    )
     source = {
-        "kind": "saturn_native_latest_extraction",
+        "kind": "saturn_storm_day_ahead_cache_with_native_gap_fallback",
         "requested_series": series,
         "series": series,
-        "primary_series": STORM_DASHBOARD_NATIVE_PRIMARY_BY_ZONE[zone_key],
+        "primary_series": STORM_DASHBOARD_PRIMARY_SERIES_BY_ZONE[zone_key],
+        "fallback_series": fallback_series,
+        "fallback_primary_series": STORM_DASHBOARD_NATIVE_PRIMARY_BY_ZONE[
+            zone_key
+        ],
         "zone": zone_key,
         "naive_timezone": timezone,
         "extracted_at_utc": str(extracted),
-        "requested_from_local": str(start_local - pd.Timedelta(hours=2)),
-        "requested_to_local": str(end_local + pd.Timedelta(hours=2)),
-        "selection": "latest values returned by Saturn at extraction time",
+        "requested_from_utc": str(expected[0]),
+        "requested_to_utc": str(expected[-1]),
+        "selection": (
+            "frozen GEMS day-ahead cache; native curve only where cache is "
+            "missing, with cache precedence"
+        ),
+        "cache_available_hours": int(cache_available.sum()),
+        "cache_missing_hours": int((~cache_available).sum()),
+        "fallback_available_hours": int(fallback_available.sum()),
+        "fallback_used_hours": int(fallback_used.sum()),
+        "fallback_used_local_days": fallback_days,
+        "nocache": True,
+        "cache_live_recomputation": False,
+        "fallback_live_recomputation": True,
         "used_for_prediction": False,
     }
-    return raw, source
+    return merged, source
 
 
-# Backward-compatible FR alias.  It is the native dashboard series, not the
-# separate ``.da.basecase`` materialization used by the PIT proxy loader.
+# Backward-compatible FR alias for the frozen day-ahead dashboard cache.
 STORM_DASHBOARD_SERIES = storm_dashboard_series("FR")
 STORM_DASHBOARD_COLUMN = "storm_dashboard_official__q50"
 STORM_STRICT_08_COLUMN = "storm_strict_08__q50"
 STORM_LEGACY_STRICT_COLUMN = "storm_evaluation_only__q50"
 STORM_DASHBOARD_ARTIFACT = Path(
     "inputs/storm_dashboard_official_statistics.parquet"
+)
+STORM_DASHBOARD_LIVE_FORECAST_ARTIFACT = Path(
+    "inputs/storm_dashboard_official_forecast.parquet"
+)
+STORM_DASHBOARD_LIVE_FORECAST_AUDIT = Path(
+    "inputs/storm_dashboard_official_forecast_audit.json"
 )
 STATISTICS_HISTORY_NAME = "statistics_history_hourly.csv.gz"
 STATISTICS_AUDIT_NAME = "statistics_history_audit.json"
@@ -298,6 +383,7 @@ def build_dashboard_comparator(
     timezone: str = TIMEZONE,
     minimum_coverage: float = 1.0,
     maximum_missing_hours: int = 0,
+    allowed_missing_actual_index: pd.DatetimeIndex | None = None,
 ) -> StormDashboardComparator:
     """Align and audit a materialized dashboard comparator.
 
@@ -309,8 +395,41 @@ def build_dashboard_comparator(
     expected = _utc_index(expected_index, name="expected_index")
     comparator = _series_utc(values, name=STORM_DASHBOARD_COLUMN)
     actual_utc = _series_utc(actual, name="actual").reindex(expected)
-    if not np.isfinite(actual_utc.to_numpy(dtype=float)).all():
-        raise ValueError("canonical actuals are incomplete on the Statistics period")
+    actual_finite = np.isfinite(actual_utc.to_numpy(dtype=float))
+    missing_actual = expected[~actual_finite]
+    if allowed_missing_actual_index is None:
+        allowed_missing_actual = pd.DatetimeIndex([], tz="UTC")
+    else:
+        raw_allowed_missing_actual = pd.DatetimeIndex(
+            allowed_missing_actual_index
+        )
+        if raw_allowed_missing_actual.tz is None:
+            raise ValueError(
+                "allowed_missing_actual_index must be timezone-aware"
+            )
+        allowed_missing_actual = raw_allowed_missing_actual.tz_convert("UTC")
+        if allowed_missing_actual.has_duplicates:
+            raise ValueError(
+                "allowed_missing_actual_index contains duplicate timestamps"
+            )
+        if not allowed_missing_actual.is_monotonic_increasing:
+            raise ValueError("allowed_missing_actual_index must be sorted")
+        outside_period = allowed_missing_actual.difference(expected)
+        if len(outside_period):
+            raise ValueError(
+                "allowed_missing_actual_index contains timestamps outside "
+                "the Statistics period"
+            )
+    unexpected_missing_actual = missing_actual.difference(
+        allowed_missing_actual
+    )
+    if len(unexpected_missing_actual):
+        raise ValueError(
+            "canonical actuals are incomplete on the Statistics period: "
+            + ", ".join(
+                str(value) for value in unexpected_missing_actual[:10]
+            )
+        )
     aligned = comparator.reindex(expected)
     finite = np.isfinite(aligned.to_numpy(dtype=float))
     available_index = expected[finite]
@@ -363,7 +482,7 @@ def build_dashboard_comparator(
                 "fold": int(getattr(local.to_pydatetime(), "fold", 0)),
             }
         )
-    finite_actual = int(np.isfinite(actual_utc.to_numpy(dtype=float)).sum())
+    finite_actual = int(actual_finite.sum())
     source_extra = comparator.index.difference(expected)
     metrics = _metric_audit(actual_utc, aligned)
     audit: dict[str, Any] = {
@@ -406,6 +525,11 @@ def build_dashboard_comparator(
             "strict_08_fallback": False,
         },
         "actual_available_hours": finite_actual,
+        "actual_missing_hours": int(len(missing_actual)),
+        "allowed_missing_actual_hours": int(
+            len(allowed_missing_actual)
+        ),
+        "actual_missing_contract_satisfied": True,
         "metrics": metrics,
         "used_for_prediction": False,
         "used_for_live_forecast": False,
@@ -439,21 +563,19 @@ def load_dashboard_from_basecase_vintages(
     timezone: str = TIMEZONE,
     zone: str = "FR",
 ) -> StormDashboardComparator:
-    """Build a legacy pre-midnight PIT proxy for diagnostics only.
+    """Build a pre-midnight PIT proxy for missing day-ahead cache values.
 
-    The official dashboard identifier is the zone's native ``...3mv.storm``
-    series and must be fetched directly. This compatibility loader applies an
-    older selection rule to a separately materialized ``.da.basecase`` PIT
-    artifact: for every physical
+    The official dashboard identifier is the zone's ``...storm.da.cache``.
+    This compatibility loader reconstructs an absent cache value from the
+    separately materialized ``.da.basecase`` PIT artifact: for every physical
     delivery hour in civil day D, select the last vintage whose *snapshot* and
     *revision* are both strictly earlier than the start of D in ``timezone``.
     A marker exactly at midnight is ineligible.  The artifact provenance keeps
-    both identifiers explicit; it must not be labelled as the official
-    dashboard metric.
+    both identifiers explicit.
     """
 
     source_path = Path(path).expanduser().resolve()
-    native_series = storm_dashboard_series(zone)
+    dashboard_series = storm_dashboard_series(zone)
     materialization_series = (
         f"power.price.{str(zone).strip().lower()}.euromwh.h.fcst."
         "3mv.storm.da.basecase"
@@ -565,14 +687,14 @@ def load_dashboard_from_basecase_vintages(
         expected_index=expected,
         actual=actual,
         source={
-            "kind": "saturn_basecase_pit_proxy_for_native_dashboard",
+            "kind": "saturn_basecase_pit_proxy_for_dashboard_cache_gap",
             "contract": (
-                "native Storm dashboard contract represented by the last "
+                "missing Storm day-ahead cache represented by the last "
                 "basecase PIT vintage with snapshot_time_utc AND "
                 "revision_time_utc strictly before civil delivery-day start"
             ),
-            "series": native_series,
-            "series_kind": "native_exact",
+            "series": dashboard_series,
+            "series_kind": "frozen_day_ahead_cache",
             "materialization_series": materialization_series,
             "materialization_kind": "separate_basecase_pit_artifact",
             "path": str(source_path),
@@ -625,7 +747,7 @@ def load_materialized_dashboard_comparator(
         source={
             "kind": "explicit_materialized_artifact",
             "series": storm_dashboard_series(zone),
-            "series_kind": "native_exact",
+            "series_kind": "frozen_day_ahead_cache",
             "path": str(source_path),
             "sha256": _sha256(source_path),
             "timestamp_column": timestamp_column,
@@ -644,14 +766,15 @@ def normalize_native_dashboard_series(
     expected_index: pd.DatetimeIndex,
     actual: pd.Series,
     source: Mapping[str, Any] | None = None,
+    allowed_missing_actual_index: pd.DatetimeIndex | None = None,
 ) -> StormDashboardComparator:
-    """Normalize the native dashboard curve without fabricating DST hours.
+    """Normalize the cache-first dashboard curve without fabricating DST.
 
-    Saturn's exact ``...3mv.storm`` series is timezone-naive and follows the
-    local civil clock.  On the autumn transition it contains a single 02:00;
-    we map that point to standard time (``fold=1``), leave the other physical
-    fold missing, and compare candidate/Storm on the same finite timestamps.
-    No interpolation, duplication, or fallback to the 08:00 curve is allowed.
+    :func:`fetch_native_dashboard_snapshot` overlays the UTC-aware GEMS cache
+    on the timezone-naive native fallback.  On the autumn transition both
+    sources expose only one local 02:00; we map it to standard time
+    (``fold=1``), leave the other physical fold missing and compare both
+    models on the same finite timestamps.  No interpolation is allowed.
     """
 
     zone_key = str(zone).strip().upper()
@@ -661,7 +784,9 @@ def normalize_native_dashboard_series(
     if not isinstance(values, pd.Series):
         raise TypeError("native Storm values must be a pandas Series")
     expected_series = storm_dashboard_series(zone_key)
-    expected_primary = STORM_DASHBOARD_NATIVE_PRIMARY_BY_ZONE[zone_key]
+    expected_primary = STORM_DASHBOARD_PRIMARY_SERIES_BY_ZONE[zone_key]
+    expected_fallback = STORM_DASHBOARD_NATIVE_SERIES_BY_ZONE[zone_key]
+    expected_fallback_primary = STORM_DASHBOARD_NATIVE_PRIMARY_BY_ZONE[zone_key]
     supplied_source = dict(source or {})
     for key in ("requested_series", "series"):
         supplied = supplied_source.get(key)
@@ -673,21 +798,42 @@ def normalize_native_dashboard_series(
     supplied_primary = supplied_source.get("primary_series")
     if supplied_primary is not None and str(supplied_primary) != expected_primary:
         raise ValueError(
-            "native Storm primary mismatch: "
+            "Storm dashboard primary mismatch: "
             f"{supplied_primary!r} != {expected_primary!r}"
         )
+    supplied_fallback = supplied_source.get("fallback_series")
+    if supplied_fallback is not None and str(supplied_fallback) != expected_fallback:
+        raise ValueError(
+            "Storm dashboard fallback mismatch: "
+            f"{supplied_fallback!r} != {expected_fallback!r}"
+        )
+    supplied_fallback_primary = supplied_source.get("fallback_primary_series")
+    if (
+        supplied_fallback_primary is not None
+        and str(supplied_fallback_primary) != expected_fallback_primary
+    ):
+        raise ValueError(
+            "Storm dashboard fallback primary mismatch: "
+            f"{supplied_fallback_primary!r} != {expected_fallback_primary!r}"
+        )
     raw_index = pd.DatetimeIndex(values.index)
-    if raw_index.tz is not None:
-        raise ValueError("native Storm dashboard index must be timezone-naive")
-    localized = raw_index.tz_localize(
-        timezone,
-        ambiguous=False,
-        nonexistent="NaT",
-    )
-    valid = ~localized.isna()
+    numeric = pd.to_numeric(values, errors="coerce").to_numpy(dtype=float)
+    if raw_index.tz is None:
+        localized = raw_index.tz_localize(
+            timezone,
+            ambiguous=False,
+            nonexistent="NaT",
+        )
+        valid = ~localized.isna()
+        normalized_index = localized[valid].tz_convert("UTC")
+        ambiguous_policy = "standard_time_fold_only"
+    else:
+        valid = np.ones(len(raw_index), dtype=bool)
+        normalized_index = raw_index.tz_convert("UTC")
+        ambiguous_policy = "physical_utc_folds_preserved"
     normalized = pd.Series(
-        pd.to_numeric(values, errors="coerce").to_numpy(dtype=float)[valid],
-        index=localized[valid].tz_convert("UTC"),
+        numeric[valid],
+        index=normalized_index,
         name=STORM_DASHBOARD_COLUMN,
     )
     if normalized.index.has_duplicates:
@@ -702,27 +848,30 @@ def normalize_native_dashboard_series(
     allowed_missing = expected[canonical_from_naive != expected]
     actual_missing = expected.difference(normalized.index)
     unexpected_missing = actual_missing.difference(allowed_missing)
-    missing_allowed_but_present = allowed_missing.difference(actual_missing)
     if len(unexpected_missing):
         raise ValueError(
-            "native Storm is missing non-DST Statistics hours: "
+            "Storm dashboard is missing non-DST Statistics hours: "
             + ", ".join(str(value) for value in unexpected_missing[:10])
-        )
-    if len(missing_allowed_but_present):
-        raise ValueError(
-            "native Storm DST representation changed; expected missing fold(s) "
-            "are present and require a new explicit contract"
         )
     provenance = supplied_source
     provenance.update(
         {
-            "kind": "saturn_native_dashboard_series",
+            "kind": provenance.get(
+                "kind",
+                "saturn_storm_day_ahead_cache_with_native_gap_fallback",
+            ),
             "series": expected_series,
             "primary_series": expected_primary,
-            "series_kind": "native_exact",
-            "raw_index_timezone": None,
+            "series_kind": "frozen_day_ahead_cache",
+            "fallback_series": expected_fallback,
+            "fallback_primary_series": expected_fallback_primary,
+            "fallback_policy": "native_only_where_day_ahead_cache_is_missing",
+            "cache_precedence": True,
+            "raw_index_timezone": (
+                None if raw_index.tz is None else str(raw_index.tz)
+            ),
             "naive_timezone": timezone,
-            "ambiguous_policy": "standard_time_fold_only",
+            "ambiguous_policy": ambiguous_policy,
             "nonexistent_policy": "missing_no_fill",
             "raw_rows": int(len(values)),
             "normalized_rows": int(len(normalized)),
@@ -737,6 +886,7 @@ def normalize_native_dashboard_series(
         timezone=timezone,
         minimum_coverage=0.0,
         maximum_missing_hours=len(allowed_missing),
+        allowed_missing_actual_index=allowed_missing_actual_index,
     )
     comparator.audit["dst"].update(
         {
@@ -744,7 +894,9 @@ def normalize_native_dashboard_series(
             "native_allowed_missing_utc": [
                 str(value) for value in allowed_missing
             ],
-            "native_actual_missing_matches_allowed": True,
+            "native_actual_missing_matches_allowed": actual_missing.equals(
+                allowed_missing
+            ),
         }
     )
     return comparator
@@ -945,8 +1097,9 @@ def create_report_only_copy(
         )
         prior_note = str(statistics_audit.get("report_scope_note", "")).strip()
         explicit_note = (
-            "Storm officiel dashboard (extraction courante de la série "
-            "native exacte, figée et checksumée) est le benchmark primaire "
+            "Storm officiel dashboard (cache day-ahead figé de GEMS, avec "
+            "fallback natif audité uniquement sur les trous du cache, puis "
+            "snapshot checksumé) est le benchmark primaire "
             "du rapport "
             f"({dashboard_audit['available_hours']}/"
             f"{dashboard_audit['expected_hours']} heures appariées). "
@@ -1034,7 +1187,11 @@ __all__ = (
     "STATISTICS_HISTORY_NAME",
     "STORM_DASHBOARD_COLUMN",
     "STORM_DASHBOARD_ARTIFACT",
+    "STORM_DASHBOARD_LIVE_FORECAST_ARTIFACT",
+    "STORM_DASHBOARD_LIVE_FORECAST_AUDIT",
+    "STORM_DASHBOARD_CACHE_SERIES_BY_ZONE",
     "STORM_DASHBOARD_NATIVE_SERIES_BY_ZONE",
+    "STORM_DASHBOARD_PRIMARY_SERIES_BY_ZONE",
     "STORM_DASHBOARD_SERIES",
     "STORM_LEGACY_STRICT_COLUMN",
     "STORM_STRICT_08_COLUMN",

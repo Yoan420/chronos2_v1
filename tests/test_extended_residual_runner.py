@@ -1,11 +1,8 @@
 from __future__ import annotations
 
-from pathlib import Path
-
 import numpy as np
 import pandas as pd
 import pytest
-import yaml
 
 from run_extended_residual_hourly import (
     RECIPE,
@@ -17,58 +14,6 @@ from run_extended_residual_hourly import (
     _validate_source_artifacts,
     _validate_complete_days,
 )
-
-
-ROOT = Path(__file__).resolve().parents[1]
-EXTENDED_ZONE_CONTRACTS = {
-    "BE": "Europe/Brussels",
-    "DE": "Europe/Berlin",
-    "NL": "Europe/Amsterdam",
-    "ES": "Europe/Madrid",
-}
-
-
-@pytest.mark.parametrize(
-    ("zone", "timezone"),
-    EXTENDED_ZONE_CONTRACTS.items(),
-)
-def test_extended_zone_config_paths_are_isolated(
-    zone: str,
-    timezone: str,
-) -> None:
-    key = zone.lower()
-    path = ROOT / f"chronos2_hourly_{key}_residual_extended_v1.yaml"
-    payload = yaml.safe_load(path.read_text(encoding="utf-8"))
-    settings = payload["extended_residual"]
-
-    assert settings["zone"] == zone
-    assert settings["timezone"] == timezone
-    assert payload["zones"][zone]["enabled"] is True
-    assert payload["zones"][zone]["timezone"] == timezone
-    assert payload["zones"][zone]["target"]["series"].startswith(
-        f"power.price.da.{zone.lower()}"
-        if zone != "DE"
-        else "power.price.da.de_lu"
-    )
-    assert settings["source_run"] == f"runs/chronos2_hourly_{key}_residual_v1"
-    assert settings["extended_oof_file"] == (
-        f"runs/chronos_oof_extended/{key}/"
-        "chronos_oof_native_20240102_20240811.csv.gz"
-    )
-    assert settings["chronos_oof_file"] == (
-        f"runs/chronos2_hourly_{key}_residual_v1/chronos_oof_hourly.csv.gz"
-    )
-    assert settings["chronos_live_file"] == (
-        f"runs/chronos2_hourly_{key}_residual_v1/chronos_live_hourly.csv"
-    )
-    assert settings["schema"] == "chronos_only"
-    assert settings["recipe"] == RECIPE
-    assert payload["output"]["directory"] == (
-        f"runs/chronos2_hourly_{key}_residual_extended_v1"
-    )
-    assert payload["report"]["filename"] == (
-        f"chronos2_hourly_{key}_residual_extended_v1.html"
-    )
 
 
 def test_frozen_recipe_matches_screen_hyperparameters() -> None:

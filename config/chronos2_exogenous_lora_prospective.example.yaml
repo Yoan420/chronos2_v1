@@ -1,0 +1,92 @@
+format_version: 1
+experiment_id: chronos2_exogenous_lora_prospective_RENAME_ME
+evaluation_role: primary_predeclared
+project_root: ..
+
+# Template only. Copy it to a new filename and replace every RENAME_ME path.
+# production_pit_evidence=true does not manufacture evidence: Panel and
+# CalibrationPanel will fail unless every non-calendar source has an authentic,
+# SHA-bound prospective-capture sidecar.
+data:
+  panel_path: runs/experiments/chronos2_exogenous_lora_prospective_RENAME_ME/inputs/training_panel_frozen.parquet
+  timestamp_column: timestamp
+  origin_column: origin_timestamp
+  item_column: item_id
+  feature_available_at_column: feature_available_at_utc
+  target_columns: [target]
+  known_future_covariates:
+    - fr_residual_load_fcst
+    - de_residual_load_fcst
+    - be_residual_load_fcst
+    - nl_residual_load_fcst
+    - es_residual_load_fcst
+    - known_hour_sin
+    - known_hour_cos
+    - known_dow_sin
+    - known_dow_cos
+    - known_doy_sin
+    - known_doy_cos
+    - known_is_weekend
+    - local_temperature_fcst
+    - local_wind_generation_fcst
+    - local_solar_generation_fcst
+    - ttf_m1_eur_mwh_th
+    - eua_first_dec_eur_tco2
+    - ttf_change_1d
+    - ttf_change_5d
+    - eua_change_1d
+    - eua_change_5d
+    - fuel_volatility_20d
+    - ccgt_marginal_cost_eur_mwh
+    - flowbased_availability
+    - flowbased_hour_imputed
+    - flowbased_cnec_count
+    - flowbased_external_ram_p10_gw
+    - flowbased_ram_p10_gw
+    - flowbased_ram_headroom_p10_to_median_gw
+    - flowbased_low_ram_share
+    - flowbased_ram_to_fmax_p05
+    - flowbased_fr_neighbor_ptdf_spread_p90
+    - flowbased_fr_neighbor_ram_stress_p95_per_gw
+    - flowbased_core_ram_stress_p95_per_gw
+    - flowbased_stress_hhi
+  past_only_covariates: []
+  timezone: Europe/Paris
+  cutoff_local_time: "08:00"
+  frequency: h
+  context_length: 2048
+  prediction_length: 24
+  training_window_days: 365
+  validation_days: 30
+  evaluation_days: 365
+  require_consecutive_origins: true
+  require_complete_known_future: true
+  allow_unresolved_final_evaluation_day: true
+  production_pit_evidence: true
+
+model:
+  model_id: amazon/chronos-2
+  revision: 29ec3766d36d6f73f0696f85560a422f50e8498c
+  local_files_only: true
+  device_map: auto
+
+training:
+  finetune_mode: lora
+  learning_rate: 1.0e-5
+  num_steps: 500
+  batch_size: 64
+  seed: 42
+  lora_config:
+    r: 16
+    lora_alpha: 32
+    lora_dropout: 0.05
+    bias: none
+    target_modules:
+      - self_attention.q
+      - self_attention.v
+      - self_attention.k
+      - self_attention.o
+      - output_patch_embedding.output_layer
+
+output:
+  directory: runs/experiments/chronos2_exogenous_lora_prospective_RENAME_ME/artifact

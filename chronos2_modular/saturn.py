@@ -30,6 +30,55 @@ VINTAGE_COLUMNS = (
 )
 
 
+# The canonical UTC/CDH targets can lag complete auction days although Saturn's
+# official multi-source hourly formulas are already published.  These four
+# completion contracts were audited point-in-time at 2026-09-01 06:00Z: each
+# supplied a finite, gap-free 48-hour suffix and matched the canonical target
+# over its preceding 168 available hours to floating-point noise.  Admission
+# comes from this explicit central source contract; because each official
+# formula can itself fall back to the canonical series, the 168-hour runtime
+# match is a compatibility/continuity guard, not an independent lineage proof.
+# The formulas are local-civil, not intrinsically safe on a 25-hour autumn DST
+# day; strict target normalisation below therefore rejects a missing fold
+# instead of inventing it.
+# Spain is deliberately absent: its official formula matched only 30/168 hours
+# (MAE 4.60 EUR/MWh, maximum difference 28.52 EUR/MWh).
+AUDITED_EQUIVALENT_TARGET_FALLBACKS: Mapping[str, Mapping[str, Any]] = {
+    "power.price.da.fr.bzn.hourly.entsoe.utc.cdh.eurmwh": {
+        "series": "power.price.da.fr.bzn.hourly.entsoe.eurmwh",
+        "naive_timezone": "Europe/Paris",
+        "request_padding_hours": 3,
+        "nocache": True,
+        "validation_hours": 168,
+        "atol_eur_mwh": 1e-9,
+    },
+    "power.price.da.de_lu.bzn.hourly.entsoe.utc.cdh.eurmwh": {
+        "series": "power.price.da.de_lu.bzn.hourly.entsoe.eurmwh",
+        "naive_timezone": "Europe/Berlin",
+        "request_padding_hours": 3,
+        "nocache": True,
+        "validation_hours": 168,
+        "atol_eur_mwh": 1e-9,
+    },
+    "power.price.da.be.bzn.hourly.entsoe.utc.cdh.eurmwh": {
+        "series": "power.price.da.be.bzn.hourly.entsoe.eurmwh",
+        "naive_timezone": "Europe/Brussels",
+        "request_padding_hours": 3,
+        "nocache": True,
+        "validation_hours": 168,
+        "atol_eur_mwh": 1e-9,
+    },
+    "power.price.da.nl.bzn.hourly.entsoe.utc.cdh.eurmwh": {
+        "series": "power.price.da.nl.bzn.hourly.entsoe.eurmwh",
+        "naive_timezone": "Europe/Amsterdam",
+        "request_padding_hours": 3,
+        "nocache": True,
+        "validation_hours": 168,
+        "atol_eur_mwh": 1e-9,
+    },
+}
+
+
 @dataclass(frozen=True)
 class SaturnSyncResult:
     zone: str
@@ -44,6 +93,13 @@ class SaturnSyncResult:
     first_revision_utc: str | None
     last_revision_utc: str | None
     sync_as_of_utc: str
+    equivalent_fallback_series: str | None = None
+    equivalent_fallback_rows: int = 0
+    equivalent_fallback_validation_paired_hours: int = 0
+    equivalent_fallback_validation_max_abs_difference_eur_mwh: float | None = None
+    equivalent_fallback_validation_tolerance_eur_mwh: float | None = None
+    equivalent_fallback_internal_rows: int = 0
+    equivalent_fallback_value_times_utc: tuple[str, ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -218,15 +274,16 @@ def normalize_saturn_series(
     For a local-naive source, each ambiguous autumn timestamp must normally
     occur exactly twice.  The first occurrence is assigned to the DST fold and
     the second to standard time.  ``incomplete_dst_policy='duplicate'`` is an
-    explicit covariate-only escape hatch: a singleton autumn label is copied
-    onto both folds and the repair is logged.  Nonexistent spring timestamps
-    and malformed groups containing more than two labels remain rejected.
+    explicit covariate-only escape hatch.  The narrower
+    ``'duplicate_zero_only'`` policy copies a singleton only when its value is
+    finite and zero to numerical tolerance; any non-zero or malformed group is
+    rejected.  Every repair is exposed in ``Series.attrs['dst_repairs']``.
     """
     dst_policy = str(incomplete_dst_policy).strip().lower()
-    if dst_policy not in {"raise", "duplicate"}:
+    if dst_policy not in {"raise", "duplicate", "duplicate_zero_only"}:
         raise ValueError(
             f"{name}: incomplete_dst_policy inconnue '{dst_policy}'. "
-            "Valeurs autorisées : raise, duplicate."
+            "Valeurs autorisées : raise, duplicate, duplicate_zero_only."
         )
 
     series = coerce_saturn_to_series(raw, name)
@@ -250,6 +307,7 @@ def normalize_saturn_series(
     valid = ~index.isna()
     series = series.loc[valid]
     index = index[valid]
+    repairs: list[dict[str, Any]] = []
 
     if index.tz is None:
         # Saturn payloads may be returned in descending or otherwise
@@ -310,11 +368,30 @@ def normalize_saturn_series(
                 ambiguous_timestamps = index[ambiguous_mask].unique()
                 repair_positions: list[int] = []
                 repaired_timestamps: list[pd.Timestamp] = []
+                repaired_values: list[float] = []
                 for timestamp in ambiguous_timestamps:
                     positions = np.flatnonzero(index == timestamp)
-                    if len(positions) == 1 and dst_policy == "duplicate":
-                        repair_positions.append(int(positions[0]))
+                    if len(positions) == 1 and dst_policy in {
+                        "duplicate",
+                        "duplicate_zero_only",
+                    }:
+                        position = int(positions[0])
+                        numeric_value = pd.to_numeric(
+                            pd.Series([series.iloc[position]]),
+                            errors="coerce",
+                        ).iloc[0]
+                        value = float(numeric_value)
+                        if dst_policy == "duplicate_zero_only" and (
+                            not np.isfinite(value) or abs(value) > 1e-12
+                        ):
+                            raise ValueError(
+                                f"{name}: l'heure DST ambiguë {timestamp} "
+                                "est singleton mais sa valeur n'est pas un "
+                                f"zero fini prouve (valeur={numeric_value!r})."
+                            )
+                        repair_positions.append(position)
                         repaired_timestamps.append(pd.Timestamp(timestamp))
+                        repaired_values.append(value)
                     elif len(positions) != 2:
                         raise ValueError(
                             f"{name}: l'heure DST ambiguë {timestamp} "
@@ -332,10 +409,11 @@ def normalize_saturn_series(
                     series = series.iloc[expanded_positions]
                     LOGGER.warning(
                         "%s: réparation DST opt-in "
-                        "incomplete_dst_policy=duplicate; %s heure(s) "
+                        "incomplete_dst_policy=%s; %s heure(s) "
                         "automnale(s) singleton dupliquée(s) sur les deux "
                         "folds: %s",
                         name,
+                        dst_policy,
                         len(repaired_timestamps),
                         ", ".join(
                             str(timestamp)
@@ -364,6 +442,22 @@ def normalize_saturn_series(
                     ambiguous=ambiguous_flags,
                     nonexistent="raise",
                 )
+                for timestamp, value in zip(
+                    repaired_timestamps,
+                    repaired_values,
+                ):
+                    local_mask = index.tz_localize(None) == timestamp
+                    physical_hours = index[local_mask].tz_convert("UTC")
+                    repairs.append(
+                        {
+                            "policy": dst_policy,
+                            "local_timestamp": timestamp.isoformat(),
+                            "duplicated_value": float(value),
+                            "physical_hours_utc": [
+                                item.isoformat() for item in physical_hours
+                            ],
+                        }
+                    )
             except Exception as exc:
                 if isinstance(exc, ValueError) and str(exc).startswith(
                     (
@@ -391,8 +485,17 @@ def normalize_saturn_series(
         dtype=float,
     ).sort_index()
 
+    if result.index.duplicated().any() and dst_policy == "duplicate_zero_only":
+        duplicates = result.index[result.index.duplicated(keep=False)].unique()
+        raise ValueError(
+            f"{name}: duplicate physique inattendu sous "
+            "incomplete_dst_policy=duplicate_zero_only: "
+            f"{[item.isoformat() for item in duplicates[:4]]}."
+        )
     if result.index.duplicated().any():
         result = result.groupby(level=0).last()
+
+    result.attrs["dst_repairs"] = repairs
 
     return result
 
@@ -432,57 +535,131 @@ def fetch_saturn_series_from_client(
     revision_date: pd.Timestamp | None = None,
     naive_timezone: str | None = None,
     incomplete_dst_policy: str = "raise",
+    nocache: bool = False,
+    live: bool = False,
+    allow_empty: bool = False,
+    request_padding_hours: int = 0,
 ) -> pd.Series:
-    date_kwargs = (
-        {
-            "from_value_date": start,
-            "to_value_date": end,
-        },
-        {
-            "from_value": start,
-            "to_value": end,
-        },
-        {
-            "start": start,
-            "end": end,
-        },
+    query_start = pd.Timestamp(start)
+    query_end = pd.Timestamp(end)
+    padding_hours = int(request_padding_hours)
+    if not 0 <= padding_hours <= 48:
+        raise ValueError(
+            f"{series_name}: request_padding_hours invalide "
+            f"({padding_hours}; attendu entre 0 et 48)."
+        )
+    if padding_hours:
+        # Some Saturn local-civil formulas are filtered server-side as if their
+        # naive labels were UTC.  A small symmetric over-fetch avoids dropping
+        # boundary hours; the caller still reindexes the exact physical grid.
+        padding = pd.Timedelta(hours=padding_hours)
+        query_start -= padding
+        query_end += padding
+
+    date_dialects = (
+        (
+            "from_value_date/to_value_date",
+            {
+                "from_value_date": query_start,
+                "to_value_date": query_end,
+            },
+        ),
+        (
+            "from_value/to_value",
+            {
+                "from_value": query_start,
+                "to_value": query_end,
+            },
+        ),
+        (
+            "start/end",
+            {
+                "start": query_start,
+                "end": query_end,
+            },
+        ),
     )
 
     errors: list[str] = []
     raw = None
-    terminal_error = False
+    resolved_dialect: str | None = None
+    resolved_kwargs: dict[str, Any] | None = None
 
-    for kwargs in date_kwargs:
+    for dialect, kwargs in date_dialects:
         if revision_date is not None:
             kwargs = {
                 **kwargs,
                 "revision_date": _as_utc(revision_date),
             }
+        if nocache:
+            kwargs = {**kwargs, "nocache": True}
+        if live:
+            kwargs = {**kwargs, "live": True}
         try:
             raw = client.get(series_name, **kwargs)
-            if _has_values(raw):
-                break
         except TypeError as exc:
             errors.append(f"{type(exc).__name__}: {exc}")
-            if "unexpected keyword argument" not in str(exc):
-                terminal_error = True
-                break
+            # A dialect fallback is safe only when the client explicitly says
+            # that one of the keyword names is unsupported.  A TypeError from
+            # inside Saturn (or from payload processing) is a terminal error:
+            # retrying it with another date convention can hide the cause or
+            # silently change the requested interval.
+            if "unexpected keyword argument" in str(exc).lower():
+                continue
+            break
         except Exception as exc:
             errors.append(f"{type(exc).__name__}: {exc}")
-            terminal_error = True
+            break
+        else:
+            # An exception-free response proves that this client accepted the
+            # dialect.  Empty is a valid Saturn answer for an unpublished
+            # interval and must not trigger probing of other signatures.
+            resolved_dialect = dialect
+            resolved_kwargs = dict(kwargs)
             break
 
-    if not _has_values(raw) and revision_date is None and not terminal_error:
+    if (
+        resolved_dialect is not None
+        and resolved_kwargs is not None
+        and not _has_values(raw)
+        and not nocache
+    ):
+        # Saturn's HTTP/cache layer may transiently retain an empty payload
+        # while the auction has already propagated.  Retry the *same* proven
+        # keyword dialect once with nocache; never fall through to a legacy
+        # signature after a valid empty response.
+        retry_kwargs = {**resolved_kwargs, "nocache": True}
         try:
-            raw = client.get(series_name, start, end)
+            retry_raw = client.get(series_name, **retry_kwargs)
         except Exception as exc:
-            errors.append(f"{type(exc).__name__}: {exc}")
+            errors.append(
+                f"reprise nocache {type(exc).__name__}: {exc}"
+            )
+        else:
+            raw = retry_raw
 
     if not _has_values(raw):
-        suffix = " | ".join(errors[-4:])
+        if allow_empty and resolved_dialect is not None:
+            return pd.Series(
+                dtype=float,
+                index=pd.DatetimeIndex([], tz=timezone),
+                name=series_name,
+            )
+
+        cutoff = (
+            str(_as_utc(revision_date))
+            if revision_date is not None
+            else "latest"
+        )
+        if resolved_dialect is not None:
+            detail = (
+                f"reponse vide (dialecte={resolved_dialect})"
+            )
+        else:
+            detail = " | ".join(errors[-4:]) or "aucune reponse exploitable"
         raise RuntimeError(
-            f"Saturn indisponible ou vide pour {series_name}. "
-            f"{suffix}"
+            f"Saturn indisponible ou vide pour {series_name}; "
+            f"plage={start} -> {end}; cutoff={cutoff}. {detail}"
         )
 
     return normalize_saturn_series(
@@ -505,6 +682,8 @@ def fetch_saturn_series(
     revision_date: pd.Timestamp | None = None,
     naive_timezone: str | None = None,
     incomplete_dst_policy: str = "raise",
+    nocache: bool = False,
+    live: bool = False,
 ) -> pd.Series:
     client = create_saturn_client(
         saturn_url,
@@ -519,6 +698,8 @@ def fetch_saturn_series(
         revision_date=revision_date,
         naive_timezone=naive_timezone,
         incomplete_dst_policy=incomplete_dst_policy,
+        nocache=nocache,
+        live=live,
     )
 
 
@@ -776,6 +957,7 @@ def sync_latest_series(
     overlap_days: int = 7,
     full: bool = False,
     require_contiguous_hourly: bool = False,
+    equivalent_target_fallback: Mapping[str, Any] | None = None,
 ) -> SaturnSyncResult:
     if (
         str(alias).lower() == "target"
@@ -792,16 +974,69 @@ def sync_latest_series(
         else _read_latest_store(path, alias, timezone)
     )
     rows_before = int(len(existing))
+    audited_fallback_config = AUDITED_EQUIVALENT_TARGET_FALLBACKS.get(
+        str(series_name)
+    )
+    fallback_config = (
+        audited_fallback_config
+        if equivalent_target_fallback is None
+        else equivalent_target_fallback
+    )
+    # An empty canonical response may continue only along the narrow path
+    # whose safety can be re-proved below: strict target continuity, an
+    # existing canonical cache, and one of the centrally audited equivalents
+    # with at least the operational 168-hour validation contract.  Explicit
+    # caller-provided mappings remain usable for non-empty gap repair but do
+    # not gain this empty-response exemption.
+    allow_empty_canonical = bool(
+        str(alias).casefold() == "target"
+        and require_contiguous_hourly
+        and incomplete_dst_policy == "raise"
+        and not existing.empty
+        and equivalent_target_fallback is None
+        and audited_fallback_config is not None
+        and int(audited_fallback_config.get("validation_hours", 0)) >= 168
+    )
     fetch_start = _as_zone(start, timezone)
     fetch_end = _as_zone(end, timezone)
     requested_start = fetch_start
 
     if not existing.empty:
+        # Historical PIT replays may run after the shared latest cache has
+        # already advanced beyond their cutoff.  Anchoring the overlap on the
+        # cache maximum would then invert the Saturn request (start > end),
+        # which returns an empty series.  Cap the anchor at the replay end so
+        # the target is refreshed on a valid, causal interval.
+        overlap_anchor = min(existing.index.max(), fetch_end)
+        effective_overlap_days = max(0, overlap_days)
+        if allow_empty_canonical and audited_fallback_config is not None:
+            validation_hours = int(
+                audited_fallback_config.get("validation_hours", 168)
+            )
+            # The cache maximum may itself belong to a previously published
+            # fallback suffix.  Fetch enough extra overlap to retain 168 fully
+            # canonical hours even when the formula currently lags by up to
+            # two auction days.
+            validation_days = (validation_hours + 23) // 24
+            effective_overlap_days = max(
+                effective_overlap_days,
+                validation_days + 2,
+            )
         overlap_start = (
-            existing.index.max()
-            - pd.Timedelta(days=max(0, overlap_days))
+            overlap_anchor
+            - pd.Timedelta(days=effective_overlap_days)
         )
-        fetch_start = max(fetch_start, overlap_start)
+        if allow_empty_canonical:
+            # The live runners deliberately request only D-2 onward.  That is
+            # sufficient for ordinary incremental target refreshes but not for
+            # the 168-hour compatibility guard of an official completion
+            # source.  Read the extra canonical overlap only on this centrally
+            # audited strict-target path; otherwise a late requested start
+            # makes the canonical download empty and the guard accidentally
+            # compares against a stale completion suffix already in the cache.
+            fetch_start = overlap_start
+        else:
+            fetch_start = max(fetch_start, overlap_start)
 
     continuity_start = (
         requested_start
@@ -814,7 +1049,7 @@ def sync_latest_series(
             end=fetch_end,
             freq="h",
         )
-        finite_existing = existing.loc[existing.notna()].index
+        finite_existing = existing.loc[np.isfinite(existing.to_numpy(dtype=float))].index
         missing_before = expected_before.difference(finite_existing)
         if len(missing_before):
             first_missing = pd.Timestamp(missing_before[0])
@@ -846,7 +1081,45 @@ def sync_latest_series(
         revision_date=sync_as_of_utc,
         naive_timezone=naive_timezone,
         incomplete_dst_policy=incomplete_dst_policy,
+        allow_empty=allow_empty_canonical,
     ).rename(alias)
+    if downloaded.empty and not allow_empty_canonical:
+        raise RuntimeError(
+            f"{zone}/{alias}: reponse Saturn vide interdite; "
+            f"plage={fetch_start} -> {fetch_end}; "
+            f"cutoff={_as_utc(sync_as_of_utc)}. Une reponse canonique "
+            "vide n'est eligible qu'en cible stricte avec cache existant "
+            "et fallback central audite sur 168 h."
+        )
+
+    if require_contiguous_hourly and fallback_config and not downloaded.empty:
+        finite_current = downloaded.loc[np.isfinite(downloaded.to_numpy(dtype=float))]
+        if not finite_current.empty:
+            current_grid = pd.date_range(
+                finite_current.index.min(), finite_current.index.max(), freq="h"
+            )
+            current_gaps = current_grid.difference(finite_current.index)
+            if len(current_gaps):
+                # Internal holes need an authoritative overlap before the first
+                # hole, even when the caller requested only D-2.  Fetch that
+                # small missing prefix once, at exactly the same PIT cutoff.
+                validation_start = current_gaps[0] - pd.Timedelta(
+                    hours=int(fallback_config.get("validation_hours", 168))
+                )
+                prefix_end = finite_current.index.min() - pd.Timedelta(hours=1)
+                if validation_start <= prefix_end:
+                    prefix = fetch_saturn_series_from_client(
+                        client, series_name, validation_start, prefix_end, timezone,
+                        revision_date=sync_as_of_utc,
+                        naive_timezone=naive_timezone,
+                        incomplete_dst_policy=incomplete_dst_policy,
+                        nocache=True,
+                    ).rename(alias)
+                    prefix = prefix.loc[
+                        (prefix.index >= validation_start) & (prefix.index <= prefix_end)
+                    ]
+                    downloaded = pd.concat([prefix, downloaded]).sort_index()
+                    downloaded = downloaded.loc[~downloaded.index.duplicated(keep="last")]
 
     merged = (
         downloaded.copy()
@@ -856,14 +1129,220 @@ def sync_latest_series(
     merged = merged.loc[
         ~merged.index.duplicated(keep="last")
     ]
+    fallback_series: str | None = None
+    fallback_rows = 0
+    fallback_paired_hours = 0
+    fallback_maximum_difference: float | None = None
+    fallback_tolerance: float | None = None
+    fallback_internal_rows = 0
+    fallback_value_times_utc: tuple[str, ...] = ()
     if require_contiguous_hourly and continuity_start <= fetch_end:
         expected_after = pd.date_range(
             start=continuity_start,
             end=fetch_end,
             freq="h",
         )
-        finite_merged = merged.loc[merged.notna()].index
+        finite_merged = merged.loc[np.isfinite(merged.to_numpy(dtype=float))].index
         missing_after = expected_after.difference(finite_merged)
+        finite_downloaded = downloaded.loc[np.isfinite(downloaded.to_numpy(dtype=float))]
+        fallback_tail_index: pd.DatetimeIndex | None = None
+        validation_index: pd.DatetimeIndex | None = None
+        validation_source: pd.Series | None = None
+
+        if not finite_downloaded.empty:
+            canonical_start = pd.Timestamp(finite_downloaded.index.min())
+            canonical_end = pd.Timestamp(finite_downloaded.index.max())
+            canonical_grid = pd.date_range(
+                start=canonical_start,
+                end=canonical_end,
+                freq="h",
+            )
+            missing_in_download = canonical_grid.difference(
+                finite_downloaded.index
+            )
+            if len(missing_in_download) and not fallback_config:
+                examples = [str(value) for value in missing_in_download[:8]]
+                raise ValueError(
+                    f"{zone}/target: download canonique courant discontinu; "
+                    f"{len(missing_in_download)} heure(s) absente(s) entre "
+                    f"{canonical_start} et {canonical_end}. Exemples: "
+                    f"{examples}. Le cache existant n'a pas ete remplace."
+                )
+
+            # A current canonical download is the only authoritative anchor
+            # for refreshing an already-populated fallback tail.  Validate
+            # against its own last 168 hours, then replace every later hour up
+            # to fetch_end; never compare against stale fallback values that
+            # happen to be present in the merged cache.
+            if (canonical_end < fetch_end or len(missing_in_download)) and fallback_config:
+                suffix_index = pd.date_range(
+                    start=canonical_end + pd.Timedelta(hours=1),
+                    end=fetch_end,
+                    freq="h",
+                )
+                fallback_tail_index = missing_in_download.union(suffix_index)
+                validation_hours_for_index = int(
+                    fallback_config.get("validation_hours", 168)
+                )
+                first_repair = pd.Timestamp(fallback_tail_index[0])
+                validation_index = pd.date_range(
+                    end=first_repair - pd.Timedelta(hours=1),
+                    periods=validation_hours_for_index,
+                    freq="h",
+                )
+                if len(missing_in_download):
+                    # Prove the full overlap before the first gap and every
+                    # fresh canonical value between/after internal gaps.  Cached
+                    # completion values never prove their own equivalence.
+                    validation_index = validation_index.union(
+                        finite_downloaded.index[finite_downloaded.index >= first_repair]
+                    )
+                    fallback_internal_rows = int(len(missing_in_download))
+                validation_source = downloaded
+        elif len(missing_after) and fallback_config:
+            # With an empty canonical response there is no new authoritative
+            # anchor.  Preserve the original fail-closed behaviour: only a
+            # genuinely missing contiguous suffix may be completed, using the
+            # existing canonical cache for the 168-hour equivalence proof.
+            first_missing = pd.Timestamp(missing_after[0])
+            missing_suffix = pd.date_range(
+                start=first_missing,
+                end=fetch_end,
+                freq="h",
+            )
+            if missing_after.equals(missing_suffix):
+                validation_hours_for_index = int(
+                    fallback_config.get("validation_hours", 168)
+                )
+                fallback_tail_index = missing_after
+                validation_index = pd.date_range(
+                    end=first_missing - pd.Timedelta(hours=1),
+                    periods=validation_hours_for_index,
+                    freq="h",
+                )
+                validation_source = merged
+
+        if fallback_tail_index is not None and fallback_config:
+            if str(alias).casefold() != "target":
+                raise ValueError(
+                    "Un fallback equivalent est autorise uniquement pour la cible."
+                )
+            fallback_series = str(fallback_config.get("series", "")).strip()
+            fallback_naive_timezone = str(
+                fallback_config.get("naive_timezone", "UTC")
+            ).strip()
+            fallback_request_padding_hours = int(
+                fallback_config.get("request_padding_hours", 0)
+            )
+            fallback_nocache = bool(fallback_config.get("nocache", False))
+            validation_hours = int(
+                fallback_config.get("validation_hours", 168)
+            )
+            fallback_tolerance = float(
+                fallback_config.get("atol_eur_mwh", 1e-9)
+            )
+            if not fallback_series:
+                raise ValueError(f"{zone}/target: serie fallback equivalente absente.")
+            if validation_hours < 24:
+                raise ValueError(
+                    f"{zone}/target: validation fallback insuffisante "
+                    f"({validation_hours} h < 24 h)."
+                )
+            if not np.isfinite(fallback_tolerance) or not (
+                0.0 <= fallback_tolerance <= 1e-6
+            ):
+                raise ValueError(
+                    f"{zone}/target: tolerance fallback invalide."
+                )
+            if validation_index is None or validation_source is None:
+                raise AssertionError("Validation fallback non initialisee.")
+            if len(validation_index) < validation_hours:
+                raise ValueError(
+                    f"{zone}/target: fenetre de validation fallback invalide."
+                )
+
+            fallback_start = pd.Timestamp(validation_index[0])
+            fallback_downloaded = fetch_saturn_series_from_client(
+                client,
+                fallback_series,
+                fallback_start,
+                fetch_end,
+                timezone,
+                revision_date=sync_as_of_utc,
+                naive_timezone=fallback_naive_timezone,
+                incomplete_dst_policy="raise",
+                request_padding_hours=fallback_request_padding_hours,
+                nocache=fallback_nocache,
+            ).sort_index()
+            paired = pd.concat(
+                [
+                    validation_source.reindex(validation_index).rename(
+                        "canonical"
+                    ),
+                    fallback_downloaded.reindex(validation_index).rename(
+                        "fallback"
+                    ),
+                ],
+                axis=1,
+            )
+            paired = paired.loc[np.isfinite(paired.to_numpy(dtype=float)).all(axis=1)]
+            fallback_paired_hours = int(len(paired))
+            if fallback_paired_hours != len(validation_index):
+                raise ValueError(
+                    f"{zone}/target: recouvrement fallback insuffisant "
+                    f"({fallback_paired_hours} h != {len(validation_index)} h). "
+                    "Le cache existant n'a pas ete remplace."
+                )
+            differences = (paired["canonical"] - paired["fallback"]).abs()
+            fallback_maximum_difference = float(differences.max())
+            if fallback_maximum_difference > fallback_tolerance:
+                raise ValueError(
+                    f"{zone}/target: fallback {fallback_series} non "
+                    "equivalent a la cible canonique "
+                    f"(ecart max={fallback_maximum_difference:.12g} "
+                    f"EUR/MWh > {fallback_tolerance:.12g}). "
+                    "Le cache existant n'a pas ete remplace."
+                )
+            fallback_tail = pd.to_numeric(
+                fallback_downloaded.reindex(fallback_tail_index),
+                errors="coerce",
+            )
+            if not np.isfinite(fallback_tail.to_numpy(dtype=float)).all():
+                raise ValueError(
+                    f"{zone}/target: fallback {fallback_series} incomplet "
+                    "sur les heures manquantes. Le cache existant n'a pas ete "
+                    "remplace."
+                )
+            supplement = pd.Series(
+                fallback_tail.to_numpy(dtype=float),
+                index=fallback_tail_index,
+                name=alias,
+            )
+            # Replace exactly the absent canonical hours and the suffix.  Keep
+            # canonical islands between gaps, and newer values beyond cutoff.
+            replace_mask = merged.index.isin(fallback_tail_index)
+            merged = pd.concat(
+                [merged.loc[~replace_mask], supplement]
+            ).sort_index()
+            merged = merged.loc[
+                ~merged.index.duplicated(keep="last")
+            ]
+            fallback_rows = int(len(fallback_tail_index))
+            fallback_value_times_utc = tuple(
+                value.isoformat() for value in fallback_tail_index.tz_convert("UTC")
+            )
+            finite_merged = merged.loc[np.isfinite(merged.to_numpy(dtype=float))].index
+            missing_after = expected_after.difference(finite_merged)
+            LOGGER.warning(
+                "[Saturn] %s/target | %s heure(s) remplacee(s) depuis %s "
+                "au cutoff %s apres validation de %s h (ecart max %.3g).",
+                zone,
+                fallback_rows,
+                fallback_series,
+                sync_as_of_utc,
+                fallback_paired_hours,
+                fallback_maximum_difference,
+            )
         if len(missing_after):
             examples = [str(value) for value in missing_after[:8]]
             raise ValueError(
@@ -887,6 +1366,19 @@ def sync_latest_series(
         first_revision_utc=None,
         last_revision_utc=None,
         sync_as_of_utc=str(_as_utc(sync_as_of_utc)),
+        equivalent_fallback_series=(
+            fallback_series if fallback_rows else None
+        ),
+        equivalent_fallback_rows=fallback_rows,
+        equivalent_fallback_validation_paired_hours=fallback_paired_hours,
+        equivalent_fallback_validation_max_abs_difference_eur_mwh=(
+            fallback_maximum_difference
+        ),
+        equivalent_fallback_validation_tolerance_eur_mwh=(
+            fallback_tolerance if fallback_rows else None
+        ),
+        equivalent_fallback_internal_rows=fallback_internal_rows,
+        equivalent_fallback_value_times_utc=fallback_value_times_utc,
     )
 
 
@@ -916,15 +1408,31 @@ def sync_vintage_series(
     )
     rows_before = int(len(existing))
 
-    fetch_start = _as_utc(revision_start)
+    requested_start = _as_utc(revision_start)
+    fetch_start = requested_start
     fetch_end = _as_utc(revision_end)
 
     if not existing.empty:
         last_revision = existing["revision_time_utc"].max()
-        incremental_start = last_revision - pd.Timedelta(
-            days=max(0, overlap_days)
-        )
-        fetch_start = max(fetch_start, incremental_start)
+        if fetch_end < last_revision:
+            # A PIT replay asks what was known at an older cutoff.  A cache
+            # containing newer revisions does not prove that this historical
+            # insertion window was ever downloaded.  Query the requested
+            # window exactly instead of applying the normal latest-tail
+            # optimisation, then merge the returned vintages atomically.
+            LOGGER.info(
+                "[Saturn/PIT] %s | resynchronisation historique exacte "
+                "%s -> %s (cache plus recent: %s)",
+                alias,
+                requested_start,
+                fetch_end,
+                last_revision,
+            )
+        else:
+            incremental_start = last_revision - pd.Timedelta(
+                days=max(0, overlap_days)
+            )
+            fetch_start = max(fetch_start, incremental_start)
 
     if fetch_start > fetch_end:
         return SaturnSyncResult(

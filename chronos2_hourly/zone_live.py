@@ -20,9 +20,9 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 import yaml
 
 from chronos2_hourly.storm_dashboard import (
+    STORM_DASHBOARD_CACHE_SERIES_BY_ZONE,
     STORM_DASHBOARD_NATIVE_NAIVE_TIMEZONE_BY_ZONE,
-    STORM_DASHBOARD_NATIVE_PRIMARY_BY_ZONE,
-    STORM_DASHBOARD_NATIVE_SERIES_BY_ZONE,
+    STORM_DASHBOARD_PRIMARY_SERIES_BY_ZONE,
 )
 from chronos2_modular.common import load_yaml
 
@@ -279,10 +279,10 @@ def audit_zone_live_bundle(
             blockers.append(f"{field}: {observed or 'absent'} != {expected}")
 
     # Storm is an evaluation-only dashboard comparator, never a model input.
-    # The exact native identifiers have been verified only for these zones.
+    # The frozen day-ahead cache identifiers have been verified for these zones.
     # A strict D-1 08:00 basecase materialisation remains useful diagnostics,
     # but its absence cannot make an otherwise independent model unavailable.
-    expected_dashboard = STORM_DASHBOARD_NATIVE_SERIES_BY_ZONE.get(code)
+    expected_dashboard = STORM_DASHBOARD_CACHE_SERIES_BY_ZONE.get(code)
     storm_status = _text(raw.get("storm_status"))
     storm_primary = _text(raw.get("storm_primary_series"))
     storm_timezone = _text(raw.get("storm_naive_timezone"))
@@ -299,18 +299,18 @@ def audit_zone_live_bundle(
         _expect_equal(
             storm_series,
             expected_dashboard,
-            label="serie Storm dashboard native",
+            label="cache Storm day-ahead dashboard",
             blockers=blockers,
         )
         _expect_equal(
             storm_status,
-            "audited_native_dashboard",
+            "audited_day_ahead_cache",
             label="storm_status",
             blockers=blockers,
         )
         _expect_equal(
             storm_primary,
-            STORM_DASHBOARD_NATIVE_PRIMARY_BY_ZONE[code],
+            STORM_DASHBOARD_PRIMARY_SERIES_BY_ZONE[code],
             label="storm_primary_series",
             blockers=blockers,
         )
@@ -320,19 +320,19 @@ def audit_zone_live_bundle(
             label="storm_naive_timezone",
             blockers=blockers,
         )
-        checks.append("storm_dashboard:native_exact")
+        checks.append("storm_dashboard:day_ahead_cache")
     elif storm_status == "native_dashboard_unavailable":
         # Kept for readability of the two-state contract above.  This branch
         # is reachable only when a future zone is added without a native map.
         checks.append("storm_dashboard:unavailable_optional")
     elif not storm_series and not storm_status:
         blockers.append(
-            "storm_status absent; audited_native_dashboard ou "
+            "storm_status absent; audited_day_ahead_cache ou "
             "native_dashboard_unavailable requis"
         )
     elif storm_series:
         blockers.append(
-            f"serie Storm dashboard native non verifiee pour {code}"
+            f"cache Storm day-ahead dashboard non verifie pour {code}"
         )
     price_unit = _text(raw.get("price_unit"))
     if price_unit != "EUR/MWh":
@@ -791,6 +791,8 @@ def build_zone_runner_command(
     workers: int | None = None,
     local_files_only: bool = False,
     pit_replay: bool = False,
+    residual_load_source: str = "saturn",
+    residual_load_bundle_manifest: str | Path | None = None,
 ) -> list[str]:
     audit.require_ready()
     assert audit.runner is not None and audit.live_config is not None
@@ -809,4 +811,23 @@ def build_zone_runner_command(
         command.append("--local-files-only")
     if pit_replay:
         command.append("--pit-replay")
+    normalized_residual_load_source = str(residual_load_source).strip().lower()
+    if normalized_residual_load_source not in {"saturn", "chronos2"}:
+        raise ZoneBundleError(
+            "residual_load_source doit valoir 'saturn' ou 'chronos2'"
+        )
+    if normalized_residual_load_source == "chronos2":
+        if residual_load_bundle_manifest in (None, ""):
+            raise ZoneBundleError(
+                "residual_load_bundle_manifest est obligatoire lorsque "
+                "residual_load_source='chronos2'"
+            )
+        command.extend(
+            [
+                "--residual-load-source",
+                "chronos2",
+                "--residual-load-bundle-manifest",
+                str(residual_load_bundle_manifest),
+            ]
+        )
     return command

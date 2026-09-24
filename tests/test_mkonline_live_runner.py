@@ -14,6 +14,7 @@ from chronos2_hourly.hourly_contract import local_delivery_day_index
 import run_mkonline_live_hourly as live_runner
 from run_mkonline_live_hourly import (
     LiveSchedule,
+    _archive_output_root,
     _build_dynamic_data,
     _forecast_frame,
     _resolve_schedule,
@@ -44,6 +45,94 @@ def _valid_forecast(schedule: LiveSchedule) -> pd.DataFrame:
             "q90": np.linspace(50.0, 60.0, size),
         }
     )
+
+
+def test_publish_retries_a_transient_windows_directory_lock(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    staging = tmp_path / ".run.tmp"
+    output = tmp_path / "published"
+    staging.mkdir()
+    (staging / "forecast.csv").write_text("sealed", encoding="utf-8")
+    original_replace = Path.replace
+    calls = 0
+    sleeps: list[float] = []
+
+    def transient_replace(source: Path, destination: Path) -> Path:
+        nonlocal calls
+        calls += 1
+        if calls < 3:
+            raise PermissionError(5, "Access is denied", str(source))
+        return original_replace(source, destination)
+
+    monkeypatch.setattr(Path, "replace", transient_replace)
+    monkeypatch.setattr(live_runner.time, "sleep", sleeps.append)
+
+    live_runner._publish(staging, output, attempts=5, retry_seconds=0.25)
+
+    assert calls == 3
+    assert sleeps == [0.25, 0.5]
+    assert (output / "forecast.csv").read_text(encoding="utf-8") == "sealed"
+    assert not staging.exists()
+
+
+def test_publish_never_replaces_an_existing_archive(tmp_path: Path) -> None:
+    staging = tmp_path / ".run.tmp"
+    output = tmp_path / "published"
+    staging.mkdir()
+    output.mkdir()
+    (staging / "forecast.csv").write_text("new", encoding="utf-8")
+    (output / "forecast.csv").write_text("sealed", encoding="utf-8")
+
+    with pytest.raises(FileExistsError, match="immuable"):
+        live_runner._publish(staging, output)
+
+    assert (output / "forecast.csv").read_text(encoding="utf-8") == "sealed"
+    assert staging.is_dir()
+
+
+def test_archive_output_root_preserves_production_and_isolates_challenger(
+    tmp_path: Path,
+) -> None:
+    configured_root = tmp_path / "runs" / "live" / "fr"
+
+    assert _archive_output_root(
+        configured_root,
+        pit_replay=False,
+        residual_load_source="saturn",
+    ) == configured_root
+    assert _archive_output_root(
+        configured_root,
+        pit_replay=True,
+        residual_load_source="saturn",
+    ) == configured_root / "_replays"
+    assert _archive_output_root(
+        configured_root,
+        pit_replay=False,
+        residual_load_source="chronos2",
+    ) == configured_root / "_challengers" / "residual_load_chronos2"
+
+
+def test_archive_output_root_rejects_a_challenger_junction_escape(
+    tmp_path: Path,
+) -> None:
+    configured_root = tmp_path / "live"
+    configured_root.mkdir()
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    junction = configured_root / "_challengers"
+    try:
+        junction.symlink_to(outside, target_is_directory=True)
+    except OSError as exc:
+        pytest.skip(f"Liens de dossier indisponibles: {exc}")
+
+    with pytest.raises(ValueError, match="sort de output_root"):
+        _archive_output_root(
+            configured_root,
+            pit_replay=False,
+            residual_load_source="chronos2",
+        )
 
 
 def test_resolve_schedule_uses_tomorrow_and_civil_eight_cutoff() -> None:
@@ -333,11 +422,19 @@ def test_live_metrics_replace_only_live_diagnostics(tmp_path: Path) -> None:
     assert updated["forecast_diagnostics"]["n_forecast_hours"] == 24
 
 
-@pytest.mark.parametrize("pit_replay", [False, True])
+@pytest.mark.parametrize(
+    ("pit_replay", "residual_load_source"),
+    [
+        (False, "saturn"),
+        (True, "saturn"),
+        (False, "chronos2"),
+    ],
+)
 def test_main_publishes_one_coherent_live_run_with_mocked_engines(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
     pit_replay: bool,
+    residual_load_source: str,
 ) -> None:
     as_of = (
         "2026-08-12T12:00:00+02:00"
@@ -349,11 +446,17 @@ def test_main_publishes_one_coherent_live_run_with_mocked_engines(
     frozen = tmp_path / "frozen"
     benchmark = tmp_path / "benchmark"
     output_root = tmp_path / "runs"
-    output = (
-        output_root / "_replays" / f"fr_day_ahead_{delivery_day}"
-        if pit_replay
-        else output_root / f"fr_day_ahead_{delivery_day}"
-    )
+    if residual_load_source == "chronos2":
+        output = (
+            output_root
+            / "_challengers"
+            / "residual_load_chronos2"
+            / f"fr_day_ahead_{delivery_day}_residual_load_chronos2"
+        )
+    elif pit_replay:
+        output = output_root / "_replays" / f"fr_day_ahead_{delivery_day}"
+    else:
+        output = output_root / f"fr_day_ahead_{delivery_day}"
     frozen.mkdir()
     benchmark.mkdir()
     (frozen / "artifact_checksums.json").write_text("{}", encoding="utf-8")
@@ -386,6 +489,72 @@ def test_main_publishes_one_coherent_live_run_with_mocked_engines(
         ),
         encoding="utf-8",
     )
+    residual_bundle_manifest = tmp_path / "residual_load_bundle_manifest.json"
+    if residual_load_source == "chronos2":
+        residual_bundle_manifest.write_text("{}", encoding="utf-8")
+        monkeypatch.setattr(
+            live_runner,
+            "__file__",
+            str(tmp_path / "run_mkonline_live_hourly.py"),
+        )
+        from chronos2_hourly import chronos_residual_load as residual_provider
+
+        def fake_archive_bundle(
+            manifest_path: Path,
+            *,
+            archive_inputs_dir: Path,
+            expected_delivery_day: object,
+            expected_runtime_cutoff: object,
+        ) -> dict[str, object]:
+            del expected_delivery_day, expected_runtime_cutoff
+            inputs = Path(archive_inputs_dir)
+            archived_root = inputs / "residual_load_bundle"
+            archived_root.mkdir(parents=True)
+            archived_manifest = archived_root / "manifest.json"
+            archived_manifest.write_bytes(Path(manifest_path).read_bytes())
+            for position, alias in enumerate(
+                residual_provider.EXPECTED_ALIASES
+            ):
+                (archived_root / f"a{position}.parquet").write_bytes(
+                    alias.encode("utf-8")
+                )
+            return {
+                "origin_manifest_path": str(Path(manifest_path).resolve()),
+                "origin_manifest_sha256": live_runner._sha256(
+                    Path(manifest_path)
+                ),
+                "archived_manifest_path": "residual_load_bundle/manifest.json",
+                "archived_manifest_sha256": live_runner._sha256(
+                    archived_manifest
+                ),
+                "files": {},
+            }
+
+        monkeypatch.setattr(
+            residual_provider,
+            "archive_live_residual_load_bundle",
+            fake_archive_bundle,
+        )
+
+        def fake_copy_primary(
+            _archive: Path,
+            *,
+            destination: Path,
+            expected_delivery_day: object,
+            expected_zone: str,
+        ) -> dict[str, object]:
+            del expected_delivery_day, expected_zone
+            Path(destination).write_bytes(b"sealed primary placeholder")
+            return {
+                "source": "sealed_saturn_control",
+                "copied_byte_for_byte": True,
+            }
+
+        monkeypatch.setattr(
+            residual_provider,
+            "copy_sealed_saturn_primary",
+            fake_copy_primary,
+        )
     index = schedule.delivery_index
     fresh = pd.DataFrame({"feature": 1.0}, index=index)
     chronos = pd.DataFrame(
@@ -478,6 +647,7 @@ def test_main_publishes_one_coherent_live_run_with_mocked_engines(
     )
 
     def fake_copy(_benchmark: Path, staging: Path) -> None:
+        events.append("copy_benchmark")
         (staging / "metrics_hourly.json").write_text(
             json.dumps(
                 {
@@ -535,7 +705,7 @@ def test_main_publishes_one_coherent_live_run_with_mocked_engines(
 
     def fake_report(run_dir, *, output_path, **_kwargs):
         staging = Path(run_dir)
-        assert events == ["history"]
+        assert events == ["copy_benchmark", "history"]
         assert (staging / "statistics_history_hourly.csv.gz").is_file()
         assert (staging / "statistics_history_audit.json").is_file()
         events.append("html")
@@ -553,7 +723,7 @@ def test_main_publishes_one_coherent_live_run_with_mocked_engines(
             "{}", encoding="utf-8"
         ),
     )
-    if not pit_replay:
+    if not pit_replay and residual_load_source == "saturn":
         import chronos2_hourly.rolling_capture as capture_module
 
         def fail_capture_after_publish(**kwargs):
@@ -581,29 +751,56 @@ def test_main_publishes_one_coherent_live_run_with_mocked_engines(
             delivery_day,
             *(
                 ["--rolling365-capture-root", str(tmp_path / "rolling")]
-                if not pit_replay
+                if not pit_replay and residual_load_source == "saturn"
                 else []
             ),
             *(["--pit-replay"] if pit_replay else []),
+            *(
+                [
+                    "--residual-load-source",
+                    "chronos2",
+                    "--residual-load-bundle-manifest",
+                    str(residual_bundle_manifest),
+                ]
+                if residual_load_source == "chronos2"
+                else []
+            ),
         ],
     )
 
     assert live_runner.main() == 0
     forecast = pd.read_csv(output / "forecast_hourly_fr.csv")
     manifest = json.loads((output / "run_manifest.json").read_text(encoding="utf-8"))
-    metrics = json.loads((output / "metrics_hourly.json").read_text(encoding="utf-8"))
     assert len(forecast) == 24
     assert manifest["config"] == str(config)
-    expected_run_type = "pit_replay" if pit_replay else "live_day_ahead"
+    expected_run_type = (
+        "shadow_live_day_ahead"
+        if residual_load_source == "chronos2"
+        else ("pit_replay" if pit_replay else "live_day_ahead")
+    )
     assert manifest["delivery_day_local"] == delivery_day
     assert manifest["run_type"] == expected_run_type
-    assert manifest["statistics_history"]["run_type"] == expected_run_type
     assert manifest["target_availability"] == availability
-    assert metrics["forecast_diagnostics"]["delivery_day_local"] == delivery_day
     assert (output / f"live_{delivery_day}.html").is_file()
-    assert events == (
-        ["history", "html", "capture"]
-        if not pit_replay
-        else ["history", "html"]
-    )
+    if residual_load_source == "chronos2":
+        assert manifest["reporting_status"] == "forecast_only"
+        assert manifest["statistics_history"]["status"] == "prospective_only"
+        assert not (output / "metrics_hourly.json").exists()
+        assert not (output / "backtest_hourly_oof.csv.gz").exists()
+        assert not (output / "statistics_history_hourly.csv.gz").exists()
+        archived_bundle_root = output / "inputs" / "residual_load_bundle"
+        assert (archived_bundle_root / "manifest.json").is_file()
+        assert len(list(archived_bundle_root.glob("*.parquet"))) == 5
+        assert events == []
+    else:
+        assert manifest["statistics_history"]["run_type"] == expected_run_type
+        metrics = json.loads(
+            (output / "metrics_hourly.json").read_text(encoding="utf-8")
+        )
+        assert metrics["forecast_diagnostics"]["delivery_day_local"] == delivery_day
+        assert events == (
+            ["copy_benchmark", "history", "html", "capture"]
+            if not pit_replay
+            else ["copy_benchmark", "history", "html"]
+        )
     assert ("_replays" in output.parts) is pit_replay

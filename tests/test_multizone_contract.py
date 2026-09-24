@@ -24,22 +24,22 @@ ZONE_CASES = {
         "timezone": "Europe/Brussels",
         "target": "power.price.da.be.bzn.hourly.entsoe.utc.cdh.eurmwh",
         "primary": "41555_native",
-        "storm": "power.price.be.euromwh.h.fcst.3mv.storm",
-        "storm_primary": "41378_native",
+        "storm": "power.price.be.euromwh.h.fcst.3mv.storm.da.cache",
+        "storm_primary": "power.price.be.euromwh.h.fcst.3mv.storm.da.cache",
     },
     "DE": {
         "timezone": "Europe/Berlin",
         "target": "power.price.da.de_lu.bzn.hourly.entsoe.utc.cdh.eurmwh",
         "primary": "41550_native",
-        "storm": "power.price.de.euromwh.h.fcst.3mv.storm",
-        "storm_primary": "41376_native",
+        "storm": "power.price.de.euromwh.h.fcst.3mv.storm.da.cache",
+        "storm_primary": "power.price.de.euromwh.h.fcst.3mv.storm.da.cache",
     },
     "NL": {
         "timezone": "Europe/Amsterdam",
         "target": "power.price.da.nl.bzn.hourly.entsoe.utc.cdh.eurmwh",
         "primary": "41554_native",
-        "storm": "power.price.nl.euromwh.h.fcst.3mv.storm",
-        "storm_primary": "41379_native",
+        "storm": "power.price.nl.euromwh.h.fcst.3mv.storm.da.cache",
+        "storm_primary": "power.price.nl.euromwh.h.fcst.3mv.storm.da.cache",
     },
     "ES": {
         "timezone": "Europe/Madrid",
@@ -313,7 +313,7 @@ def _bundle(
         "primary_status": "audited_primary",
         "storm_series": dashboard,
         "storm_status": (
-            "audited_native_dashboard"
+            "audited_day_ahead_cache"
             if dashboard is not None
             else "native_dashboard_unavailable"
         ),
@@ -562,7 +562,9 @@ def test_es_can_be_model_ready_only_with_explicit_unavailable_native_storm(
     tmp_path: Path,
 ) -> None:
     bundle = _bundle(tmp_path, zone="ES")
-    probable_but_unverified = "power.price.es.euromwh.h.fcst.3mv.storm"
+    probable_but_unverified = (
+        "power.price.es.euromwh.h.fcst.3mv.storm.da.cache"
+    )
     live = bundle["live"]["live"]
     live["storm_dashboard_series"] = probable_but_unverified
     live["storm_dashboard_primary_series"] = "unverified_native"
@@ -571,7 +573,7 @@ def test_es_can_be_model_ready_only_with_explicit_unavailable_native_storm(
     registry["storm_series"] = probable_but_unverified
     registry["storm_primary_series"] = "unverified_native"
     registry["storm_naive_timezone"] = "Europe/Madrid"
-    registry["storm_status"] = "audited_native_dashboard"
+    registry["storm_status"] = "audited_day_ahead_cache"
     _rewrite_live(bundle)
     _rewrite_registry(bundle)
 
@@ -804,7 +806,7 @@ def test_contract_rejects_foreign_storm_comparator(tmp_path: Path) -> None:
     manifest_path = bundle["benchmark_path"] / "run_manifest.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     manifest["evaluation_only_comparators"].append(
-        "power.price.fr.euromwh.h.fcst.3mv.storm"
+        "power.price.fr.euromwh.h.fcst.3mv.storm.da.cache"
     )
     _write_json(manifest_path, manifest)
     checksum_path = bundle["benchmark_path"] / "artifact_checksums.json"

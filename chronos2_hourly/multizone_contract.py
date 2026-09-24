@@ -17,8 +17,8 @@ Expected ``live`` keys in a new zone configuration::
     prediction_mode: autonomous_only
     mkonline_enabled: false
     primary_series: null
-    storm_dashboard_series: power.price.be.euromwh.h.fcst.3mv.storm  # or null
-    storm_dashboard_primary_series: 41378_native                    # or null
+    storm_dashboard_series: power.price.be.euromwh.h.fcst.3mv.storm.da.cache
+    storm_dashboard_primary_series: power.price.be.euromwh.h.fcst.3mv.storm.da.cache
     storm_dashboard_naive_timezone: Europe/Brussels                 # or null
     storm_strict_08_series: power.price.be.euromwh.h.fcst.3mv.storm.da.basecase
     forecast_filename: forecast_hourly_be.csv
@@ -57,9 +57,10 @@ from typing import Any, Mapping, Sequence
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from chronos2_hourly.storm_dashboard import (
+    STORM_DASHBOARD_CACHE_SERIES_BY_ZONE,
     STORM_DASHBOARD_NATIVE_NAIVE_TIMEZONE_BY_ZONE,
-    STORM_DASHBOARD_NATIVE_PRIMARY_BY_ZONE,
     STORM_DASHBOARD_NATIVE_SERIES_BY_ZONE,
+    STORM_DASHBOARD_PRIMARY_SERIES_BY_ZONE,
     storm_dashboard_series,
 )
 from chronos2_hourly.zone_live import (
@@ -117,7 +118,9 @@ FR_SEALED_ARTIFACT_HASHES = frozenset(
 )
 FR_PRIMARY_SERIES = "41551_native"
 FR_TARGET_SERIES = "power.price.da.fr.bzn.hourly.entsoe.utc.cdh.eurmwh"
-FR_DASHBOARD_SERIES = "power.price.fr.euromwh.h.fcst.3mv.storm"
+FR_DASHBOARD_SERIES = (
+    "power.price.fr.euromwh.h.fcst.3mv.storm.da.cache"
+)
 FR_BLEND_WEIGHTS = (0.4977609282924196, 0.5022390717075804)
 
 _SHA256_RE = re.compile(r"^[0-9a-fA-F]{64}$")
@@ -715,7 +718,7 @@ def _reject_fr_reuse_outside_fr(
         raise ZoneModelContractError(
             "the France Storm dashboard series cannot be reused outside FR"
         )
-    if dashboard_primary_series == STORM_DASHBOARD_NATIVE_PRIMARY_BY_ZONE["FR"]:
+    if dashboard_primary_series == STORM_DASHBOARD_PRIMARY_SERIES_BY_ZONE["FR"]:
         raise ZoneModelContractError(
             "the France Storm dashboard primary cannot be reused outside FR"
         )
@@ -1013,34 +1016,34 @@ def load_zone_model_contract(
     if dashboard is not None:
         _assert_equal(
             registry_zone.get("storm_status"),
-            "audited_native_dashboard",
+            "audited_day_ahead_cache",
             name=f"registry.zones.{zone}.storm_status",
         )
         try:
             verified_dashboard = storm_dashboard_series(zone)
         except ValueError as exc:
             raise ZoneModelContractError(
-                f"{zone}: native Storm dashboard series has not been verified"
+                f"{zone}: Storm day-ahead dashboard cache has not been verified"
             ) from exc
         _assert_equal(
             dashboard,
             verified_dashboard,
-            name="live.storm_dashboard_series versus verified native series",
+            name="live.storm_dashboard_series versus verified cache series",
         )
         _assert_equal(
             dashboard_primary,
-            STORM_DASHBOARD_NATIVE_PRIMARY_BY_ZONE[zone],
-            name="live.storm_dashboard_primary_series versus verified native primary",
+            STORM_DASHBOARD_PRIMARY_SERIES_BY_ZONE[zone],
+            name="live.storm_dashboard_primary_series versus verified cache primary",
         )
         _assert_equal(
             dashboard_naive_timezone,
             STORM_DASHBOARD_NATIVE_NAIVE_TIMEZONE_BY_ZONE[zone],
-            name="live.storm_dashboard_naive_timezone versus verified native timezone",
+            name="live.storm_dashboard_naive_timezone versus verified fallback timezone",
         )
     else:
-        if zone in STORM_DASHBOARD_NATIVE_SERIES_BY_ZONE:
+        if zone in STORM_DASHBOARD_CACHE_SERIES_BY_ZONE:
             raise ZoneModelContractError(
-                f"{zone}: verified native Storm dashboard declarations are mandatory"
+                f"{zone}: verified Storm dashboard declarations are mandatory"
             )
         _assert_equal(
             dashboard_primary,
@@ -1281,11 +1284,22 @@ def load_zone_model_contract(
             raise ZoneModelContractError(
                 f"{label} manifest.evaluation_only_comparators must be a list"
             )
+        allowed_zone_storm = {
+            value
+            for value in (
+                dashboard,
+                STORM_DASHBOARD_NATIVE_SERIES_BY_ZONE.get(zone),
+            )
+            if value is not None
+        }
         foreign_dashboard = sorted(
             set(str(value) for value in comparators)
             & (
-                set(STORM_DASHBOARD_NATIVE_SERIES_BY_ZONE.values())
-                - ({dashboard} if dashboard is not None else set())
+                (
+                    set(STORM_DASHBOARD_CACHE_SERIES_BY_ZONE.values())
+                    | set(STORM_DASHBOARD_NATIVE_SERIES_BY_ZONE.values())
+                )
+                - allowed_zone_storm
             )
         )
         if foreign_dashboard:

@@ -564,6 +564,7 @@ def _realized_rows(
     timezone: str,
     candidate_model: str = "mkonline_blend",
     storm_strict_08_series: str | None = None,
+    allow_incomplete_actual_day: date | None = None,
 ) -> tuple[pd.DataFrame, pd.DataFrame, dict[str, Any]]:
     if not forecasts:
         return (
@@ -579,8 +580,22 @@ def _realized_rows(
     if bool((local_day >= current_delivery_day).any()):
         raise ValueError("Current/future delivery leaked into Statistics")
     actual = _canonical_target_utc(canonical_target).reindex(delivery)
-    if not np.isfinite(actual.to_numpy(dtype=float)).all():
-        raise ValueError("Canonical actuals are incomplete for Statistics")
+    actual_finite = np.isfinite(actual.to_numpy(dtype=float))
+    if not actual_finite.all():
+        missing_delivery = delivery[~actual_finite]
+        missing_days = set(
+            missing_delivery.tz_convert(timezone).date
+        )
+        allowed = allow_incomplete_actual_day
+        if allowed is None or missing_days != {allowed}:
+            raise ValueError("Canonical actuals are incomplete for Statistics")
+        allowed_selector = np.asarray(local_day == allowed, dtype=bool)
+        allowed_finite = actual_finite[allowed_selector]
+        if allowed_finite.any():
+            raise ValueError(
+                "Current-day Statistics actuals must be complete or entirely "
+                "empty; partial daily observations are forbidden"
+            )
     # Storm is attached only after all candidate forecasts are frozen.
     # The old strict-08 curve is diagnostic only. Its local vintage store may
     # lag behind the native dashboard extraction; this must never block the
@@ -655,6 +670,8 @@ def update_live_statistics_history(
     current_delivery_day: date,
     canonical_target: pd.Series,
     storm_pit_path: str | Path,
+    canonical_target_source: Mapping[str, Any] | None = None,
+    statistics_through_day: date | None = None,
     storm_dashboard_native: pd.Series | None = None,
     storm_dashboard_source: Mapping[str, Any] | None = None,
     zone: str = "FR",
@@ -665,6 +682,7 @@ def update_live_statistics_history(
     target_series: str = "power.price.da.fr.bzn.hourly.entsoe.utc.cdh.eurmwh",
     prediction_mode: str = "mkonline_blend",
     allow_partial_prefix: bool = False,
+    allow_current_day_placeholder: bool = False,
     statistics_blocker: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Write a strictly contiguous Statistics source and explicit audit.
@@ -687,11 +705,29 @@ def update_live_statistics_history(
         )
     )
     first_history_day = benchmark_end + pd.Timedelta(days=1)
-    last_eligible_day = current_delivery_day - pd.Timedelta(days=1)
+    default_last_eligible_day = current_delivery_day - pd.Timedelta(days=1)
+    last_eligible_day = (
+        default_last_eligible_day
+        if statistics_through_day is None
+        else pd.Timestamp(statistics_through_day).date()
+    )
+    if last_eligible_day > current_delivery_day:
+        raise ValueError(
+            "Statistics cannot extend beyond the current forecast delivery day"
+        )
+    if last_eligible_day < benchmark_end:
+        raise ValueError(
+            "statistics_through_day cannot precede the sealed benchmark end"
+        )
+    # Discovery historically uses an exclusive upper bound.  Moving that
+    # bound by one civil day lets a report-only refresh evaluate the current
+    # forecast once its complete day-ahead price curve is available, without
+    # changing the default live-run behaviour (which remains D-1).
+    archive_cutoff_day = last_eligible_day + pd.Timedelta(days=1)
     forecasts, source_audit = discover_archived_forecasts(
         live_output_root=live_output_root,
         replay_output_root=replay_output_root,
-        current_delivery_day=current_delivery_day,
+        current_delivery_day=archive_cutoff_day,
         first_history_day=first_history_day,
         timezone=timezone,
         forecast_name=forecast_name,
@@ -733,10 +769,16 @@ def update_live_statistics_history(
         forecast_audits=audits_by_day,
         canonical_target=canonical_target,
         storm_pit_path=Path(storm_pit_path).expanduser().resolve(),
-        current_delivery_day=current_delivery_day,
+        current_delivery_day=archive_cutoff_day,
         timezone=timezone,
         candidate_model=candidate_model,
         storm_strict_08_series=storm_strict_08_series,
+        allow_incomplete_actual_day=(
+            current_delivery_day
+            if allow_current_day_placeholder
+            and last_eligible_day == current_delivery_day
+            else None
+        ),
     )
     populated_realized = realized.dropna(axis=1, how="all")
     history = pd.concat(
@@ -759,6 +801,90 @@ def update_live_statistics_history(
         )
     if delivery.has_duplicates or not delivery.equals(expected_full):
         raise ValueError("Statistics history is not a contiguous civil-day series")
+    canonical_actuals = _canonical_target_utc(canonical_target)
+    refreshed_actual = canonical_actuals.reindex(delivery)
+    refreshed_finite = np.isfinite(refreshed_actual.to_numpy(dtype=float))
+    missing_actual = delivery[~refreshed_finite]
+    placeholder_day = (
+        current_delivery_day
+        if allow_current_day_placeholder
+        and last_eligible_day == current_delivery_day
+        else None
+    )
+    if len(missing_actual):
+        missing_local_days = set(
+            missing_actual.tz_convert(timezone).date
+        )
+        placeholder_selector = np.asarray(
+            pd.Index(delivery.tz_convert(timezone).date) == placeholder_day,
+            dtype=bool,
+        )
+        placeholder_finite = refreshed_finite[placeholder_selector]
+        allowed_placeholder = (
+            placeholder_day is not None
+            and missing_local_days == {placeholder_day}
+            and not placeholder_finite.any()
+        )
+        if not allowed_placeholder:
+            raise ValueError(
+                "Canonical actuals are incomplete on the complete Statistics "
+                "timeline: "
+                + ", ".join(str(value) for value in missing_actual[:10])
+            )
+    # Forecasts remain immutable; only their evaluation target is refreshed.
+    # Applying the latest canonical target to the whole timeline also updates
+    # observations inherited from the sealed benchmark, not just appended
+    # live/replay days.
+    history["actual"] = refreshed_actual.to_numpy(dtype=float)
+    target_source = dict(canonical_target_source or {})
+    canonical_finite = canonical_actuals.loc[
+        np.isfinite(canonical_actuals.to_numpy(dtype=float))
+    ]
+    applied_finite = refreshed_actual.loc[refreshed_finite]
+    complete_actual_days: list[date] = []
+    delivery_days = pd.Index(delivery.tz_convert(timezone).date)
+    for local_day_value in delivery_days.drop_duplicates():
+        selector = np.asarray(delivery_days == local_day_value, dtype=bool)
+        if bool(refreshed_finite[selector].all()):
+            complete_actual_days.append(local_day_value)
+    latest_complete_actual_day = (
+        complete_actual_days[-1] if complete_actual_days else None
+    )
+    current_placeholder = bool(
+        placeholder_day is not None
+        and len(missing_actual)
+        and set(missing_actual.tz_convert(timezone).date) == {placeholder_day}
+    )
+    canonical_actuals_audit: dict[str, Any] = {
+        "status": (
+            "current_delivery_pending"
+            if current_placeholder
+            else "complete"
+        ),
+        "role": "statistics_evaluation_target",
+        "refresh_mode": (
+            "full_history_latest_snapshot"
+            if target_source.get("kind") == "saturn_target_latest_extraction"
+            else "full_history_canonical_snapshot"
+        ),
+        "series": target_series,
+        "expected_hours": int(len(delivery)),
+        "available_hours": int(refreshed_finite.sum()),
+        "missing_hours": int((~refreshed_finite).sum()),
+        "first_applied_observation_utc": str(delivery[0]),
+        "last_applied_observation_utc": (
+            str(applied_finite.index[-1]) if not applied_finite.empty else None
+        ),
+        "last_available_observation_utc": str(canonical_finite.index[-1]),
+        "latest_complete_day_local": (
+            latest_complete_actual_day.isoformat()
+            if latest_complete_actual_day is not None
+            else None
+        ),
+        "current_delivery_day_local": current_delivery_day.isoformat(),
+        "current_delivery_placeholder": current_placeholder,
+        "source": target_source,
+    }
     if storm_dashboard_native is not None:
         actual_history = pd.Series(
             pd.to_numeric(history["actual"], errors="coerce").to_numpy(float),
@@ -771,6 +897,9 @@ def update_live_statistics_history(
             expected_index=delivery,
             actual=actual_history,
             source=storm_dashboard_source,
+            allowed_missing_actual_index=(
+                missing_actual if current_placeholder else None
+            ),
         )
         legacy_strict = (
             history[STORM_LEGACY_STRICT_COLUMN]
@@ -832,7 +961,12 @@ def update_live_statistics_history(
         "statistics_audit_path": STATISTICS_AUDIT_NAME,
         "sealed_benchmark": benchmark_audit,
         "current_delivery_day_local": current_delivery_day.isoformat(),
-        "eligibility_rule": "delivery_day_local < current_delivery_day_local",
+        "eligibility_rule": (
+            "delivery_day_local <= statistics_through_day_local; the current "
+            "forecast day is always represented and its actual is either a "
+            "complete physical-day curve or entirely empty"
+        ),
+        "statistics_through_day_local": statistics_end_day.isoformat(),
         "first_required_realized_day": (
             first_history_day.isoformat() if expected_days else None
         ),
@@ -850,7 +984,9 @@ def update_live_statistics_history(
         "n_evaluated_realized_hours": int(len(realized)),
         "n_total_statistics_hours": int(len(history)),
         "forecast_sources": source_audit,
-        "canonical_actuals_complete": True,
+        "canonical_actuals_complete": not current_placeholder,
+        "current_delivery_actual_placeholder": current_placeholder,
+        "canonical_actuals": canonical_actuals_audit,
         "storm": storm_audit,
         "storm_used_for_prediction": False,
         "historical_forecasts_rewritten": False,
@@ -919,10 +1055,28 @@ def update_live_statistics_history(
     note_parts.append(
         "Storm est joint apres gel du candidat, uniquement pour l'evaluation"
     )
-    if dashboard is not None:
+    extracted_actual = target_source.get("extracted_at_utc")
+    actual_note = (
+        f"observations {target_series} actualisees sur toute la periode "
+        f"jusqu'au "
+        f"{latest_complete_actual_day.isoformat() if latest_complete_actual_day else 'aucun jour complet'}"
+    )
+    if extracted_actual:
+        actual_note += f" (extraction {extracted_actual})"
+    note_parts.append(actual_note)
+    if current_placeholder:
         note_parts.append(
-            f"benchmark principal {storm_dashboard_series(zone)} natif; "
-            "heures DST absentes non interpolees"
+            "prix observe du jour de livraison non encore publie : emplacement "
+            "Statistics conserve et valeur observee laissee vide"
+        )
+    if dashboard is not None:
+        dashboard_source = dashboard.audit.get("source", {})
+        fallback_days = dashboard_source.get("fallback_used_local_days", [])
+        note_parts.append(
+            f"benchmark principal {storm_dashboard_series(zone)} (cache "
+            "day-ahead GEMS); fallback historique natif audite sur "
+            f"{len(fallback_days)} jour(s) absent(s) du cache; heures DST "
+            "absentes non interpolees"
         )
     audit["realized_pit_replay_days"] = replay_days
     audit["realized_live_days"] = issued_days

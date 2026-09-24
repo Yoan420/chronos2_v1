@@ -11,9 +11,11 @@ from chronos2_hourly.hourly_contract import local_delivery_day_index
 from chronos2_hourly.storm_dashboard import (
     COMPARATOR_AUDIT_NAME,
     STORM_DASHBOARD_ARTIFACT,
+    STORM_DASHBOARD_CACHE_SERIES_BY_ZONE,
     STORM_DASHBOARD_NATIVE_NAIVE_TIMEZONE_BY_ZONE,
     STORM_DASHBOARD_NATIVE_PRIMARY_BY_ZONE,
     STORM_DASHBOARD_NATIVE_SERIES_BY_ZONE,
+    STORM_DASHBOARD_PRIMARY_SERIES_BY_ZONE,
     STORM_DASHBOARD_COLUMN,
     STORM_LEGACY_STRICT_COLUMN,
     STORM_STRICT_08_COLUMN,
@@ -43,7 +45,7 @@ def test_native_dashboard_uses_local_clock_and_never_fabricates_dst_fold() -> No
     )
 
     assert comparator.audit["series"] == (
-        "power.price.fr.euromwh.h.fcst.3mv.storm"
+        "power.price.fr.euromwh.h.fcst.3mv.storm.da.cache"
     )
     assert comparator.audit["available_hours"] == 24
     assert comparator.audit["missing_hours"] == 1
@@ -69,6 +71,33 @@ def test_native_dashboard_rejects_a_non_dst_missing_hour() -> None:
             expected_index=expected,
             actual=pd.Series(0.0, index=expected),
         )
+
+
+def test_dashboard_comparator_accepts_only_explicit_actual_placeholder() -> None:
+    expected = local_delivery_day_index("2026-01-02")
+    values = pd.Series(80.0, index=expected)
+    actual = pd.Series(np.nan, index=expected)
+
+    with pytest.raises(ValueError, match="canonical actuals are incomplete"):
+        build_dashboard_comparator(
+            values,
+            expected_index=expected,
+            actual=actual,
+            source={"kind": "offline_test"},
+        )
+
+    comparator = build_dashboard_comparator(
+        values,
+        expected_index=expected,
+        actual=actual,
+        source={"kind": "offline_test"},
+        allowed_missing_actual_index=expected,
+    )
+
+    assert comparator.audit["actual_available_hours"] == 0
+    assert comparator.audit["actual_missing_hours"] == 24
+    assert comparator.audit["allowed_missing_actual_hours"] == 24
+    assert comparator.audit["metrics"]["n"] == 0
 
 
 def test_native_dashboard_rejects_wrong_requested_series() -> None:
@@ -180,12 +209,12 @@ def test_basecase_selector_matches_strict_civil_midnight_contract(
     assert comparator.audit["metrics"]["mae"] == 1.0
     source = comparator.audit["source"]
     assert source["kind"] == (
-        "saturn_basecase_pit_proxy_for_native_dashboard"
+        "saturn_basecase_pit_proxy_for_dashboard_cache_gap"
     )
     assert source["series"] == (
-        "power.price.fr.euromwh.h.fcst.3mv.storm"
+        "power.price.fr.euromwh.h.fcst.3mv.storm.da.cache"
     )
-    assert source["series_kind"] == "native_exact"
+    assert source["series_kind"] == "frozen_day_ahead_cache"
     assert source["materialization_series"] == (
         "power.price.fr.euromwh.h.fcst.3mv.storm.da.basecase"
     )
@@ -200,9 +229,15 @@ def test_basecase_selector_matches_strict_civil_midnight_contract(
 def test_dashboard_native_series_identifiers_are_exact_and_zone_aware(
     zone: str,
 ) -> None:
-    expected = f"power.price.{zone.lower()}.euromwh.h.fcst.3mv.storm"
+    expected = (
+        f"power.price.{zone.lower()}.euromwh.h.fcst.3mv.storm.da.cache"
+    )
     assert storm_dashboard_series(zone) == expected
-    assert STORM_DASHBOARD_NATIVE_SERIES_BY_ZONE[zone] == expected
+    assert STORM_DASHBOARD_CACHE_SERIES_BY_ZONE[zone] == expected
+    assert STORM_DASHBOARD_PRIMARY_SERIES_BY_ZONE[zone] == expected
+    assert STORM_DASHBOARD_NATIVE_SERIES_BY_ZONE[zone] == (
+        f"power.price.{zone.lower()}.euromwh.h.fcst.3mv.storm"
+    )
 
 
 @pytest.mark.parametrize(
@@ -222,6 +257,10 @@ def test_native_dashboard_fetch_and_dst_contract_are_zone_specific(
     expected = local_delivery_day_index("2025-10-26", timezone=timezone)
     local_naive = expected.tz_convert(timezone).tz_localize(None).drop_duplicates()
     raw = pd.Series(np.arange(len(local_naive), dtype=float), index=local_naive)
+    cache_index = local_naive.tz_localize(
+        timezone, ambiguous=False
+    ).tz_convert("UTC")
+    cache = pd.Series(np.arange(len(cache_index), dtype=float), index=cache_index)
 
     class FakeClient:
         def __init__(self) -> None:
@@ -229,7 +268,7 @@ def test_native_dashboard_fetch_and_dst_contract_are_zone_specific(
 
         def get(self, series: str, **kwargs: object) -> pd.Series:
             self.calls.append((series, kwargs))
-            return raw
+            return cache if series.endswith(".da.cache") else raw
 
     client = FakeClient()
     fetched, source = fetch_native_dashboard_snapshot(
@@ -239,11 +278,24 @@ def test_native_dashboard_fetch_and_dst_contract_are_zone_specific(
         extracted_at_utc=pd.Timestamp("2026-08-13T12:00:00Z"),
     )
 
-    exact_series = f"power.price.{zone.lower()}.euromwh.h.fcst.3mv.storm"
-    assert fetched is raw
+    exact_series = (
+        f"power.price.{zone.lower()}.euromwh.h.fcst.3mv.storm.da.cache"
+    )
+    fallback_series = f"power.price.{zone.lower()}.euromwh.h.fcst.3mv.storm"
+    assert len(fetched) == len(raw)
     assert client.calls[0][0] == exact_series
+    assert client.calls[1][0] == fallback_series
+    assert client.calls[0][1]["nocache"] is True
+    assert client.calls[0][1]["live"] is False
+    assert client.calls[1][1]["nocache"] is True
+    assert client.calls[1][1]["live"] is True
     assert source["requested_series"] == exact_series
-    assert source["primary_series"] == primary
+    assert source["nocache"] is True
+    assert source["cache_live_recomputation"] is False
+    assert source["fallback_live_recomputation"] is True
+    assert source["primary_series"] == exact_series
+    assert source["fallback_series"] == fallback_series
+    assert source["fallback_primary_series"] == primary
     assert source["naive_timezone"] == timezone
     assert STORM_DASHBOARD_NATIVE_PRIMARY_BY_ZONE[zone] == primary
     assert STORM_DASHBOARD_NATIVE_NAIVE_TIMEZONE_BY_ZONE[zone] == timezone
@@ -263,8 +315,38 @@ def test_native_dashboard_fetch_and_dst_contract_are_zone_specific(
 
 
 def test_dashboard_native_series_rejects_unverified_zone() -> None:
-    with pytest.raises(ValueError, match="verified native"):
+    with pytest.raises(ValueError, match="day-ahead dashboard"):
         storm_dashboard_series("ES")
+
+
+def test_fr_20260826_uses_dashboard_cache_148_not_native_12881() -> None:
+    expected = local_delivery_day_index("2026-08-26")
+    cache_mean = 147.99454095833335
+    native_mean = 128.80891033333333
+    cache = pd.Series(cache_mean, index=expected)
+    native_index = expected.tz_convert("Europe/Paris").tz_localize(None)
+    native = pd.Series(native_mean, index=native_index)
+
+    class FakeClient:
+        def get(self, series: str, **_kwargs: object) -> pd.Series:
+            return cache if series.endswith(".da.cache") else native
+
+    raw, source = fetch_native_dashboard_snapshot(
+        FakeClient(), zone="FR", expected_index=expected
+    )
+    comparator = normalize_native_dashboard_series(
+        raw,
+        zone="FR",
+        expected_index=expected,
+        actual=pd.Series(0.0, index=expected),
+        source=source,
+    )
+
+    assert len(comparator.values) == 24
+    assert comparator.values.mean() == pytest.approx(cache_mean)
+    assert comparator.values.mean() != pytest.approx(native_mean)
+    assert source["cache_available_hours"] == 24
+    assert source["fallback_used_hours"] == 0
 
 
 def test_basecase_selector_requires_exact_statistics_timeline(

@@ -693,7 +693,17 @@ def test_partial_statistics_uses_only_prefix_before_first_gap(
         },
     )
     staging = tmp_path / "statistics_staging"
-    actual = pd.Series(values + 0.5, index=index)
+    benchmark_index = local_delivery_day_index(
+        date(2026, 8, 13),
+        timezone=contract.delivery_timezone,
+    )
+    benchmark_values = np.arange(len(benchmark_index), dtype=float) + 50.0
+    actual = pd.concat(
+        [
+            pd.Series(benchmark_values + 0.5, index=benchmark_index),
+            pd.Series(values + 0.5, index=index),
+        ]
+    ).sort_index()
     blocker = {
         "status": "blocked_missing_causal_archives",
         "missing_realized_days": ["2026-08-15"],

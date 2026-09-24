@@ -270,6 +270,43 @@ class CovariateDstNormalizationTests(unittest.TestCase):
             raw.to_numpy(),
         )
 
+    def test_duplicate_zero_only_records_zero_and_rejects_nonzero(self) -> None:
+        expected_utc = pd.date_range(
+            "2025-10-25 22:00",
+            "2025-10-26 22:00",
+            freq="h",
+            tz="UTC",
+        )
+        raw = _local_naive_series(
+            expected_utc,
+            lose_second_fall_fold=True,
+        )
+        ambiguous = pd.Timestamp("2025-10-26 02:00")
+        raw.loc[ambiguous] = 0.25
+        with self.assertRaisesRegex(ValueError, "zero fini prouve"):
+            normalize_saturn_series(
+                raw,
+                "solar",
+                PARIS,
+                naive_timezone=PARIS,
+                incomplete_dst_policy="duplicate_zero_only",
+            )
+
+        raw.loc[ambiguous] = 0.0
+        normalized = normalize_saturn_series(
+            raw,
+            "solar",
+            PARIS,
+            naive_timezone=PARIS,
+            incomplete_dst_policy="duplicate_zero_only",
+        )
+
+        self.assertTrue(normalized.index.tz_convert("UTC").equals(expected_utc))
+        self.assertEqual(len(normalized.attrs["dst_repairs"]), 1)
+        repair = normalized.attrs["dst_repairs"][0]
+        self.assertEqual(repair["duplicated_value"], 0.0)
+        self.assertEqual(len(repair["physical_hours_utc"]), 2)
+
 
 class CovariateDstPolicyPlumbingTests(unittest.TestCase):
     def test_cache_identity_changes_with_dst_policy(self) -> None:
@@ -343,6 +380,144 @@ class CovariateDstPolicyPlumbingTests(unittest.TestCase):
             normalizer.call_args.kwargs["naive_timezone"],
             PARIS,
         )
+
+    def test_fetch_empty_valid_response_stops_dialect_detection(self) -> None:
+        client = Mock()
+        client.get.return_value = pd.Series(dtype=float)
+        start = pd.Timestamp("2026-09-01 00:00", tz=PARIS)
+        end = pd.Timestamp("2026-09-01 23:00", tz=PARIS)
+        cutoff = pd.Timestamp("2026-09-01 06:00", tz="UTC")
+
+        with self.assertRaisesRegex(
+            RuntimeError,
+            r"plage=.*2026-09-01.*cutoff=.*2026-09-01.*reponse vide",
+        ):
+            fetch_saturn_series_from_client(
+                client,
+                NUCLEAR,
+                start,
+                end,
+                PARIS,
+                revision_date=cutoff,
+            )
+
+        self.assertEqual(client.get.call_count, 2)
+        args, kwargs = client.get.call_args_list[0]
+        self.assertEqual(args, (NUCLEAR,))
+        self.assertIn("from_value_date", kwargs)
+        self.assertIn("to_value_date", kwargs)
+        self.assertNotIn("from_value", kwargs)
+        self.assertNotIn("start", kwargs)
+        retry_args, retry_kwargs = client.get.call_args_list[1]
+        self.assertEqual(retry_args, (NUCLEAR,))
+        self.assertEqual(
+            retry_kwargs["from_value_date"],
+            kwargs["from_value_date"],
+        )
+        self.assertEqual(
+            retry_kwargs["to_value_date"],
+            kwargs["to_value_date"],
+        )
+        self.assertTrue(retry_kwargs["nocache"])
+
+    def test_fetch_same_dialect_nocache_retry_can_recover_empty(self) -> None:
+        raw = pd.Series(
+            [40.0],
+            index=pd.DatetimeIndex(["2026-09-01 00:00"], tz="UTC"),
+        )
+        client = Mock()
+        client.get.side_effect = [pd.Series(dtype=float), raw]
+
+        result = fetch_saturn_series_from_client(
+            client,
+            NUCLEAR,
+            pd.Timestamp("2026-09-01 00:00", tz=PARIS),
+            pd.Timestamp("2026-09-01 23:00", tz=PARIS),
+            PARIS,
+            revision_date=pd.Timestamp("2026-09-01 06:00", tz="UTC"),
+        )
+
+        self.assertEqual(client.get.call_count, 2)
+        first = client.get.call_args_list[0]
+        retry = client.get.call_args_list[1]
+        self.assertEqual(first.args, retry.args)
+        self.assertEqual(
+            first.kwargs["from_value_date"],
+            retry.kwargs["from_value_date"],
+        )
+        self.assertNotIn("from_value", retry.kwargs)
+        self.assertTrue(retry.kwargs["nocache"])
+        self.assertEqual(float(result.iloc[0]), 40.0)
+
+    def test_fetch_changes_dialect_only_for_unexpected_keyword(self) -> None:
+        raw = pd.Series(
+            [40.0],
+            index=pd.DatetimeIndex(["2024-01-01 00:00"]),
+        )
+
+        class Client:
+            def __init__(self) -> None:
+                self.calls: list[dict[str, object]] = []
+
+            def get(self, _name: str, **kwargs: object) -> pd.Series:
+                self.calls.append(dict(kwargs))
+                if "from_value_date" in kwargs:
+                    raise TypeError(
+                        "get() got an unexpected keyword argument "
+                        "'from_value_date'"
+                    )
+                return raw
+
+        client = Client()
+        result = fetch_saturn_series_from_client(
+            client,
+            NUCLEAR,
+            pd.Timestamp("2024-01-01", tz=PARIS),
+            pd.Timestamp("2024-01-02", tz=PARIS),
+            PARIS,
+            naive_timezone=PARIS,
+        )
+
+        self.assertEqual(len(client.calls), 2)
+        self.assertIn("from_value_date", client.calls[0])
+        self.assertIn("from_value", client.calls[1])
+        self.assertEqual(float(result.iloc[0]), 40.0)
+
+    def test_fetch_internal_type_error_is_terminal_and_never_positional(self) -> None:
+        client = Mock()
+        client.get.side_effect = TypeError("payload conversion failed")
+
+        with self.assertRaisesRegex(RuntimeError, "payload conversion failed"):
+            fetch_saturn_series_from_client(
+                client,
+                NUCLEAR,
+                pd.Timestamp("2024-01-01", tz=PARIS),
+                pd.Timestamp("2024-01-02", tz=PARIS),
+                PARIS,
+            )
+
+        self.assertEqual(client.get.call_count, 1)
+        args, _kwargs = client.get.call_args
+        self.assertEqual(args, (NUCLEAR,))
+
+    def test_fetch_never_uses_positional_date_fallback(self) -> None:
+        client = Mock()
+        client.get.side_effect = TypeError(
+            "get() got an unexpected keyword argument 'date'"
+        )
+
+        with self.assertRaisesRegex(RuntimeError, "unexpected keyword"):
+            fetch_saturn_series_from_client(
+                client,
+                NUCLEAR,
+                pd.Timestamp("2024-01-01", tz=PARIS),
+                pd.Timestamp("2024-01-02", tz=PARIS),
+                PARIS,
+            )
+
+        self.assertEqual(client.get.call_count, 3)
+        for call in client.get.call_args_list:
+            self.assertEqual(call.args, (NUCLEAR,))
 
     def test_sync_passes_policy_to_fetch_boundary(self) -> None:
         downloaded = pd.Series(

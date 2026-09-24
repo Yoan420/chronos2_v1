@@ -224,6 +224,60 @@ def test_reporting_uses_separate_paired_statistics_history_when_present(
     assert all(record["benchmark_mae"] == 4.0 for record in daily)
 
 
+def test_reporting_keeps_current_day_with_blank_observed_price(
+    tmp_path: Path,
+) -> None:
+    run_dir = tmp_path / "run"
+    _sealed_index, history_index = _write_reporting_run(run_dir)
+    history_path = run_dir / "statistics_history_hourly.csv.gz"
+    history = pd.read_csv(history_path)
+    current_index = local_delivery_day_index("2026-01-04")
+    current_q50 = np.arange(len(current_index), dtype=float) + 60.0
+    current = pd.DataFrame(
+        {
+            "delivery_start_utc": current_index,
+            "forecast_origin_utc": pd.Timestamp("2026-01-03 07:00Z"),
+            "mkonline_blend_forecast_origin_utc": pd.Timestamp(
+                "2026-01-03 07:00Z"
+            ),
+            "actual": np.nan,
+            "storm_evaluation_only__q50": current_q50 + 3.0,
+            **_model_columns("mkonline_blend", current_q50),
+        }
+    )
+    pd.concat([history, current], ignore_index=True).to_csv(
+        history_path,
+        index=False,
+        compression="gzip",
+    )
+
+    result = build_hourly_zone_result(
+        run_dir,
+        native_model="mkonline_blend",
+        baseline_model="residual_corrected",
+    )
+    assert len(result.statistics_candidate) == len(history_index) + len(current)
+    records = build_statistics_records([result])
+    daily = {
+        record["period_start"]: record
+        for record in records
+        if record["sample"] == "daily"
+    }
+    pending = daily["2026-01-04"]
+    assert pending["observed_mean_price"] is None
+    assert pending["mean_price"] == pytest.approx(float(np.mean(current_q50)))
+    assert pending["benchmark_mean_price"] == pytest.approx(
+        float(np.mean(current_q50 + 3.0))
+    )
+    assert pending["mae"] is None
+    assert pending["benchmark_mae"] is None
+    assert pending["n"] == pending["benchmark_n"] == 0
+    rendered = build_statistics_table_html([result])
+    assert '"period_start": "2026-01-04"' in rendered
+    assert '"observed_mean_price": null' in rendered
+    assert "function formatValue" in rendered
+
+
 def test_reporting_rejects_duplicate_statistics_history_timestamps(
     tmp_path: Path,
 ) -> None:
@@ -344,9 +398,9 @@ def test_reporting_reads_zone_specific_forecast_filename(tmp_path: Path) -> None
         "BE", timezone="Europe/Brussels"
     )[STORM_DASHBOARD_CONTRACT_ID]
     assert dashboard_contract["series"] == (
-        "power.price.be.euromwh.h.fcst.3mv.storm"
+        "power.price.be.euromwh.h.fcst.3mv.storm.da.cache"
     )
-    assert dashboard_contract["series_kind"] == "native_exact"
+    assert dashboard_contract["series_kind"] == "frozen_day_ahead_cache"
     assert dashboard_contract["series_identifier_verified"] is True
     assert dashboard_contract["zone"] == "BE"
     assert dashboard_contract["timezone"] == "Europe/Brussels"

@@ -37,6 +37,11 @@ from chronos2_modular.common import load_yaml
 
 
 APP_ZONES: tuple[str, ...] = ("FR", "DE", "BE", "NL", "ES")
+RESIDUAL_LOAD_SOURCES: tuple[str, ...] = ("saturn", "chronos2")
+CHRONOS2_RESIDUAL_ARCHIVE_SUFFIX = "_residual_load_chronos2"
+CHRONOS2_RESIDUAL_ARCHIVE_SUBDIR = Path(
+    "_challengers/residual_load_chronos2"
+)
 _REQUESTS_PROXY_ENV_NAMES: tuple[str, ...] = (
     "HTTP_PROXY",
     "HTTPS_PROXY",
@@ -45,6 +50,59 @@ _REQUESTS_PROXY_ENV_NAMES: tuple[str, ...] = (
     "https_proxy",
     "all_proxy",
 )
+
+
+def normalize_residual_load_source(value: str | None) -> str:
+    """Return the explicit residual-load provider used by a forecast run."""
+
+    source = str(value or "saturn").strip().lower()
+    if source not in RESIDUAL_LOAD_SOURCES:
+        raise ValueError(
+            "residual_load_source doit etre saturn ou chronos2."
+        )
+    return source
+
+
+def forecast_archive_name(
+    zone: str,
+    delivery_day: str | date,
+    *,
+    residual_load_source: str = "saturn",
+) -> str:
+    """Name production and shadow archives without allowing collisions."""
+
+    code = canonical_zone(zone)
+    delivery_text = (
+        delivery_day.isoformat()
+        if isinstance(delivery_day, date)
+        else date.fromisoformat(str(delivery_day)).isoformat()
+    )
+    source = normalize_residual_load_source(residual_load_source)
+    suffix = CHRONOS2_RESIDUAL_ARCHIVE_SUFFIX if source == "chronos2" else ""
+    return f"{code.lower()}_day_ahead_{delivery_text}{suffix}"
+
+
+def _residual_bundle_path(
+    value: str | Path | None,
+    *,
+    project_root: Path,
+    required: bool,
+) -> Path | None:
+    if value in (None, ""):
+        if required:
+            raise ValueError(
+                "residual_load_bundle_manifest est obligatoire avec chronos2."
+            )
+        return None
+    path = Path(str(value)).expanduser()
+    path = (path if path.is_absolute() else project_root / path).resolve()
+    try:
+        path.relative_to(project_root)
+    except ValueError as exc:
+        raise ValueError(
+            "Le manifeste de charge residuelle doit rester dans le projet."
+        ) from exc
+    return path
 STATISTIC_DEFINITIONS: tuple[tuple[str, str, bool], ...] = (
     ("mae", "MAE", False),
     ("rmse", "RMSE", False),
@@ -65,6 +123,11 @@ CANDIDATE_COLUMN_PRIORITY: tuple[str, ...] = (
     "residual_corrected__q50",
     "ensemble__q50",
     "chronos2__q50",
+)
+FORECAST_VARIANTS: tuple[str, ...] = (
+    "production",
+    "autonomous",
+    "mkonline_blend",
 )
 BENCHMARK_COLUMN_PRIORITY: tuple[str, ...] = (
     # The native dashboard snapshot is the reporting benchmark when its
@@ -119,6 +182,25 @@ class StatisticsDataset:
 
 
 @dataclass(frozen=True)
+class PerformanceArtifact:
+    """One fully audited Statistics history selected for a zone."""
+
+    zone: str
+    timezone: str
+    archive_kind: str
+    delivery_day: str
+    archive_path: Path
+    statistics_path: Path
+    audit_path: Path
+    statistics_prefix_end_local: str
+    n_total_statistics_hours: int
+    statistics_complete: bool
+    missing_realized_days: tuple[str, ...]
+    statistics_sha256: str
+    modified_at: datetime
+
+
+@dataclass(frozen=True)
 class ForecastDataset:
     path: Path
     frame: pd.DataFrame
@@ -145,6 +227,7 @@ class ForecastComparison:
     archives: tuple[ForecastArchiveDataset, ...]
     frame: pd.DataFrame
     timeline_aligned: bool
+    variant: str = "production"
 
     @property
     def zones(self) -> tuple[str, ...]:
@@ -312,6 +395,8 @@ def validate_existing_forecast_archive(
     project_root: str | Path,
     delivery_day: str | date,
     pit_replay: bool = False,
+    residual_load_source: str = "saturn",
+    residual_load_bundle_manifest: str | Path | None = None,
 ) -> Path | None:
     """Return a fully verified immutable archive, or ``None`` if absent.
 
@@ -326,6 +411,17 @@ def validate_existing_forecast_archive(
         raise ValueError("delivery_day est obligatoire pour l'audit idempotent")
     delivery = date.fromisoformat(delivery_text)
     root = Path(project_root).expanduser().resolve()
+    source = normalize_residual_load_source(residual_load_source)
+    if pit_replay and source != "saturn":
+        raise ValueError(
+            "Les replays PIT Chronos-2 doivent etre materialises par le "
+            "protocole historique dedie, jamais par le runner live."
+        )
+    expected_bundle = _residual_bundle_path(
+        residual_load_bundle_manifest,
+        project_root=root,
+        required=False,
+    )
     if status.live_config is None:
         raise ExistingForecastArchiveError(
             f"{code}: configuration live absente; archive impossible à auditer."
@@ -360,11 +456,29 @@ def validate_existing_forecast_archive(
         raise ExistingForecastArchiveError(
             f"{code}: live.output_root doit rester dans le projet: {output_root}"
         ) from exc
-    archive_root = output_root / "_replays" if pit_replay else output_root
+    archive_root = (
+        output_root / CHRONOS2_RESIDUAL_ARCHIVE_SUBDIR
+        if source == "chronos2"
+        else (output_root / "_replays" if pit_replay else output_root)
+    )
+    resolved_archive_root = archive_root.resolve()
+    if source == "chronos2":
+        try:
+            resolved_archive_root.relative_to(output_root)
+        except ValueError as exc:
+            raise ExistingForecastArchiveError(
+                f"{code}: racine challenger hors output_root: "
+                f"{resolved_archive_root}"
+            ) from exc
     archive = (
-        archive_root / f"{code.lower()}_day_ahead_{delivery_text}"
+        resolved_archive_root
+        / forecast_archive_name(
+            code,
+            delivery_text,
+            residual_load_source=source,
+        )
     ).resolve()
-    if archive.parent != archive_root.resolve():
+    if archive.parent != resolved_archive_root:
         raise ExistingForecastArchiveError(
             f"{code}: chemin d'archive inattendu: {archive}"
         )
@@ -385,8 +499,24 @@ def validate_existing_forecast_archive(
     manifest = _archive_json(archive / "run_manifest.json")
     summary = _archive_json(archive / "live_run_summary.json")
     checksum_manifest = _archive_json(archive / "artifact_checksums.json")
-    expected_run_type = "pit_replay" if pit_replay else "live_day_ahead"
-    expected_forecast_status = "pit_reconstruction" if pit_replay else "issued_live"
+    expected_run_type = (
+        "pit_replay"
+        if pit_replay
+        else (
+            "shadow_live_day_ahead"
+            if source == "chronos2"
+            else "live_day_ahead"
+        )
+    )
+    expected_forecast_status = (
+        "pit_reconstruction"
+        if pit_replay
+        else (
+            "shadow_challenger"
+            if source == "chronos2"
+            else "issued_live"
+        )
+    )
     expected_identity = {
         "zone": code,
         "timezone": status.timezone,
@@ -400,6 +530,196 @@ def validate_existing_forecast_archive(
                 f"{archive}: run_manifest.{key}={manifest.get(key)!r}, "
                 f"attendu {expected!r}."
             )
+    observed_source = normalize_residual_load_source(
+        manifest.get("residual_load_source", "saturn")
+    )
+    if observed_source != source:
+        raise ExistingForecastArchiveError(
+            f"{archive}: run_manifest.residual_load_source="
+            f"{observed_source!r}, attendu {source!r}."
+        )
+    if source == "chronos2":
+        if manifest.get("production_eligible") is not False:
+            raise ExistingForecastArchiveError(
+                f"{archive}: le challenger doit declarer production_eligible=false."
+            )
+        try:
+            from chronos2_hourly.chronos_residual_load import (
+                ARCHIVED_BUNDLE_DIRECTORY,
+                ARCHIVED_BUNDLE_MANIFEST,
+                BundleValidationError,
+                EXPECTED_ALIASES,
+                validate_archived_residual_load_overlay,
+            )
+        except ImportError as exc:  # pragma: no cover - installation failure
+            raise ExistingForecastArchiveError(
+                "Le validateur residual-load Chronos-2 est indisponible."
+            ) from exc
+
+        raw_bundle = str(
+            manifest.get("residual_load_bundle_manifest_path") or ""
+        )
+        bundle_reference = Path(raw_bundle)
+        expected_archive_reference = Path("inputs") / ARCHIVED_BUNDLE_MANIFEST
+        if (
+            not raw_bundle
+            or bundle_reference.is_absolute()
+            or ".." in bundle_reference.parts
+            or bundle_reference.as_posix()
+            != expected_archive_reference.as_posix()
+        ):
+            raise ExistingForecastArchiveError(
+                f"{archive}: chemin du bundle archive non canonique: "
+                f"{raw_bundle!r}."
+            )
+        archived_bundle = (archive / bundle_reference).resolve()
+        try:
+            archived_bundle.relative_to(archive)
+        except ValueError as exc:
+            raise ExistingForecastArchiveError(
+                f"{archive}: bundle archive hors de l'archive."
+            ) from exc
+        raw_origin_bundle = manifest.get(
+            "residual_load_bundle_origin_manifest_path"
+        )
+        origin_bundle = Path(str(raw_origin_bundle or "")).expanduser()
+        if (
+            not str(raw_origin_bundle or "").strip()
+            or not origin_bundle.is_absolute()
+        ):
+            raise ExistingForecastArchiveError(
+                f"{archive}: chemin amont d'origine absolu absent."
+            )
+        # Provenance only: never require or open this external path. The run
+        # remains auditable after cleanup or relocation of runs/experiments.
+        origin_bundle = origin_bundle.resolve()
+        if expected_bundle is not None and origin_bundle != expected_bundle:
+            raise ExistingForecastArchiveError(
+                f"{archive}: bundle de charge residuelle different de celui demande."
+            )
+        if not archived_bundle.is_file():
+            raise ExistingForecastArchiveError(
+                f"{archive}: manifeste Chronos-2 archive absent: {archived_bundle}."
+            )
+        expected_bundle_sha = str(
+            manifest.get("residual_load_bundle_manifest_sha256") or ""
+        ).lower()
+        if expected_bundle_sha != _archive_sha256(archived_bundle):
+            raise ExistingForecastArchiveError(
+                f"{archive}: SHA-256 du manifeste Chronos-2 archive divergent."
+            )
+        if expected_bundle is not None and expected_bundle.is_file() and (
+            _archive_sha256(expected_bundle) != expected_bundle_sha
+        ):
+            raise ExistingForecastArchiveError(
+                f"{archive}: l'amont fourni diverge du bundle archive."
+            )
+        input_diagnostics = manifest.get("input_diagnostics")
+        provider_provenance = (
+            input_diagnostics.get("residual_load_provider")
+            if isinstance(input_diagnostics, Mapping)
+            else None
+        )
+        if not isinstance(provider_provenance, Mapping):
+            raise ExistingForecastArchiveError(
+                f"{archive}: provenance residual_load_provider absente."
+            )
+        cutoff_value = manifest.get("forecast_cutoff_utc")
+        if cutoff_value in (None, ""):
+            raise ExistingForecastArchiveError(
+                f"{archive}: forecast_cutoff_utc absent du manifeste."
+            )
+        try:
+            overlay_validation = validate_archived_residual_load_overlay(
+                archive / "inputs",
+                upstream_manifest_path=archived_bundle,
+                upstream_origin_manifest_path=origin_bundle,
+                expected_delivery_day=delivery_text,
+                expected_runtime_cutoff=cutoff_value,
+            )
+        except (BundleValidationError, OSError, TypeError, ValueError) as exc:
+            raise ExistingForecastArchiveError(
+                f"{archive}: overlay de charge residuelle Chronos-2 invalide: {exc}"
+            ) from exc
+        upstream_payload = _archive_json(archived_bundle)
+        expected_provider_identity = {
+            "provider": "chronos2",
+            "target_source_kind": "observed_entsoe",
+            "saturn_forecast_series_used": False,
+            "historical_context_source": "production_pit_unchanged",
+            "delivery_day_values_source": "chronos2",
+            "manifest_path": str(origin_bundle),
+            "manifest_sha256": expected_bundle_sha,
+            "archived_manifest_path": ARCHIVED_BUNDLE_MANIFEST,
+            "archived_manifest_sha256": expected_bundle_sha,
+            "composite_path_base": "runtime_inputs_directory",
+            "delivery_day_local": delivery_text,
+            "runtime_cutoff_utc": upstream_payload.get("runtime_cutoff_utc"),
+            "model_id": upstream_payload.get("model_id"),
+            "model_revision": upstream_payload.get("model_revision"),
+        }
+        for key, expected in expected_provider_identity.items():
+            if provider_provenance.get(key) != expected:
+                raise ExistingForecastArchiveError(
+                    f"{archive}: provenance {key}="
+                    f"{provider_provenance.get(key)!r}, attendu {expected!r}."
+                )
+        inputs_root = (archive / "inputs").resolve()
+        composite_manifest = Path(overlay_validation["manifest_path"])
+        expected_composite_reference = composite_manifest.relative_to(
+            inputs_root
+        ).as_posix()
+        if (
+            provider_provenance.get("composite_manifest_path")
+            != expected_composite_reference
+            or provider_provenance.get("composite_manifest_sha256")
+            != overlay_validation["manifest_sha256"]
+        ):
+            raise ExistingForecastArchiveError(
+                f"{archive}: provenance du manifeste composite divergente."
+            )
+        provider_files = provider_provenance.get("files")
+        if not isinstance(provider_files, Mapping) or set(provider_files) != set(
+            EXPECTED_ALIASES
+        ):
+            raise ExistingForecastArchiveError(
+                f"{archive}: provenance des cinq overlays absente ou invalide."
+            )
+        for alias in EXPECTED_ALIASES:
+            observed = provider_files.get(alias)
+            validated = overlay_validation["files"][alias]
+            if not isinstance(observed, Mapping):
+                raise ExistingForecastArchiveError(
+                    f"{archive}: provenance overlay absente pour {alias}."
+                )
+            upstream_declaration = next(
+                item
+                for item in upstream_payload["artifacts"]
+                if str(item["alias"]) == alias
+            )
+            upstream_relative = Path(str(upstream_declaration["path"]))
+            expected_file_identity = {
+                "path": Path(validated["path"])
+                .relative_to(inputs_root)
+                .as_posix(),
+                "sha256": validated["sha256"],
+                "historical_rows": validated["historical_rows"],
+                "delivery_day_rows": validated["delivery_day_rows"],
+                "upstream_forecast_path": str(
+                    (origin_bundle.parent / upstream_relative).resolve()
+                ),
+                "upstream_forecast_sha256": str(
+                    upstream_declaration["sha256"]
+                ),
+                "archived_upstream_forecast_path": (
+                    Path(ARCHIVED_BUNDLE_DIRECTORY) / upstream_relative
+                ).as_posix(),
+            }
+            for key, expected in expected_file_identity.items():
+                if observed.get(key) != expected:
+                    raise ExistingForecastArchiveError(
+                        f"{archive}: provenance {alias}.{key} divergente."
+                    )
     if manifest.get("forecast_path") not in (None, forecast_name):
         raise ExistingForecastArchiveError(
             f"{archive}: run_manifest.forecast_path ne correspond pas à {forecast_name}."
@@ -429,6 +749,14 @@ def validate_existing_forecast_archive(
     if summary.get("zone") not in (None, code):
         raise ExistingForecastArchiveError(
             f"{archive}: live_run_summary.zone ne correspond pas à {code}."
+        )
+    summary_source = normalize_residual_load_source(
+        summary.get("residual_load_source", "saturn")
+    )
+    if summary_source != source:
+        raise ExistingForecastArchiveError(
+            f"{archive}: live_run_summary.residual_load_source="
+            f"{summary_source!r}, attendu {source!r}."
         )
 
     if checksum_manifest.get("algorithm") != "sha256":
@@ -669,6 +997,7 @@ def load_latest_forecast_comparison(
     project_root: str | Path,
     zones: Sequence[str],
     allow_mixed_delivery_days: bool = False,
+    variant: str = "production",
 ) -> ForecastComparison:
     """Load the newest issued-live forecast for every requested zone.
 
@@ -680,6 +1009,7 @@ def load_latest_forecast_comparison(
     the UI and report cannot hide that difference.
     """
 
+    selected_variant = _normalize_forecast_variant(variant)
     requested = tuple(canonical_zone(zone) for zone in zones)
     if not requested:
         raise ValueError("Selectionnez au moins un pays pour la comparaison.")
@@ -740,6 +1070,7 @@ def load_latest_forecast_comparison(
         dataset = load_forecast_curve(
             forecast_path,
             timezone_name=status.timezone,
+            variant=selected_variant,
         )
         utc = pd.DatetimeIndex(dataset.frame["timestamp"]).tz_convert("UTC")
         expected = local_delivery_day_index(
@@ -814,6 +1145,7 @@ def load_latest_forecast_comparison(
         archives=tuple(archives),
         frame=comparison_frame,
         timeline_aligned=timeline_aligned,
+        variant=selected_variant,
     )
 
 
@@ -830,6 +1162,8 @@ def build_dispatch_command(
     workers: int | None = None,
     local_files_only: bool = False,
     pit_replay: bool = False,
+    residual_load_source: str = "saturn",
+    residual_load_bundle_manifest: str | Path | None = None,
 ) -> list[str]:
     """Build a dispatcher argv list; no shell parsing is ever involved."""
 
@@ -838,6 +1172,20 @@ def build_dispatch_command(
         raise ZoneBundleError(f"{status.code}: lancement refusé: {detail}")
     code = canonical_zone(status.code)
     root = Path(project_root).expanduser().resolve()
+    source = normalize_residual_load_source(residual_load_source)
+    if pit_replay and source != "saturn":
+        raise ValueError(
+            "Le runner live ne materialise pas de replay PIT Chronos-2."
+        )
+    bundle_manifest = _residual_bundle_path(
+        residual_load_bundle_manifest,
+        project_root=root,
+        required=source == "chronos2",
+    )
+    if source == "saturn" and bundle_manifest is not None:
+        raise ValueError(
+            "Un manifeste Chronos-2 ne peut pas etre fourni avec source=saturn."
+        )
     dispatcher = (root / "run_mkonline_live_zone.py").resolve()
     if not dispatcher.is_file():
         raise FileNotFoundError(f"Dispatcher absent: {dispatcher}")
@@ -877,6 +1225,15 @@ def build_dispatch_command(
         command.append("--local-files-only")
     if pit_replay:
         command.append("--pit-replay")
+    if source == "chronos2":
+        command.extend(
+            (
+                "--residual-load-source",
+                source,
+                "--residual-load-bundle-manifest",
+                str(bundle_manifest),
+            )
+        )
     return command
 
 
@@ -992,14 +1349,45 @@ def launch_zone_forecast(
     workers: int | None = None,
     local_files_only: bool = False,
     pit_replay: bool = False,
+    residual_load_source: str = "saturn",
+    residual_load_bundle_manifest: str | Path | None = None,
 ) -> ForecastProcess | ForecastSkip:
     """Re-audit immediately before dispatch, then launch the zone safely."""
 
     code = canonical_zone(zone)
     status = inspect_zone_statuses(registry_path, zones=(code,))[0]
+    source = normalize_residual_load_source(residual_load_source)
+    root = Path(project_root).expanduser().resolve()
+    resolved_bundle = _residual_bundle_path(
+        residual_load_bundle_manifest,
+        project_root=root,
+        required=False,
+    )
+    delivery = _iso_date(delivery_day, name="delivery_day")
+    if source == "chronos2" and (
+        resolved_bundle is None or not resolved_bundle.is_file()
+    ):
+        if delivery is not None:
+            existing = validate_existing_forecast_archive(
+                status,
+                project_root=root,
+                delivery_day=delivery,
+                pit_replay=pit_replay,
+                residual_load_source=source,
+            )
+            if existing is not None:
+                return ForecastSkip(
+                    zone=code,
+                    delivery_day=delivery,
+                    archive_path=existing,
+                )
+        raise FileNotFoundError(
+            "Le manifeste amont Chronos-2 doit exister avant le lancement: "
+            f"{resolved_bundle}."
+        )
     command = build_dispatch_command(
         status,
-        project_root=project_root,
+        project_root=root,
         registry_path=registry_path,
         python_executable=python_executable,
         delivery_day=delivery_day,
@@ -1009,14 +1397,17 @@ def launch_zone_forecast(
         workers=workers,
         local_files_only=local_files_only,
         pit_replay=pit_replay,
+        residual_load_source=source,
+        residual_load_bundle_manifest=resolved_bundle,
     )
-    delivery = _iso_date(delivery_day, name="delivery_day")
     if delivery is not None:
         existing = validate_existing_forecast_archive(
             status,
-            project_root=project_root,
+            project_root=root,
             delivery_day=delivery,
             pit_replay=pit_replay,
+            residual_load_source=source,
+            residual_load_bundle_manifest=resolved_bundle,
         )
         if existing is not None:
             return ForecastSkip(
@@ -1132,6 +1523,8 @@ def list_run_artifacts(
             if directory.name.endswith("_sealed_benchmark_v1")
             else "rapport"
             if "_reports" in parts_lower
+            else "challenger prospectif"
+            if "_challengers" in parts_lower
             else "replay"
             if "_replays" in parts_lower
             else "run live"
@@ -1161,7 +1554,11 @@ def _first_existing_column(frame: pd.DataFrame, names: Sequence[str]) -> str | N
     return None
 
 
-def load_statistics_history(path: str | Path) -> StatisticsDataset:
+def load_statistics_history(
+    path: str | Path,
+    *,
+    variant: str = "production",
+) -> StatisticsDataset:
     """Load a reporting-only Statistics artifact with explicit Storm semantics."""
 
     statistics_path = Path(path).expanduser().resolve()
@@ -1173,9 +1570,17 @@ def load_statistics_history(path: str | Path) -> StatisticsDataset:
     delivery = pd.to_datetime(frame["delivery_start_utc"], utc=True, errors="raise")
     if bool(delivery.duplicated().any()):
         raise ValueError("La timeline Statistics contient des doublons.")
-    candidate = _first_existing_column(frame, CANDIDATE_COLUMN_PRIORITY)
+    selected_variant = _normalize_forecast_variant(variant)
+    candidate_priority = {
+        "production": CANDIDATE_COLUMN_PRIORITY,
+        "autonomous": ("residual_corrected__q50",),
+        "mkonline_blend": ("mkonline_blend__q50",),
+    }[selected_variant]
+    candidate = _first_existing_column(frame, candidate_priority)
     if candidate is None:
-        raise ValueError("Aucune prévision candidate P50 reconnue dans Statistics.")
+        raise ValueError(
+            f"Variante {selected_variant} absente de l'historique Statistics."
+        )
 
     audit_path = statistics_path.parent / "statistics_history_audit.json"
     audit: dict[str, Any] = {}
@@ -1228,25 +1633,351 @@ def load_statistics_history(path: str | Path) -> StatisticsDataset:
     )
 
 
+@dataclass(frozen=True)
+class _PerformanceCandidate:
+    archive_path: Path
+    pit_replay: bool
+    delivery_day: str
+    prefix_end_local: str
+    max_timestamp_utc: pd.Timestamp
+    row_count: int
+
+
+def _performance_candidate(
+    archive_path: Path,
+    *,
+    pit_replay: bool,
+    delivery_day: str,
+    timezone_name: str,
+) -> _PerformanceCandidate:
+    statistics_path = archive_path / "statistics_history_hourly.csv.gz"
+    audit_path = archive_path / "statistics_history_audit.json"
+    audit = _archive_json(audit_path)
+    try:
+        timeline_frame = pd.read_csv(
+            statistics_path,
+            compression="infer",
+            usecols=["delivery_start_utc"],
+        )
+        delivery = pd.DatetimeIndex(
+            pd.to_datetime(
+                timeline_frame["delivery_start_utc"],
+                utc=True,
+                errors="raise",
+            )
+        )
+    except (KeyError, OSError, ValueError) as exc:
+        raise ExistingForecastArchiveError(
+            f"{archive_path}: historique Statistics illisible."
+        ) from exc
+    if delivery.empty:
+        raise ExistingForecastArchiveError(
+            f"{archive_path}: historique Statistics vide."
+        )
+    max_timestamp_utc = pd.Timestamp(delivery.max())
+    observed_prefix = max_timestamp_utc.tz_convert(timezone_name).date().isoformat()
+    raw_prefix = audit.get("statistics_prefix_end_local")
+    if raw_prefix in (None, ""):
+        prefix_end_local = observed_prefix
+    else:
+        try:
+            prefix_end_local = date.fromisoformat(str(raw_prefix)).isoformat()
+        except ValueError as exc:
+            raise ExistingForecastArchiveError(
+                f"{archive_path}: statistics_prefix_end_local invalide."
+            ) from exc
+    return _PerformanceCandidate(
+        archive_path=archive_path,
+        pit_replay=pit_replay,
+        delivery_day=delivery_day,
+        prefix_end_local=prefix_end_local,
+        max_timestamp_utc=max_timestamp_utc,
+        row_count=len(timeline_frame),
+    )
+
+
+def _canonical_performance_candidates(
+    status: ZoneStatus,
+    *,
+    project_root: str | Path,
+) -> tuple[_PerformanceCandidate, ...]:
+    code = canonical_zone(status.code)
+    output_root, _forecast_name = _live_output_contract(
+        status,
+        project_root=project_root,
+    )
+    if not output_root.is_dir():
+        raise ExistingForecastArchiveError(
+            f"{code}: aucun dossier live canonique n'est publie."
+        )
+    pattern = re.compile(
+        rf"^{re.escape(code.lower())}_day_ahead_(\d{{4}}-\d{{2}}-\d{{2}})$"
+    )
+    candidates: list[_PerformanceCandidate] = []
+    for archive_root, pit_replay in (
+        (output_root, False),
+        (output_root / "_replays", True),
+    ):
+        if not archive_root.is_dir():
+            continue
+        try:
+            archive_root.resolve().relative_to(output_root)
+        except ValueError as exc:
+            raise ExistingForecastArchiveError(
+                f"{code}: racine d'archive Statistics hors du projet live."
+            ) from exc
+        for raw_archive in archive_root.iterdir():
+            match = pattern.fullmatch(raw_archive.name)
+            if match is None or not raw_archive.is_dir():
+                continue
+            try:
+                delivery_day = date.fromisoformat(match.group(1)).isoformat()
+            except ValueError:
+                continue
+            archive_path = raw_archive.resolve()
+            if archive_path.parent != archive_root.resolve():
+                raise ExistingForecastArchiveError(
+                    f"{code}: archive Statistics hors de sa racine canonique."
+                )
+            statistics_path = archive_path / "statistics_history_hourly.csv.gz"
+            audit_path = archive_path / "statistics_history_audit.json"
+            if not statistics_path.is_file() and not audit_path.is_file():
+                continue
+            if not statistics_path.is_file() or not audit_path.is_file():
+                raise ExistingForecastArchiveError(
+                    f"{archive_path}: paire Statistics/audit incomplete."
+                )
+            candidates.append(
+                _performance_candidate(
+                    archive_path,
+                    pit_replay=pit_replay,
+                    delivery_day=delivery_day,
+                    timezone_name=status.timezone,
+                )
+            )
+    if not candidates:
+        raise ExistingForecastArchiveError(
+            f"{code}: aucun historique Statistics audite n'est publie."
+        )
+    return tuple(candidates)
+
+
+def _validated_performance_artifact(
+    status: ZoneStatus,
+    candidate: _PerformanceCandidate,
+    *,
+    project_root: str | Path,
+    variant: str,
+) -> tuple[PerformanceArtifact, StatisticsDataset]:
+    code = canonical_zone(status.code)
+    validated_archive = validate_existing_forecast_archive(
+        status,
+        project_root=project_root,
+        delivery_day=candidate.delivery_day,
+        pit_replay=candidate.pit_replay,
+    )
+    if validated_archive is None or validated_archive != candidate.archive_path:
+        raise ExistingForecastArchiveError(
+            f"{candidate.archive_path}: archive Statistics introuvable apres selection."
+        )
+    statistics_path = validated_archive / "statistics_history_hourly.csv.gz"
+    audit_path = validated_archive / "statistics_history_audit.json"
+    audit = _archive_json(audit_path)
+    if audit.get("statistics_history_path") != statistics_path.name:
+        raise ExistingForecastArchiveError(
+            f"{validated_archive}: statistics_history_path non canonique."
+        )
+    if audit.get("statistics_audit_path") != audit_path.name:
+        raise ExistingForecastArchiveError(
+            f"{validated_archive}: statistics_audit_path non canonique."
+        )
+    current_delivery_day = audit.get("current_delivery_day_local")
+    if current_delivery_day not in (None, candidate.delivery_day):
+        raise ExistingForecastArchiveError(
+            f"{validated_archive}: current_delivery_day_local incoherent."
+        )
+    expected_sha = str(audit.get("statistics_history_sha256") or "").lower()
+    actual_sha = _archive_sha256(statistics_path)
+    if (
+        len(expected_sha) != 64
+        or not re.fullmatch(r"[0-9a-f]{64}", expected_sha)
+        or expected_sha != actual_sha
+    ):
+        raise ExistingForecastArchiveError(
+            f"{validated_archive}: statistics_history_sha256 divergent."
+        )
+    try:
+        dataset = load_statistics_history(statistics_path, variant=variant)
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        raise ExistingForecastArchiveError(
+            f"{validated_archive}: historique Statistics invalide pour {variant}."
+        ) from exc
+    if len(dataset.frame) != candidate.row_count:
+        raise ExistingForecastArchiveError(
+            f"{validated_archive}: nombre de lignes Statistics instable."
+        )
+    raw_total = audit.get("n_total_statistics_hours")
+    if isinstance(raw_total, bool):
+        raise ExistingForecastArchiveError(
+            f"{validated_archive}: n_total_statistics_hours invalide."
+        )
+    try:
+        audited_total = int(raw_total)
+    except (TypeError, ValueError) as exc:
+        raise ExistingForecastArchiveError(
+            f"{validated_archive}: n_total_statistics_hours invalide."
+        ) from exc
+    if audited_total != len(dataset.frame):
+        raise ExistingForecastArchiveError(
+            f"{validated_archive}: n_total_statistics_hours divergent."
+        )
+    observed_max = pd.Timestamp(dataset.frame["timestamp"].max())
+    observed_prefix = observed_max.tz_convert(status.timezone).date().isoformat()
+    raw_prefix = audit.get("statistics_prefix_end_local")
+    if raw_prefix not in (None, ""):
+        try:
+            audited_prefix = date.fromisoformat(str(raw_prefix)).isoformat()
+        except ValueError as exc:
+            raise ExistingForecastArchiveError(
+                f"{validated_archive}: statistics_prefix_end_local invalide."
+            ) from exc
+        if audited_prefix != observed_prefix:
+            raise ExistingForecastArchiveError(
+                f"{validated_archive}: statistics_prefix_end_local divergent."
+            )
+    elif candidate.prefix_end_local != observed_prefix:
+        raise ExistingForecastArchiveError(
+            f"{validated_archive}: couverture Statistics instable."
+        )
+    raw_complete = audit.get("statistics_complete", False)
+    if not isinstance(raw_complete, bool):
+        raise ExistingForecastArchiveError(
+            f"{validated_archive}: statistics_complete doit etre booleen."
+        )
+    raw_missing = audit.get("missing_realized_days", [])
+    if not isinstance(raw_missing, list):
+        raise ExistingForecastArchiveError(
+            f"{validated_archive}: missing_realized_days doit etre une liste."
+        )
+    missing_realized_days: list[str] = []
+    for raw_day in raw_missing:
+        try:
+            missing_realized_days.append(date.fromisoformat(str(raw_day)).isoformat())
+        except ValueError as exc:
+            raise ExistingForecastArchiveError(
+                f"{validated_archive}: missing_realized_days contient une date invalide."
+            ) from exc
+    modified_at = datetime.fromtimestamp(
+        max(statistics_path.stat().st_mtime, audit_path.stat().st_mtime),
+        tz=timezone.utc,
+    )
+    artifact = PerformanceArtifact(
+        zone=code,
+        timezone=status.timezone,
+        archive_kind="pit_replay" if candidate.pit_replay else "live_day_ahead",
+        delivery_day=candidate.delivery_day,
+        archive_path=validated_archive,
+        statistics_path=statistics_path,
+        audit_path=audit_path,
+        statistics_prefix_end_local=observed_prefix,
+        n_total_statistics_hours=len(dataset.frame),
+        statistics_complete=raw_complete,
+        missing_realized_days=tuple(missing_realized_days),
+        statistics_sha256=actual_sha,
+        modified_at=modified_at,
+    )
+    return artifact, dataset
+
+
+def load_best_statistics_history(
+    status: ZoneStatus,
+    *,
+    project_root: str | Path,
+    variant: str = "production",
+) -> tuple[PerformanceArtifact, StatisticsDataset]:
+    """Load the freshest checksum-sealed Statistics history for one zone.
+
+    Freshness is based only on scored coverage, never on filesystem mtime.
+    The highest-ranked archive is validated fail-closed; a corrupt fresher
+    artifact is not silently replaced with an older history.
+    """
+
+    selected_variant = _normalize_forecast_variant(variant)
+    candidates = _canonical_performance_candidates(
+        status,
+        project_root=project_root,
+    )
+    selected = max(
+        candidates,
+        key=lambda item: (
+            date.fromisoformat(item.prefix_end_local),
+            item.max_timestamp_utc.value,
+            item.row_count,
+            date.fromisoformat(item.delivery_day),
+            not item.pit_replay,
+        ),
+    )
+    return _validated_performance_artifact(
+        status,
+        selected,
+        project_root=project_root,
+        variant=selected_variant,
+    )
+
+
+def _normalize_forecast_variant(value: str) -> str:
+    variant = str(value).strip().lower()
+    aliases = {
+        "production": "production",
+        "autonomous": "autonomous",
+        "autonome": "autonomous",
+        "mkonline_blend": "mkonline_blend",
+        "blend": "mkonline_blend",
+    }
+    try:
+        return aliases[variant]
+    except KeyError as exc:
+        raise ValueError(
+            "variant doit etre production, autonomous ou mkonline_blend."
+        ) from exc
+
+
 def load_forecast_curve(
     path: str | Path,
     *,
     timezone_name: str,
+    variant: str = "production",
 ) -> ForecastDataset:
     """Load one immutable forecast for display, with strict quantile guards."""
 
     forecast_path = Path(path).expanduser().resolve()
     frame = pd.read_csv(forecast_path)
-    required = {"delivery_start_utc", "q10", "q50", "q90"}
+    selected_variant = _normalize_forecast_variant(variant)
+    quantile_columns = {
+        "production": ("q10", "q50", "q90"),
+        "autonomous": (
+            "residual_corrected__q10",
+            "residual_corrected__q50",
+            "residual_corrected__q90",
+        ),
+        "mkonline_blend": (
+            "mkonline_blend__q10",
+            "mkonline_blend__q50",
+            "mkonline_blend__q90",
+        ),
+    }[selected_variant]
+    required = {"delivery_start_utc", *quantile_columns}
     missing = sorted(required.difference(frame.columns))
     if missing:
-        raise ValueError(f"Colonnes forecast absentes: {missing}")
+        raise ValueError(
+            f"Variante {selected_variant} indisponible; colonnes absentes: {missing}"
+        )
     delivery = pd.DatetimeIndex(
         pd.to_datetime(frame["delivery_start_utc"], utc=True, errors="raise")
     )
     if delivery.has_duplicates or not delivery.is_monotonic_increasing:
         raise ValueError("La timeline forecast doit être unique et triée.")
-    quantiles = frame.loc[:, ["q10", "q50", "q90"]].apply(
+    quantiles = frame.loc[:, list(quantile_columns)].apply(
         pd.to_numeric, errors="coerce"
     )
     values = quantiles.to_numpy(dtype=float)

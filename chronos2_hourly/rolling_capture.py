@@ -30,6 +30,7 @@ import numpy as np
 import pandas as pd
 
 from chronos2_hourly.hourly_contract import local_delivery_day_index
+from chronos2_hourly.observation_precision import validate_observation_precision
 
 
 LOGGER = logging.getLogger("rolling_capture")
@@ -556,13 +557,21 @@ def prove_frozen_builder_subset_equivalence(
     }
     full_meta = build_residual_meta_features(full, experts, **options)
     captured_meta = build_residual_meta_features(captured, experts, **options)
+    meta_feature_column_order_normalized = False
     if list(full_meta.columns) != list(captured_meta.columns):
         missing = sorted(set(full_meta.columns).difference(captured_meta.columns))
         unexpected = sorted(set(captured_meta.columns).difference(full_meta.columns))
-        raise RollingCaptureError(
-            "captured subset changes frozen residual meta-feature schema: "
-            f"missing={missing}, unexpected={unexpected}"
-        )
+        if missing or unexpected:
+            raise RollingCaptureError(
+                "captured subset changes frozen residual meta-feature schema: "
+                f"missing={missing}, unexpected={unexpected}"
+            )
+        # The frozen builder can preserve the order of its physical inputs.
+        # A capture subset may therefore emit the exact same named features in
+        # another order.  Align by the already-proved identical names, then keep
+        # the strict value and hash checks below.
+        captured_meta = captured_meta.loc[:, list(full_meta.columns)]
+        meta_feature_column_order_normalized = True
     left = full_meta.to_numpy(dtype=float)
     right = captured_meta.to_numpy(dtype=float)
     if not np.allclose(
@@ -609,6 +618,9 @@ def prove_frozen_builder_subset_equivalence(
         "captured_feature_count": int(len(captured.columns)),
         "meta_feature_count": int(len(full_meta.columns)),
         "excluded_features": excluded,
+        "meta_feature_column_order_normalized": (
+            meta_feature_column_order_normalized
+        ),
         "maximum_meta_feature_difference": 0.0,
     }
 
@@ -1037,6 +1049,8 @@ def finalize_target_pending_candidate(
     target_source_index = pd.DatetimeIndex(
         pd.to_datetime(target_frame["timestamp"], utc=True, errors="raise")
     )
+    if target_source_index.has_duplicates:
+        raise RollingCaptureError("target source contains duplicate timestamps")
     target_source_values = pd.Series(
         pd.to_numeric(target_frame["value"], errors="coerce").to_numpy(float),
         index=target_source_index,
@@ -1064,15 +1078,18 @@ def finalize_target_pending_candidate(
     if not np.isfinite(values).all():
         raise RollingCaptureError("realised target is unavailable or non-finite")
     source_values = target_source_values.reindex(index).to_numpy(dtype=float)
-    if not np.isfinite(source_values).all() or not np.allclose(
-        values,
-        source_values,
-        rtol=0.0,
-        atol=5e-6,
-    ):
-        raise RollingCaptureError(
-            "canonical_target differs from the checksummed target source"
+    # Data preparation retains model targets as float32, while the sealed
+    # source cache retains float64 observations.  Prove that representation
+    # change explicitly; a general absolute tolerance can reject legitimate
+    # rounding while accepting a smaller but real price revision.
+    try:
+        target_precision = validate_observation_precision(
+            values, source_values, name="rolling canonical target / sealed source"
         )
+    except ValueError as exc:
+        raise RollingCaptureError(
+            f"canonical_target differs from the checksummed target source: {exc}"
+        ) from exc
     candidate.insert(1, "actual", values)
 
     final_root = root / FINAL_DIRNAME
@@ -1104,6 +1121,7 @@ def finalize_target_pending_candidate(
             "actual_rows": int(len(values)),
             "target_source_path": str(source_path),
             "target_source_sha256": observed_target_sha,
+            "target_observation_precision": target_precision,
             "target_series": str(target_series),
             "target_observed_at_utc": observation_proof.get(
                 "issued_live_observed_at_utc"
@@ -1134,6 +1152,7 @@ def finalize_target_pending_candidate(
         "artifact_checksums_sha256": final_checksum_sha,
         "pending_artifact_checksums_sha256": pending_checksum_sha,
         "hours": int(len(values)),
+        "target_observation_precision": target_precision,
     }
 
 
@@ -1218,6 +1237,7 @@ def capture_issued_live_block_isolated(
             expected_config_sha256=expected_config_sha256,
             expected_base_bundle_sha256=expected_base_bundle_sha256,
             target_series=target_series,
+            target_source_path=target_source_path,
             issued_live_archive=issued_live_archive,
             issued_live_forecast_filename=issued_live_forecast_filename,
         )
