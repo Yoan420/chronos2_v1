@@ -1,0 +1,15 @@
+# Runtime officiel Timer-S1 (le code du checkpoint requiert la branche 4.57).
+torch>=2.3
+transformers>=4.57.1,<4.58
+accelerate>=1.0
+
+# Denominateur Chronos-2 target-only et protocole de comparaison existant.
+chronos-forecasting>=2.2.2,<3
+numpy>=1.26,<3
+pandas>=2.1,<4
+PyYAML>=6.0
+holidays>=0.60,<1
+packaging>=23
+psutil>=5.9
+scikit-learn>=1.4,<2
+catboost>=1.2,<2

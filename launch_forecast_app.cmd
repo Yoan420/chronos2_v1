@@ -2,7 +2,7 @@
 setlocal
 
 set "APP_ROOT=%~dp0"
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%APP_ROOT%Start-ForecastApp.ps1"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%APP_ROOT%Forecast.ps1" -Action App
 set "EXIT_CODE=%ERRORLEVEL%"
 
 if not "%EXIT_CODE%"=="0" (

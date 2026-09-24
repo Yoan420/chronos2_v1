@@ -1,0 +1,43 @@
+1. Introduction
+Electricity price forecasts are a fundamental input to the decision-making processes of power
+companies [1, 2]. Because expectations about future outcomes shape most operational decisions
+[3], even modest improvements in forecast accuracy can have substantial economic value [4, 5].
+Yet predicting electricity prices is anything but easy.
+Day-ahead electricity prices exhibit pronounced daily and weekly seasonality, abrupt spikes,
+heavy tails, and, in many markets, negative values [6]. They depend not only on their own recent
+history but also on weather-driven demand, renewable generation, fuel and emission prices, plant
+availability, transmission constraints, and market design [7, 8]. Moreover, prices for all load pe-
+riods of the following day are determined simultaneously using the same information set. They
+should therefore not be viewed as unrelated univariate time series [9]. Any successful forecasting
+approach must account for both the complex temporal dependence of electricity prices and the
+market-relevant information available at the forecast origin.
+A further challenge concerns the form in which future prices should be represented. Point
+forecasts, such as conditional means or medians, are easy to interpret and can be incorporated
+directly into many operational procedures. However, they provide no information about forecast
+uncertainty and may create a misleading impression of precision [10]. This limitation becomes
+particularly important when forecast errors have asymmetric consequences, extreme price realiza-
+tions are costly, or decisions are subject to risk constraints [11, 12]. In such settings, probabilistic
+forecasts, expressed as quantiles [13] or full predictive distributions [14], are more informative
+because they describe both the expected outcome and the uncertainty surrounding it [15].
+Instead of estimating a separate model from scratch for each market and forecasting task, a
+foundation model(FM) is pretrained on a large and diverse collection of empirical datasets, purely
+synthetic data, or both, and can then be applied without retraining in the so-calledzero-shotmode
+[16]. In principle, such a model can transfer information across time series, reduce the need for
+manual feature engineering, and provide useful point or probabilistic forecasts even when only a
+short history is available.
+Foundation models have recently attracted growing attention inelectricity price forecasting
+(EPF). Hornek et al. [17] consider five European day-ahead markets and six time series FMs, but
+they only benchmark point forecasting performance, do not consider exogenous predictors, and
+limit the testing period to a single year. Marchesi et al. [18] go beyond point forecasts and assess
+predictive performance in a probabilistic setting in four markets, but only for the Moirai model
+and a single year of testing. Lettner et al. [19] consider probabilistic forecasting with Moirai and
+Chronos models, but limited to a German market, a single year of testing, and no assessment of the
+economic value of forecasts. Yu et al. [20] introduce a FM for day-ahead electricity markets and
+benchmark it against three general time series FM families on a dataset comprising 24 European
+countries. However, the testing period is again limited to a single year and does not consider the
+performance of forecasts in a market-related decision problem. Ponyuenyong et al. [21] evaluate
+point forecasts from a large set of time series FMs, but only in a Singapore market and with less
+than half a year of testing.
+The strength of the benchmarks also varies across studies. Hornek et al. [17] primarily compare
+FMs with generic statistical methods and relatively simple machine learning models. Ponyueny-
+2

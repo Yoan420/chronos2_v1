@@ -1,0 +1,123 @@
+NOTE D’EXPLICATION — FILTRE DE KALMAN
+
+1. Objectif
+
+Le filtre de Kalman constitue une troisième couche de correction :
+
+Données → Chronos-2 → correcteur résiduel → Kalman gouverné → forecast final
+
+Il ne remplace ni Chronos-2 ni le correcteur résiduel. Il cherche à corriger les erreurs lentes et récentes qui subsistent après ces deux modèles : décalage général du niveau des prix, biais selon l’heure ou changement temporaire de régime de marché.
+
+
+2. Intuition simple
+
+Le filtre conserve une estimation de l’erreur actuelle du modèle, appelée « état caché ». Cet état n’est pas observé directement : il est déduit progressivement des erreurs réalisées les jours précédents.
+
+À chaque nouvelle journée :
+
+1. il prévoit l’erreur probable du modèle pour le lendemain ;
+2. il applique éventuellement une petite correction à la prévision existante ;
+3. il attend que toute la journée soit terminée ;
+4. lorsque les prix réels sont connus, il compare la prévision au réalisé et met à jour son état pour les jours suivants.
+
+Le filtre arbitre en permanence entre deux idées :
+
+- conserver son estimation précédente, qui représente la tendance récente ;
+- tenir compte de la nouvelle erreur observée.
+
+S’il considère la nouvelle observation comme très bruitée, il se déplace peu. S’il est suffisamment certain qu’elle révèle un changement de régime, il s’adapte davantage.
+
+
+3. Que corrige notre Kalman ?
+
+La prévision d’entrée est celle du modèle « residual_corrected », c’est-à-dire Chronos-2 après le correcteur résiduel.
+
+Le système teste plusieurs formes de correction :
+
+- biais simple : un décalage commun à toutes les heures ;
+- biais horaire : un biais qui varie au cours de la journée ;
+- biais de marché : une correction liée à l’heure, au niveau du prix, à la largeur P10–P90, à la correction résiduelle et aux charges résiduelles des cinq pays ;
+- recalibrage linéaire : une correction du niveau et de l’intensité de la correction résiduelle ;
+- recalibrage non linéaire UKF : une version plus souple, mais dont le facteur d’échelle reste borné.
+
+Le filtre cherche donc principalement à répondre à deux questions :
+
+- reste-t-il un biais récent après le correcteur résiduel ?
+- la correction résiduelle est-elle actuellement trop forte ou trop faible ?
+
+
+4. Pourquoi parle-t-on de Kalman « gouverné » ?
+
+La correction n’est pas appliquée automatiquement. Avant chaque journée, une gouvernance compare les différentes variantes sur les 60 derniers jours déjà réalisés.
+
+Elle choisit :
+
+- le filtre ayant produit la MAE la plus faible ;
+- le poids de correction le plus efficace, entre 0 % et 100 %, par pas de 5 %.
+
+Le Kalman n’est activé que si son gain dépasse à la fois un seuil absolu et un seuil relatif. Sinon, le système sélectionne « identity » : la prévision du correcteur résiduel reste inchangée.
+
+Il faut au moins 14 jours réalisés avant que cette gouvernance puisse activer une correction.
+
+
+5. Calcul de la prévision finale
+
+Pour une heure donnée :
+
+correction appliquée = poids sélectionné × correction Kalman estimée
+
+prévision finale = prévision résiduelle corrigée + correction appliquée
+
+Exemple :
+
+- P50 après correcteur résiduel : 150 EUR/MWh ;
+- correction Kalman estimée : +6 EUR/MWh ;
+- poids retenu par la gouvernance : 75 % ;
+- correction appliquée : +4,5 EUR/MWh ;
+- P50 finale : 154,5 EUR/MWh.
+
+Le même déplacement de +4,5 EUR/MWh est ajouté à P10, P50 et P90. La largeur de la bande d’incertitude reste donc identique et l’ordre P10 ≤ P50 ≤ P90 est conservé.
+
+
+6. Fonctionnement causal
+
+L’état utilisé pour prévoir une journée est figé avant sa première heure. Il est utilisé pour l’ensemble des 23, 24 ou 25 heures physiques de cette journée et n’est mis à jour qu’après que la journée est entièrement réalisée.
+
+Ainsi, la prévision du jour D utilise uniquement les observations des jours strictement antérieurs à D. Même lors d’un replay historique, le prix réel du jour D est retiré avant de construire la prévision de D.
+
+Le système n’utilise ni lissage rétrospectif, ni estimation EM, ni donnée future. Storm reste uniquement un benchmark d’évaluation et n’entre jamais dans le filtre.
+
+
+7. Principaux garde-fous
+
+- La correction brute est limitée à ±20 EUR/MWh.
+- Les observations exceptionnellement éloignées sont limitées à ±3 écarts-types avant la mise à jour de l’état.
+- Le facteur de recalibrage de la correction résiduelle reste compris entre 0,5 et 1,5.
+- Les variables de marché sont normalisées de manière robuste et bornées.
+- La correction n’est appliquée que si elle améliore suffisamment la MAE récente.
+- Le même déplacement est appliqué aux trois quantiles pour éviter leur croisement.
+- Les journées de changement d’heure de 23 ou 25 heures sont prises en charge.
+- La performance publiée est évaluée sur une fenêtre causale complète de 365 jours, après une période de warm-up.
+
+
+8. Différence avec le correcteur résiduel
+
+Le correcteur résiduel apprend des relations relativement structurelles à partir d’un historique d’entraînement figé : calendrier, forme de la courbe Chronos-2 et fondamentaux de marché.
+
+Le Kalman intervient ensuite comme une couche d’adaptation en ligne. Il suit les erreurs récemment réalisées et peut s’ajuster progressivement à un biais ou à un changement de régime temporaire.
+
+En résumé :
+
+- le correcteur résiduel apprend les erreurs habituelles ;
+- le Kalman suit les erreurs récentes ;
+- la gouvernance empêche le Kalman d’intervenir lorsqu’il n’apporte pas de gain mesurable.
+
+
+9. Texte court prêt à dire
+
+« Le filtre de Kalman est la dernière couche de correction du modèle. Il observe uniquement les erreurs déjà réalisées pour estimer si la prévision actuelle conserve un biais récent ou si la correction résiduelle est devenue trop forte ou trop faible. Plusieurs variantes sont testées, puis une gouvernance choisit chaque jour celle qui améliore réellement la MAE sur les 60 derniers jours. En l’absence de gain suffisant, aucune correction n’est appliquée. L’état est figé avant la journée de livraison, ce qui garantit qu’aucune information future n’entre dans la prévision. »
+
+
+10. Message à retenir
+
+Le Kalman n’est pas un nouveau modèle de prix autonome. C’est un mécanisme prudent d’adaptation aux erreurs récentes, ajouté au-dessus de Chronos-2 et du correcteur résiduel, avec la possibilité explicite de ne rien modifier.

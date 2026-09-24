@@ -1,0 +1,42 @@
+Table 3: Forecast evaluation for the German power market over the 2021-2025 test period in terms of statistical metrics
+(MAE, RMSE, and CRPS; see Sec. 6.1) and economic measures (see Sec. 6.2). For the latter, we report total profits (in
+EUR) from the 1 MWh battery trading strategy for five levels ofα=90%, . . . ,50%, as well as for the unlimited-bid
+(UB) and Oracle scenarios. Cell coloring (green→good,red→bad) is applied independently for each column. ∗,
+∗∗, and ∗∗∗ indicate that the foundation model significantly outperforms the DDNN-JSU benchmark according to the
+one-sided multivariate CPA test at the 10%, 5%, and 1% levels, respectively; see Sec. 6.1 for details.
+Total profitModel MAE RMSE CRPS UB 90% 80% 70% 60% 50%
+Chronos-2 16.13 27.00 11.80 129,689 122,257 111,972 103,184 93,867 85,528
+Chronos-2-synth 15.77 27.07 11.53 130,337 119,634 109,594 100,990 90,680 83,188
+Chronos-2-small 17.39 28.50 12.65 127,636 115,581 103,253 94,046 80,299 71,988
+Moirai-2 21.84 35.79 16.20 121,823 115,909 105,160 95,257 82,566 72,350
+TimesFM-2.5 18.79 31.32 14.26 124,305 98,639 98,639 77,542 77,542 56,884
+TabPFN-2 12.62∗∗∗ 22.65∗∗∗ 9.55∗∗∗ 131,708 120,312 108,451 100,315 88,034 78,357
+TabPFN-3 12.59∗∗∗ 22.59∗∗∗ 9.15∗∗∗ 131,919 121,026 108,730 99,013 90,787 80,768
+TabPFN-TS-3 12.81∗∗∗ 22.74∗∗∗ 9.33∗∗∗ 132,716 125,903 114,705 105,989 94,907 85,416
+Mitra+CP 15.69 25.69 12.08 126,564 107,863 92,650 79,618 70,058 61,019
+LEAR+CP 15.93 26.67 12.23 128,843 115,036 103,744 92,585 83,471 74,324
+DDNN-JSU 14.58 24.96 10.70 130,434 122,825 114,197 104,520 95,842 86,123
+Oracle 0 0 0 143,474 — — — — —
+We consider five values ofα∈ {90%,80%, . . . ,50%}. A higher value ofαcorresponds to more
+extreme quantiles and hence less restrictive limit prices, increasing the probability that the loop
+bid is accepted, see Figure 3. We therefore interpretαas a parameter controlling the risk appetite
+of the trader. In the unlimited-bid strategy the trader simply submits market orders, that is, buy
+and sell orders without price limits, whenever the predicted daily profit is positive, ˆπd >0.
+For comparison, we also consider anOracle(orCrystal Ball) strategy, which assumes per-
+fect foresight of day-ahead prices and therefore represents the maximum profit attainable in each
+market over the test period under the same battery constraints and operating costs.
+6.3. Results
+6.3.1. Forecast accuracy
+Tables 3-5 summarize the statistical and economic performance of the benchmark and foun-
+dation models in the German, Polish, and Spanish power markets over the 2021-2025 test period.
+Across all three markets, the strongest statistical performance is delivered by the TabPFN family.
+In Germany, TabPFN-3 achieves the lowest MAE, RMSE, and CRPS, with values of 12.59, 22.59,
+and 9.15, respectively. TabPFN-2 and TabPFN-TS-3 perform only slightly worse. A similar pat-
+tern is observed in Poland. In Spain, TabPFN-2 achieves the lowest MAE and RMSE, whereas
+TabPFN-3 produces the lowest CRPS.
+The gains in probabilistic accuracy are substantial. Relative to DDNN-JSU, the stronger of the
+two EPF-specific benchmarks in terms of the CRPS, TabPFN-3 reduces the CRPS from 10.70 to
+9.15 in Germany, from 10.96 to 9.61 in Poland, and from 9.30 to 8.15 in Spain. These reductions
+correspond to approximately 14.5%, 12.3%, and 12.4%, respectively. The CPA tests confirm that
+the improvements achieved by the TabPFN models are statistically significant. All three TabPFN
+17

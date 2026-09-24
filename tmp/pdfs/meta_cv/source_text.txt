@@ -1,0 +1,46 @@
+YOAN KESRAOUI
+QUANTITATIVE RESEARCH  |  TRADING  |  RISK ANALYTICS
+Paris, France  •  +33 7 81 83 13 88  •  kesraoui.yoan@gmail.com  •  linkedin.com/in/yoan-kesraoui-20b983304
+PROFILE
+Quantitative researcher trained in data science, econometrics and applied mathematics, with experience across commodities, front-office market 
+risk, pricing, ALM and market microstructure. Develops statistical and ML models, scalable data pipelines and leakage-safe backtests for market 
+forecasting and risk analytics.
+EDUCATION
+Université Paris 1 Panthéon-Sorbonne — M.Sc. Data Science 2025–2026
+Paris, France — Machine learning, deep learning, statistics, optimisation and time series
+Université Paris Cité — M.Sc. Applied Economics — Econometrics 2023–2025
+Paris, France — Econometrics, statistical inference, financial modelling and panel data
+Université Paris Cité — B.Sc. Economics & Mathematics 2020–2023
+Paris, France
+PROFESSIONAL EXPERIENCE
+ENGIE Global Markets — Quant Research Intern — Energy Markets Jun 2026–Present
+Global Market Analysis, Paris
+• Quantitative modelling: Developed French day-ahead power-price forecasts combining Chronos-2, LEAR, CatBoost and out-of-fold
+ensembles; achieved 12.82 EUR/MWh MAE on a sealed 365-day holdout.
+• Research discipline: Built point-in-time pipelines with vintage fundamentals, rolling validation, strict leakage controls and DST-safe hourly
+targets; evaluated bias, spikes, negative prices and regime shifts.
+• Markets: Modelled residual load, cross-border flows, nuclear availability and supply stacks informed by European market coupling; produced
+macro and oil-market research on Brent/WTI, inventories and physical flows.
+Société Générale — Quant Market Risk Intern Sep 2025–Mar 2026
+Front Office Market Risk, Paris
+• Risk models: Developed GARCH, EGARCH and VAR models for financial time series and portfolio-risk dynamics; supported analysis of
+Greeks, VaR and stress scenarios.
+• Engineering & controls: Built Python/SQL/API pipelines for large risk datasets and applied clustering and k-nearest neighbours to anomaly
+detection and risk-monitoring workflows.
+Autorité des marchés financiers (AMF) — Data Scientist / Economist Jan–Jun 2025
+Financial Stability & Risk Studies, Paris
+• Market microstructure: Analysed millions of MiFID II transactions with PySpark, Python, R and panel econometrics; engineered investor-
+level turnover, return and trading-intensity indicators.
+• Research output: Studied investor behaviour and market dynamics and contributed empirical analysis to the AMF Market and Risk Mapping
+2025.
+Generali — Quantitative Analyst Intern Apr–Sep 2024
+ALM & Strategic Asset Allocation, Paris
+• Pricing & rates: Built XGBoost surrogates for computationally intensive Full-Revaluation pricing; calibrated Vasicek/CIR interest-rate models
+and analysed non-linear risk-factor relationships.
+• Risk analytics: Supported VaR, ALM and strategic asset-allocation stress scenarios and automated analytical workflows with Python, SQL and
+Power BI.
+QUANTITATIVE & TECHNICAL SKILLS
+Programming: Python (PyTorch, TensorFlow, scikit-learn, pandas, NumPy, statsmodels), SQL, PySpark/Spark, R, Git
+Methods: Time-series forecasting, econometrics, ML/DL, probabilistic modelling, Monte Carlo, optimisation, backtesting, anomaly detection
+Markets & Risk: FICC, power & oil, derivatives, rates, pricing, Greeks, VaR/stress testing, ALM, market microstructure
+Languages: French (native), English (C1), Spanish (beginner)

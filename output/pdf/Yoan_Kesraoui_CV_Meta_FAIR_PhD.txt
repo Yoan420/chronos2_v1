@@ -1,0 +1,44 @@
+YOAN KESRAOUI
+MACHINE LEARNING AND QUANTITATIVE RESEARCH
+Paris, France | +33 7 81 83 13 88 | kesraoui.yoan@gmail.com
+https://www.linkedin.com/in/yoan-kesraoui-20b983304
+
+RESEARCH PROFILE
+Quantitative researcher trained in data science, econometrics and applied mathematics, with experience applying machine learning to forecasting, designing rigorous evaluation protocols and analysing large-scale transaction data. Seeking to pursue doctoral research in machine learning and computational statistics at Meta FAIR.
+
+EDUCATION
+Université Paris 1 Panthéon-Sorbonne - M.Sc. Data Science | 2025-2026
+Machine learning, deep learning, statistics, optimisation and time series
+
+Université Paris Cité - M.Sc. Applied Economics - Econometrics | 2023-2025
+Econometrics, statistical inference, financial modelling and panel data
+
+Université Paris Cité - B.Sc. Economics & Mathematics | 2020-2023
+
+RESEARCH AND PROFESSIONAL EXPERIENCE
+ENGIE Global Markets - Quant Research Intern - Energy Markets | Jun 2026-Present
+Global Market Analysis, Paris
+- Developed French day-ahead electricity-price forecasts using Chronos-2, a pretrained time-series foundation model, alongside LEAR, CatBoost and out-of-fold ensembles.
+- Achieved 12.82 EUR/MWh MAE on a sealed 365-day holdout; evaluated forecast bias, price spikes, negative prices and performance across regime shifts.
+- Built point-in-time data pipelines with historical data vintages, rolling validation and strict leakage controls; aligned hourly targets across daylight-saving transitions.
+
+Société Générale - Quant Market Risk Intern | Sep 2025-Mar 2026
+Front Office Market Risk, Paris
+- Developed GARCH, EGARCH and VAR models to study financial time series and portfolio-risk dynamics.
+- Built Python/SQL/API pipelines for large risk datasets; applied clustering and k-nearest neighbours to anomaly detection and risk monitoring.
+
+Autorité des marchés financiers (AMF) - Data Scientist / Economist | Jan-Jun 2025
+Financial Stability & Risk Studies, Paris
+- Analysed millions of MiFID II transactions using PySpark, Python, R and panel econometrics to study investor behaviour and market dynamics.
+- Engineered investor-level turnover, return and trading-intensity indicators; contributed empirical analysis to the AMF Market and Risk Mapping 2025.
+
+Generali - Quantitative Analyst Intern | Apr-Sep 2024
+ALM & Strategic Asset Allocation, Paris
+- Built XGBoost surrogate models for computationally intensive full-revaluation pricing; investigated non-linear relationships between risk factors.
+- Calibrated Vasicek/CIR interest-rate models and automated analytical workflows with Python, SQL and Power BI.
+
+TECHNICAL SKILLS
+Programming and data: Python, SQL, PySpark/Spark, R, Git
+ML libraries: PyTorch, TensorFlow, scikit-learn, CatBoost, XGBoost, pandas, NumPy, statsmodels
+Methods: Time-series forecasting, deep learning, econometrics, statistical inference, probabilistic modelling, optimisation, anomaly detection
+Languages: French (native), English (C1), Spanish (beginner)

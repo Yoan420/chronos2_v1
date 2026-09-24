@@ -1,0 +1,42 @@
+and coal futures). The datasets span the period from 6 January 2017 to 31 December 2025, with a
+five-year out-of-sample test period beginning on 1 January 2021.
+We consider three major European markets – Germany, Poland, and Spain – with diverse
+characteristics and levels of renewable energy sources (RES) penetration. This variation provides a
+useful test of whether model performance is robust across systems with different generation mixes
+and price dynamics. Figure 1 illustrates these structural differences by showing the public net
+electricity generation mix in 2025 and the evolution of the share of RES in electricity generation
+over the 2017-2025 study period. The figure highlights the comparatively high shares of wind and
+solar generation in Germany and Spain, the stronger role of coal in Poland, and the presence of
+nuclear generation in Spain, as well as the increasing contribution of RES over time.
+Day-ahead prices, see the top three panels in Figure 2, represent the following bidding zones:
+BZN|DE-LU for Germany, BZN|PL for Poland, and BZN|ES for Spain. The day-ahead load and
+renewable generation forecasts correspond to the countries – Germany (DE), Poland (PL), and
+Spain (ES) – rather than to the bidding zones. As in [22, 32], therenewable generationforecast is
+calculated as the sum of the day-ahead onshore wind, offshore wind (only for Germany), and solar
+generation forecasts. Because some ENTSO-E series are available at a 15-minute resolution, we
+aggregate them to hourly values.
+As in [22, 33], we consider four fundamental variables: European Union Allowance (EUA)
+prices, natural gas prices from the Title Transfer Facility (TTF) virtual trading point in the Nether-
+lands, Brent crude oil prices, and API2 coal prices. They are represented by the most recent
+closing prices of nearest-to-delivery futures contracts (yearly for EUA, monthly for others) avail-
+able at the time of bidding in the day-ahead power market, corresponding to a two-day lag relative
+to the target day, see the bottom panel in Figure 2.
+All time series were preprocessed to account for transitions to and from daylight saving time
+(DST). Missing values occurring during the transition to DST were replaced with observations
+from the preceding hour. Duplicate values occurring during the transition from DST were replaced
+with their arithmetic mean. Any missing values in the day-ahead price and load forecasts were
+replaced with the value from the preceding hour or, if that value was also missing, with the value
+from the preceding day. Missing values in onshore wind, offshore wind, and solar generation
+forecasts were replaced with zeros.
+4. Foundation models
+Recent years have witnessed rapid advances in foundation models for both time series and tab-
+ular prediction tasks. Although these two applications involve distinct challenges and data struc-
+tures, the FMs considered in this study share several features. All are based on the Transformer
+architecture [34], which comprises encoder and decoder stacks that rely on attention mechanisms
+but process information differently. The encoder has access to the entire input sequence and trans-
+forms it into a latent representation. The decoder uses masked attention, restricting information
+flow so that the output associated with each sequence element depends only on preceding ele-
+ments, thus imposing an autoregressive structure on the output. Modern architectures often use
+just one of these components, called encoder-only, first implemented in BERT, and decoder-only,
+popularized by GPT-1 [35].
+8

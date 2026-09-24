@@ -1,0 +1,108 @@
+{"kind":"deck","id":"pr/ritz43","name":"Deck"}
+{"kind":"layout","layoutId":"b1459424-789e-43a4-aa63-c2dbccf14f3a","name":"Master","type":"master"}
+{"kind":"layout","layoutId":"361c6468-63aa-4667-a7e8-8e66124bf345","name":"Title Slide","type":"title"}
+{"kind":"slide","id":"sl/6gfb5i","slide":1,"title":"PRÉVISION DAY-AHEAD  •  FRANCE","textShapes":5}
+{"kind":"shape","id":"sh/t8b2h4va","slide":1,"name":"cover-accent","bbox":[41,41,10,68]}
+{"kind":"textbox","id":"sh/650jm9cj","slide":1,"text":"PRÉVISION DAY-AHEAD  •  FRANCE","textPreview":"PRÉVISION DAY-AHEAD  •  FRANCE","textChars":30,"textLines":1,"bbox":[70,47,560,42]}
+{"kind":"textbox","id":"sh/76t0fud4","slide":1,"text":"Chronos-2","textPreview":"Chronos-2","textChars":9,"textLines":1,"bbox":[41,190,995,90]}
+{"kind":"textbox","id":"sh/k3i1kzut","slide":1,"text":"Prévoir demain,\nheure par heure","textPreview":"Prévoir demain, | heure par heure","textChars":31,"textLines":2,"bbox":[41,295,1030,170]}
+{"kind":"textbox","id":"sh/54rid4vy","slide":1,"text":"Fonctionnement du modèle  •  Résultats du 26 août 2026","textPreview":"Fonctionnement du modèle  •  Résultats du 26 août 2026","textChars":54,"textLines":1,"bbox":[41,520,880,48]}
+{"kind":"shape","id":"sh/ih0jipcn","slide":1,"name":"cover-rule","bbox":[41,610,1198,0.03]}
+{"kind":"textbox","id":"sh/j290bud8","slide":1,"text":"Courbe centrale P50 + scénarios P10 / P90","textPreview":"Courbe centrale P50 + scénarios P10 / P90","textChars":41,"textLines":1,"bbox":[41,631,650,28]}
+{"kind":"notes","id":"nt/6gfb5i","slide":1,"text":"Présenter l’objectif en une phrase : prévoir le prix day-ahead français pour chacune des 24 heures du lendemain, avec une courbe centrale et une plage d’incertitude.\n\n[Sources]\n- C:/Users/BQ6757/Downloads/Présentation courte — Forecast Fran.txt\n[/Sources]"}
+{"kind":"slide","id":"sl/7km8n9","slide":2,"title":"Du signal brut à une prévision contrôlée","textShapes":19}
+{"kind":"textbox","id":"sh/w3mloj6l","slide":2,"text":"Du signal brut à une prévision contrôlée","textPreview":"Du signal brut à une prévision contrôlée","textChars":40,"textLines":1,"bbox":[41,36,1197,66]}
+{"kind":"textbox","id":"sh/v2tkvep0","slide":2,"text":"Une chaîne causale en cinq étapes","textPreview":"Une chaîne causale en cinq étapes","textChars":33,"textLines":1,"bbox":[41,105,680,35]}
+{"kind":"shape","id":"sh/u1k3m9of","slide":2,"name":"pipeline-line","bbox":[78,307,1093,0.03]}
+{"kind":"textbox","id":"sh/58v21o72","slide":2,"text":"D−1","textPreview":"D−1","textChars":3,"textLines":1,"bbox":[78,225,180,30]}
+{"kind":"shape","id":"sh/47mlsj6h","slide":2,"name":"node-0","bbox":[78,294,26,26]}
+{"kind":"textbox","id":"sh/j6dkzepw","slide":2,"text":"Entrées","textPreview":"Entrées","textChars":7,"textLines":1,"bbox":[78,354,190,38]}
+{"kind":"textbox","id":"sh/i543q9ob","slide":2,"text":"Prix récents\nCalendrier\nCharges résiduelles\nFR, DE, BE, NL, ES","textPreview":"Prix récents | Calendrier | Charges résiduelles | FR, DE, BE, NL, ES","textChars":62,"textLines":4,"bbox":[78,404,182,125]}
+{"kind":"textbox","id":"sh/tcf258ny","slide":2,"text":"BASE","textPreview":"BASE","textChars":4,"textLines":1,"bbox":[309,225,180,30]}
+{"kind":"shape","id":"sh/sb6lw36d","slide":2,"name":"node-1","bbox":[309,294,26,26]}
+{"kind":"textbox","id":"sh/uxw7uxwv","slide":2,"text":"Chronos-2","textPreview":"Chronos-2","textChars":9,"textLines":1,"bbox":[309,354,190,38]}
+{"kind":"textbox","id":"sh/vi5o32xg","slide":2,"text":"Construit la forme\nde la journée et\nproduit P10, P50, P90","textPreview":"Construit la forme | de la journée et | produit P10, P50, P90","textChars":57,"textLines":3,"bbox":[309,404,182,125]}
+{"kind":"textbox","id":"sh/wjypw7e1","slide":2,"text":"AJUST.","textPreview":"AJUST.","textChars":6,"textLines":1,"bbox":[540,225,180,30]}
+{"kind":"shape","id":"sh/hk765cfm","slide":2,"name":"node-2","bbox":[540,294,26,26]}
+{"kind":"textbox","id":"sh/ilg7yhw7","slide":2,"text":"Correcteur","textPreview":"Correcteur","textChars":10,"textLines":1,"bbox":[540,354,190,38]}
+{"kind":"textbox","id":"sh/jmpo7mxc","slide":2,"text":"Anticipe l’erreur\nrécurrente et déplace\nles trois quantiles","textPreview":"Anticipe l’erreur | récurrente et déplace | les trois quantiles","textChars":59,"textLines":3,"bbox":[540,404,182,125]}
+{"kind":"textbox","id":"sh/4nyp07ex","slide":2,"text":"GEL","textPreview":"GEL","textChars":3,"textLines":1,"bbox":[771,225,180,30]}
+{"kind":"shape","id":"sh/5o769cfi","slide":2,"name":"node-3","bbox":[771,294,26,26]}
+{"kind":"textbox","id":"sh/ypcnmdwn","slide":2,"text":"Contrôles","textPreview":"Contrôles","textChars":9,"textLines":1,"bbox":[771,354,190,38]}
+{"kind":"textbox","id":"sh/zqlovix8","slide":2,"text":"24 heures\nP10 ≤ P50 ≤ P90\nAbsence de fuite future","textPreview":"24 heures | P10 ≤ P50 ≤ P90 | Absence de fuite future","textChars":49,"textLines":3,"bbox":[771,404,182,125]}
+{"kind":"textbox","id":"sh/3u14ned0","slide":2,"text":"APRÈS","textPreview":"APRÈS","textChars":5,"textLines":1,"bbox":[1002,225,180,30]}
+{"kind":"shape","id":"sh/2ts3u9cf","slide":2,"name":"node-4","bbox":[1002,294,26,26]}
+{"kind":"textbox","id":"sh/pwjmpov6","slide":2,"text":"Évaluation","textPreview":"Évaluation","textChars":10,"textLines":1,"bbox":[1002,354,190,38]}
+{"kind":"textbox","id":"sh/ovalwjul","slide":2,"text":"Prix réels, métriques\net comparaison à Storm\nuniquement après coup","textPreview":"Prix réels, métriques | et comparaison à Storm | uniquement après coup","textChars":66,"textLines":3,"bbox":[1002,404,182,125]}
+{"kind":"shape","id":"sh/f6hkjed4","slide":2,"name":"causal-callout","bbox":[41,579,1198,58]}
+{"kind":"textbox","id":"sh/e583q9wj","slide":2,"text":"Principe clé : seules les informations disponibles au moment du forecast entrent dans la chaîne.","textPreview":"Principe clé : seules les informations disponibles au moment du forecast entrent dans la chaîne.","textChars":96,"textLines":1,"bbox":[68,595,1145,28]}
+{"kind":"textbox","id":"sh/18jml4vu","slide":2,"text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[1184,659,55,25]}
+{"kind":"notes","id":"nt/7km8n9","slide":2,"text":"Dérouler la chaîne de gauche à droite. Insister sur la causalité : aucune information connue après l’heure du forecast n’est utilisée. Storm est un benchmark ex-post, jamais une variable d’entrée.\n\n[Sources]\n- C:/Users/BQ6757/Downloads/Présentation courte — Forecast Fran.txt\n[/Sources]"}
+{"kind":"slide","id":"sl/qtmpls","slide":3,"title":"Deux étages, deux rôles complémentaires","textShapes":20}
+{"kind":"textbox","id":"sh/hgvuhofq","slide":3,"text":"Deux étages, deux rôles complémentaires","textPreview":"Deux étages, deux rôles complémentaires","textChars":39,"textLines":1,"bbox":[41,36,1197,66]}
+{"kind":"textbox","id":"sh/ud4b6tgf","slide":3,"text":"Chronos-2 construit la prévision de base ; le correcteur apprend quand cette base se trompe.","textPreview":"Chronos-2 construit la prévision de base ; le correcteur apprend quand cette base se trompe.","textChars":92,"textLines":1,"bbox":[41,110,1197,38]}
+{"kind":"shape","id":"sh/vedcfyxk","slide":3,"name":"chronos-card","bbox":[41,181,581,431]}
+{"kind":"shape","id":"sh/4jmdc3yh","slide":3,"name":"corrector-card","bbox":[657,181,581,431]}
+{"kind":"shape","id":"sh/5kful8f2","slide":3,"name":"stage-one","bbox":[72,211,36,36]}
+{"kind":"textbox","id":"sh/ih4vatgb","slide":3,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[82,217,16,22]}
+{"kind":"textbox","id":"sh/jidcjyxw","slide":3,"text":"Chronos-2","textPreview":"Chronos-2","textChars":9,"textLines":1,"bbox":[125,207,400,48]}
+{"kind":"textbox","id":"sh/s76dgnyd","slide":3,"text":"Modèle pré-entraîné de séries temporelles","textPreview":"Modèle pré-entraîné de séries temporelles","textChars":41,"textLines":1,"bbox":[72,271,500,34]}
+{"kind":"textbox","id":"sh/t8fupsfy","slide":3,"text":"• Jusqu’à 2 048 heures de prix récent\n• Calendrier + contexte électrique des 5 pays\n• Reconnaît cycles, pics et changements de régime\n• Produit une distribution, pas un point unique","textPreview":"• Jusqu’à 2 048 heures de prix récent | • Calendrier + contexte électrique des 5 pays | • Reconnaît cycles, pics et changements de régime...","textChars":181,"textLines":4,"bbox":[72,324,495,142]}
+{"kind":"shape","id":"sh/tsbqpcr2","slide":3,"name":"quantile-rule","bbox":[72,492,494,0.03]}
+{"kind":"textbox","id":"sh/sr29w7qh","slide":3,"text":"P10","textPreview":"P10","textChars":3,"textLines":1,"bbox":[78,519,78,28]}
+{"kind":"textbox","id":"sh/rq98nm9w","slide":3,"text":"P50","textPreview":"P50","textChars":3,"textLines":1,"bbox":[255,519,78,28]}
+{"kind":"textbox","id":"sh/6p0ruh8r","slide":3,"text":"P90","textPreview":"P90","textChars":3,"textLines":1,"bbox":[432,519,78,28]}
+{"kind":"textbox","id":"sh/1wbatwre","slide":3,"text":"scénario bas","textPreview":"scénario bas","textChars":12,"textLines":1,"bbox":[78,551,110,25]}
+{"kind":"textbox","id":"sh/gv290rqt","slide":3,"text":"central","textPreview":"central","textChars":7,"textLines":1,"bbox":[255,551,110,25]}
+{"kind":"textbox","id":"sh/fut8rm98","slide":3,"text":"scénario haut","textPreview":"scénario haut","textChars":13,"textLines":1,"bbox":[432,551,120,25]}
+{"kind":"shape","id":"sh/etkryh8n","slide":3,"name":"stage-two","bbox":[688,211,36,36]}
+{"kind":"textbox","id":"sh/h0rqhsru","slide":3,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[698,217,16,22]}
+{"kind":"textbox","id":"sh/wzi9onq9","slide":3,"text":"Correcteur résiduel","textPreview":"Correcteur résiduel","textChars":19,"textLines":1,"bbox":[741,207,440,48]}
+{"kind":"textbox","id":"sh/o32947y5","slide":3,"text":"Cible : prix réel − P50 Chronos-2","textPreview":"Cible : prix réel − P50 Chronos-2","textChars":33,"textLines":1,"bbox":[688,271,500,34]}
+{"kind":"textbox","id":"sh/94vqxszq","slide":3,"text":"CatBoost et HistGradientBoosting ajoutent des arbres successifs : chaque arbre corrige une partie de l’erreur laissée par les précédents.","textPreview":"CatBoost et HistGradientBoosting ajoutent des arbres successifs : chaque arbre corrige une partie de l’erreur laissée par les précédents.","textChars":137,"textLines":1,"bbox":[688,320,500,84]}
+{"kind":"shape","id":"sh/m1kr2xgf","slide":3,"name":"blend","bbox":[688,423,500,61]}
+{"kind":"textbox","id":"sh/n2t8v2hk","slide":3,"text":"CatBoost  50 %   +   HistGradientBoosting  50 %","textPreview":"CatBoost  50 %   +   HistGradientBoosting  50 %","textChars":47,"textLines":1,"bbox":[710,441,457,25]}
+{"kind":"textbox","id":"sh/w7m987yh","slide":3,"text":"Apprentissage causal out-of-fold  •  correction limitée à ±40 €/MWh","textPreview":"Apprentissage causal out-of-fold  •  correction limitée à ±40 €/MWh","textChars":67,"textLines":1,"bbox":[688,506,500,48]}
+{"kind":"textbox","id":"sh/x8va1cz2","slide":3,"text":"Exemple   150 + 8 = 158 €/MWh","textPreview":"Exemple   150 + 8 = 158 €/MWh","textChars":29,"textLines":1,"bbox":[688,564,500,31]}
+{"kind":"textbox","id":"sh/a54r6xgb","slide":3,"text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[1184,659,55,25]}
+{"kind":"notes","id":"nt/qtmpls","slide":3,"text":"Chronos-2 apporte une base probabiliste générale. Le correcteur ne re-prédit pas directement le prix : il prédit le résidu. Les deux algorithmes sont des ensembles d’arbres construits séquentiellement. CatBoost capte bien les interactions complexes ; HistGradientBoosting regroupe les valeurs en intervalles pour apprendre efficacement. Leurs sorties sont moyennées. À chaque forecast, les modèles sont recréés sur le même historique figé : il s’agit d’un réentraînement technique, pas d’un recalibrage avec les toutes dernières observations. Le même déplacement est ajouté à P10, P50 et P90, donc la largeur de la bande reste inchangée.\n\n[Sources]\n- C:/Users/BQ6757/Downloads/Présentation courte — Forecast Fran.txt\n[/Sources]"}
+{"kind":"slide","id":"sl/91h8n9","slide":4,"title":"Forecast France — 26 août 2026","textShapes":10}
+{"kind":"textbox","id":"sh/jqp4fe94","slide":4,"text":"Forecast France — 26 août 2026","textPreview":"Forecast France — 26 août 2026","textChars":30,"textLines":1,"bbox":[41,36,1197,66]}
+{"kind":"textbox","id":"sh/kryl8jap","slide":4,"text":"P50 dessine la trajectoire centrale ; P10 et P90 matérialisent l’incertitude horaire.","textPreview":"P50 dessine la trajectoire centrale ; P10 et P90 matérialisent l’incertitude horaire.","textChars":85,"textLines":1,"bbox":[41,105,1197,35]}
+{"kind":"shape","id":"sh/5s7m1ora","slide":4,"name":"avg-card","bbox":[823,182,190,174]}
+{"kind":"shape","id":"sh/alw329sn","slide":4,"name":"range-card","bbox":[1041,182,198,174]}
+{"kind":"textbox","id":"sh/vm54be98","slide":4,"text":"144,0","textPreview":"144,0","textChars":5,"textLines":1,"bbox":[849,213,140,58]}
+{"kind":"textbox","id":"sh/wnyl4jat","slide":4,"text":"€/MWh\nP50 moyenne","textPreview":"€/MWh | P50 moyenne","textChars":17,"textLines":2,"bbox":[849,284,140,49]}
+{"kind":"textbox","id":"sh/xo7mdore","slide":4,"text":"75,9 → 191,5","textPreview":"75,9 → 191,5","textChars":12,"textLines":1,"bbox":[1058,220,164,49]}
+{"kind":"textbox","id":"sh/mhw3y9sr","slide":4,"text":"€/MWh\nde 13 h à 20 h","textPreview":"€/MWh | de 13 h à 20 h","textChars":20,"textLines":2,"bbox":[1065,286,150,48]}
+{"kind":"textbox","id":"sh/ni5k7u9c","slide":4,"text":"Lecture rapide","textPreview":"Lecture rapide","textChars":14,"textLines":1,"bbox":[823,403,416,32]}
+{"kind":"textbox","id":"sh/v6d0raxk","slide":4,"text":"• Creux à 13 h\n• Pic du soir à 20 h\n• Bande la plus large à 12 h : 138,7 €/MWh\n• L’incertitude varie fortement selon l’heure","textPreview":"• Creux à 13 h | • Pic du soir à 20 h | • Bande la plus large à 12 h : 138,7 €/MWh | • L’incertitude varie fortement selon l’heure","textChars":124,"textLines":4,"bbox":[823,453,407,135]}
+{"kind":"shape","id":"sh/a54zi5gf","slide":4,"name":"stats-rule","bbox":[823,615,416,0.03]}
+{"kind":"textbox","id":"sh/h8vitkfq","slide":4,"text":"Les quantiles sont des scénarios, pas des bornes garanties.","textPreview":"Les quantiles sont des scénarios, pas des bornes garanties.","textChars":59,"textLines":1,"bbox":[823,630,395,29]}
+{"kind":"textbox","id":"sh/w7mhkfy5","slide":4,"text":"04","textPreview":"04","textChars":2,"textLines":1,"bbox":[1184,659,55,25]}
+{"kind":"chart","id":"ch/fihgvux8","slide":4,"name":"","chartType":"line","bbox":[41,159,739,485]}
+{"kind":"notes","id":"nt/91h8n9","slide":4,"text":"Commencer par la forme de la journée : baisse jusqu’au milieu de journée puis nette remontée en soirée. P50 vaut en moyenne 144,0 €/MWh, avec un minimum de 75,9 €/MWh à 13 h et un maximum de 191,5 €/MWh à 20 h. La bande P10–P90 est particulièrement large à 12 h : l’incertitude n’est donc pas uniforme.\n\n[Sources]\n- C:/Users/BQ6757/chronos2_v1/runs/exports/2026-08-26/fr/autonomous/forecast_fr_2026-08-26_autonomous.csv\n- C:/Users/BQ6757/Downloads/Présentation courte — Forecast Fran.txt\n[/Sources]"}
+{"kind":"slide","id":"sl/9sbxwl","slide":5,"title":"Ce que montrent les résultats historiques","textShapes":16}
+{"kind":"textbox","id":"sh/9knalor6","slide":5,"text":"Ce que montrent les résultats historiques","textPreview":"Ce que montrent les résultats historiques","textChars":41,"textLines":1,"bbox":[41,36,1197,66]}
+{"kind":"textbox","id":"sh/mxwbqtsv","slide":5,"text":"Le correcteur améliore Chronos-2 brut ; Storm reste légèrement devant sur la fenêtre complète.","textPreview":"Le correcteur améliore Chronos-2 brut ; Storm reste légèrement devant sur la fenêtre complète.","textChars":94,"textLines":1,"bbox":[41,105,1197,35]}
+{"kind":"textbox","id":"sh/7y5sjy9g","slide":5,"text":"MAE  •  plus bas = meilleur","textPreview":"MAE  •  plus bas = meilleur","textChars":27,"textLines":1,"bbox":[41,184,500,31]}
+{"kind":"textbox","id":"sh/kvutojap","slide":5,"text":"Chronos-2","textPreview":"Chronos-2","textChars":9,"textLines":1,"bbox":[41,247,165,28]}
+{"kind":"shape","id":"sh/lw3ahora","slide":5,"name":"bar-chronos","bbox":[220,245,430,32]}
+{"kind":"textbox","id":"sh/ytcbm9sj","slide":5,"text":"13,11","textPreview":"13,11","textChars":5,"textLines":1,"bbox":[665,244,82,31]}
+{"kind":"textbox","id":"sh/zulsfe94","slide":5,"text":"Corrigé","textPreview":"Corrigé","textChars":7,"textLines":1,"bbox":[41,319,165,28]}
+{"kind":"shape","id":"sh/crutkzat","slide":5,"name":"bar-corrected","bbox":[220,317,408,32]}
+{"kind":"textbox","id":"sh/xs3ad4re","slide":5,"text":"12,44","textPreview":"12,44","textChars":5,"textLines":1,"bbox":[665,316,82,31]}
+{"kind":"textbox","id":"sh/1cvi5o7y","slide":5,"text":"Storm","textPreview":"Storm","textChars":5,"textLines":1,"bbox":[41,391,165,28]}
+{"kind":"shape","id":"sh/0bmhcjqd","slide":5,"name":"bar-storm","bbox":[220,389,383,32]}
+{"kind":"textbox","id":"sh/fad03yps","slide":5,"text":"11,67","textPreview":"11,67","textChars":5,"textLines":1,"bbox":[665,388,82,31]}
+{"kind":"shape","id":"sh/e94zat87","slide":5,"name":"evidence-separator","bbox":[790,184,0.03,321]}
+{"kind":"textbox","id":"sh/d8vi1o7m","slide":5,"text":"−5,1 %","textPreview":"−5,1 %","textChars":6,"textLines":1,"bbox":[841,210,355,82]}
+{"kind":"textbox","id":"sh/s72h8jqh","slide":5,"text":"de MAE par rapport à Chronos-2 brut","textPreview":"de MAE par rapport à Chronos-2 brut","textChars":35,"textLines":1,"bbox":[841,299,355,56]}
+{"kind":"textbox","id":"sh/r6t0zepw","slide":5,"text":"Corrélation : 0,93","textPreview":"Corrélation : 0,93","textChars":18,"textLines":1,"bbox":[841,382,355,34]}
+{"kind":"textbox","id":"sh/q5kz698b","slide":5,"text":"Win rate face à Storm : 47,56 %","textPreview":"Win rate face à Storm : 47,56 %","textChars":31,"textLines":1,"bbox":[841,434,355,34]}
+{"kind":"shape","id":"sh/54bix47q","slide":5,"name":"storm-note","bbox":[841,493,355,66]}
+{"kind":"textbox","id":"sh/432h4zq5","slide":5,"text":"Storm = benchmark après coup,\njamais une entrée du modèle","textPreview":"Storm = benchmark après coup, | jamais une entrée du modèle","textChars":57,"textLines":2,"bbox":[864,508,310,41]}
+{"kind":"shape","id":"sh/wn6hkjy1","slide":5,"name":"takeaway","bbox":[41,595,1198,70]}
+{"kind":"textbox","id":"sh/hofidofm","slide":5,"text":"À retenir : lire P50 avec P10–P90 comme une estimation encadrée — pas comme une valeur certaine.","textPreview":"À retenir : lire P50 avec P10–P90 comme une estimation encadrée — pas comme une valeur certaine.","textChars":96,"textLines":1,"bbox":[70,615,1138,31]}
+{"kind":"textbox","id":"sh/al4zi9gv","slide":5,"text":"05","textPreview":"05","textChars":2,"textLines":1,"bbox":[1184,659,55,25]}
+{"kind":"notes","id":"nt/9sbxwl","slide":5,"text":"Le correcteur réduit la MAE de Chronos-2 d’environ 5 %, à 12,44 €/MWh, avec une corrélation de 0,93. Storm conserve une MAE plus basse, à 11,67 €/MWh, et le modèle gagne 47,56 % des heures face à lui. Le message final est donc équilibré : gain réel par rapport à la base, mais marge d’amélioration encore visible face au benchmark.\n\n[Sources]\n- C:/Users/BQ6757/chronos2_v1/runs/exports/2026-08-26/fr/autonomous/forecast_fr_2026-08-26_autonomous.html\n- C:/Users/BQ6757/Downloads/Présentation courte — Forecast Fran.txt\n[/Sources]"}

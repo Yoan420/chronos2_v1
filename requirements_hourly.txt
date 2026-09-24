@@ -1,10 +1,22 @@
 -r requirements.txt
 
+# Le pipeline valide utilise pandas 2.x (affectations float32/float64 historiques).
+# Requalifier le moteur et ses caches avant une migration majeure vers pandas 3.
+pandas>=2.0,<3
+
 # Experts supervisés et optimisation de l'ensemble OOF.
 scikit-learn>=1.4,<2
 scipy>=1.11,<2
 catboost>=1.2,<2
 holidays>=0.60,<1
+pykalman==0.11.2
+
+# Verrous de processus recuperables apres un arret brutal.
+filelock>=3,<4
+psutil>=5.9,<8
+
+# Adaptateurs LoRA stricts du challenger Chronos-2 exogene.
+peft>=0.20,<1
 
 # Suite de validation causale/DST.
 pytest>=8,<9

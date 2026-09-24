@@ -1,0 +1,42 @@
+below focuses on the first trend and the emerging use of foundation models, whereas our empirical
+study addresses all three.
+2.1. Point forecasting with foundation models
+Hornek et al. [17] compare six models (Chronos-Bolt, Chronos-T5, TimesFM, Moirai, Time-
+MoE, and TimeGPT) in a point forecasting setup. The test period spans one year (2024) for each of
+the five European day-ahead markets: Austria, Belgium, France, Germany, and the Netherlands.
+Chronos-Bolt and Time-MoE are the strongest FMs, but none significantly outperforms MSTL,
+a comparatively simple multiple-seasonal decomposition benchmark [25]. The authors conclude
+that zero-shot forecasting is feasible, but pretraining alone does not guarantee superior accuracy.
+More encouraging results are reported in a point forecasting study of the real-time Singapore
+market, which operates with half-hourly load periods. Ponyuenyong et al. [21] combine Tiny
+Time Mixers, Moirai, MOMENT, and TimesFM (zero-shot and fine-tuned versions) with a regu-
+larization strategy designed to improve performance during price spikes. The foundation models
+outperform the ARIMA, LSTM, and CNN-LSTM benchmarks by up to 37.4% in the Mean Ab-
+solute Percentage Error (MAPE) over a test set comprising 10% of the 2021-2024 sample; note
+that MAPE should actually be avoided in EPF [26, 27]. The authors argue that FMs may be
+particularly useful when the price process is highly nonlinear and conventional models struggle to
+accommodate extreme observations. However, the study considers generic benchmarks rather than
+EPF-specific models such as those discussed in Sec. 5 and uses real-time market data. Therefore,
+its conclusions may not be directly transferable to day-ahead markets.
+Sayghe et al. [28] propose GridFM, a physics-informed foundation model for the joint point
+forecasting of electricity load, locational marginal prices, carbon emissions, and renewable gener-
+ation using 11 years of real-time data from the New York Independent System Operator (NYISO)
+at five-minute resolution. The test set covers the final two years, 2023-2024, and the forecasting
+horizons range from 1 to 24 hours. The model combines a foundation model with a frequency-
+domain adaptation layer, graph-based representations of grid topology, physical constraints, mul-
+titask learning, and explainability tools. The study focuses more broadly on real-time, multitask
+power-system forecasting rather than specifically on EPF. Nevertheless, for the EPF task, it reports
+a 15.9 to 23.2% reduction in MAPE relative to the baseline foundation models TimesFM, Chronos,
+and Moirai-MoE. The study reports CRPS and coverage statistics in Sec. 5.9 but does not discuss
+them in detail. As with [21], its conclusions may not be directly transferable to day-ahead markets.
+2.2. Probabilistic forecasting with foundation models
+Marchesi et al. [18] study Moirai in zero-shot and fine-tuned probabilistic forecasting settings.
+Considering day-ahead data from four European bidding zones (Belgium, Germany, Spain, and
+Sweden SE3) and test periods spanning a full year (1.10.2023 to 30.09.2024), they find that zero-
+shot forecasts are promising, but generally less accurate in terms of the CRPS than those of the
+DDNN benchmark; see Sec. 5 or [22]. Fine-tuning improves calibration, whereas the gains from
+including exogenous variables are limited. The latter result points to one of the major weaknesses
+of many FMs – if they were designed primarily for univariate forecasting, they may not fully
+exploit the covariates. This is a serious limitation in EPF. At the time day-ahead bids are submitted,
+market participants typically have access to forecasts of load and renewable generation. Ignoring
+4

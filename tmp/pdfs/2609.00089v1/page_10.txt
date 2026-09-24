@@ -1,0 +1,41 @@
+the quantile head of Moirai-2 is limited to nine deciles, the model implements an autoregressive
+multi-quantile decoding algorithm that increases the resolution of the predictive distribution. It
+does so by feeding the predicted deciles back into the model, generating additional sets of deciles,
+and then sampling quantiles at the required probability levels.
+With 11.4 million parameters, Moirai-2 is one of the smallest FMs considered in this study. It
+is also the only model from the Moirai family that does not support covariates. However, in our
+initial tests, both Moirai-1 and Moirai-MoE performed considerably worse than Moirai-2, so we
+include only the latter in the final comparison.
+4.1.3. TimesFM-2.5
+Developed by Google Research and released in September 2025,TimesFM-2.5is a time se-
+ries FM that, like Moirai-2, uses a decoder-only architecture [16]. With approximately 200 mil-
+lion parameters, it is the largest model considered in this study. To generate probabilistic forecasts,
+TimesFM-2.5 uses a quantile head that directly produces forecasts for nine decile levels. Although
+the model does not natively incorporate covariates, they can be included through an external re-
+gression mechanism known as XReg. We use the default XReg pipeline, in which the residuals
+of the TimesFM forecasts over the context window are regressed linearly on the supplied covari-
+ates. The final forecast is obtained by adding the resulting regression component to the original
+TimesFM output.
+4.2. Tabular models
+4.2.1. TabPFN
+TabPFN is a tabular foundation model developed by Prior Labs for classification and regression
+tasks [36]. It is a Transformer pretrained solely on synthetic datasets according to the Prior-Fitted
+Network (PFN) learning paradigm. The central idea is to sample datasets from a prior distribution
+over generative processes and train the model on these synthetic datasets in a supervised-learning
+framework.
+PFNs usein-context learning, i.e., the training data are supplied to the model together with
+the predictor values corresponding to the unknown test target, allowing it to generate a predictive
+distribution for that target. As a result, the model can infer the relationship between predictors
+and responses from the supplied data and produce predictions for unseen observations in a single
+forward pass, without task-specific training.
+In this study, we evaluate three variants of TabPFN:
+•TabPFN-2is a lightweight model with 11 million parameters, released in January 2025.
+Its architecture consists of a linear encoder followed by twelve TabPFN layers containing
+column-wise attention, row-wise attention, and a multilayer perceptron [36].
+•TabPFN-3, a substantially larger model with 58 million parameters that can process up to
+100 times more observations or 40 times more features [39]. It replaces separate row-wise
+and column-wise attention with full-row embeddings. This version of TabPFN was released
+in May 2026.
+•TabPFN-TS-3, a data-processing pipeline that performs feature generation and augmenta-
+tion for time series data, transforms the forecasting task into a tabular regression problem
+10

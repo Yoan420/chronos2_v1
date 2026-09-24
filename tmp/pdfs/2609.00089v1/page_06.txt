@@ -1,0 +1,113 @@
+Germany (2025)
+Hydro Run-of-River
+12.89 TWh
+3.0%
+Biomass
+35.87 TWh
+8.4%
+Wind offshore 
+26.19 TWh 
+6.1%
+Wind onshore
+106.77 TWh
+24.9%
+Solar
+73.78 TWh
+17.2%
+Fossil hard coal
+28.16 TWh
+6.6%
+Fossil brown coal
+67.17 TWh
+15.7%
+derived gas
+4.15 TWh
+1.0%
+Fossil gas
+60.55 TWh
+14.1%
+Fossil coal-
+Poland (2025)
+Biomass
+2.87 TWh
+1.8%
+Wind onshore
+21.89 TWh
+13.9%
+Solar
+19.23 TWh
+12.2%
+Fossil brown coal
+30.62 TWh 
+19.4%
+Fossil hard coal
+52.19 TWh
+33.0%
+Fossil oil
+1.49 TWh
+0.9%
+Fossil coal-
+derived gas 
+1.49 TWh
+0.9%
+Fossil gas
+20.99 TWh
+13.3%
+Others
+5.19 TWh
+3.3%
+Spain (2025)
+Hydro Run-of-River
+8.38 TWh
+3.4%  
+Hydro water
+reservoir
+21.86 TWh
+8.7%
+Biomass
+3.68 TWh
+1.5%
+Wind onshore
+55.57 TWh
+22.2%
+Solar
+52.52 TWh
+21.0%
+Nuclear
+51.91 TWh
+ 20.8%
+Fossil hard coal
+1.31 TWh
+ 0.5%
+Fossil gas
+52.13 TWh
+ 20.9%
+0%
+10%
+20%
+30%
+40%
+50%
+60%
+70%
+2017 2018 2019 2020 2021 2022 2023 2024 2025
+Share of RES generation (2017-2025)
+Germany SpainPoland
+Figure 1: Public net electricity generation in Germany, Poland, and Spain in 2025, together with the share of renewable
+energy sources (RES) in electricity generation in the three countries over the 2017-2025 study period.Data source:
+https://www.energy-charts.info.
+should therefore be viewed as one element of the forecasting pipeline, not as a substitute for careful
+problem formulation, data preprocessing, or forecast combination.
+2.4. Conclusions
+Overall, the existing literature has separately examined point and probabilistic zero-shot fore-
+casting, the use of exogenous information, and hybrid FM-based forecasting systems. However,
+the evidence is based predominantly on short test periods, and no study reviewed above jointly
+evaluates FMs against strong EPF-specific benchmarks in terms of point forecasting accuracy,
+probabilistic forecasting accuracy, and economic value over a long test period. The empirical
+analysis below is designed to address this gap.
+3. Datasets
+The data used in this study are publicly available and can be downloaded from ENTSO-
+E (https://transparency.entsoe.eu; day-ahead prices, day-ahead load forecasts, and day-
+ahead onshore wind, offshore wind, and solar generation forecasts) and Investing.com (https:
+//www.investing.com/; closing prices of carbon emission allowances, natural gas, crude oil,
+6

@@ -1,0 +1,4 @@
+# Optional decoder for the experimental NOAA GFS archive materializer.
+# Install in an isolated dependency directory for the public-data experiment.
+eccodes==2.48.0
+findlibs==0.1.3

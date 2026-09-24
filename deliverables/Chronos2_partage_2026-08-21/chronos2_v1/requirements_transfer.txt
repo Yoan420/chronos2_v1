@@ -1,0 +1,2 @@
+-r requirements_hourly.txt
+tshistory_lite==0.5

@@ -1,0 +1,8 @@
+# Console only. The scientific environment remains managed by requirements_hourly.txt.
+psutil>=5.9,<8
+filelock>=3,<4
+PyYAML>=6,<7
+plotly>=5.20,<7
+# Validation only
+pytest>=8,<9
+httpx>=0.27,<1

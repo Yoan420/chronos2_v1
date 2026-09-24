@@ -1,0 +1,52 @@
+economic evaluation of predictive accuracy (2026).arXiv:2604.19580.
+[24] T. Gneiting, M. Katzfuss, Probabilistic forecasting, Annual Review of Statistics and Its Application 1 (2014)
+125–151.doi:10.1146/annurev-statistics-062713-085831.
+[25] K. Bandara, R. J. Hyndman, C. Bergmeir, MSTL: a seasonal-trend decomposition algorithm for time series
+with multiple seasonal patterns, International Journal of Operational Research 52 (1) (2025) 79–98.doi:
+10.1504/IJOR.2025.143957.
+[26] R. Weron, Electricity price forecasting: A review of the state-of-the-art with a look into the future, International
+Journal of Forecasting 30 (4) (2014) 1030–1081.doi:10.1016/j.ijforecast.2014.08.008.
+[27] J. Lago, G. Marcjasz, B. De Schutter, R. Weron, Forecasting day-ahead electricity prices: A review of state-
+of-the-art algorithms, best practices and an open-access benchmark, Applied Energy 293 (2021) 116983.doi:
+10.1016/j.apenergy.2021.116983.
+[28] A. Sayghe, M. A. Mousa, S. Batiyah, A. Husawi, M. Almuwallad, GridFM: A physics-informed foundation
+model for multi-task energy forecasting using real-time NYISO data, Energies 19 (2) (2026) 357.doi:10.
+3390/en19020357.
+[29] A. Potapczynski, R. K. Selvam, T. Konstantinova, M. Wolff, K. G. Olivares, R. Ma, et al., Time-aware prior
+fitted networks for zero-shot forecasting with exogenous variables, Transactions on Machine Learning Research
+2026-June (2026).
+URLhttps://openreview.net/forum?id=nJARpxp3cF
+[30] Y . Qiu, B. Li, H. Wei, S. Weng, C. Wang, Z. Pei, et al., Regression models meet foundation models: A hybrid-AI
+approach to practical electricity price forecasting (2026).arXiv:2603.06726.
+[31] A. Lipiecki, K. Bili ´nska, N. Kourentzes, R. Weron, Stealing accuracy: Predicting day-ahead electricity prices
+with temporal hierarchy forecasting (THieF), International Journal of Forecasting (2026).doi:10.1016/j.
+ijforecast.2026.03.003.
+[32] B. Uniejewski, Variance stabilizing transformations for electricity price forecasting in periods of increased
+volatility, Electric Power Systems Research 257 (2026) 112992.doi:10.1016/j.epsr.2026.112992.
+[33] B. Uniejewski, F. Ziel, The role of probabilistic load and renewable prediction in enhancing day-ahead electricity
+price forecasts, Renewable Energy 269 (2026) 125844.doi:10.1016/j.renene.2026.125844.
+[34] A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. N. Gomez, et al., Attention is all you need, in:
+Advances in Neural Information Processing Systems (NeurIPS), 2017, pp. 5999–6009.arXiv:1706.03762.
+[35] B. Min, H. Ross, E. Sulem, A. P. B. Veyseh, T. H. Nguyen, O. Sainz, et al., Recent advances in natural language
+processing via large pre-trained language models: A survey, ACM Compututing Surveys 56 (2) (2023) 30.
+doi:10.1145/3605943.
+[36] N. Hollmann, S. Müller, L. Purucker, A. Krishnakumar, M. Körfer, S. B. Hoo, et al., Accurate predic-
+tions on small data with a tabular foundation model, Nature 637 (8045) (2025) 319–326.doi:10.1038/
+s41586-024-08328-6.
+[37] A. F. Ansari, O. Shchur, J. Küken, A. Auer, B. Han, P. Mercado, et al., Chronos-2: From univariate to universal
+forecasting (2025).arXiv:2510.15821.
+[38] C. Liu, T. Aksu, J. Liu, X. Liu, H. Yan, Q. Pham, et al., Moirai 2.0: When less is more for time series forecasting
+(2026).arXiv:2511.11698.
+[39] L. Grinsztajn, K. Flöge, O. Key, F. Birkel, P. Jund, B. Roof, M. Manium, et al., TabPFN-3: Technical report
+(2026).arXiv:2605.13986.
+[40] S. B. Hoo, S. Müller, D. Salinas, F. Hutter, From tables to time: Extending tabpfn-v2 to time series forecasting
+(2026).arXiv:2501.02945.
+[41] X. Zhang, D. C. Maddix, J. Yin, N. Erickson, A. F. Ansari, B. Han, et al., Mitra: Mixed synthetic priors for
+enhancing tabular foundation models (2025).arXiv:2510.21204.
+[42] X. Liu, J. Liu, G. Woo, T. Aksu, Y . Liang, R. Zimmermann, et al., Moirai-MoE: Empowering time series foun-
+dation models with sparse mixture of experts, Proceedings of Machine Learning Research 267 (2025) 38940–
+38962.
+[43] K. Hubicka, G. Marcjasz, R. Weron, A note on averaging day-ahead electricity price forecasts across calibra-
+tion windows, IEEE Transactions on Sustainable Energy 10 (1) (2019) 321–323.doi:10.1109/TSTE.2018.
+2869557.
+23

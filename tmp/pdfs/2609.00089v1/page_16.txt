@@ -1,0 +1,35 @@
+Figure 3: Illustration of the quantile-based trading strategy for TabPFN-3 forecasts, with the QB decision parameter
+set toα=90%, for a sample day in the German market, 20 April 2024. The height of the light green shaded area
+represents the predicted profit ˆπd, see Eq. (11), associated with buying electricity at hourhb =15 and selling it at hour
+hs =21. The dark green shaded area represents the corresponding worst-case profit derived from the relevant quantile
+forecasts, ˆp5%
+d,hs
+and ˆp95%
+d,hb
+. Note that on this day the realized spread between the buying and selling prices is greater
+than expected from the point forecasts. For simplicity, the illustration assumesη=1.
+efficiency ofη=0.95, corresponding to a round-trip efficiency of ca. 0.9. The initial state of
+charge is 0 MWh.
+In the QB strategy, the trader seeks to generate a profit on daydby buying electricity at hour
+hb, charging the battery, and subsequently discharging it and selling the electricity at hourhs >h b;
+see Figure 3. In contrast to the strategy of Uniejewski [57], we assume that the trader submits a
+so-calledloop bid, also referred to as aloop blockat EPEX SPOT; seehttps://www.epexspot.
+com/en/tradingproducts. The loop bid consists of two coupled orders that are either both
+executed or both rejected. Consequently, there is no need to settle a partially executed pair of
+orders in the intraday or balancing market [12], to trade using only a part of the battery capacity
+[13, 57, 59], or to replace the limit orders with unlimited bids [22, 60].
+The trader selects the buying and selling hours,h b andh s, by maximizing the predicted daily
+profit:
+ˆπd =ηˆpd,hs − 1
+η ˆpd,hb −C,(11)
+whereCdenotes the round-trip operating cost of the battery. This cost accounts for investment ex-
+penditure, fixed and variable operation and maintenance costs, and battery degradation. Following
+the estimate of Lindberg et al. [61], we setC=25 EUR. As in Maciejowska et al. [62], the same
+costCis deducted when calculating the realized profit whenever a trade is executed.
+The trader commits to a trade only if ˆπd >0 and sets the limit-order prices according to the
+parameterα: the buy-order limit is set to ˆp1−τ
+d,hb
+, and the sell-order limit to ˆpτ
+d,hs
+, whereτ=(1−α)/2.
+16

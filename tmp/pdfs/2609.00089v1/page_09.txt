@@ -1,0 +1,41 @@
+Table 1: Foundation models and benchmarks considered in this study. Except for the LEAR benchmark, model size is
+reported in millions (M) of parameters. Pretraining data are classified assyntheticormixed. MLP, PDF, and TS stand
+for multilayer perceptron, probability density function, and time series, respectively, while→indicates the model
+output; see the main text for details. Models marked with†are not licensed for commercial use free of charge.
+Model Release date Type Size Pretraining Architecture
+Foundation models
+Chronos-2 Oct. 2025 [37]  TS
+120M Mixed  Encoder-only→QuantilesChronos-2-synth Nov. 2025 120M Synthetic
+Chronos-2-small Nov. 2025 28M Mixed
+Moirai-2† Aug. 2025 [38] TS 11M Mixed Decoder-only→Quantiles
+TimesFM-2.5 Sep. 2025 [16] TS 200M Mixed Decoder-only→Quantiles
+TabPFN-2 Jan. 2025 [36] Tabular 11M  Synthetic
+
+Encoder-only→Discretized PDFTabPFN-3† May 2026 [39] Tabular 58M
+TabPFN-TS-3† May 2026 [40] TS+Tabular 58M TS feature generation→TabPFN-3
+Mitra Jul. 2025 [41] Tabular 72M Synthetic Encoder-only→Mean
+Benchmarks
+LEAR Jul. 2021 [27] Tabular 250 Linear→Mean
+DDNN-JSU Sep. 2023 [22] Tabular 0.4M MLP→PDF parameters
+In what follows, we describe the FMs used in this study, beginning with the time series models
+and then turning to the tabular models. We focus on theirzero-shotperformance; that is, their
+ability to generate forecasts for previously unseen series without task-specific weight updates,
+relying instead on the in-context learning paradigm [36].
+4.1. Time series models
+4.1.1. Chronos-2
+Chronos-2 is a time series foundation model developed by Amazon for general-purpose fore-
+casting tasks [37]. Released in October 2025, it uses an encoder-only Transformer architecture
+with time-attention and group-attention layers. These layers are followed by a quantile head that
+produces forecasts at 21 probability levels: 19 equally spaced levels between 0.05 and 0.95, to-
+gether with two additional tail levels, 0.01 and 0.99, intended to improve the representation of the
+predictive distribution tails and allow the retrieval of percentile forecasts by interpolation. Note
+that Chronos-2 is the only FM in this study that natively supports multivariate forecasting.
+We consider three variants: the defaultChronos-2model with 120 million parameters,
+Chronos-2-synth, which is pretrained exclusively on synthetic data, andChronos-2-small,
+which contains 28 million parameters and is approximately one-quarter the size of the default
+model.
+4.1.2. Moirai-2
+Moirai-2is a decoder-only Transformer developed by Salesforce AI Research and released in
+August 2025 [38]. Compared with its predecessors, Moirai-1 and Moirai-MoE [42], it replaces
+mixture-distribution modeling with direct quantile estimation, similarly to Chronos-2. Although
+9

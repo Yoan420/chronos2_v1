@@ -1,0 +1,42 @@
+Table 5: Forecast evaluation for the Spanish power market over the 2021-2025 test period in terms of statistical metrics
+(MAE, RMSE, and CRPS; see Sec. 6.1) and economic measures (see Sec. 6.2). The format is the same as in Tables 3
+and 4.
+Total profitModel MAE RMSE CRPS UB 90% 80% 70% 60% 50%
+Chronos-2 12.94 19.47 9.46 62,871 60,356 55,094 51,338 46,577 41,992
+Chronos-2-synth 13.23 20.01 9.66 62,446 58,586 53,562 49,637 44,831 39,197
+Chronos-2-small 13.78 20.55 10.06 61,300 56,890 51,541 47,112 41,211 37,525
+Moirai-2 15.33 23.53 11.33 60,600 58,061 53,286 49,000 42,854 38,344
+TimesFM-2.5 13.88 20.94 10.54 59,706 48,606 48,606 38,278 38,278 29,717
+TabPFN-2 11.01∗∗∗ 17.05∗∗∗ 8.29∗∗∗ 64,477 59,873 55,598 50,188 45,454 41,010
+TabPFN-3 11.18∗∗∗ 17.50∗∗∗ 8.15∗∗∗ 64,261 59,797 54,278 49,036 44,553 39,610
+TabPFN-TS-3 11.47∗∗∗ 17.64∗∗∗ 8.35∗∗∗ 64,595 61,242 56,637 51,716 47,183 42,150
+Mitra+CP 12.64∗ 19.07 9.66 61,901 55,967 50,677 44,976 39,639 34,589
+LEAR+CP 13.33 19.37 10.06 62,661 57,416 51,683 46,982 42,974 38,098
+DDNN-JSU 12.66 19.07 9.30 63,183 59,894 56,930 53,749 49,917 46,714
+Oracle 0 0 0 77,558 — — — — —
+rations, suggest that the precise ranking of closely related models should be interpreted cautiously.
+Tables 3-5 also report results for theOraclestrategy, which assumes perfect foresight; hence
+the zero values in the MAE, RMSE, and CRPS columns. It represents the maximum profit attain-
+able in each market over the test period. The best UB strategies capture approximately 92.5%,
+86.4%, and 83.3% of Oracle profits in Germany, Poland, and Spain, respectively. Thus, although
+the model-based strategies capture a large share of the profit available under perfect foresight, a
+non-negligible economic performance gap remains.
+Figure 4 provides further insight into the economic performance of the better-performing
+benchmark, DDNN-JSU, and the model with the best overall CRPS performance, TabPFN-3, by
+showing the distributions of daily profits from settled transactions. In all three markets, the distri-
+butions are strongly right-skewed, with relatively long upper tails, while some settled transactions
+result in losses. The unlimited-bid strategy produces the largest number of settled transactions,
+corresponding to around 93% of the test days in Germany, over 82% in Poland, and over 86% in
+Spain. By comparison, the quantile-based strategies are substantially more selective in all three
+markets. Across the QB strategies shown in Figure 4, the largest number of settled transactions is
+1,346, or about 74% of the test days, for DDNN-JSU withα=80% in Germany. At the same time,
+the quantile-based strategies generally yield higher mean and median profits per settled transac-
+tion, reflecting the avoidance of large losses with the limit bids. Thus, the cumulative profits
+reported in Tables 3–5 reflect two distinct components: the frequency of settled transactions and
+the distribution of profits conditional on settlement.
+The results also show that statistical accuracy does not translate one-to-one into economic per-
+formance. The TabPFN models generally rank highly under both evaluation approaches, but the
+model with the lowest MAE, RMSE, or CRPS does not always generate the highest trading profit.
+DDNN-JSU provides the clearest example: although it does not attain the lowest statistical errors
+in any of the three markets, it produces the highest profits forα=60% and 50% in all three mar-
+19

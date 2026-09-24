@@ -1,0 +1,47 @@
+6. Empirical evidence
+6.1. Statistical error measures and conditional predictive ability
+The standard metric for evaluating probabilistic forecasts is the Continuous Ranked Probability
+Score [CRPS; 54]:
+CRPS( ˆF,x)=
+Z ∞
+−∞
+ ˆF(y)−1 {x≤y}
+2
+dy,(7)
+where ˆFis the predictive distribution andxis the observation, e.g., the electricity pricep d,h. It can
+be approximated by:
+CRPS( ˆF,x)≈ 2
+M
+MX
+i=1
+PS (ˆq,x,qi) ,(8)
+where
+PS(ˆq,x,q)=
+
+1 {x<ˆq}−q
+
+(ˆq−x) (9)
+is the so-called Pinball Score [6, 55], ˆq≡ˆF−1(q) is the quantile forecast for quantile levelq∈(0,1),
+and (q1, . . . ,qM) is an equidistant monotonically increasing dense grid of probabilities. Note that
+some studies in the EPF literature [22, 48, 56] report the average Pinball Score acrossM=99
+percentiles (quantile levels) and call it CRPS. Clearly, such “CRPS values” are half the actual
+CRPS defined in Eq. (8).
+The CRPS values below are averages over all hours in the five-year test samples. To comple-
+ment them, we also compute two standard metrics for point forecasts: the Mean Absolute Error
+(MAE) and the Root Mean Squared Error (RMSE). As in [22, 57], we take the median of the
+predictive distribution as the point forecast:
+ˆpd,h ≡ˆp50%
+d,h = ˆF−1(0.5).(10)
+To formally compare the predictive performance of a foundation model with that of a benchmark,
+we apply the test ofconditional predictive ability[CPA; 58]. Following Lago et al. [27] and
+Lipiecki et al. [48], we use its multivariate variant tailored to the 24-dimensional structure of
+day-ahead electricity price forecasts. The test aggregates the hourly loss differentials within each
+day and is applied separately using the daily MAE, MSE, and CRPS. In each case, the one-sided
+alternative is that the foundation model yields a lower expected loss than the benchmark, either
+LEAR+CP or DDNN-JSU.
+6.2. Economic evaluation based on BESS trading
+To evaluate the models in economic terms, we consider two BESS trading strategies similar
+to those considered by Uniejewski [57]: aquantile-based(QB) strategy, with limit-order prices
+determined by quantile forecasts, and anunlimited-bid(UB) strategy; see also the recent review
+by Hirsch and Ziel [23]. Both strategies use a 1 MWh battery with a charging and discharging
+15

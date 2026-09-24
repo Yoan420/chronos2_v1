@@ -1,0 +1,42 @@
+Table 2: Hyperparameter search space for the DDNN-JSU model. The number of neurons,neurons_i, and the
+activation function,activation_i, are optimized separately for each of the two hidden layers. The strength of the
+L1 penalty is also estimated separately for each hidden layer,l1_hidden_i, and each of the four distributional heads,
+l1_head_i. For dropout,l1_hidden_i, andl1_head_i, an additional binary tuning parameter determines whether
+the corresponding form of regularization is applied.
+Hyperparameter Type Range [...]/Set {...} Sampling
+neurons_iInteger [16,512] Uniform (per hidden layeri)
+activation_iCategorical {elu,tanh,relu,softplus,sigmoid} Uniform (per hidden layeri)
+learning_rateFloat [10 −5,10 −1] Log-uniform
+dropoutFloat [0.0,1.0] Uniform
+l1_hidden_iFloat [10 −5,10 −1] Log-uniform (per hidden layeri)
+l1_head_iFloat [10 −5,10 −1] Log-uniform (per head layeri)
+first training window consisting of 1085 data points. As a result, four independently selected hy-
+perparameter sets are obtained for each calendar year. The networks are trained using the AdamW
+optimizer [52] for a maximum of 1000 epochs, with 20% of the training set held out for valida-
+tion. To avoid overfitting, we implement early stopping with a patience of 50 epochs and a sched-
+uler that reduces the learning rate by a factor of 10 when the validation loss does not improve
+for 15 consecutive epochs. Note that Marcjasz et al. [22] used a slightly different setup: 1000
+hyperparameter-tuning trials, variable selection during hyperparameter optimization, the Adam
+optimizer, no learning-rate scheduler, an upper limit of 1024 neurons (rather than 512), and batch
+normalization. Our setup is computationally faster while retaining comparable predictive accu-
+racy. Furthermore, instead of the moment-based parameterization, we use the original formulation
+of the Johnson’s SU distribution, with location parameterξ, scale parameterλ, and shape param-
+etersγandδ[53]. Although these parameters cannot be directly interpreted as moments of the
+distribution, they allow quantile forecasts to be obtained analytically from the estimated parame-
+ters.
+For out-of-sample testing, four models, each corresponding to a different hyperparameter set,
+are retrained daily on the 1,449 most recent observations. DDNN-JSU solves the tabular regression
+task defined in Eq. (5). As in LEAR, the day-of-week variable DoWd is represented using one-hot
+encoding. DDNN-JSU uses the same context data as TabPFN-2 and TabPFN-3 but, unlike these
+models, jointly estimates the distribution parameters for all 24 hourly prices. For each quantile
+level, the final forecast is obtained as a trimmed mean of the four quantile forecasts; with four
+values, this is equivalent to the median. Theτ-quantile forecast ˆqτfrom each model realization is
+obtained using the Johnson’s SU quantile function [53]:
+ˆqτ = ˆξ+ ˆλsinh
+ zτ −ˆγ
+ˆδ
+!
+,(6)
+wherez τ is theτ-quantile of the standard normal distribution, and ˆξ, ˆλ, ˆγ, andˆδare the estimated
+distribution parameters returned by the network.
+14

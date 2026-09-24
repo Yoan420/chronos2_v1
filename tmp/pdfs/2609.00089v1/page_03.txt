@@ -1,0 +1,42 @@
+ong et al. [21] consider more complex deep learning benchmarks based on long short-term memory
+and convolutional neural networks but lack comparison with EPF-specific models. By contrast,
+Marchesi et al. [18] include a model developed for probabilistic EPF by Marcjasz et al. [22].
+The key question is whether broad pretraining offers an advantage over market-specific EPF
+models. Existing studies do not establish whether zero-shot FMs can consistently outperform
+such models across different day-ahead markets and over an extended test period, nor whether
+gains in statistical forecast accuracy translate into greater economic value. We address this gap
+through a common evaluation comprising (i) point forecasting, (ii) probabilistic forecasting, (iii)
+economic assessment of forecast accuracy, (iv) both time series and tabular foundation models,
+and (v) established EPF benchmarks.
+1.1. Our contribution
+This study provides a large-scale empirical comparison of foundation models for probabilistic
+day-ahead electricity price forecasting. We consider nine variants from five foundation-model
+families: Chronos-2, Chronos-2-synth, Chronos-2-small, Mitra, Moirai-2, TabPFN-2, TabPFN-
+3, TabPFN-TS-3, and TimesFM-2.5. These models are compared with two state-of-the-art EPF
+benchmarks. The empirical analysis covers a common five-year test period, from 2021 to 2025,
+in three structurally different European power markets: Germany, Poland, and Spain. This setting
+allows us to examine whether the relative performance of the models is robust across markets with
+different generation mixes, levels of renewable penetration, and price dynamics.
+In line with recent developments in the EPF literature [12, 23], we evaluate the models from
+both statistical and economic perspectives. Point forecast accuracy is assessed using the Mean
+Absolute Error (MAE) and Root Mean Squared Error (RMSE), while probabilistic performance is
+evaluated using the Continuous Ranked Probability Score (CRPS), a strictly proper scoring rule for
+probabilistic forecasts [15, 24]. To complement the statistical evaluation, we assess the economic
+value of the forecasts in a Battery Energy Storage System (BESS) arbitrage application, using both
+quantile-based decisions and an unlimited-bid setting [22, 23].
+The study yields two main findings. First, pretrained foundation models with native support for
+exogenous variables perform competitively against market-specific EPF benchmarks, but only the
+TabPFN family achieves superior statistical accuracy across all considered markets. Second, the
+economic evaluation provides a more nuanced picture: TabPFN dominates under riskier battery
+trading strategies, whereas the Distributional Deep Neural Network (DDNN) benchmark is the
+most profitable model when risk tolerance is lower.
+The remainder of the paper is structured as follows. Section 2 reviews the emerging literature
+on foundation models. Section 3 briefly describes the datasets. Section 4 then introduces the time
+series and tabular foundation models and explains their input structures and forecasting setups,
+while Section 5 presents the two benchmarks. Section 6 presents the statistical and economic
+evaluation. Finally, Section 7 concludes.
+2. Literature review
+According to Maciejowska et al. [6], recent EPF research is characterized by three broad
+trends: a shift toward high-dimensional statistical and machine learning methods, increasing inter-
+est in probabilistic forecasts, and growing emphasis on economic evaluation. The literature review
+3

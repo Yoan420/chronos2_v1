@@ -1,2 +1,0 @@
-catboost>=1.2.7,<2
-pytest>=8,<9

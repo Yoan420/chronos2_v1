@@ -1,0 +1,42 @@
+this information puts even a sophisticated pretrained model at a disadvantage relative to a well-
+specified regression or neural network.
+Two recent approaches address this issue more directly. PriceFM is a domain-specific founda-
+tion model trained on data from 38 interconnected European bidding zones [20]. It incorporates
+load, wind, and solar forecasts, as well as information on transmission topology, within a prob-
+abilistic EPF framework. The reported Average Quantile Loss (AQL; similar to the CRPS) for
+2025, together with the MAE and RMSE, indicates strong zero-shot and fine-tuned performance.
+The improvements are substantial relative to naive benchmarks and more moderate relative to FM
+baselines (Chronos, Moirai, TimeMoE, and TimesFM) and models specialized in spatial fore-
+casting (including PatchTST and GraphDiffusion). Nevertheless, Ref. [20] points to a promising
+direction for future research: combining large-scale pretraining with spatial structures and covari-
+ates that reflect the operation of electricity markets. However, the PriceFM model includes recent
+EPF data (with 2024 being the last training year) in its training corpus, which would not allow us
+to consider an extensive five-year testing period.
+ApolloPFN takes a different approach [29]. It is a time-aware prior-fitted network trained
+on synthetically generated data and designed to incorporate future exogenous variables directly.
+Across the same five datasets as in [27], it performs on par with TabPFN-TS-2 in terms of the
+CRPS and considerably better than Chronos-large, Moirai-large, Sundial-base, and classical time
+series benchmarks such as AutoARIMAX and Prophet. Although the reported performance is very
+promising, ApolloPFN is a proprietary model and is therefore not included in our study.
+Finally, Lettner et al. [19] compare Moirai-1 and ChronosX with two task-specific probabilistic
+EPF models, NHITS combined with Quantile Regression Averaging (QRA) and a Transformer-
+conditioned Normalizing Flow, on the German-Luxembourg bidding zone day-ahead prices in
+2024. Fine-tuned foundation models achieve the best CRPS, Energy Score, and calibration, while
+their zero-shot variants also outperform simple empirical benchmarks. However, a carefully con-
+figured NHITS+QRA model performs relatively close to the FMs and can benefit more consis-
+tently from additional exogenous and cross-market information. The authors conclude that the
+modest predictive gains offered by FMs should be weighed against their substantially greater com-
+putational requirements.
+2.3. Components of larger forecasting systems
+Foundation models can also be used as components of larger forecasting systems. Future-
+Boosting uses a pretrained time series FM to predict explanatory variables that are unavailable at
+the forecast origin and passes these predictions to a regression model [30]. This hybrid approach
+outperforms both standalone FMs and conventional regression benchmarks in the reported point
+forecasting experiments. The takeaway is that a foundation model can generate covariates that
+improve a simpler downstream model.
+A related lesson follows from Temporal Hierarchy Forecasting (THieF). Lipiecki et al. [31]
+show that reconciling forecasts for hourly, multi-hour block, and baseload products improves the
+accuracy of linear regression, neural network, gradient-boosted tree, and Mitra forecasts. This
+suggests that the information contained in the market structure and in relationships across temporal
+aggregation levels can be at least as valuable as increasing model complexity. A foundation model
+5

@@ -1,0 +1,37 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const vm=require('node:vm');
+const source=fs.readFileSync('experiment_console/static/cwe-navigation.js','utf8');
+const messages=[],handlers={},created=[];
+const parent={postMessage:(data,target)=>messages.push({data,target})};
+const time={textContent:'2026-09-12',getAttribute:()=> '2026-09-12',replaceWith(node){this.replacement=node;}};
+const document={readyState:'complete',querySelector:()=>time,createElement:tag=>{
+  const node={tag,children:[],attributes:{},events:{},setAttribute(k,v){this.attributes[k]=v;},append(child){this.children.push(child);},replaceChildren(...children){this.children=children;},addEventListener(k,fn){this.events[k]=fn;},focus(){this.focused=true;}};
+  created.push(node);return node;
+}};
+const window={parent,addEventListener:(name,fn)=>handlers[name]=fn};
+vm.runInNewContext(source,{window,document});
+const select=created.find(node=>node.tag==='select');
+assert.equal(time.replacement,undefined);
+assert.equal(messages[0].data.type,'nyx:delivery-ready');
+handlers.message({source:{},data:{type:'nyx:delivery-options',dates:['2026-09-11']}});
+assert.equal(time.replacement,undefined);
+handlers.message({source:parent,data:{type:'nyx:delivery-options',dates:['<script>']}});
+assert.equal(time.replacement,undefined);
+handlers.message({source:parent,data:{type:'nyx:delivery-options',dates:['2026-09-12','2026-09-11'],selectedDay:'2026-09-11',focus:true}});
+assert.equal(time.replacement,select);
+assert.equal(select.value,'2026-09-12');
+assert.equal(select.disabled,false);
+assert.equal(select.focused,true);
+assert.deepEqual(select.children.map(option=>option.value),['2026-09-12','2026-09-11']);
+assert.equal(messages.length,1); // Updating options never navigates by itself.
+select.value='2026-09-11';select.events.change();
+assert.equal(messages[1].data.type,'nyx:delivery-selected');
+assert.equal(messages[1].data.date,'2026-09-11');
+assert.equal(messages[1].target,'*');
+assert.equal(select.attributes['aria-label'],'Date de livraison du rapport CWE');
+let queried=false;
+const standalone={};standalone.parent=standalone;
+vm.runInNewContext(source,{window:standalone,document:{readyState:'complete',querySelector(){queried=true;}}});
+assert.equal(queried,false);
+console.log('CWE date selector contracts passed: parent validation, actual report date, selection, focus, standalone fallback.');

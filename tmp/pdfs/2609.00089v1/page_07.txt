@@ -1,0 +1,9 @@
+Figure 2:Top three panels:German (DE), Polish (PL), and Spanish (ES) day-ahead electricity prices from 6 January
+2017 to 31 December 2025.Two middle panels:Day-ahead load and renewable generation (RES) forecasts in the
+three countries.Bottom panel:Four fundamental variables common for all three markets: European Union Allowance
+(EUA) prices, natural gas (TTF) prices, crude oil (Brent) prices, and coal (API2) prices. The dark shaded area indicates
+the initial training window for the point-forecasting models, that is, the data used to estimate LEAR and Mitra when
+generating forecasts for the first day of the initial postprocessing window, shown by the light shaded area. Taken
+together, the dark and light shaded areas indicate the initial training window for the models that directly produce
+probabilistic forecasts for the first day of the test period, 1 January 2021.
+7

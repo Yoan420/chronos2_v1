@@ -1,0 +1,2667 @@
+PAGE 1
+Journal of the Operational Research Society
+ISSN: 0160-5682 (Print) 1476-9360 (Online) Journal homepage: www.tandfonline.com/journals/tjor20
+An interpretable machine learning approach for
+forecasting the occurrence of extreme electricity
+prices in the day-ahead market
+Jingchuan Ma , Yu-wang Chen & Fanlin Meng
+To cite this article: Jingchuan Ma , Yu-wang Chen & Fanlin Meng (18 May 2026): An
+interpretable machine learning approach for forecasting the occurrence of extreme
+electricity prices in the day-ahead market, Journal of the Operational Research Society, DOI:
+10.1080/01605682.2026.2660989
+To link to this article:  https://doi.org/10.1080/01605682.2026.2660989
+© 2026 The Author(s). Published by Informa
+UK Limited, trading as Taylor & Francis
+Group.
+Published online: 18 May 2026.
+Submit your article to this journal 
+Article views: 943
+View related articles 
+View Crossmark data
+Full Terms & Conditions of access and use can be found at
+https://www.tandfonline.com/action/journalInformation?journalCode=tjor20
+
+PAGE 2
+RESEARCH ARTICLE
+An interpretable machine learning approach for forecasting the 
+occurrence of extreme electricity prices in the day-ahead market
+Jingchuan Ma
+a
+, Yu-wang Chen
+a 
+and Fanlin Meng
+b 
+a
+Alliance Manchester Business School, The University of Manchester, Manchester, UK; 
+b
+University of Exeter Business School, 
+University of Exeter, Exeter, UK 
+ABSTRACT 
+In recent years, extreme electricity price events have become more frequent and severe due 
+to increased renewable energy integration and external market shocks, posing significant 
+risks to market participants and system operators. Accurate forecasting of such events is 
+essential for supporting market stability, operational planning, and risk management. This 
+paper proposes an adaptive dynamic weighted threshold (DWT) approach to identify 
+extreme price events under dynamically changing market conditions. To address the chal -
+lenge of imbalanced data, a weighted-XGBoost (W-XGB) classification model is developed to 
+forecast extreme price occurrences. Comparative experiments demonstrate that the pro -
+posed method outperforms baseline models in predictive performance and class discrimin -
+ation. To enhance interpretability, SHAP (SHapley Additive exPlanations) is applied to 
+quantify feature contributions and provide insights into the drivers of extreme price events. 
+Results show that extremely high prices are influenced by multiple factors, including supply- 
+demand dynamics, fuel price volatility, and historical patterns, while extremely low prices are 
+primarily driven by residual load, reflecting a more deterministic structure. The proposed 
+framework integrates adaptive thresholding, imbalanced learning, and interpretable analysis, 
+providing a practical tool to support decision-making in electricity markets. It offers action -
+able insights to inform bidding strategies, operational decisions, and risk management in 
+increasingly volatile electricity markets.
+PRACTITIONER SUMMARY 
+Extreme electricity price events have become more frequent due to increased renewable 
+energy integration and external shocks, posing significant risks to electricity market partici -
+pants and system operators. These events directly impact bidding strategies, operational 
+planning, and risk management decisions. This study introduces a practical and interpretable 
+machine learning framework to improve the forecasting of extreme electricity price occur -
+rences. A dynamic weighted threshold (DWT) method is proposed to identify extreme prices 
+more accurately by adapting to changing market conditions. To forecast these events, a 
+weighted-XGBoost model is employed, which effectively handles the rarity of extreme price 
+events in historical data. SHAP-based explainability is applied to identify the key drivers of 
+extreme prices. The results show that extremely high prices are influenced by multiple inter -
+acting factors, while extremely low prices are more closely related to renewable generation 
+and residual load conditions. The proposed framework provides actionable insights to sup -
+port practical decision-making in volatile electricity markets.
+ARTICLE HISTORY 
+Received 29 December 2025 
+Accepted 12 April 2026 
+KEYWORDS 
+Electricity price forecasting; 
+extreme events; XGBoost; 
+interpretable machine 
+learning; imbalanced data   
+1. Introduction
+With the deregulation of European electricity mar -
+kets in the late twentieth century, market partici -
+pants and system operators have become 
+increasingly exposed to significant price risks. 
+Unlike traditional commodities, electricity cannot be 
+efficiently stored, and its transmission is constrained 
+by the physical limitations of the grid (Souhir et al., 
+2019 ). Consequently, electricity spot prices exhibit 
+higher volatility and are characterised by extreme 
+behaviours, including sharp spikes and even 
+negative prices. These extreme price dynamics pose 
+substantial challenges for operational planning, risk 
+management, and market decision-making, as par -
+ticipants and operators need to continuously adapt 
+their decisions under highly uncertain price 
+conditions.
+In recent years, the increasing penetration of 
+renewable energy and the occurrence of external 
+shocks have further intensified electricity price vola -
+tility. Renewable energy sources such as wind and 
+photovoltaic power are inherently intermittent, 
+CONTACT Yu-wang Chen 
+ yu-wang.chen@manchester.ac.uk 
+ Alliance Manchester Business School, The University of Manchester, Manchester, 
+M15 6PB, UK 
+� 2026 The Author(s). Published by Informa UK Limited, trading as Taylor & Francis Group. 
+This is an Open Access article distributed under the terms of the Creative Commons Attribution-NonCommercial-NoDerivatives License (http://creativecommons.org/ 
+licenses/by-nc-nd/4.0/), which permits non-commercial re-use, distribution, and reproduction in any medium, provided the original work is properly cited, and is not 
+altered, transformed, or built upon in any way. The terms on which this article has been published allow the posting of the Accepted Manuscript in a repository by the 
+author(s) or with their consent.
+JOURNAL OF THE OPERATIONAL RESEARCH SOCIETY 
+https://doi.org/10.1080/01605682.2026.2660989 
+
+PAGE 3
+creating imbalances between supply and demand 
+and contributing to more frequent extreme price 
+events (Ketterer, 2014 ; Maniatis & Milonas, 2022 ; 
+Mukherjee & Nateghi, 2019 ). At the same time, geo -
+political disruptions, such as the Russia–Ukraine 
+war, have affected fuel supply and generation costs, 
+further amplifying market instability (Martin- 
+Valmayor et al., 2023 ; Sa ^adaoui & Jabeur, 2023 ; Su 
+et al., 2021 ; Zhang et al., 2022b ). As a result, 
+extreme price behaviour has become more complex 
+and less predictable, increasing the difficulty of 
+effective decision-making and risk management in 
+electricity markets.
+To manage electricity price risks, various 
+approaches have been employed, primarily including 
+hedging and forecasting (C ¸anako �glu & Adıyeke, 
+2020 ; Conejo et al., 2010 ; Deng & Oren, 2006 ; 
+Garc � ıa-Martos et al., 2015 ; Janczura & W �ojcik, 
+2022 ). However, in many regions, particularly in 
+emerging markets, financial derivatives for hedging, 
+such as futures and options, remain underdeveloped 
+or unavailable (Avci Surucu et al., 2018 ). 
+Consequently, electricity price forecasting (EPF) has 
+become a primary decision-support tool in practice. 
+While significant progress has been made using stat -
+istical and machine learning methods (Chang et al., 
+2019 ; Lago et al., 2018 ; Loi & Ng, 2018 ; Nowotarski 
+& Weron, 2018 ; Tschora et al., 2022 ; Zhang et al., 
+2022a ), forecasting extreme price occurrences 
+remains particularly challenging due to their rarity, 
+abruptness, and irregular patterns (He et al., 2015 ; 
+Tafakori et al., 2018 ).
+From an operational perspective, accurate forecast -
+ing of extreme price occurrences is essential for both 
+market participants and system operators. When pri -
+ces exceed or fall below critical thresholds, trading 
+strategies and operational decisions should be 
+adjusted accordingly (Lin et al., 2022 ; Ullah et al., 
+2018 ). For example, generators should avoid under -
+pricing during low-price periods, while retailers and 
+consumers need to mitigate the risk of overpaying 
+during price spikes. In addition, system operators 
+rely on accurate forecasts to manage supply–demand 
+imbalances, ensure system reliability, and monitor 
+potential market power abuse (Westgaard et al., 
+2021 ). Therefore, robust identification and forecasting 
+of extreme price events are crucial for supporting 
+operational planning, risk management, and regula -
+tory oversight in electricity markets.
+1.1. Definition and occurrences of extreme price
+The occurrence of extreme electricity prices can be 
+formulated as a binary classification problem, where 
+price observations are categorised into normal and 
+extreme events based on predefined thresholds 
+(Hagfors et al., 2016 ). Since extreme prices are not 
+directly observable, determining an appropriate 
+threshold is a critical first step in identifying such 
+events.
+From an operational perspective, threshold defi -
+nitions play a key role in decision-making. In prac -
+tice, extreme price signals are used to trigger risk 
+management actions, such as adjusting bidding 
+strategies, activating hedging mechanisms, or imple -
+menting system interventions. Therefore, the way in 
+which extreme prices are defined directly affects 
+downstream operational and trading decisions.
+In the literature, two main approaches have been 
+used to define extreme price thresholds: fixed 
+thresholds and variable thresholds. Fixed thresholds 
+specify a constant price level (e.g., 100 or 150 EUR/ 
+MWh) (Clements et al., 2015 ; Galarneau-Vincent 
+et al., 2023 ; He & Chen, 2016 ; Herrera & Gonz �alez, 
+2014 ; Manner et al., 2016 ), while variable thresholds 
+are typically defined using statistical quantiles, such 
+as the 90th or 95th percentile for high prices and 
+the 10th or 5th percentile for low prices (Liu et al., 
+2022a ; Sandhu et al., 2016 ; Stefan et al., 2007 ). 
+Compared to fixed thresholds, variable thresholds 
+offer greater flexibility by adapting to the distribu -
+tion of electricity prices.
+In practice, quantile-based thresholds are more 
+widely adopted due to their adaptability, and thus 
+form the focus of this study. However, despite this 
+advantage, they typically rely on static quantiles 
+computed over the entire dataset. This global, time- 
+invariant perspective tends to overemphasise periods 
+affected by external shocks, such as geopolitical con -
+flicts, extreme weather, or policy changes, which 
+cause sharp price fluctuations while other periods 
+remain relatively stable. As a result, extreme price 
+classification becomes biased towards these volatile 
+years, potentially overlooking high prices during 
+more typical market conditions.
+More importantly, current approaches lack the 
+ability to balance stability and adaptability when 
+defining extreme price events. From a decision-mak -
+ing perspective, unstable or poorly calibrated thresh -
+olds may lead to either delayed responses to 
+extreme events or overreactions to short-term fluc -
+tuations, both of which can result in suboptimal 
+operational and trading decisions. This limitation 
+highlights the need for a more adaptive and flexible 
+approach to accurately identify extreme electricity 
+price occurrences.
+1.2. Methods for forecasting extreme price 
+occurrences
+A wide range of approaches has been proposed to 
+forecast the occurrence of extreme electricity prices. 
+2
+ J. MA ET AL.
+
+PAGE 4
+Traditional statistical methods, such as autoregres -
+sive models and logistic regression, have been widely 
+used due to their interpretability and well-estab -
+lished theoretical foundations (Adline & Ikeda, 
+2023 ; Eichler et al., 2014 ; Liu et al., 2022a ; Manner 
+et al., 2016 ; Maryniak & Weron, 2019 ). However, 
+these approaches often struggle to capture the non -
+linear relationships and complex interactions among 
+variables inherent in electricity markets, particularly 
+under highly volatile conditions.
+In recent years, machine learning (ML) methods 
+have demonstrated superior performance in model -
+ling nonlinear dependencies and handling high- 
+dimensional data (Galarneau-Vincent et al., 2023 ). 
+As a result, various ML models, including random 
+forests (RF) (Datta & Datta, 2016 ; Galarneau- 
+Vincent et al., 2023 ; He & Chen, 2016 ), deep neural 
+networks (DNNs) (Yamada & Mori, 2021 ; Liu et al., 
+2022b ), and gradient boosting decision trees 
+(GBDT) (Galarneau-Vincent et al., 2023 ; Stathakis 
+et al., 2021 ; Zamudio L �opez et al., 2024 ), have been 
+increasingly applied to electricity price forecasting.
+Despite these advances, forecasting extreme price 
+occurrences remains particularly challenging. 
+Extreme events are rare and often exhibit abrupt 
+and irregular patterns, making them difficult to cap -
+ture even for advanced machine learning models. 
+Moreover, most existing studies primarily focus on 
+improving predictive accuracy, while paying limited 
+attention to model interpretability and how the 
+resulting insights can support decision-making in 
+practice.
+Among ML approaches, boosting-based ensemble 
+methods, particularly Extreme Gradient Boosting 
+(XGBoost), have emerged as state-of-the-art techni -
+ques due to their strong predictive performance and 
+computational efficiency (Coenen et al., 2022 ; 
+Rawson et al., 2022 ; Yao et al., 2024 ). XGBoost is 
+especially effective in capturing nonlinear relation -
+ships and complex feature interactions, which are 
+characteristic of electricity price dynamics. However, 
+existing applications of XGBoost mainly focus on 
+forecasting general electricity prices, while its appli -
+cation to forecasting extreme price occurrences, par -
+ticularly in an interpretable and decision-oriented 
+framework, remains limited.
+1.3. Challenges on classification of imbalanced 
+data and its interpretability
+In practice, occurrences of extremely high or low 
+prices are relatively rare compared to normal price 
+events, resulting in a highly imbalanced dataset. 
+This imbalance poses a significant challenge for 
+standard machine learning algorithms, which tend 
+to be biased towards the majority class and may fail 
+to accurately identify rare but critical extreme price 
+events (Averro et al., 2023 ; Ruisen et al., 2018 ). As a 
+result, effectively handling class imbalance is essen -
+tial for reliable forecasting of extreme electricity 
+price occurrences.
+Existing approaches to address class imbalance 
+can be broadly categorised into data-level and algo -
+rithm-level methods (Tanha et al., 2020 ). Data-level 
+approaches aim to rebalance the dataset through 
+resampling techniques such as over-sampling, 
+under-sampling, and SMOTE (Del Rio et al., 2015 ; 
+Dhankhad et al., 2018 ; Varmedja et al., 2019 ). While 
+these methods can improve class balance, they may 
+alter the original data distribution and introduce 
+additional noise, which can be problematic in time- 
+series settings where preserving temporal dependen -
+cies and chronological structure is essential.
+Algorithm-level approaches, on the other hand, 
+modify the learning process to account for class 
+imbalance (Tanha et al., 2020 ; Wang et al., 2020 ). In 
+particular, class-weighting mechanisms adjust the 
+importance of minority class observations within the 
+model training process, enabling more balanced 
+classification performance without modifying the 
+input data. This is especially advantageous for time- 
+series forecasting problems, where maintaining the 
+chronological structure of the data is essential for 
+avoiding information distortion and ensuring realis -
+tic modelling.
+Given the characteristics of extreme electricity 
+price events, weighted-XGBoost provides a suitable 
+modelling framework by combining the advantages 
+of boosting algorithms with an effective class- 
+weighting mechanism (Averro et al., 2023 ). It is cap -
+able of capturing complex nonlinear relationships 
+while simultaneously addressing class imbalance in a 
+principled and efficient manner.
+In addition to predictive performance, interpret -
+ability plays a crucial role in the practical applica -
+tion of forecasting models. Market participants and 
+system operators are not only interested in accurate 
+forecasts but also in understanding the key drivers 
+of extreme price events. Such insights are essential 
+for supporting risk management, improving bidding 
+strategies, and enhancing operational decision-mak -
+ing in electricity markets.
+Explainable Artificial Intelligence (xAI) has 
+emerged as an important area of research to address 
+the interpretability of complex machine learning 
+models (Burkart & Huber, 2021 ; Molnar, 2020 ). 
+Among various methods, SHAP (SHapley Additive 
+exPlanations) provides a unified framework for 
+quantifying the contribution of each input feature to 
+model predictions (Lundberg & Lee, 2017 ).
+Although SHAP has been widely applied in elec -
+tricity system studies, existing work has primarily 
+JOURNAL OF THE OPERATIONAL RESEARCH SOCIETY
+ 3
+
+PAGE 5
+focused on general forecasting tasks. Its application 
+to understanding and interpreting extreme electri -
+city price occurrences, particularly in a way that can 
+support decision-making, remains limited. This 
+highlights the need for an integrated approach that 
+combines accurate forecasting with interpretable 
+insights tailored to extreme price events.
+1.4. Research aims and contributions
+To address the gaps, this study develops an inter -
+pretable machine learning framework for forecasting 
+imbalanced extreme electricity price occurrences 
+and analysing the contribution of different input 
+features. The proposed framework integrates a 
+dynamic weighted threshold method for identifying 
+extreme price events with a weighted-XGBoost 
+model for forecasting their occurrence. It bench -
+marks forecasting performance against Logistic 
+Regression and Random Forest models with class 
+weighting, and incorporates multiple sources of 
+information, including historical electricity prices, 
+market characteristics (e.g., load and generation), 
+fuel prices, and a geopolitical risk indicator. 
+Furthermore, SHapley Additive exPlanations 
+(SHAP) are employed to quantify feature contribu -
+tions and uncover the key drivers of extreme price 
+occurrences. This enables the proposed framework 
+to provide not only accurate forecasts but also inter -
+pretable insights that directly support risk manage -
+ment, operational planning, and decision-making in 
+electricity markets.
+Overall, the proposed framework bridges fore -
+casting modelling and decision support by integrat -
+ing adaptive threshold design, imbalanced learning, 
+and interpretable analysis for extreme electricity 
+price forecasting. The key contributions of this 
+paper are summarised as follows.
+� Proposing a dynamic weighted threshold method 
+for identifying extreme electricity prices, which 
+balances stability and adaptability under varying 
+market conditions. Compared to conventional 
+static or rolling quantile-based thresholds, the 
+proposed approach enables more robust and 
+context-sensitive identification of extreme price 
+events.
+� Incorporating the Geopolitical Risk Index as a 
+novel feature in extreme electricity price forecast -
+ing, examining its potential impact in the context 
+of geopolitical dynamics.
+� Developing a weighted-XGBoost-based forecast -
+ing model that effectively addresses class imbal -
+ance while preserving the temporal structure of 
+the data. This improves the model’s ability to 
+forecast rare extreme price events without dis -
+torting the original time-series characteristics.
+� Applying SHAP-based explainability to decom -
+pose model results and assess feature contribu -
+tion. This enables stakeholders to better 
+understand the underlying mechanisms of 
+extreme events and supports more informed risk 
+management and operational decision-making.
+The remainder of the paper is organised as fol -
+lows. Section 2 presents the data and methodo -
+logical framework, including the proposed dynamic 
+weighted threshold and weighted-XGBoost model. 
+Section 3 reports results and discussion, including 
+forecasting performance evaluation, model interpret -
+ation based on SHAP analysis, economic interpret -
+ation of key drivers, and cross-market validation. 
+Finally, Section 4 concludes the paper and outlines 
+directions for future research.
+2. Data and methodology
+This section consists of three phases, as illustrated 
+in Figure 1 . The first phase covers data collection 
+and pre-processing, detailed in Sections 2.1 , 2.2 , and 
+2.3. The second phase focuses on machine learning 
+modelling, discussed in Section 2.4 . The last phase 
+covers methods of forecast evaluation and interpret -
+ing analysis, presented in Sections 2.5 and 2.6 .
+2.1. Data
+This research focuses primarily on the European 
+electricity spot market. Five years of data from 
+January 1, 2019, to December 31, 2023, are chosen 
+as this period primarily encompasses the European 
+energy crisis. In addition, since Germany’s day- 
+ahead electricity market is one of the most actively 
+traded spot markets with a high penetration of 
+renewable energy resources in Europe (Lehna et al., 
+2022 ), German data is selected for research. For 
+power market data, day-ahead (DA) electricity pri -
+ces, residual load forecasts, total load forecasts, and 
+total generation forecasts in the German market are 
+obtained from the European Network of 
+Transmission System Operators for Electricity 
+(ENTSOE) platform (Entsoe, 2026 ), as well as 
+renewable energy-related input variables: wind and 
+photovoltaics generation forecasts.
+Although renewable energy resources already 
+account for more than half of Germany’s electricity 
+production, coal- and natural gas-based power gen -
+eration continues to be a crucial complement to 
+intermittent generation (Madadkhani & Ikonnikova, 
+2024 ). Therefore, EGIX (European Gas Index) and 
+API2 (ARA coal price) indexes are considered in 
+4
+ J. MA ET AL.
+
+PAGE 6
+this research. To capture the influence of carbon 
+pricing, EUA (European Union Allowance) carbon 
+prices are further included in the set of variables. 
+These daily data are obtained from Refinitiv ( 2026 ). 
+Since the market closed on weekends, missing 
+observations are imputed using a forward-fill 
+method based on Friday’s data (Mankoff et al., 
+2020 ).
+Furthermore, this study takes into account the 
+geopolitical conditions. Even though the geopolitical 
+impact may already be transmitted to electricity pri -
+ces through fuel prices, we still include a geopolitical 
+risk indicator in the model to better understand its 
+direct and independent impact on the occurrence of 
+extreme electricity prices. Prior research suggested 
+that geopolitical risks can significantly affect 
+European electricity prices (Abdullah et al., 2023 ; 
+Sa ^adaoui & Jabeur, 2023 ). Thus, the daily 
+Geopolitical Risk Index proposed by Caldara and 
+Iacoviello ( 2022 ) is considered in this research.
+The lower-frequency daily data is converted to 
+hourly data using a forward-fill approach to align it 
+with hourly observations (Mankoff et al., 2020 ). 
+This method ensures that all 24 hourly values within 
+the same day remain identical after the conversion. 
+As a result, we obtained 43824 hourly values for the 
+DA electricity price and each variable, correspond -
+ing to 1826 days of data (5 years), with 24 observa -
+tions per day. Tables 1 and 2 respectively 
+summarise the model variables with data sources 
+and the corresponding descriptive statistics. Figure 2
+illustrates the time-dependent plots of these 
+variables.
+2.2. Input features
+To ensure the feasibility of our forecasting 
+approach, all input features must be available at the 
+time of the forecast. Specifically, we forecast 
+extremely high and low electricity prices for a given 
+hour on day d, using only information accessible by 
+the previous day ( d − 1). This ensures that the 
+model remains applicable to real-world forecasting 
+scenarios.
+Electricity prices exhibit strong daily and weekly 
+patterns due to fluctuations in supply and demand 
+dynamics (Liu et al., 2022a ). To capture these 
+effects, historical prices from d − 1 and d − 7 are 
+included as daily and weekly indicators. 
+Additionally, market forecasts such as electricity 
+load and generation forecasts, published on d − 1;
+provide essential forward-looking information on 
+expected market conditions. Furthermore, fuel pri -
+ces and the geopolitical indicator are included using 
+the most recent available data on d − 1 to reflect 
+broader external influences. The selected features 
+are categorised as follows:
+� Historical prices: Day-ahead electricity prices at 
+hour s one day earlier ( p
+s , d −1
+) and one week ear -
+lier ( p
+s , d −7
+).
+� Load forecasts: Day-ahead forecasts for total load 
+( x
+Load
+s , d
+) and residual load ( x
+Res
+s , d
+) at hour s on 
+day d.
+� Generation forecasts: Day-ahead forecasts for 
+total generation ( x
+Gen
+s , d
+), wind generation ( x
+Wind
+s , d
+), 
+and photovoltaic (PV) generation ( x
+PV
+s , d
+) at hour s 
+on day d.
+� Fuel-related prices: Closing prices of key fuel at 
+hour s on the previous day, including Carbon 
+( x
+Carbon
+s , d −1
+), Gas ( x
+Gas
+s , d −1
+), and Coal ( x
+Coal
+s , d−1
+).
+� Geopolitical indicator: Geopolitical Risk Index at 
+hour s on the previous day ( x
+GPR
+s , d −1
+).
+Here, s represents the hour of the day, taking val -
+ues from 0 to 23, and d represents the day, ranging 
+from 1 (January 1, 2019) to 1826 (December 31, 
+2023). d − 1 refers to the previous day and d − 7 
+corresponds to the one week earlier.
+Figure 1. Proposed methodology for forecasting and interpreting extreme electricity prices.
+JOURNAL OF THE OPERATIONAL RESEARCH SOCIETY
+ 5
+
+PAGE 7
+2.3. Identifying extreme prices
+With the input features established, the next step is 
+to define the target variable for forecasting extreme 
+electricity prices. This study formulates the task as a 
+supervised binary classification problem. Traditional 
+approaches often rely on a static percentile com -
+puted over the entire dataset, which fails to effect -
+ively adapt to temporal variations in the market. To 
+enhance extreme price identification, we propose an 
+adaptive, dynamic weighted threshold (DWT) 
+method, integrating static global quantiles (capturing 
+overall market trends) with rolling local quantiles 
+(reflecting short-term fluctuations). The weights are 
+dynamically adjusted based on market volatility, 
+allowing the thresholds to adapt effectively to price 
+variations.
+This approach, inspired by applications of rolling 
+quantile in risk management, volatility forecasting, 
+and trading strategy optimisation (Jiang et al., 2019 ; 
+Marshall et al., 2017 ; Packham et al., 2017 ), ensures 
+more responsive classification compared to static 
+quantile methods.
+For each time point ðs, d Þ; we define a rolling 
+window P
+ðr Þ
+s , d 
+that contains the most recent r � 24 
+hourly price observations, including the current 
+time point. Formally, the set is defined as:
+P
+ðr Þ
+s , d
+¼ p
+s
+0
+, d
+0 jðs
+0
+, d
+0
+Þ � ðs, d Þ
+� �
+, P
+ðr Þ
+s , d
+�
+�
+�
+�
+�
+� ¼ r � 24:
+(1) 
+Here, r denotes the window length in days. The 
+inequality ðs
+0
+, d
+0
+Þ � ðs, d Þ follows lexicographic 
+order, meaning that earlier days and earlier hours 
+are considered smaller. This ensures the window 
+always contains the latest r � 24 hourly records in 
+chronological order.
+Extreme price thresholds are determined using 
+both global and local quantiles. Global quantiles 
+capture long-term trends by computing quantiles 
+over the entire time series P:
+h
+G
+ðaÞ ¼ inf fp : F ðpÞ � ag,
+h
+G
+ð1 − aÞ ¼ supfp : F ðpÞ � 1 − ag,
+(2) 
+where F ðpÞ is the cumulative distribution function 
+(CDF) of P, and a is the quantile level, restricted to 
+a 2 ð0, 1Þ: Here, p denotes an individual observa -
+tion, which remains consistently defined in 
+subsequent equations to represent data points 
+drawn from either the full time series or a rolling 
+window.
+Local quantiles, in contrast, adapt to short-term 
+fluctuations by computing quantiles within the roll -
+ing window P
+ðr Þ
+s , d
+:
+h
+L
+s , d
+ðaÞ ¼ inf fp : F
+ðr Þ
+s , d
+ðpÞ � ag,
+h
+L
+s , d
+ð1 − aÞ ¼ supfp : F
+ðr Þ
+s , d
+ðpÞ � 1 − ag,
+(3) 
+where F
+ðr Þ
+s , d
+ðpÞ is the CDF of the price set in the roll -
+ing window P
+ðr Þ
+s , d
+:
+Volatility is a key indicator of market conditions 
+and structural market changes (Lin and Wesseh Jr, 
+2013 ; Hernandez et al., 2022 ). Therefore, we employ 
+it as an adaptive weighting factor to dynamically 
+adjust the balance between global and local quan -
+tiles. The local volatility r
+s , d 
+is computed as the 
+Table 1. Descriptions of the model variables and data sources.
+Data Units Frequency Description Data sources
+Power market data
+Day-ahead prices EUR/MWh Hourly Electricity prices in the day-ahead market. Entsoe ( 2026 )
+Grid Load forecast MWh Hourly Forecasted total electricity demand in the power system. Entsoe ( 2026 )
+Residual load forecast MWh Hourly Forecasted remaining demand that renewable energy cannot cover. Entsoe ( 2026 )
+Generation forecast MWh Hourly Forecasted total electricity generation in the power system. Entsoe ( 2026 )
+Renewable energy-related data
+Wind generation forecast MWh Hourly Forecasted electricity generation from wind power sources. Entsoe ( 2026 )
+PV generation forecast MWh Hourly Forecasted electricity generation from photovoltaic solar panels. Entsoe ( 2026 )
+Fuel-related data
+Gas prices EUR/MWh Daily European Gas Index (EGIX), representing natural gas prices. Refinitiv ( 2026 )
+Coal prices EUR/MWh Daily API2 (ARA coal price) index, representing coal prices. Refinitiv ( 2026 )
+Carbon prices EUR/tCO2 Daily EUA carbon prices, representing the cost of carbon emissions. Refinitiv ( 2026 )
+Geopolitics-related data
+Geopolitical Risk Index Point Daily A measure of adverse geopolitical events and associated risks. Caldara and Iacoviello ( 2022 )
+Table 2. Descriptive statistics of the considered data.
+Variable Mean Std Min Q1 Median Q3 Max
+Day-ahead prices 99.09 105.56 −500.00 35.23 59.39 122.32 871.00
+Grid load forecast 54577.21 9278.80 30544.75 47062.94 54476.25 62323.38 77585.75
+Residual load forecast 34577.35 12689.43 −986.50 26326.13 35335.38 43466.19 70214.25
+Generation forecast 54096.19 11660.10 20000.00 45616.75 54188.00 62421.25 87389.00
+Wind generation forecast 14405.89 10661.28 244.75 5853.69 11480.75 20761.56 50295.75
+PV generation forecast 5590.80 8594.95 0.00 0.00 217.75 8882.50 41174.00
+Gas prices 49.75 52.95 4.05 14.11 27.95 73.36 321.95
+Coal prices 100.77 55.42 36.48 48.98 94.81 135.69 255.04
+Carbon prices 53.42 26.72 15.23 25.75 53.26 80.85 97.58
+Geopolitical Risk Index 104.06 60.77 3.57 63.53 93.65 129.90 540.83
+Note. Q1 ¼ First quartile (25th percentile); Q3 ¼ Third quartile (75th percentile).
+6
+ J. MA ET AL.
+
+PAGE 8
+standard deviation of prices within P
+ðr Þ
+s , d
+:
+r
+s , d
+¼
+ffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffi
+1
+jP
+ðr Þ
+s , d
+j
+X
+p2P
+ðr Þ
+s , d
+ðp − l
+s , d
+Þ
+2
+v
+u
+u
+t
+,
+l
+s , d
+¼
+1
+jP
+ðr Þ
+s , d
+j
+X
+p2P
+ðr Þ
+s , d
+p:
+(4) 
+To ensure consistency, r
+s , d 
+is normalised between 
+0 and 1:
+r
+norm
+s , d
+¼
+r
+s , d
+− minðrÞ
+maxðrÞ − minðrÞ
+: (5) 
+Finally, the dynamic weighted thresholds for 
+extreme price classification are computed as:
+d
+s , d
+ðaÞ ¼ r
+norm
+s , d
+h
+G
+ðaÞ þ ð1 − r
+norm
+s , d
+Þh
+L
+s , d
+ðaÞ,
+d
+s , d
+ð1 − aÞ ¼ r
+norm
+s , d
+h
+G
+ð1 − aÞ þ ð1 − r
+norm
+s , d
+Þh
+L
+s , d
+ð1 − aÞ:
+(6) 
+This adaptive weighting scheme follows an intui -
+tive principle: global quantiles are weighted more for 
+threshold stability when local volatility is high, since 
+local price information is fluctuating and unstable. 
+Conversely, local quantiles are weighted more for 
+better threshold responsiveness when local volatility 
+is low, since local price information is more reliable.
+This mechanism ensures that threshold values 
+adjust dynamically without excessive fluctuations, 
+making them more effective for real-world decision- 
+making in risk management. The approach 
+Figure 2. Time series plots of the considered data.
+JOURNAL OF THE OPERATIONAL RESEARCH SOCIETY
+ 7
+
+PAGE 9
+effectively balances stability and adaptability, ensur -
+ing that extreme price thresholds remain useful in 
+both calm and volatile market conditions.
+Based on the quantile definitions, the correspond -
+ing threshold series for the static, rolling, and 
+dynamic weighted approaches are constructed and 
+presented in Figure 3 . Using a 30-day rolling win -
+dow as an illustrative example, the figure provides a 
+comparative view of these methods and demon -
+strates the effectiveness of the DWT approach. The 
+static thresholds (dashed lines) remain fixed at the 
+90th and 10th quantiles over the entire dataset, fail -
+ing to adapt to evolving market conditions. The 
+rolling quantile-based thresholds (dash-dotted lines) 
+respond more sensitively to short-term fluctuations, 
+but they exhibit higher local variability, particularly 
+during periods of high volatility. This can lead to 
+less stable threshold definitions and increased sensi -
+tivity to transient market movements.
+In contrast, the dynamic weighted thresholds 
+(solid lines) adjust in response to market fluctua -
+tions. Notably, during periods of extreme market 
+shocks (e.g., post-COVID energy crisis and the 
+Russia–Ukraine war), the dynamic weighted thresh -
+olds adapt to changing conditions while maintaining 
+stability. This adaptive behaviour provides a balance 
+between adaptability and stability, making the 
+thresholds more robust for identifying extreme price 
+events.
+Using the dynamic weighted thresholds, we 
+define extreme price occurrences as follows:
+y
+high
+s , d
+¼
+1, p
+s , d
+> d
+s , d
+ðaÞ
+0, otherwise
+�
+(7) 
+where y
+high
+s , d
+¼ 1 indicates that p
+s , d 
+is classified as an 
+extremely high price at hour s on day d, while 
+y
+high
+s , d
+¼ 0 denotes a non-extreme price.
+Similarly, extremely low prices are labelled as:
+y
+low
+s , d
+¼
+1, p
+s , d
+< d
+s , d
+ð1 − aÞ
+0, otherwise
+�
+(8) 
+where y
+low
+s , d
+¼ 1 indicates that p
+s , d 
+is classified as an 
+extremely low price at hour s on day d, and y
+low
+s , d
+¼
+0 denotes a non-extreme price.
+In this paper, extremely high and low prices are 
+classified separately to facilitate targeted forecasting 
+and to examine the distinct mechanisms driving 
+these price extremes. Furthermore, typical values for 
+a are set to 0.9, enabling the identification of the 
+top and bottom prices based on DWT, respectively.
+Since the DWT approach integrates both global 
+and local information, it is crucial to use a relatively 
+short window r to effectively capture immediate 
+fluctuations. Given this, we set the window size r to 
+30 days, corresponding to 30 � 24 ¼ 720 hourly 
+observations. In practice, decision-makers may con -
+sider different time window sizes to capture recent 
+information. Therefore, we also evaluate the method 
+using varying window sizes 615 days, resulting in 
+three window lengths: 15 � 24 ¼ 360; 30 � 24 ¼
+720; and 45 � 24 ¼ 1080 hourly observations. With 
+these thresholds established, extreme price occur -
+rences, serving as the target variables for classifica -
+tion, can be determined. Table 3 summarises the 
+counts of extreme price occurrences identified using 
+this method.
+2.4. Weighted-XGBoost classifier
+Weighted-XGBoost is an enhanced version of 
+XGBoost designed to address class imbalance issues 
+(Averro et al., 2023 ). It is integrated into the 
+XGBoost package and can be activated by setting 
+the parameter scale pos weight during model 
+Figure 3. Comparison of static, rolling, and dynamic weighted thresholds for identifying extreme electricity prices.
+8
+ J. MA ET AL.
+
+PAGE 10
+training (Chen & Guestrin, 2016 ). In this study, this 
+method is tailored to forecast extreme electricity 
+price occurrences, which are relatively rare com -
+pared to normal prices, resulting in a highly imbal -
+anced dataset. The class-weighting mechanism 
+allows the model to account for this imbalance 
+without modifying the original data distribution, 
+thereby preserving the temporal dependencies inher -
+ent in time-series data.
+This section describes how weighted-XGBoost is 
+employed to forecast extreme price occurrences and 
+elaborates on its mathematical foundation.
+2.4.1. Feature representation and temporal 
+indexing
+Weighted-XGBoost is implemented as a binary classi -
+fication model to forecast the occurrence of extremely 
+high and low electricity prices. The dataset D ¼
+fðx
+i
+, y
+i
+Þg consists of n hourly observations recorded 
+in strict chronological order, where x
+i
+2 R
+M 
+is the 
+feature vector, with M denoting the number of input 
+features, and y
+i
+2 f0, 1g is the binary target variable. 
+Each sample, indexed by i, corresponds to an observa -
+tion at hour s on day d and is represented as ðx
+i
+, y
+i
+Þ:
+The feature vector x
+i 
+includes the following compo -
+nents as determined in Section 2.2 :
+x
+i
+¼ f p
+s , d −1
+, p
+s , d−7
+, x
+Load
+s , d
+, x
+Res
+s , d
+, x
+Gen
+s , d
+, x
+Wind
+s , d
+, x
+PV
+s , d
+, x
+Carbon
+s , d −1
+,
+x
+Gas
+s , d −1
+, x
+Coal
+s , d −1
+, x
+GPR
+s , d−1
+g:
+(9) 
+The target variable y
+i
+2 f0, 1g represents whether 
+an extreme price event occurs at the corresponding 
+time. In this study, two separate weighted-XGBoost 
+models are trained for forecasting extreme price 
+occurrences: one for extremely high ( y
+high
+s , d
+) and 
+another for extremely low ( y
+low
+s , d
+), as detailed in 
+Section 2.3 .
+2.4.2. Regularised learning objective
+In this setup, ðx
+i
+, y
+i
+Þ represents a data pair, the 
+model’s final forecast for the i-th sample, denoted 
+^y
+i
+; shown as follows:
+^y
+i
+¼
+X
+K
+k¼1
+f
+k
+x
+ið Þ
+, f
+k
+2 F , (10) 
+where K denotes the number of trees and F repre -
+sents the space of trees utilised in boosting. Each f
+k 
+corresponds to an independent tree structure q and 
+leaf weights w. The set of functions f
+k 
+can be 
+learned by minimising the regularised objective 
+function L as follows:
+L ¼
+X
+n
+i¼1
+l ^y
+i
+, y
+i
+  �
+þ
+X
+K
+k¼1
+X f
+k
+ð Þ , (11) 
+where l ^y
+i
+, y
+i
+  �
+represents the binary classification 
+loss function, which quantifies the deviation 
+between the forecasted value ^y
+i 
+and the observed 
+value y
+i
+: In classification trees, this loss is typically 
+defined using the logistic loss function, formulated 
+as:
+l ^y
+i
+, y
+i
+  �
+¼ y
+i
+ln 1 þ e
+− ^y
+ið Þ
+þ 1 − y
+i
+ð Þ ln 1 þ e
+^y
+ið Þ
+,
+(12) 
+while Xðf Þ represents the regularisation term on 
+decision trees to prevent overfitting:
+Xðf Þ ¼ cT þ
+1
+2
+kkwk
+2
+, (13) 
+where cT is a structural complexity penalty, with T 
+representing the number of leaf nodes in the tree 
+and c being a regularisation parameter that specifies 
+the minimum loss reduction required to make a fur -
+ther partition on a leaf node. The second term, 
+1
+2
+kkwk
+2
+; applies l
+2 
+regularisation on the leaf weights 
+w, where k controls the strength of the regularisa -
+tion. This formulation ensures the model does not 
+grow excessively complex while maintaining good 
+generalisation performance.
+2.4.3. Gradient tree boosting
+Gradient boosting trees adopt an additive modelling 
+approach, where at the t-th iteration, a new decision 
+tree f
+t 
+is added to improve the model’s forecast ^y
+ðt Þ
+i 
+by minimising the loss function, shown as follows:
+L
+ðt Þ
+’
+X
+n
+i¼1
+l y
+i
+, ^y
+ðt −1Þ
+i
+þ f
+t
+x
+ið Þ
+� �
+þ X f
+t
+ð Þ : (14) 
+To enable efficient optimisation of the objective 
+function, the Taylor expansion is applied, resulting 
+in the following expression:
+L
+ðt Þ
+’
+X
+n
+i¼1
+l y
+i
+, ^y
+ðt −1Þ
+i
+� �
+þ g
+i
+f
+t
+x
+ið Þ
+þ
+1
+2
+h
+i
+f
+2
+t
+x
+ið Þ
+� �
+þ X f
+t
+ð Þ ,
+(15) 
+where g
+i
+¼ @
+^y
+ðt −1Þ
+i
+lðy
+i
+, ^y
+ðt −1Þ
+i
+Þ and h
+i
+¼ @
+2
+^y
+ðt −1Þ
+i
+lðy
+i
+, ^y
+ðt −1Þ
+i
+Þ
+represent first- and second- order gradient statistics 
+on the loss function, respectively. The constant term 
+lðy
+i
+, ^y
+t −1
+i
+Þ can be removed to simplify the objective 
+function at step t, shown as follows:
+~
+L
+ðt Þ
+¼
+X
+n
+i¼1
+g
+i
+f
+t
+x
+ið Þ
+þ
+1
+2
+h
+i
+f
+2
+t
+x
+ið Þ
+� �
+þ X f
+t
+ð Þ : (16) 
+Let I
+j
+¼ fijqðx
+i
+Þ ¼ jg represent the sample set of 
+leaf j. Substituting the expanded form of X into the 
+Table 3. Overview of extreme price occurrence counts.
+Time window
+Experiment Price type 15-day 30-day 45-day
+Extremely high Extreme 4213 4376 4373
+Normal 39611 39448 39451
+Extremely low Extreme 4047 4053 3995
+Normal 39777 39771 39829
+JOURNAL OF THE OPERATIONAL RESEARCH SOCIETY
+ 9
+
+PAGE 11
+Eq. (16) , we obtain the following expression after 
+simplifying:
+~
+L
+ðt Þ
+¼
+X
+n
+i¼1
+g
+i
+f
+t
+x
+ið Þ
+þ
+1
+2
+h
+i
+f
+2
+t
+x
+ið Þ
+� �
+þ cT þ
+1
+2
+k
+X
+T
+j¼1
+w
+2
+j
+¼
+X
+T
+j¼1
+X
+i2I
+j
+g
+i
+� �
+w
+j
+þ
+1
+2
+X
+i2I
+j
+h
+i
+þ k
+� �
+w
+2
+j
+" #
+þ cT ,
+(17) 
+where w
+j 
+represents the weight of the leaf node j.
+The optimal weight w
+�
+j 
+of leaf j in a fixed struc -
+ture qðx Þ can be calculated as follows:
+w
+�
+j
+¼ −
+P
+i2I
+j
+g
+i
+P
+i2I
+j
+h
+i
+þ k
+, (18) 
+and the corresponding optimal value of the objective 
+function can be found:
+~
+L
+ðt Þ
+ðqÞ ¼ −
+1
+2
+X
+T
+j¼1
+X
+i2I
+j
+g
+i
+� �
+2
+X
+i2I
+j
+h
+i
+þ k
+þ cT : (19) 
+This expression can be used to measure the qual -
+ity of a tree structure q.
+However, enumerating all possible tree structures 
+q is computationally infeasible. Instead, a greedy 
+algorithm that iteratively expands the tree by adding 
+branches is employed. At each step, the model eval -
+uates candidate splits and selects the one that maxi -
+mises the loss reduction. Given a node containing 
+instance set I ¼ I
+L
+[ I
+R
+; splitting it into left and 
+right nodes, I
+L 
+and I
+R
+; respectively, results in the 
+following loss reduction:
+L
+split
+¼
+1
+2
+P
+i2I
+L
+g
+i
+  �
+2
+P
+i2I
+L
+h
+i
+þ k
+þ
+P
+i2I
+R
+g
+i
+  �
+2
+P
+i2I
+R
+h
+i
+þ k
+−
+P
+i2I
+g
+i
+  �
+2
+P
+i2I
+h
+i
+þ k
+" #
+− c:
+(20) 
+If the reduction in loss is positive ( L
+split
+> 0), the 
+split is considered beneficial, and the model pro -
+ceeds with the partition. Otherwise, the split is dis -
+carded to prevent unnecessary complexity.
+Overall, the proposed tree structure of weighted- 
+XGBoost can be established based on the aforemen -
+tioned loss function.
+2.4.4. Hyperparameter optimisation
+Furthermore, some parameters cannot be deter -
+mined through the training process above and must 
+be specified in advance. Machine learning com -
+monly uses hyperparameter optimisation techniques 
+to set these parameters in order to achieve the best 
+forecasting performance. Common approaches 
+include grid search, random search, and Bayesian 
+optimisation (Bischl et al., 2023 ; Srinivas & Katarya, 
+2022 ; Yang & Shami, 2020 ). Grid and random 
+search exhaustively explore the entire parameter 
+space, while Bayesian optimisation uses prior infor -
+mation to guide a more efficient search process. By 
+leveraging probabilistic modelling, Bayesian opti -
+misation can identify optimal hyperparameters with 
+fewer evaluations (Lindauer et al., 2022 ; Stuke et al., 
+2021 ; Turner et al., 2021 ). Therefore, this study 
+adopts Bayesian optimisation for hyperparameter 
+tuning. Several key hyperparameters are selected for 
+optimising weighted-XGBoost in this study, includ -
+ing the following:
+1. max_depth: Defines the maximum depth of 
+each tree, controlling the model’s complexity.
+2. learning rate ðgÞ: Determines the step size dur -
+ing optimisation, affecting model convergence.
+3. n_estimators: Specifies the number of boosting 
+rounds, balancing model accuracy and compu -
+tational cost.
+4. gamma ðcÞ: A regularisation term that controls 
+tree complexity by setting a minimum loss 
+reduction required for a split.
+5. lambda ðkÞ: Applies an l
+2 
+penalty on leaf weights 
+to prevent overfitting and improve generalisation.
+6. scale_pos_weight: Adjusts the penalty for the 
+minority class, enhancing model performance 
+on imbalanced datasets.
+2.5. Model evaluation
+For this study’s objective of forecasting the occur -
+rence of extreme prices, traditional metrics like 
+Accuracy, Precision, Recall and F1-score provide 
+general insights into overall model performance. 
+However, due to the inherent class imbalance in the 
+data, additional metrics, the geometric mean (G- 
+Mean) and Area Under the Curve (AUC), are par -
+ticularly critical. These metrics are calculated based 
+on the classification outcomes summarised in the 
+confusion matrix, shown in Table 4 .
+Accuracy is the ratio of correctly classified sam -
+ples to the total number of samples. Precision indi -
+cates the proportion of samples predicted as positive 
+by the model that are actually positive. Recall repre -
+sents the proportion of all actual positive samples 
+that are correctly identified by the model. The F1- 
+score is the harmonic mean of precision and recall. 
+These are shown as:
+Accuracy ¼
+TP þ TN
+TP þ FP þ TN þ FN
+, (21) 
+Table 4. Confusion matrix.
+Predicted values
+Positive Negative
+Actual values Positive TP FN
+Negative FP TN
+Note: TP ¼ True positive, FN ¼ False negative, FP ¼ False positive, 
+TN ¼ True negative.
+10
+ J. MA ET AL.
+
+PAGE 12
+Precision ¼
+TP
+TP þ FP
+, (22) 
+Recall ¼
+TP
+TP þ FN
+, (23) 
+F 1 − score ¼
+Recall � Precision � 2
+Recall þ Precision
+: (24) 
+In addition, G-Mean balances sensitivity (recall 
+for the minority class) and specificity (recall for the 
+majority class), ensuring that the model performs 
+well across both classes (Zhang et al., 2019 ). A high 
+G-Mean value indicates that the model is effective 
+in identifying minority class instances without sacri -
+ficing accuracy for the majority class.
+G − Mean ¼
+ffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffi
+TP
+TP þ FN
+�
+TN
+TN þ FP
+r
+: (25) 
+Furthermore, AUC of the Receiver Operating 
+Characteristic (ROC) is an effective metric for evalu -
+ating imbalanced binary classifiers (Zou et al., 
+2016 ). ROC curve plots True Positive Rate (TPR) 
+versus False Positive Rate (FPR) at different classifi -
+cation thresholds (Sokolova et al., 2006 ).
+TPR ¼
+TP
+TP þ FN
+, (26) 
+FPR ¼
+FP
+TN þ FP
+: (27) 
+AUC values range from 0 to 1, with higher values 
+indicating stronger discriminatory power for both 
+minority and majority classes.
+2.6. SHapley additive exPlanations (SHAP)
+SHAP (Lundberg & Lee, 2017 ) is employed in this 
+study to interpret the predictive model’s output. 
+Prior to SHAP, the Shapley value was developed 
+based on game theory (Shapley, 1953 ) as a method 
+for evaluating the contribution of each feature to a 
+model’s predictions. It quantifies the marginal 
+impact of a feature by analysing the changes in 
+model output when the feature is included or 
+excluded.
+Formally, the Shapley value /
+m 
+for feature m is 
+defined as:
+/
+m
+¼
+X
+x
+S
+�x nfmg
+jx
+S
+j!ðjx j − jx
+S
+j − 1Þ!
+jxj!
+f
+x
+S[fmg
+ðx
+S[fmg
+Þ − f
+x
+S
+ðx
+S
+Þ
+� �
+,
+(28) 
+where x represents the complete set of input fea -
+tures, and x
+S 
+denotes a subset that excludes feature 
+m. The term f
+x
+S[fmg
+refers to the model trained with 
+feature m, while f
+x
+S 
+corresponds to the model 
+trained without it. Thus, f
+x
+S[fmg
+ðx
+S[fmg
+Þ represents 
+the model output when feature m is included, 
+whereas f
+x
+S
+ðx
+S
+Þ represents the output when it is 
+omitted.
+However, computing the exact Shapley values is 
+computationally expensive due to the combinatorial 
+complexity involved in estimating all possible fea -
+ture contributions. To address this, Lundberg and 
+Lee ( 2017 ) introduced SHAP as an efficient approxi -
+mation, leveraging a linear additive explanation 
+model to express feature contributions:
+g ðz
+0
+Þ ¼ /
+0
+þ
+X
+M
+m¼1
+/
+m
+z
+0
+m
+, (29) 
+where M denotes the number of features, as previ -
+ously defined. z
+0
+m 
+is a binary indicator function that 
+equals 1 if feature m is present and 0 otherwise. The 
+term /
+0 
+represents the expected model output when 
+all features are omitted, serving as a baseline 
+prediction.
+By employing SHAP, this study enhances the 
+interpretability of the weighted-XGBoost models, 
+thereby enabling a more transparent understanding 
+of how individual features contribute to extreme 
+electricity price occurrences.
+3. Results and discussion
+Section 3.1 reports the forecasting performance for 
+extremely high and extremely low prices across dif -
+ferent time windows. Section 3.2 provides a com -
+parative analysis against benchmark models. Section 
+3.3 presents the SHAP-based model interpretation 
+to identify key driving factors. Section 3.4 further 
+examines the economic implications of these drivers. 
+Finally, Section 3.5 evaluates the generalisability of 
+the proposed approach through cross-market 
+validation.
+3.1. Results on extreme price forecasts
+Two types of experiments are conducted to forecast 
+extreme electricity price occurrences, focusing separ -
+ately on extremely high prices and extremely low 
+prices across various time windows. To evaluate the 
+performance of the machine learning model, the 
+dataset is divided into a training set (75%) and a 
+test set (25%). The split is performed in chrono -
+logical order, where earlier observations are used for 
+training and more recent observations are reserved 
+for testing, to avoid information leakage and ensure 
+a realistic forecasting setting. In both experiments, 
+forecasting is performed using the proposed 
+weighted-XGBoost with Bayesian optimisation. 
+During the hyperparameter optimisation phase, the 
+Bayesian optimisation algorithm explored different 
+combinations of weighted-XGBoost parameters to 
+maximise the mean AUC score through 10-fold 
+time series cross-validation, where each fold pre -
+serves temporal ordering such that training data 
+JOURNAL OF THE OPERATIONAL RESEARCH SOCIETY
+ 11
+
+PAGE 13
+always precede validation data. This strategy is 
+appropriate for time-dependent forecasting as it 
+reflects real-world conditions and prevents look- 
+ahead bias. After completing the iterative process, 
+the algorithm identifies an optimal set of parame -
+ters. The hyperparameter tuning ranges and the 
+optimal parameter results for both experiments are 
+summarised in Table 5 . The forecasting results are 
+reported as follows.
+The performance of weighted-XGBoost in fore -
+casting extreme electricity prices is summarised in 
+Figures 4 and 5 , as well as in Tables 6 and 7 , which 
+present the confusion matrices and evaluation met -
+rics across the 15-day, 30-day, and 45-day time 
+Table 5. Hyperparameter tuning for the proposed weighted-XGBoost model in this study.
+Optimal value (High prices) Optimal value (Low prices)
+Hyperparameter Search range Type 15-day 30-day 45-day 15-day 30-day 45-day
+learning_rate [0.005, 0.1] Real 0.05 0.08 0.05 0.05 0.05 0.08
+max_depth [2, 5] Integer 4 5 4 4 4 3
+n_estimators [50, 200] Integer 158 139 158 158 158 91
+reg_alpha [5, 50] Real 24.09 34.19 24.09 24.09 24.09 19.08
+reg_lambda [5, 50] Real 34.26 23.99 34.26 34.26 34.26 11.87
+gamma [1, 10] Real 8.20 6.55 8.20 8.20 8.20 1.03
+subsample [0.5, 1] Real 0.83 0.82 0.83 0.83 0.83 0.91
+min_child_weight [5, 15] Integer 14 11 14 14 14 11
+max_delta_step [5, 10] Integer 8 7 8 8 8 9
+scale_pos_weight [5, 30] Real 13.83 23.35 13.83 13.83 13.83 27.35
+Figure 4. Confusion matrix for forecasting extremely high prices across different time windows. (a) 15-day window, (b) 30-day 
+window, (c) 45-day window.
+Figure 5. Confusion matrix for forecasting extremely low prices across different time windows. (a) 15-day window, (b) 30-day 
+window, (c) 45-day window.
+Table 6. Evaluation metric for forecasting extremely high prices using weighted-XGBoost across different time windows.
+Time window Data set Accuracy Precision Recall F1-score G-Mean ROC-AUC
+15-day Training 0.919 0.953 0.919 0.928 0.945 0.989
+Test 0.864 0.942 0.864 0.890 0.883 0.954
+30-day Training 0.923 0.955 0.923 0.931 0.953 0.994
+Test 0.885 0.939 0.885 0.902 0.870 0.955
+45-day Training 0.925 0.954 0.925 0.933 0.950 0.991
+Test 0.881 0.945 0.881 0.902 0.888 0.961
+Average Training 0.922 0.954 0.922 0.931 0.949 0.991
+Test 0.877 0.942 0.877 0.898 0.880 0.957
+12
+ J. MA ET AL.
+
+PAGE 14
+windows. Precision, Recall, and F1-score are 
+reported as weighted averages to account for class 
+imbalance. The results indicate that the model 
+effectively distinguishes between normal and 
+extreme prices while maintaining a reasonable bal -
+ance between false positives and false negatives.
+For extremely high prices, the model maintains 
+strong classification performance across all time 
+windows. The test Accuracy averages 0.877, while 
+Precision and Recall reach 0.942 and 0.877, respect -
+ively, resulting in an average F1-score of 0.898. 
+Furthermore, G-Mean (0.880) and AUC (0.957) 
+confirm the model’s robustness in handling class 
+imbalance. The ROC curves in Figure 6 show 
+consistently high test AUC values above 0.95, with 
+scores of 0.954, 0.955, and 0.961 for the 15-day, 30- 
+day, and 45-day windows, respectively. These results 
+demonstrate the strong discriminatory power of 
+weighted-XGBoost in forecasting extremely high 
+price occurrences.
+Similarly, for extremely low prices, the model 
+exhibits reliable classification performance. The test 
+Accuracy averages 0.876, with Precision, Recall, and 
+F1-score reaching 0.937, 0.876, and 0.893, respect -
+ively. G-Mean (0.908) and AUC (0.968) further val -
+idate the model’s effectiveness in handling class 
+imbalance while maintaining reliable forecasting. As 
+illustrated in the ROC curves in Figure 7 , the AUC 
+Table 7. Evaluation metric for forecasting extremely low prices using weighted-XGBoost across different time windows.
+Time window Data set Accuracy Precision Recall F1-score G-Mean ROC-AUC
+15-day Training 0.898 0.950 0.898 0.913 0.934 0.982
+Test 0.887 0.940 0.887 0.902 0.914 0.968
+30-day Training 0.915 0.955 0.915 0.926 0.945 0.986
+Test 0.873 0.934 0.873 0.891 0.902 0.967
+45-day Training 0.891 0.951 0.891 0.908 0.935 0.986
+Test 0.867 0.937 0.867 0.887 0.909 0.969
+Average Training 0.901 0.952 0.901 0.916 0.938 0.985
+Test 0.876 0.937 0.876 0.893 0.908 0.968
+Figure 6. ROC curves for forecasting extremely high prices across different time windows. (a) 15-day window, (b) 30-day win -
+dow, (c) 45-day window.
+Figure 7. ROC curves for forecasting extremely low prices across different time windows. (a) 15-day window, (b) 30-day win -
+dow, (c) 45-day window.
+JOURNAL OF THE OPERATIONAL RESEARCH SOCIETY
+ 13
+
+PAGE 15
+values remain consistently high across different time 
+windows, with test AUCs of 0.968, 0.967, and 0.969. 
+Notably, the model exhibits a tiny training-test 
+AUC gap, which remains below 0.02 across all time 
+windows, indicating strong generalisation.
+Overall, weighted-XGBoost consistently achieves 
+high forecasting performance for both extremely 
+high and low prices. Its strong results across tradi -
+tional and imbalance-sensitive metrics confirm its 
+effectiveness in identifying rare events, highlighting 
+its value for market participants managing price 
+risks in volatile conditions.
+3.2. Comparative analysis
+To evaluate the advantages of weighted-XGBoost in 
+forecasting imbalanced extreme electricity prices, the 
+proposed model’s performance is compared with 
+two widely used baseline models: Logistic 
+Regression with class weighting (W-LR) and 
+Random Forest with class weighting (W-RF). All 
+models are trained on the same dataset under iden -
+tical experimental conditions, including the feature 
+set, hyperparameter optimisation framework, and 
+evaluation metrics. This ensures that observed per -
+formance differences can be attributed to the mod -
+els’ inherent capabilities in handling class imbalance. 
+Two imbalance-sensitive metrics, AUC and G- 
+Mean, are selected to compare the models.
+The comparative performance of weighted- 
+XGBoost against W-LR and W-RF in forecasting 
+extremely high and low electricity prices is summar -
+ised in Tables 8 and 9 , respectively. The results con -
+sistently demonstrate the superiority of weighted- 
+XGBoost across all time windows in both AUC and 
+G-Mean metrics for forecasting extremely high and 
+low electricity prices. For extremely high prices, 
+weighted-XGBoost achieves the highest test AUC 
+(0.957) and G-Mean (0.880), outperforming W-LR 
+(AUC: 0.941, G-Mean: 0.793) and W-RF (AUC: 
+0.950, G-Mean: 0.875). Similarly, for extremely low 
+prices, weighted-XGBoost again leads with the high -
+est AUC (0.968) and G-Mean (0.908), compared to 
+W-LR (AUC: 0.959, G-Mean: 0.849) and W-RF 
+(AUC: 0.962, G-Mean: 0.902).
+Overall, the results show that weighted-XGBoost 
+outperforms baseline models in forecasting both 
+extremely high and low prices. Its consistently 
+higher AUC and G-Mean values demonstrate strong 
+capability in handling class imbalance, highlighting 
+its potential as a reliable tool for managing price 
+risks in volatile electricity markets.
+3.3. Model interpretation
+Interpreting the features driving the model’s fore -
+casts is essential for validating forecasting effective -
+ness and understanding model behaviour. While 
+Table 8. Comparative analysis for forecasting extremely high prices.
+Time window
+Metric Model Data set 15-day 30-day 45-day Average
+AUC W-LR Training 0.960 0.965 0.965 0.963
+Test 0.926 0.942 0.954 0.941
+W-RF Training 0.978 0.978 0.979 0.978
+Test 0.941 0.954 0.956 0.950
+W-XGB Training 0.989 0.994 0.991 0.991
+Test 0.954 0.955 0.961 0.957
+G-Mean W-LR Training 0.892 0.901 0.900 0.898
+Test 0.772 0.788 0.819 0.793
+W-RF Training 0.922 0.925 0.927 0.925
+Test 0.861 0.884 0.880 0.875
+W-XGB Training 0.945 0.953 0.950 0.949
+Test 0.883 0.870 0.888 0.880
+Note: LR ¼ Logistic Regression; RF ¼ Random Forest; XGB ¼ XGBoost.
+Table 9. Comparative analysis for forecasting extremely low prices.
+Time window
+Metric Model Data set 15-day 30-day 45-day Average
+AUC W-LR Training 0.940 0.973 0.958 0.957
+Test 0.954 0.966 0.957 0.959
+W-RF Training 0.967 0.979 0.982 0.976
+Test 0.961 0.963 0.963 0.962
+W-XGB Training 0.982 0.986 0.986 0.985
+Test 0.968 0.967 0.969 0.968
+G-Mean W-LR Training 0.856 0.913 0.883 0.884
+Test 0.846 0.860 0.841 0.849
+W-RF Training 0.906 0.925 0.933 0.921
+Test 0.902 0.899 0.905 0.902
+W-XGB Training 0.934 0.945 0.935 0.938
+Test 0.914 0.902 0.909 0.908
+Note: LR ¼ Logistic Regression; RF ¼ Random Forest; XGB ¼ XGBoost.
+14
+ J. MA ET AL.
+
+PAGE 16
+performance metrics assess overall accuracy, they 
+offer limited insight into how individual features 
+contribute to predictions. SHAP is therefore 
+employed to provide a transparent view of feature 
+contributions.
+SHAP analysis is conducted at both global and 
+local levels. Globally, SHAP values are aggregated 
+across the dataset to identify key influential features, 
+typically visualised via summary plots (Lundberg & 
+Lee, 2017 ). Locally, force plots explain individual 
+forecasts by showing how specific features push the 
+output relative to a baseline (Lundberg et al., 2020 ). 
+The following sections present SHAP-based global 
+and local analyses for forecasting extreme electricity 
+prices across different time windows.
+3.3.1. Global feature interpretation
+The SHAP summary plots in Figures 8 and 9 illus -
+trate the global feature importance for forecasting 
+extremely high and low electricity prices across dif -
+ferent time windows. In the SHAP summary plots, 
+each point represents an individual observation, 
+with its position on the horizontal axis indicating 
+the SHAP value, i.e., the contribution of the feature 
+to the model output. Positive SHAP values indicate 
+that the feature increases the likelihood of an 
+extreme price event, while negative values indicate a 
+decreasing effect. The colour of each point reflects 
+the magnitude of the feature value, with red repre -
+senting higher values and blue representing lower 
+values. The spread of points for each feature reflects 
+both its overall importance and the variability of its 
+impact across observations.
+For extremely high prices, forecasted residual 
+load consistently ranks as the most influential fea -
+ture across all time windows, indicating a strong 
+contribution to the model forecasts. Higher residual 
+load values are associated with an increased likeli -
+hood of extreme price events. Fuel-related variables, 
+such as coal and gas prices, also exhibit notable 
+influence, with higher values generally contributing 
+positively to extreme price forecasts. Historical 
+Figure 8. SHAP summary plots for extremely high prices 
+across different time windows. (a) 15-day window, (b) 30- 
+day window, (c) 45-day window.
+Figure 9. SHAP summary plots for extremely low prices 
+across different time windows. (a) 15-day window, (b) 30- 
+day window, (c) 45-day window.
+JOURNAL OF THE OPERATIONAL RESEARCH SOCIETY
+ 15
+
+PAGE 17
+electricity prices (e.g., day-ahead price at t − 1 and 
+t − 7) further demonstrate strong forecasting power.
+In contrast, extremely low prices are primarily 
+driven by forecasted residual load, which exhibits 
+dominant SHAP values across all time windows. 
+Lower residual load values are associated with a 
+higher likelihood of extreme low price events. Other 
+features, including carbon price and total gener -
+ation, show comparatively smaller contributions.
+Overall, the results reveal a clear asymmetry 
+between extremely high and low price events. 
+Extremely high prices exhibit a multifactor struc -
+ture, where several variables jointly influence the 
+model forecasts. In contrast, extremely low prices 
+follow a more concentrated pattern, with residual 
+load acting as the dominant driver. This difference 
+highlights the varying complexity of the underlying 
+patterns captured by the model. These patterns are 
+consistent across different time windows.
+3.3.2. Local feature interpretation
+While global SHAP analysis identifies overall feature 
+importance, local SHAP force plots provide case- 
+specific explanations by showing how individual fea -
+tures influence each forecast.
+Figures 10 and 11 present representative force 
+plots for extremely high and low prices across 15-, 
+30-, and 45-day windows. Each plot illustrates how 
+different features contribute to shifting the model 
+forecast from the baseline value. In the SHAP force 
+plots, the base value represents the average model 
+output, while individual features push the forecast 
+higher (red) or lower (blue), depending on their 
+contribution.
+For extremely high price cases, a consistent pat -
+tern can be observed across all time windows. High 
+forecasted residual load (e.g., 4:698 � 10
+4
+; 6:112 �
+10
+4
+; and 5:655 � 10
+4 
+MWh) plays a dominant role 
+in pushing the forecasts upward. In addition, fuel- 
+related variables and lagged electricity prices con -
+tribute positively, while some features (e.g., gas price 
+or day-ahead price) may exert smaller opposing 
+effects. These results indicate that extremely high 
+price forecasts are driven by the combined influence 
+of multiple factors.
+In contrast, for extremely low price cases, the 
+model forecasts are consistently dominated by low 
+forecasted residual load across all time windows 
+(e.g., 1:188 � 10
+4
+; 0:9423 � 10
+4
+; and 1:4830 � 10
+4 
+MWh). Other variables, such as fuel prices and gen -
+eration-related features, exhibit comparatively 
+smaller contributions. This suggests a more concen -
+trated pattern in which a single key feature largely 
+determines the forecast.
+These local explanations are consistent with the 
+global SHAP analysis and illustrate how feature val -
+ues influence individual forecasts. The economic 
+interpretation of these patterns is further discussed 
+in the following section.
+3.4. Economic interpretation
+The SHAP analysis presented in the previous section 
+provides insights into the key factors influencing 
+extreme electricity price events. In this section, we 
+interpret these findings from an economic perspec -
+tive and relate them to underlying market mecha -
+nisms and existing literature.
+Figure 10. SHAP force plots for extremely high prices across different time windows. (a) 15-day window, (b) 30-day window, 
+(c) 45-day window.
+16
+ J. MA ET AL.
+
+PAGE 18
+A key insight from the SHAP results is the asym -
+metry between extremely high and low price events. 
+While prior studies have also documented differen -
+ces between price spikes and negative prices 
+(Hagfors et al., 2016 ), our results suggest that this 
+asymmetry has become more pronounced under 
+recent market conditions. Extremely high prices are 
+driven by the combined influence of multiple fac -
+tors, whereas extremely low prices are largely domi -
+nated by a single key variable, namely residual load. 
+This reflects distinct economic mechanisms underly -
+ing price spikes and price collapses.
+Residual load emerges as one of the most influen -
+tial variables. As a measure of net demand after 
+accounting for renewable generation, higher residual 
+load indicates tighter supply–demand conditions, 
+requiring the dispatch of higher-cost generation 
+units. This increases marginal prices and the likeli -
+hood of price spikes. Conversely, low residual load, 
+which is often associated with high renewable gener -
+ation, can lead to excess supply and even negative 
+prices. This explains the more concentrated and 
+deterministic pattern observed for extremely low 
+prices.
+Fuel-related variables, such as gas and coal prices, 
+also play a significant role. Increases in fuel prices 
+raise the marginal cost of thermal generation, shift -
+ing the supply curve upward and leading to higher 
+market-clearing prices. This is consistent with the 
+merit-order framework widely used in the electricity 
+economics literature (Do et al., 2019 ; Nowotarski & 
+Weron, 2018 ), and helps explain the multi-factor 
+nature of extremely high price events, particularly 
+under conditions of fuel price volatility.
+Lagged electricity prices further contribute by 
+capturing temporal dependence and persistence in 
+market conditions. Price spikes tend to cluster over 
+time, reflecting sustained supply constraints or pro -
+longed demand surges, which adds to the complex -
+ity of extreme high price dynamics.
+In addition, the Geopolitical Risk Index was 
+included to capture broader economic and political 
+disruptions. While prior studies suggest that geopol -
+itical risk significantly influences electricity prices in 
+general electricity price dynamics (Abdullah et al., 
+2023 ; Sa ^adaoui & Jabeur, 2023 ), its relatively lower 
+importance in our analysis reflects its infrequent 
+occurrence rather than a lack of impact. 
+Geopolitical shocks can affect energy prices rapidly, 
+but such events are rare. Their effects are primarily 
+transmitted through fuel markets, particularly gas 
+prices, which directly influence marginal costs. As a 
+result, geopolitical risk plays a more indirect role in 
+extreme price events, operating through fuel cost 
+adjustments rather than acting as a dominant short- 
+term driver.
+Overall, these findings are broadly consistent 
+with existing literature on electricity price behav -
+iour, which emphasises the roles of demand variabil -
+ity, generation mix, and fuel costs in shaping price 
+volatility (Lago et al., 2018 ; Nowotarski & Weron, 
+2018 ). At the same time, the results provide add -
+itional insights into how these factors operate differ -
+ently in the context of extreme price events, 
+particularly in terms of asymmetry and interaction 
+effects.
+From a decision-support perspective, these 
+insights have direct practical implications. 
+Figure 11. SHAP force plots for extremely low prices across different time windows. (a) 15-day window, (b) 30-day window, 
+(c) 45-day window.
+JOURNAL OF THE OPERATIONAL RESEARCH SOCIETY
+ 17
+
+PAGE 19
+Monitoring residual load forecasts can help antici -
+pate potential price spikes and inform bidding strat -
+egies or system balancing actions. Similarly, tracking 
+fuel price movements can provide early signals of 
+upward pressure on electricity prices. Overall, the 
+integration of forecasting modelling and interpret -
+able analysis offers a valuable tool for supporting 
+operational planning, market monitoring, and risk 
+management in increasingly complex electricity 
+markets.
+3.5. Cross-market validation
+To evaluate the generalisability of the proposed fore -
+casting approach, we extend the analysis to add -
+itional electricity markets, including France and 
+Italy. These markets differ in generation mix, mar -
+ket structure, and price dynamics, providing a suit -
+able test for assessing the robustness of the model 
+beyond a single-country setting.
+All experimental settings, including feature con -
+struction, model configuration, and hyperparameter 
+optimisation procedures, are kept consistent with 
+those used for the German market. This ensures 
+that the cross-market evaluation reflects the intrinsic 
+generalisability of the proposed approach rather 
+than differences arising from model tuning.
+Table 10 reports the out-of-sample (test set) per -
+formance of the weighted-XGBoost model across 
+Germany, France, and Italy, in terms of AUC and 
+G-Mean for each time window (15-, 30-, and 45- 
+day) as well as their averages. The results show that 
+the model maintains consistently strong forecasting 
+performance across markets and across different 
+forecasting horizons. In particular, the AUC values 
+remain high for both extremely high and low price 
+events, indicating that the model effectively captures 
+the underlying patterns associated with extreme 
+price occurrences.
+Some variation in performance is observed across 
+markets, particularly for extremely low prices, where 
+G-Mean values are relatively lower in France and 
+Italy. This can be attributed to the increased com -
+plexity and market-specific nature of low price 
+events, which are often driven by renewable gener -
+ation and system-specific conditions. Despite this, 
+the model continues to deliver robust forecasting 
+performance across all markets.
+Overall, these findings provide evidence that the 
+proposed approach generalises well to different elec -
+tricity markets and remains stable across different 
+forecasting horizons. This supports its potential 
+applicability for broader use in electricity market 
+analysis, operational planning, and risk 
+management.
+4. Conclusion
+This study explored the application of weighted- 
+XGBoost for forecasting extreme electricity prices in 
+the context of imbalanced data, focusing on both 
+extremely high and low price occurrences. The 
+experimental results demonstrated the robustness 
+and effectiveness of the proposed approach across 
+different time windows in the German electricity 
+market, with consistently strong performance across 
+multiple evaluation metrics.
+The G-Mean and ROC-AUC metrics confirmed 
+the model’s ability to effectively distinguish between 
+extreme and normal prices despite the inherent class 
+imbalance. AUC values consistently exceeded 0.95 
+across training and test datasets, highlighting the 
+model’s high classification quality. Furthermore, 
+compared to baseline models, weighted-XGBoost 
+achieved superior performance, demonstrating 
+higher forecasting accuracy and better robustness in 
+handling class imbalance. This highlights its effect -
+iveness in capturing the underlying patterns of 
+extreme price occurrences.
+The SHAP-based interpretability analysis provided 
+further insights into the key drivers of extreme elec -
+tricity prices. The results revealed distinct differences 
+between the determinants of extremely high and 
+extremely low prices. Extremely high prices arise 
+from a complex interaction of supply-demand condi -
+tions, historical price trends, and external market 
+dynamics, making them more volatile and susceptible 
+to external shocks. Forecasted residual load, grid 
+load, and wind generation play crucial roles, along -
+side fuel price factors such as gas, carbon, and coal 
+prices, indicating a significant influence of fuel cost 
+fluctuations. In contrast, extremely low prices are pri -
+marily driven by forecasted residual load. The lack of 
+strong contributions from price-related variables sug -
+gests that low-price events are more structurally 
+determined by demand-side imbalances and 
+Table 10. Cross-market validation results across different 
+time windows.
+Extremely high Extremely low
+Market Window AUC G-Mean AUC G-Mean
+Germany 15-day 0.954 0.883 0.968 0.914
+30-day 0.955 0.870 0.967 0.902
+45-day 0.961 0.888 0.969 0.909
+Avg. 0.957 0.880 0.968 0.908
+France 15-day 0.916 0.761 0.888 0.742
+30-day 0.941 0.858 0.908 0.775
+45-day 0.959 0.896 0.920 0.772
+Avg. 0.939 0.838 0.905 0.763
+Italy 15-day 0.939 0.869 0.939 0.798
+30-day 0.940 0.859 0.945 0.764
+45-day 0.942 0.863 0.951 0.854
+Avg. 0.940 0.864 0.945 0.805
+Note: Avg. denotes the average across different time windows.
+18
+ J. MA ET AL.
+
+PAGE 20
+renewable energy availability rather than fuel prices 
+and external market shocks.
+Notably, the Geopolitical Risk Index exhibits con -
+sistently low importance in the SHAP analysis, sug -
+gesting a limited contribution to short-term extreme 
+price forecasts. While geopolitical shocks can affect 
+energy prices rapidly, their influence on extreme 
+price dynamics is less frequently observed, as their 
+effects are largely indirect and reflected through 
+more persistent market factors such as fuel costs.
+To assess the broader applicability of the pro -
+posed approach, cross-market validation was con -
+ducted using data from additional electricity 
+markets, including France and Italy. The results 
+indicate that the model maintains strong forecasting 
+performance across different market environments. 
+While some variation is observed, particularly for 
+extremely low price events, this reflects differences 
+in market structures and the more complex and 
+market-specific nature of such events. Overall, these 
+findings provide supporting evidence for the robust -
+ness of the proposed forecasting approach across 
+diverse market settings.
+While the proposed model demonstrates strong 
+forecasting capabilities, there are areas for further 
+improvement. First, this study defines extreme price 
+events using the 90th and 10th percentiles for 
+extremely high and low prices, respectively. Future 
+research could explore stricter thresholds (e.g., 95th/ 
+5th or 99th/1st percentiles) to assess their impact on 
+forecasting accuracy. Second, while the volatility- 
+based dynamic weighted threshold adapts to market 
+fluctuations, alternative methods such as adaptive 
+quantiles, distribution-based approaches, or extreme 
+value theory (EVT) might provide additional per -
+spectives. Third, while the overall classification per -
+formance for forecasting extremely high prices is 
+satisfactory, there is still room for improvement 
+compared to extremely low price forecasts.
+From the SHAP-based interpretability analysis, it 
+is evident that certain external features, such as fuel 
+prices, play a more significant role in forecasting 
+extremely high prices. This suggests that incorporat -
+ing additional external features, potentially those 
+more directly relevant to extreme price events, could 
+further enhance the model’s ability to accurately 
+forecast extremely high prices. Future work could 
+focus on identifying and integrating such external 
+features to optimise the model’s forecasting power 
+for these events. By addressing these areas, future 
+studies can provide a more comprehensive under -
+standing of extreme price dynamics and improve 
+the robustness of forecasting models in increasingly 
+complex electricity markets.
+Overall, the proposed framework contributes to 
+the Operations Research literature by integrating 
+adaptive threshold design, imbalanced learning, and 
+interpretable analysis to support data-driven deci -
+sion-making in electricity markets. It provides a 
+practical and interpretable tool for supporting oper -
+ational planning, market monitoring, and risk man -
+agement in increasingly complex electricity systems.
+Acknowledgments
+We thank the anonymous reviewers and editors for gen -
+erously aiding us in enhancing the presentation of our 
+work.
+Author contributions
+CRediT: Jingchuan Ma: Conceptualization, Data curation, 
+Formal analysis, Methodology, Resources, Software, 
+Validation, Visualization, Writing – original draft, 
+Writing – review & editing; Yu-wang Chen: 
+Investigation, Project administration, Supervision, Writing 
+– review & editing; Fanlin Meng: Project administration, 
+Supervision, Writing – review & editing.
+Disclosure statement
+The authors declare no potential conflict of interest.
+Data availability statement
+The data that support the findings of this study are 
+openly available. The datasets used in this study were 
+obtained from Refinitiv (https://www.lseg.com/en), 
+ENTSOE Transparency Platform (https://transparency. 
+entsoe.eu), and the Geopolitical Risk Index developed by 
+Dario Caldara and Matteo Iacoviello (https://www.mat -
+teoiacoviello.com/gpr.htm).
+References
+Abdullah, M., Abakah, E. J. A., Ullah, G. W., Tiwari, 
+A. K., & Khan, I. (2023). Tail risk contagion across 
+electricity markets in crisis periods. Energy Economics, 
+127, 107100. https://doi.org/10.1016/j.eneco.2023. 
+107100
+Adline, B., & Ikeda, K. (2023). A hawkes model approach 
+to modeling price spikes in the japanese electricity 
+market. Energies, 16(4), 1570. https://doi.org/10.3390/ 
+en16041570
+Avci Surucu, E., Ketter, W., & van Heck, E. (2018). 
+Managing electricity price modeling risk via ensemble 
+forecasting. Energy Policy, 123, 390–403.
+Averro, N. T., Murfi, H., & Ardaneswari, G. (2023). The 
+imbalance data handling of xgboost in insurance fraud 
+detection, 460–467.
+Bischl, B., Binder, M., Lang, M., Pielok, T., Richter, J., 
+Coors, S., Thomas, J., Ullmann, T., Becker, M., 
+Boulesteix, A. L., et al. (2023). Hyperparameter opti -
+mization: Foundations, algorithms, best practices, and 
+open challenges. Wiley Interdisciplinary Reviews: Data 
+Mining and Knowledge Discovery, 13, e1484.
+Burkart, N., & Huber, M. F. (2021). A survey on the 
+explainability of supervised machine learning. Journal 
+JOURNAL OF THE OPERATIONAL RESEARCH SOCIETY
+ 19
+
+PAGE 21
+of Artificial Intelligence Research, 70, 245–317. https:// 
+doi.org/10.1613/jair.1.12228
+Caldara, D., & Iacoviello, M. (2022). Measuring geopolit -
+ical risk. American Economic Review, 112(4), 1194– 
+1225. https://doi.org/10.1257/aer.20191823
+C ¸anako �glu, E., & Adıyeke, E. (2020). Comparison of elec -
+tricity spot price modelling and risk management 
+applications. Energies, 13(18), 4698. https://doi.org/10. 
+3390/en13184698
+Chang, Z., Zhang, Y., & Chen, W. (2019). Electricity price 
+prediction based on hybrid model of adam optimized 
+lstm neural network and wavelet transform. Energy, 
+187, 115804. https://doi.org/10.1016/j.energy.2019.07. 
+134
+Chen, T., Guestrin, C. (2016). Xgboost: A scalable tree 
+boosting system. In Proceedings of the 22nd ACM 
+SIGKDD International Conference on Knowledge 
+Discovery and Data Mining (pp. 785–794).
+Clements, A. E., Herrera, R., & Hurn, A. (2015). 
+Modelling interregional links in electricity price spikes. 
+Energy Economics, 51, 383–393. https://doi.org/10.1016/ 
+j.eneco.2015.07.014
+Coenen, L., Verbeke, W., & Guns, T. (2022). Machine 
+learning methods for short-term probability of default: 
+A comparison of classification, regression and ranking 
+methods. Journal of the Operational Research Society, 
+73(1), 191–206. https://doi.org/10.1080/01605682.2020. 
+1865847
+Conejo, A. J., Nogales, F. J., Carri �on, M., & Morales, 
+J. M. (2010). Electricity pool prices: Long-term uncer -
+tainty characterization for futures-market trading and 
+risk management. Journal of the Operational Research 
+Society, 61(2), 235–245. https://doi.org/10.1057/jors. 
+2008.140
+Datta, A. R., & Datta, S. (2016). Electricity market price- 
+spike classification in the smart grid [Paper presenta -
+tion]. 2016 IEEE Power & Energy Society Innovative 
+Smart Grid Technologies Conference (ISGT) (pp. 1–5). 
+IEEE. https://doi.org/10.1109/ISGT.2016.7781161
+Del Rio, S., Ben � ıtez, J. M., & Herrera, F. (2015). Analysis 
+of data preprocessing increasing the oversampling ratio 
+for extremely imbalanced big data classification [Paper 
+presentation]. 2015 IEEE Trustcom/BigDataSE/ISPA 
+(pp. 180–185), IEEE. https://doi.org/10.1109/Trustcom. 
+2015.579
+Deng, S. J., & Oren, S. S. (2006). Electricity derivatives 
+and risk management. Energy, 31(6-7), 940–953. 
+https://doi.org/10.1016/j.energy.2005.02.015
+Dhankhad, S., Mohammed, E., Far, B. (2018). Supervised 
+machine learning algorithms for credit card fraudulent 
+transaction detection: A comparative study. In 2018 
+IEEE International Conference on Information Reuse 
+and Integration (IRI) (pp. 122–125). IEEE.
+Do, L. P. C., Ly �ocsa, 
+�
+S., & Moln �ar, P. (2019). Impact of 
+wind and solar production on electricity prices: 
+Quantile regression approach. Journal of the 
+Operational Research Society, 70(10), 1752–1768. 
+https://doi.org/10.1080/01605682.2019.1634783
+Eichler, M., Grothe, O., Manner, H., & Tuerk, D. (2014). 
+Models for short-term forecasting of spike occurrences 
+in australian electricity markets: A comparative study. 
+Journal of Energy Markets, 7(1), 245–266.
+Entsoe. (2026). ENTSOE. https://transparency.entsoe.eu/. 
+(accessed 03-15-2026).
+Galarneau-Vincent, R., Gauthier, G., & Godin, F. (2023). 
+Foreseeing the worst: Forecasting electricity dart spikes. 
+Energy Economics, 119, 106521. https://doi.org/10.1016/ 
+j.eneco.2023.106521
+Garc � ıa-Martos, C., Caro, E., & Jes �us S �anchez, M. (2015). 
+Electricity price forecasting accounting for renewable 
+energies: Optimal combined forecasts. Journal of the 
+Operational Research Society, 66(5), 871–884. https:// 
+doi.org/10.1057/jors.2013.177
+Hagfors, L. I., Kamperud, H. H., Paraschiv, F., 
+Prokopczuk, M., Sator, A., & Westgaard, S. (2016). 
+Prediction of extreme price occurrences in the german 
+day-ahead electricity market. Quantitative Finance, 
+16(12), 1929–1948. https://doi.org/10.1080/14697688. 
+2016.1211794
+He, D., & Chen, W. P. (2016). A real-time electricity price 
+forecasting based on the spike clustering analysis, in 
+[Paper presentation]. 2016 IEEE/PES Transmission and 
+Distribution Conference and Exposition (T&D) (pp. 1– 
+5). IEEE. https://doi.org/10.1109/TDC.2016.7519941
+He, K., Yu, L., & Tang, L. (2015). Electricity price fore -
+casting with a bed (bivariate emd denoising) method -
+ology. Energy, 91, 601–609. https://doi.org/10.1016/j. 
+energy.2015.08.021
+Hernandez, J. A., Shahzad, S. J. H., Sadorsky, P., Uddin, 
+G. S., Bouri, E., & Kang, S. H. (2022). Regime specific 
+spillovers across us sectors and the role of oil price 
+volatility. Energy Economics, 107, 105834. https://doi. 
+org/10.1016/j.eneco.2022.105834
+Herrera, R., & Gonz �alez, N. (2014). The modeling and 
+forecasting of extreme events in electricity spot mar -
+kets. International Journal of Forecasting, 30(3), 477– 
+490. https://doi.org/10.1016/j.ijforecast.2013.12.011
+Janczura, J., & W �ojcik, E. (2022). Dynamic short-term 
+risk management strategies for the choice of electricity 
+market based on probabilistic forecasts of profit and 
+risk measures. the german and the polish market case 
+study. Energy Economics, 110, 106015. https://doi.org/ 
+10.1016/j.eneco.2022.106015
+Jiang, H., Todorova, N., Roca, E., & Su, J. J. (2019). 
+Agricultural commodity futures trading based on cross- 
+country rolling quantile return signals. Quantitative 
+Finance, 19(8), 1373–1390. https://doi.org/10.1080/ 
+14697688.2019.1571682
+Ketterer, J. C. (2014). The impact of wind power gener -
+ation on the electricity price in Germany. Energy 
+Economics, 44, 270–280. https://doi.org/10.1016/j.eneco. 
+2014.04.003
+Lago, J., De Ridder, F., & De Schutter, B. (2018). 
+Forecasting spot electricity prices: Deep learning 
+approaches and empirical comparison of traditional 
+algorithms. Applied Energy, 221, 386–405. https://doi. 
+org/10.1016/j.apenergy.2018.02.069
+Lehna, M., Scheller, F., & Herwartz, H. (2022). 
+Forecasting day-ahead electricity prices: A comparison 
+of time series and neural network models taking exter -
+nal regressors into account. Energy Economics, 106, 
+105742. https://doi.org/10.1016/j.eneco.2021.105742
+Lin, B., & Wesseh, P. K. Jr, (2013). What causes price 
+volatility and regime shifts in the natural gas market. 
+Energy, 55, 553–563. https://doi.org/10.1016/j.energy. 
+2013.03.082
+Lin, J., Bao, M., Liang, Z., Sang, M., & Ding, Y. (2022). 
+Spatio-temporal evaluation of electricity price risk con -
+sidering multiple uncertainties under extreme cold 
+weather. Applied Energy, 328, 120090. https://doi.org/ 
+10.1016/j.apenergy.2022.120090
+Lindauer, M., Eggensperger, K., Feurer, M., Biedenkapp, 
+A., Deng, D., Benjamins, C., Ruhkopf, T., Sass, R., & 
+20
+ J. MA ET AL.
+
+PAGE 22
+Hutter, F. (2022). Smac3: A versatile bayesian optimiza -
+tion package for hyperparameter optimization. Journal 
+of Machine Learning Research, 23, 1–9.
+Liu, L., Bai, F., Su, C., Ma, C., Yan, R., Li, H., Sun, Q., & 
+Wennersten, R. (2022a). Forecasting the occurrence of 
+extreme electricity prices using a multivariate logistic 
+regression model. Energy, 247, 123417. https://doi.org/ 
+10.1016/j.energy.2022.123417
+Liu, S., Jiang, Y., Lin, Z., Wen, F., Ding, Y., & Yang, L. 
+(2022b). Data-driven two-step day-ahead electricity 
+price forecasting considering price spikes. Journal of 
+Modern Power Systems and Clean Energy, 11(2), 523– 
+533. https://doi.org/10.35833/MPCE.2021.000196
+Loi, T. S. A., & L., Ng, J. (2018). Anticipating electricity 
+prices for future needs–implications for liberalised 
+retail markets. Applied Energy, 212, 244–264. https:// 
+doi.org/10.1016/j.apenergy.2017.11.092
+Lundberg, S. M., Erion, G., Chen, H., DeGrave, A., 
+Prutkin, J. M., Nair, B., Katz, R., Himmelfarb, J., 
+Bansal, N., & Lee, S. I. (2020). From local explanations 
+to global understanding with explainable ai for trees. 
+Nature Machine Intelligence, 2(1), 56–67. https://doi. 
+org/10.1038/s42256-019-0138-9
+Lundberg, S. M., & Lee, S. I. (2017). A unified approach 
+to interpreting model predictions. In Advances in 
+Neural Information Processing Systems, p. 30.
+Madadkhani, S., & Ikonnikova, S. (2024). Toward high- 
+resolution projection of electricity prices: A machine 
+learning approach to quantifying the effects of high 
+fuel and co2 prices. Energy Economics, 129, 107241. 
+https://doi.org/10.1016/j.eneco.2023.107241
+Maniatis, G. I., & Milonas, N. T. (2022). The impact of 
+wind and solar power generation on the level and vola -
+tility of wholesale electricity prices in greece. Energy 
+Policy, 170, 113243. https://doi.org/10.1016/j.enpol. 
+2022.113243
+Mankoff, K. D., Solgaard, A., Colgan, W., Ahlstrøm, 
+A. P., Khan, S. A., & Fausto, R. S. (2020). Greenland 
+ice sheet solid ice discharge from 1986 through march 
+2020. Earth System Science Data, 12(2), 1367–1383. 
+https://doi.org/10.5194/essd-12-1367-2020
+Manner, H., T €urk, D., & Eichler, M. (2016). Modeling 
+and forecasting multivariate electricity price spikes. 
+Energy Economics, 60, 255–265. https://doi.org/10.1016/ 
+j.eneco.2016.10.006
+Marshall, B. R., Nguyen, N. H., & Visaltanachoti, N. 
+(2017). Time series momentum and moving average 
+trading rules. Quantitative Finance, 17(3), 405–421. 
+https://doi.org/10.1080/14697688.2016.1205209
+Martin-Valmayor, M. A., Gil-Alana, L. A., & Infante, J. 
+(2023). Energy prices in europe. evidence of persistence 
+across markets. Resources Policy, 82, 103546. https:// 
+doi.org/10.1016/j.resourpol.2023.103546
+Maryniak, P., & Weron, R. (2019). What is the probability 
+of an electricity price spike? evidence from the uk power 
+market. in Handbook of energy finance: theories, practices 
+and simulations. World Scientific. pp. 231–245.
+Molnar, C. (2020). Interpretable machine learning. Lulu. 
+com.
+Mukherjee, S., & Nateghi, R. (2019). A data-driven 
+approach to assessing supply inadequacy risks due to 
+climate-induced shifts in electricity demand. Risk 
+Analysis: An Official Publication of the Society for Risk 
+Analysis, 39(3), 673–694. https://doi.org/10.1111/risa. 
+13192
+Nowotarski, J., & Weron, R. (2018). Recent advances in 
+electricity price forecasting: A review of probabilistic 
+forecasting. Renewable and Sustainable Energy Reviews, 
+81, 1548–1568. https://doi.org/10.1016/j.rser.2017.05.234
+Packham, N., Papenbrock, J., Schwendner, P., & 
+Woebbeking, F. (2017). Tail-risk protection trading 
+strategies. Quantitative Finance, 17(5), 729–744. https:// 
+doi.org/10.1080/14697688.2016.1249512
+Rawson, A., Brito, M., & Sabeur, Z. (2022). Spatial model -
+ing of maritime risk using machine learning. Risk 
+Analysis: An Official Publication of the Society for Risk 
+Analysis, 42(10), 2291–2311. https://doi.org/10.1111/ 
+risa.13866
+Refinitiv (2026). Refinitiv. https://www.lseg.com/en 
+(accessed: 2026-03-15).
+Ruisen, L., Songyi, D., Chen, W., Peng, C., Zuodong, T., 
+YanMei, Y., & Shixiong, W. (2018). Bagging of xgboost 
+classifiers with random under-sampling and tomek link 
+for noisy label-imbalanced data, in. IOP Conference 
+Series: Materials Science and Engineering, 428, 012004. 
+https://doi.org/10.1088/1757-899X/428/1/012004
+Sa ^adaoui, F., & Jabeur, S. B. (2023). Analyzing the influ -
+ence of geopolitical risks on european power prices 
+using a multiresolution causal neural network. Energy 
+Economics, 124, 106793. https://doi.org/10.1016/j.eneco. 
+2023.106793
+Sandhu, H. S., Fang, L., & Guan, L. (2016). Forecasting 
+day-ahead price spikes for the ontario electricity mar -
+ket. Electric Power Systems Research, 141, 450–459. 
+https://doi.org/10.1016/j.epsr.2016.08.005
+Shapley, L. S. (1953). A value for n-person games. In 
+Contributions to the Theory of Games (vol. 2, pp. 307– 
+317).
+Sokolova, M., Japkowicz, N., & Szpakowicz, S. (2006). 
+Beyond accuracy, f-score and roc: A family of discrim -
+inant measures for performance evaluation. In 
+Australasian Joint Conference on Artificial Intelligence 
+(pp. 1015–1021). Springer.
+Souhir, B. A., Heni, B., & Lotfi, B. (2019). Price risk and 
+hedging strategies in nord pool electricity market evi -
+dence with sector indexes. Energy Economics, 80, 635– 
+655. https://doi.org/10.1016/j.eneco.2019.02.001
+Srinivas, P., & Katarya, R. (2022). hyoptxg: Optuna 
+hyper-parameter optimization framework for predicting 
+cardiovascular disease using xgboost. Biomedical Signal 
+Processing and Control, 73, 103456. https://doi.org/10. 
+1016/j.bspc.2021.103456
+Stathakis, E., Papadimitriou, T., & Gogas, P. (2021). 
+Forecasting price spikes in electricity markets. Review 
+of Economic Analysis, 13(1), 65–87. https://doi.org/10. 
+15353/rea.v13i1.1822
+Stefan, T., Rafal, W., & Rodney, W. (2007). Outlier treat -
+ment and robust approaches for modeling electricity spot 
+prices. Hugo Steinhaus Center, Wroclaw University of 
+Technology.
+Stuke, A., Rinke, P., & Todorovi �c, M. (2021). Efficient 
+hyperparameter tuning for kernel ridge regression with 
+bayesian optimization. Machine Learning: Science and 
+Technology, 2(3), 035022. https://doi.org/10.1088/2632- 
+2153/abee59
+Su, C. W., Khan, K., Umar, M., & Zhang, W. (2021). 
+Does renewable energy redefine geopolitical risks? 
+Energy Policy, 158, 112566. https://doi.org/10.1016/j. 
+enpol.2021.112566
+Tafakori, L., Pourkhanali, A., & Fard, F. A. (2018). 
+Forecasting spikes in electricity return innovations. 
+Energy, 150, 508–526. https://doi.org/10.1016/j.energy. 
+2018.02.140
+JOURNAL OF THE OPERATIONAL RESEARCH SOCIETY
+ 21
+
+PAGE 23
+Tanha, J., Abdi, Y., Samadi, N., Razzaghi, N., & 
+Asadpour, M. (2020). Boosting methods for multi-class 
+imbalanced data classification: An experimental review. 
+Journal of Big Data, 7(1), 47. https://doi.org/10.1186/ 
+s40537-020-00349-y
+Tschora, L., Pierre, E., Plantevit, M., & Robardet, C. 
+(2022). Electricity price forecasting on the day-ahead 
+market using machine learning. Applied Energy, 313, 
+118752. https://doi.org/10.1016/j.apenergy.2022.118752
+Turner, R., Eriksson, D., McCourt, M., Kiili, J., 
+Laaksonen, E., Xu, Z., Guyon, I., 2021. Bayesian opti -
+mization is superior to random search for machine 
+learning hyperparameter tuning: Analysis of the black- 
+box optimization challenge 2020, In NeurIPS 2020 
+Competition and Demonstration Track (pp. 3–26). 
+PMLR.
+Ullah, M. H., Paul, S., & Park, J. D. (2018). Real-time elec -
+tricity price forecasting for energy management in grid- 
+tied mtdc microgrids. [Paper presentation]. 2018 IEEE 
+Energy Conversion Congress and Exposition (ECCE) 
+(pp. 73–80). IEEE. https://doi.org/10.1109/ECCE.2018. 
+8557478
+Varmedja, D., Karanovic, M., Sladojevic, S., Arsenovic, 
+M., & Anderla, A. (2019). Credit card fraud detection- 
+machine learning methods [Paper presentation]. 2019 
+18th International Symposium Infoteh-Jahorina 
+(INFOTEH) (pp. 1–5). IEEE. https://doi.org/10.1109/ 
+INFOTEH.2019.8717766
+Wang, C., Deng, C., & Wang, S. (2020). Imbalance- 
+xgboost: Leveraging weighted and focal losses for bin -
+ary label-imbalanced classification with xgboost. 
+Pattern Recognition Letters, 136, 190–197. https://doi. 
+org/10.1016/j.patrec.2020.05.035
+Westgaard, S., Fleten, S. E., Negash, A., Botterud, A., 
+Bogaard, K., & Verling, T. H. (2021). Performing price 
+scenario analysis and stress testing using quantile 
+regression: A case study of the californian electricity 
+market. Energy, 214, 118796. https://doi.org/10.1016/j. 
+energy.2020.118796
+Yamada, K., Mori, H. (2021). A deep learning technique 
+for electricity price forecasting in consideration of 
+spikes. In TENCON 2021-2021 IEEE Region 10 
+Conference (TENCON) (pp. 744–749). IEEE.
+Yang, L., & Shami, A. (2020). On hyperparameter opti -
+mization of machine learning algorithms: Theory and 
+practice. Neurocomputing, 415, 295–316. https://doi. 
+org/10.1016/j.neucom.2020.07.061
+Yao, S., Wu, Q., Kang, Q., Chen, Y. W., & Lu, Y. (2024). 
+An interpretable xgboost-based approach for arctic 
+navigation risk assessment. Risk Analysis: An Official 
+Publication of the Society for Risk Analysis, 44(2), 459– 
+476. https://doi.org/10.1111/risa.14175
+Zamudio L �opez, M., Zareipour, H., & Quashie, M. (2024). 
+Forecasting the occurrence of electricity price spikes: A 
+statistical-economic investigation study. Forecasting. 
+Forecasting, 6(1), 115–137. https://doi.org/10.3390/ 
+forecast6010007
+Zhang, C., Tan, K. C., Li, H., & Hong, G. S. (2019). A 
+cost-sensitive deep belief network for imbalanced clas -
+sification. IEEE Transactions on Neural Networks and 
+Learning Systems, 30(1), 109–122. https://doi.org/10. 
+1109/TNNLS.2018.2832648
+Zhang, F., Fleyeh, H., & Bales, C. (2022a). A hybrid 
+model based on bidirectional long short-term memory 
+neural network and catboost for short-term electricity 
+spot price forecasting. Journal of the Operational 
+Research Society, 73(2), 301–325. https://doi.org/10. 
+1080/01605682.2020.1843976
+Zhang, Z., He, M., Zhang, Y., & Wang, Y. (2022b). 
+Geopolitical risk trends and crude oil price predictabil -
+ity. Energy, 258, 124824. https://doi.org/10.1016/j. 
+energy.2022.124824
+Zou, Q., Xie, S., Lin, Z., Wu, M., & Ju, Y. (2016). Finding 
+the best classification threshold in imbalanced classifi -
+cation. Big Data Research, 5, 2–8. https://doi.org/10. 
+1016/j.bdr.2015.12.001
+22
+ J. MA ET AL.

@@ -1,0 +1,52 @@
+[3] S. Makridakis, E. Spiliotis, R. Hollyman, F. Petropoulos, N. Swanson, A. Gaba, The M6 forecasting competition:
+Bridging the gap between forecasting and investment decisions, International Journal of Forecasting 41 (4)
+(2024) 1315–1354.
+[4] T. Hong, P. Pinson, Y . Wang, R. Weron, D. Yang, H. Zareipour, Energy forecasting: A review and outlook, IEEE
+Open Access Journal of Power and Energy 7 (2020) 376–388.doi:10.1109/OAJPE.2020.3029979.
+[5] T. Serafin, R. Weron, Loss functions in regression models: Impact on profits and risk in day-ahead electricity
+trading, Energy Economics 148 (2025) 108596.doi:10.1016/j.eneco.2025.108596.
+[6] K. Maciejowska, B. Uniejewski, R. Weron, Forecasting electricity prices, in: Oxford Research Encyclopedia
+of Economics and Finance, Oxford University Press, 2023.doi:10.1093/acrefore/9780190625979.013.
+667.
+[7] P. Ghelasi, F. Ziel, A data-driven merit order: Learning a fundamental electricity price model, Energy Economics
+154 (2026) 109114.doi:10.1016/j.eneco.2025.109114.
+[8] M. M. Mascarenhas, J. De Blauwe, M. Amelin, H. Kazmi, Leveraging asynchronous cross-border market data
+for improved day-ahead electricity price forecasting in European markets, Applied Energy 404 (2026) 127077.
+doi:10.1016/j.apenergy.2025.127077.
+[9] F. Ziel, R. Weron, Day-ahead electricity price forecasting with high-dimensional structures: Univariate vs. multi-
+variate modeling frameworks, Energy Economics 70 (2018) 396–420.doi:10.1016/j.eneco.2017.12.016.
+[10] F. Petropoulos, D. Apiletti, V . Assimakopoulos, M. Z. Babai, D. K. Barrow, S. Ben Taieb, et al., Forecast-
+ing: Theory and practice, International Journal of Forecasting 38 (3) (2022) 705–871.doi:10.1016/j.
+ijforecast.2021.11.001.
+[11] H. Chitsaz, P. Zamani-Dehkordi, H. Zareipour, P. P. Parikh, Electricity price forecasting for operational
+scheduling of behind-the-meter storage systems, IEEE Transactions on Smart Grid 9 (6) (2018) 6612–6622.
+doi:10.1109/TSG.2017.2717282.
+[12] B. Uniejewski, R. Weron, Regularized quantile regression averaging for probabilistic electricity price forecast-
+ing, Energy Economics 95 (2021) 105121.doi:10.1016/j.eneco.2021.105121.
+[13] K. Maciejowska, T. Serafin, B. Uniejewski, Probabilistic forecasting with a hybrid Factor-QRA approach: Ap-
+plication to electricity trading, Electric Power Systems Research 234 (2024) 110541.doi:10.1016/j.epsr.
+2024.110541.
+[14] A. Brusaferri, M. Matteucci, P. Portolani, A. Vitali, Bayesian deep learning based method for probabilistic
+forecast of day-ahead electricity prices, Applied Energy 250 (2019) 1158–1175.doi:10.1016/j.apenergy.
+2019.05.068.
+[15] J. Nowotarski, R. Weron, Recent advances in electricity price forecasting: A review of probabilistic forecasting,
+Renewable and Sustainable Energy Reviews 81 (1) (2018) 1548–1568.doi:10.1016/j.rser.2017.05.234.
+[16] A. Das, W. Kong, R. Sen, Y . Zhou, A decoder-only foundation model for time-series forecasting, Proceedings
+of Machine Learning Research 235 (2024) 10148–10167.
+[17] T. Hornek, A. Sartipi, I. Tchappi, G. Fridgen, Benchmarking pre-trained time series models for electricity price
+forecasting, in: 21st International Conference on the European Energy Market (EEM), 2025.doi:10.1109/
+EEM64765.2025.11050326.
+[18] G. Marchesi, A. Ballarino, A. Brusaferri, Assessing time series foundation models for probabilistic electricity
+price forecasting: Toward a unified benchmark, Energies 18 (23) (2025) 6269.doi:10.3390/en18236269.
+[19] J. N. Lettner, H. El Ashhab, V . Hagenmeyer, B. Schäfer, Assessing the performance-efficiency trade-offof foun-
+dation models in probabilistic electricity price forecasting, in: Proceedings of the 7th International Workshop
+on Energy Data and Analytics, 2026.arXiv:2604.14739.
+[20] R. Yu, C. Gu, J. Stiasny, Q. Wen, W. S. Dilov, L. Qi, et al., PriceFM: Foundation model for probabilistic
+electricity price forecasting (2026).arXiv:2508.04875.
+[21] K. Ponyuenyong, P. Tu, J. W. Tan, W. S. Cheong, J. Ng Suat Ling, L. Jiang, Day-ahead electricity price fore-
+casting for volatile markets using foundation models with regularization strategy, in: Proceedings of the AI4TS
+Workshop at the AAAI Conference on Artificial Intelligence, 2026.arXiv:2602.05430.
+[22] G. Marcjasz, M. Narajewski, R. Weron, F. Ziel, Distributional neural networks for electricity price forecasting,
+Energy Economics 125 (2023) 106843.doi:10.1016/j.eneco.2023.106843.
+[23] S. Hirsch, F. Ziel, Probabilistic forecasting for day-ahead electricity prices, battery trading strategies and the
+22

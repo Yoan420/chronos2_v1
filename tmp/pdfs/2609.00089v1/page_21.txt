@@ -1,0 +1,40 @@
+7. Conclusions
+This study compares nine variants from five foundation model families with two state-of-the-
+art electricity price forecasting benchmarks. The models are evaluated over 2021-2025 in Ger-
+many, Poland, and Spain using the MAE, RMSE, and CRPS, together with profits from quantile-
+based and unlimited-bid BESS trading strategies.
+Our results show that zero-shot FMs can outperform strong market-specific benchmarks, but
+that these gains are concentrated in the TabPFN family and do not extend across all model archi-
+tectures. TabPFN-3 achieves the lowest CRPS in all three markets, as well as the lowest MAE and
+RMSE in Germany and Poland, while TabPFN-2 performs best according to the latter two mea-
+sures in Spain. The remaining FMs perform less consistently, although Chronos-2 and Chronos-2-
+synth yield significant improvements in Poland. Overall, the statistical results do not support the
+view that FMs can universally replace models designed specifically for EPF.
+The economic rankings are more sensitive to the market and trading configuration. TabPFN
+variants tend to perform best under the unlimited-bid strategy and the riskier quantile-based strate-
+gies, whereas DDNN-JSU performs best under the risk-averse strategies. The distribution of prof-
+its from settled transactions further shows that the quantile-based strategies generally trade less
+frequently but yield higher profits per settled transaction, highlighting the role of risk aversion in
+determining cumulative profits. Hence, lower statistical errors do not necessarily imply higher
+cumulative profits. However, these profits are not proper scoring functions; rather, they provide an
+application-based assessment of the economic value of the forecasts under the specified battery-
+arbitrage setting.
+The usefulness of FMs depends on model architecture, the treatment of exogenous variables,
+the representation of temporal structure, and the decision problem. Our analysis is limited to three
+markets, one battery specification, and one family of trading strategies. The analysis also can-
+not fully rule out test-period contamination for FMs pretrained partly on empirical time series,
+although this concern does not apply to models pretrained exclusively on synthetic data, such as
+the TabPFN variants and Chronos-2-synth. Future studies should consider additional markets, al-
+ternative BESS settings, and broader measures of economic performance. Ensembling techniques
+and probabilistic FMs should therefore be viewed as promising components of EPF systems rather
+than universal substitutes for carefully designed market-specific models.
+Acknowledgments
+The study was partially supported by the National Science Centre (NCN, Poland) through grant
+no. 2025/57/B/HS4/02413 (to AL) and grant no. 2018/30/A/HS4/00444 (to RW).
+References
+[1] M. Alipour, H. Chitsaz, H. Zareipour, D. Wood, Microgrid energy management: how uncertainty modelling
+impacts economic performance, IET Generation, Transmission & Distribution 13 (24) (2019) 5504–5510.doi:
+10.1049/iet-gtd.2019.0241.
+[2] S. Beltrán, A. Castro, I. Irizar, G. Naveran, I. Yeregui, Framework for collaborative intelligence in forecasting
+day-ahead electricity price, Applied Energy 306 (2022) 118049.doi:10.1016/j.apenergy.2021.118049.
+21

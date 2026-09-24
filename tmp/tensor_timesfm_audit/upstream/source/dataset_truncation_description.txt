@@ -1,0 +1,53 @@
+Dataset packaging description
+
+This package contains five dataset files:
+
+1. rideshare_tensor.npy
+   - Format: NumPy array (.npy)
+   - Original shape: (541, 156, 15)
+   - Handling: copied without changes
+
+2. tensor_1_units.pt
+   - Format: PyTorch tensor (.pt)
+   - Original shape: (1941, 3049, 10)
+   - Handling: truncated to 10% along axis 0
+   - Truncated shape: (194, 3049, 10)
+
+3. tensor_2_price.pt
+   - Format: PyTorch tensor (.pt)
+   - Original shape: (1941, 3049, 10)
+   - Handling: truncated to 10% along axis 0
+   - Truncated shape: (194, 3049, 10)
+
+4. tensor_3_event.pt
+   - Format: PyTorch tensor (.pt)
+   - Original shape: (1941, 41)
+   - Handling: copied without changes
+
+5. fundamentals_analyst_forecast_EPS_regression.npy
+   - Format: NumPy array (.npy)
+   - Original shape: (158, 9583, 14)
+   - Handling: truncated to 10% along axis 0 for data protection
+   - Truncated shape: (15, 9583, 14)
+
+Truncation logic
+
+- Only these three files are truncated:
+  tensor_1_units.pt
+  tensor_2_price.pt
+  fundamentals_analyst_forecast_EPS_regression.npy
+- Truncation is applied on the first dimension only (axis 0).
+- The keep count is computed as int(original_length * 0.10).
+- The logic uses floor rounding, with a minimum of 1 row/item kept.
+- The original source files are not modified.
+- Truncated copies are created temporarily, then packaged into the zip archive.
+
+Packaged output
+
+- Output zip file: ECML2026datasets.zip
+- Zip file size from the current run: 6,172,777 bytes (5.89 MiB)
+
+Purpose
+
+This packaging keeps representative samples of the large or proprietary tensors
+while preserving the full structure of the smaller public-supporting files.

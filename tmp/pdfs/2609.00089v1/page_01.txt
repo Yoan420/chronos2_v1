@@ -1,0 +1,53 @@
+Foundation models for electricity price forecasting and battery
+arbitrage: Can they replace market-specific forecasting models?
+Arkadiusz Lipiecki a,b, Rafał Weron b,c,∗
+aDepartment of Computational Social Science, Wrocław University of Science and Technology, Poland
+bDepartment of Operations Research and Business Intelligence, Wrocław University of Science and Technology,
+Poland
+cCenter for Research in Energy (CoRE), Aarhus University, 8000 Aarhus C, Denmark
+Abstract
+Foundation models promise accurate forecasts with little or no task-specific training, but
+whether they can replace models designed specifically for electricity price forecasting remains
+unclear. We compare nine variants from five foundation model families, evaluated in zero-shot
+mode, with two state-of-the-art electricity price forecasting benchmarks in Germany, Poland,
+and Spain over 2021-2025. Their performance is assessed in terms of point and probabilistic
+forecasting accuracy, as well as economic value in battery energy storage arbitrage. Only the
+TabPFN models consistently and significantly outperform the benchmarks across all three markets
+and all statistical measures. However, this statistical dominance does not translate directly into
+economic dominance: TabPFN performs best under unlimited bids and riskier quantile-based
+strategies, whereas the Distributional Deep Neural Network benchmark is more profitable when
+risk tolerance is lower. Thus, foundation models cannot universally replace market-specific
+models, and their value depends on both model architecture and the decision problem.
+Keywords:Electricity price forecasting; Foundation models; Probabilistic forecasting; Economic
+evaluation; Battery storage operation; Trading strategy
+Contents
+1 Introduction 2
+1.1 Our contribution . . . . . . . . . . . . . . . . . . . . 3
+2 Literature review 3
+2.1 Point forecasting with foundation models . . . . . . 4
+2.2 Probabilistic forecasting with foundation models . . 4
+2.3 Components of larger forecasting systems . . . . . . 5
+2.4 Conclusions . . . . . . . . . . . . . . . . . . . . . . 6
+3 Datasets 6
+4 Foundation models 8
+4.1 Time series models . . . . . . . . . . . . . . . . . . 9
+4.1.1 Chronos-2 . . . . . . . . . . . . . . . . . . . 9
+4.1.2 Moirai-2 . . . . . . . . . . . . . . . . . . . 9
+4.1.3 TimesFM-2.5 . . . . . . . . . . . . . . . . . 10
+4.2 Tabular models . . . . . . . . . . . . . . . . . . . . 10
+4.2.1 TabPFN . . . . . . . . . . . . . . . . . . . . 10
+4.2.2 Mitra with conformal prediction . . . . . . . 11
+4.3 Context data . . . . . . . . . . . . . . . . . . . . . . 11
+5 Benchmark models 12
+5.1 LEAR with conformal prediction . . . . . . . . . . . 13
+5.2 DDNN-JSU . . . . . . . . . . . . . . . . . . . . . . 13
+6 Empirical evidence 15
+6.1 Statistical error measures and conditional predictive
+ability . . . . . . . . . . . . . . . . . . . . . . . . . 15
+6.2 Economic evaluation based on BESS trading . . . . . 15
+6.3 Results . . . . . . . . . . . . . . . . . . . . . . . . . 17
+6.3.1 Forecast accuracy . . . . . . . . . . . . . . . 17
+6.3.2 Profits from BESS arbitrage . . . . . . . . . 18
+7 Conclusions 21
+∗Corresponding author;email:rafal.weron@pwr.edu.pl
+arXiv:2609.00089v1  [cs.LG]  31 Aug 2026
