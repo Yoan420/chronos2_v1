@@ -1,0 +1,24 @@
+{
+  "retained_prediction_values_match_sources": true,
+  "maximum_delivery_date": "2026-08-31",
+  "all_country_counts_valid": true,
+  "selection_unchanged": true,
+  "fit_records_valid": true,
+  "manuscript_tables": 10,
+  "epex_exclusion_redundant_verified": true,
+  "independent_bootstrap_checks": [
+    {
+      "model": "ewma_country",
+      "independent_mae_interval_max_abs_difference": 3.3584246494910985e-15
+    },
+    {
+      "model": "pca_ridge",
+      "independent_mae_interval_max_abs_difference": 5.2735593669694936e-15
+    },
+    {
+      "model": "storm",
+      "independent_mae_interval_max_abs_difference": 3.608224830031759e-15
+    }
+  ],
+  "no_training_or_reselection": true
+}

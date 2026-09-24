@@ -1,0 +1,745 @@
+{
+  "queried_at_utc": "2026-09-17T15:30:04.819140+00:00",
+  "diagnostic_only": true,
+  "historical_formula_version_attested": false,
+  "sources": [
+    {
+      "name": "power.fr.price.everyday.cgc.da.index.eurmwh",
+      "asof": {
+        "2024-09-17": {
+          "status": 200,
+          "cutoff": "2024-09-17T08:00:00+02:00",
+          "count": 6,
+          "tail": {
+            "2024-09-11 00:00:00": 95.3552,
+            "2024-09-12 00:00:00": 93.8626,
+            "2024-09-13 00:00:00": 94.79332000000001,
+            "2024-09-16 00:00:00": 91.18928
+          },
+          "previous_civil_day_last": {
+            "time": "2024-09-16 00:00:00",
+            "value": 91.18928
+          }
+        },
+        "2025-09-17": {
+          "status": 200,
+          "cutoff": "2025-09-17T08:00:00+02:00",
+          "count": 7,
+          "tail": {
+            "2025-09-11 00:00:00": 91.43272,
+            "2025-09-12 00:00:00": 91.93536,
+            "2025-09-15 00:00:00": 91.194,
+            "2025-09-16 00:00:00": 91.91968
+          },
+          "previous_civil_day_last": {
+            "time": "2025-09-16 00:00:00",
+            "value": 91.91968
+          }
+        },
+        "2026-09-13": {
+          "status": 200,
+          "cutoff": "2026-09-13T08:00:00+02:00",
+          "count": 6,
+          "tail": {
+            "2026-09-08 00:00:00": 183.39455999999998,
+            "2026-09-09 00:00:00": 186.91976,
+            "2026-09-10 00:00:00": 196.17175999999998,
+            "2026-09-11 00:00:00": 192.03136
+          },
+          "previous_civil_day_last": {
+            "time": "2026-09-11 00:00:00",
+            "value": 192.03136
+          }
+        },
+        "2026-09-16": {
+          "status": 200,
+          "cutoff": "2026-09-16T08:00:00+02:00",
+          "count": 7,
+          "tail": {
+            "2026-09-10 00:00:00": 196.17175999999998,
+            "2026-09-11 00:00:00": 193.95136000000002,
+            "2026-09-14 00:00:00": 198.42032,
+            "2026-09-15 00:00:00": 193.60447999999997
+          },
+          "previous_civil_day_last": {
+            "time": "2026-09-15 00:00:00",
+            "value": 193.60447999999997
+          }
+        }
+      },
+      "metadata": {
+        "status": 200,
+        "value": {
+          "tzaware": false,
+          "index_type": "datetime64[ns]",
+          "value_type": "float64",
+          "index_dtype": "<M8[ns]",
+          "value_dtype": "<f8"
+        }
+      },
+      "interval": {
+        "status": 204,
+        "body": ""
+      },
+      "formula": {
+        "status": 200,
+        "value": "(add (* 2 (series \"gas.price.everyday.peg.da.eurmwh\")) (* 0.368 (series \"carbon.eu.price.everyday.eua.1stdec.eurt\")))"
+      },
+      "components": {
+        "status": 200,
+        "value": {
+          "power.fr.price.everyday.cgc.da.index.eurmwh": [
+            "gas.price.everyday.peg.da.eurmwh",
+            "carbon.eu.price.everyday.eua.1stdec.eurt"
+          ]
+        }
+      }
+    },
+    {
+      "name": "power.de.price.everyday.cgc.da.index.eurmwh",
+      "asof": {
+        "2024-09-17": {
+          "status": 200,
+          "cutoff": "2024-09-17T08:00:00+02:00",
+          "count": 6,
+          "tail": {
+            "2024-09-11 00:00:00": 96.9082,
+            "2024-09-12 00:00:00": 94.9696,
+            "2024-09-13 00:00:00": 95.80332,
+            "2024-09-16 00:00:00": 91.90827999999999
+          },
+          "previous_civil_day_last": {
+            "time": "2024-09-16 00:00:00",
+            "value": 91.90827999999999
+          }
+        },
+        "2025-09-17": {
+          "status": 200,
+          "cutoff": "2025-09-17T08:00:00+02:00",
+          "count": 7,
+          "tail": {
+            "2025-09-11 00:00:00": 92.20772,
+            "2025-09-12 00:00:00": 93.31736,
+            "2025-09-15 00:00:00": 91.937,
+            "2025-09-16 00:00:00": 93.08167999999999
+          },
+          "previous_civil_day_last": {
+            "time": "2025-09-16 00:00:00",
+            "value": 93.08167999999999
+          }
+        },
+        "2026-09-13": {
+          "status": 200,
+          "cutoff": "2026-09-13T08:00:00+02:00",
+          "count": 6,
+          "tail": {
+            "2026-09-08 00:00:00": 184.14256000000003,
+            "2026-09-09 00:00:00": 191.04276,
+            "2026-09-10 00:00:00": 198.06276,
+            "2026-09-11 00:00:00": 192.54036000000002
+          },
+          "previous_civil_day_last": {
+            "time": "2026-09-11 00:00:00",
+            "value": 192.54036000000002
+          }
+        },
+        "2026-09-16": {
+          "status": 200,
+          "cutoff": "2026-09-16T08:00:00+02:00",
+          "count": 7,
+          "tail": {
+            "2026-09-10 00:00:00": 198.06276,
+            "2026-09-11 00:00:00": 194.28036000000003,
+            "2026-09-14 00:00:00": 201.25331999999997,
+            "2026-09-15 00:00:00": 193.51148
+          },
+          "previous_civil_day_last": {
+            "time": "2026-09-15 00:00:00",
+            "value": 193.51148
+          }
+        }
+      },
+      "metadata": {
+        "status": 200,
+        "value": {
+          "tzaware": false,
+          "index_type": "datetime64[ns]",
+          "value_type": "float64",
+          "index_dtype": "<M8[ns]",
+          "value_dtype": "<f8"
+        }
+      },
+      "interval": {
+        "status": 204,
+        "body": ""
+      },
+      "formula": {
+        "status": 200,
+        "value": "(add (* 2 (series \"gas.price.everyday.the.da.eurmwh.new\")) (* 0.368 (series \"carbon.eu.price.everyday.eua.1stdec.eurt\")))"
+      },
+      "components": {
+        "status": 200,
+        "value": {
+          "power.de.price.everyday.cgc.da.index.eurmwh": [
+            "gas.price.everyday.the.da.eurmwh.new",
+            "carbon.eu.price.everyday.eua.1stdec.eurt"
+          ]
+        }
+      }
+    },
+    {
+      "name": "power.be.price.everyday.cgc.da.index.eurmwh",
+      "asof": {
+        "2024-09-17": {
+          "status": 200,
+          "cutoff": "2024-09-17T08:00:00+02:00",
+          "count": 6,
+          "tail": {
+            "2024-09-11 00:00:00": 96.85920000000002,
+            "2024-09-12 00:00:00": 94.7176,
+            "2024-09-13 00:00:00": 95.78995355246933,
+            "2024-09-16 00:00:00": 91.75328
+          },
+          "previous_civil_day_last": {
+            "time": "2024-09-16 00:00:00",
+            "value": 91.75328
+          }
+        },
+        "2025-09-17": {
+          "status": 200,
+          "cutoff": "2025-09-17T08:00:00+02:00",
+          "count": 7,
+          "tail": {
+            "2025-09-11 00:00:00": 90.73872,
+            "2025-09-12 00:00:00": 92.03735999999999,
+            "2025-09-15 00:00:00": 91.582,
+            "2025-09-16 00:00:00": 92.01768
+          },
+          "previous_civil_day_last": {
+            "time": "2025-09-16 00:00:00",
+            "value": 92.01768
+          }
+        },
+        "2026-09-13": {
+          "status": 200,
+          "cutoff": "2026-09-13T08:00:00+02:00",
+          "count": 6,
+          "tail": {
+            "2026-09-08 00:00:00": 183.86456,
+            "2026-09-09 00:00:00": 191.27776,
+            "2026-09-10 00:00:00": 197.13776000000001,
+            "2026-09-11 00:00:00": 191.93936
+          },
+          "previous_civil_day_last": {
+            "time": "2026-09-11 00:00:00",
+            "value": 191.93936
+          }
+        },
+        "2026-09-16": {
+          "status": 200,
+          "cutoff": "2026-09-16T08:00:00+02:00",
+          "count": 7,
+          "tail": {
+            "2026-09-10 00:00:00": 197.13776000000001,
+            "2026-09-11 00:00:00": 191.93936,
+            "2026-09-14 00:00:00": 200.82232,
+            "2026-09-15 00:00:00": 193.72648
+          },
+          "previous_civil_day_last": {
+            "time": "2026-09-15 00:00:00",
+            "value": 193.72648
+          }
+        }
+      },
+      "metadata": {
+        "status": 200,
+        "value": {
+          "tzaware": false,
+          "index_type": "datetime64[ns]",
+          "value_type": "float64",
+          "index_dtype": "<M8[ns]",
+          "value_dtype": "<f8"
+        }
+      },
+      "interval": {
+        "status": 204,
+        "body": ""
+      },
+      "formula": {
+        "status": 200,
+        "value": "(add (* 2 (series \"gas.price.everyday.zee.da.eurmwh\")) (* 0.368 (series \"carbon.eu.price.everyday.eua.1stdec.eurt\")))"
+      },
+      "components": {
+        "status": 200,
+        "value": {
+          "power.be.price.everyday.cgc.da.index.eurmwh": [
+            "gas.price.everyday.zee.da.eurmwh",
+            "carbon.eu.price.everyday.eua.1stdec.eurt"
+          ]
+        }
+      }
+    },
+    {
+      "name": "power.nl.price.everyday.cgc.da.index.eurmwh",
+      "asof": {
+        "2024-09-17": {
+          "status": 200,
+          "cutoff": "2024-09-17T08:00:00+02:00",
+          "count": 6,
+          "tail": {
+            "2024-09-11 00:00:00": 96.75319999999999,
+            "2024-09-12 00:00:00": 94.93459999999999,
+            "2024-09-13 00:00:00": 95.86032,
+            "2024-09-16 00:00:00": 91.81228
+          },
+          "previous_civil_day_last": {
+            "time": "2024-09-16 00:00:00",
+            "value": 91.81228
+          }
+        },
+        "2025-09-17": {
+          "status": 200,
+          "cutoff": "2025-09-17T08:00:00+02:00",
+          "count": 7,
+          "tail": {
+            "2025-09-11 00:00:00": 91.41472,
+            "2025-09-12 00:00:00": 91.95536,
+            "2025-09-15 00:00:00": 91.631,
+            "2025-09-16 00:00:00": 92.09868
+          },
+          "previous_civil_day_last": {
+            "time": "2025-09-16 00:00:00",
+            "value": 92.09868
+          }
+        },
+        "2026-09-13": {
+          "status": 200,
+          "cutoff": "2026-09-13T08:00:00+02:00",
+          "count": 6,
+          "tail": {
+            "2026-09-08 00:00:00": 184.21756000000002,
+            "2026-09-09 00:00:00": 191.41575999999998,
+            "2026-09-10 00:00:00": 197.00575999999998,
+            "2026-09-11 00:00:00": 192.25136000000003
+          },
+          "previous_civil_day_last": {
+            "time": "2026-09-11 00:00:00",
+            "value": 192.25136000000003
+          }
+        },
+        "2026-09-16": {
+          "status": 200,
+          "cutoff": "2026-09-16T08:00:00+02:00",
+          "count": 7,
+          "tail": {
+            "2026-09-10 00:00:00": 197.00575999999998,
+            "2026-09-11 00:00:00": 192.09036000000003,
+            "2026-09-14 00:00:00": 200.26131999999996,
+            "2026-09-15 00:00:00": 193.27048
+          },
+          "previous_civil_day_last": {
+            "time": "2026-09-15 00:00:00",
+            "value": 193.27048
+          }
+        }
+      },
+      "metadata": {
+        "status": 200,
+        "value": {
+          "tzaware": false,
+          "index_type": "datetime64[ns]",
+          "value_type": "float64",
+          "index_dtype": "<M8[ns]",
+          "value_dtype": "<f8"
+        }
+      },
+      "interval": {
+        "status": 204,
+        "body": ""
+      },
+      "formula": {
+        "status": 200,
+        "value": "(add (* 2 (series \"gas.price.everyday.ttf.da.eurmwh\")) (* 0.368 (series \"carbon.eu.price.everyday.eua.1stdec.eurt\")))"
+      },
+      "components": {
+        "status": 200,
+        "value": {
+          "power.nl.price.everyday.cgc.da.index.eurmwh": [
+            "gas.price.everyday.ttf.da.eurmwh",
+            "carbon.eu.price.everyday.eua.1stdec.eurt"
+          ]
+        }
+      }
+    },
+    {
+      "name": "power.it.price.everyday.cgc.da.index.eurmwh",
+      "asof": {
+        "2024-09-17": {
+          "status": 200,
+          "cutoff": "2024-09-17T08:00:00+02:00",
+          "count": 6,
+          "tail": {
+            "2024-09-11 00:00:00": 101.61520000000002,
+            "2024-09-12 00:00:00": 98.4556,
+            "2024-09-13 00:00:00": 99.14332,
+            "2024-09-16 00:00:00": 97.86428000000001
+          },
+          "previous_civil_day_last": {
+            "time": "2024-09-16 00:00:00",
+            "value": 97.86428000000001
+          }
+        },
+        "2025-09-17": {
+          "status": 200,
+          "cutoff": "2025-09-17T08:00:00+02:00",
+          "count": 7,
+          "tail": {
+            "2025-09-11 00:00:00": 97.32372000000001,
+            "2025-09-12 00:00:00": 96.18336,
+            "2025-09-15 00:00:00": 95.244,
+            "2025-09-16 00:00:00": 98.93368
+          },
+          "previous_civil_day_last": {
+            "time": "2025-09-16 00:00:00",
+            "value": 98.93368
+          }
+        },
+        "2026-09-13": {
+          "status": 200,
+          "cutoff": "2026-09-13T08:00:00+02:00",
+          "count": 6,
+          "tail": {
+            "2026-09-08 00:00:00": 193.15956,
+            "2026-09-09 00:00:00": 198.46475999999998,
+            "2026-09-10 00:00:00": 202.40176,
+            "2026-09-11 00:00:00": 193.95136000000002
+          },
+          "previous_civil_day_last": {
+            "time": "2026-09-11 00:00:00",
+            "value": 193.95136000000002
+          }
+        },
+        "2026-09-16": {
+          "status": 200,
+          "cutoff": "2026-09-16T08:00:00+02:00",
+          "count": 7,
+          "tail": {
+            "2026-09-10 00:00:00": 202.40176,
+            "2026-09-11 00:00:00": 199.46136,
+            "2026-09-14 00:00:00": 205.46662208333322,
+            "2026-09-15 00:00:00": 196.57078208333337
+          },
+          "previous_civil_day_last": {
+            "time": "2026-09-15 00:00:00",
+            "value": 196.57078208333337
+          }
+        }
+      },
+      "metadata": {
+        "status": 200,
+        "value": {
+          "tzaware": false,
+          "index_type": "datetime64[ns]",
+          "value_type": "float64",
+          "index_dtype": "<M8[ns]",
+          "value_dtype": "<f8"
+        }
+      },
+      "interval": {
+        "status": 204,
+        "body": ""
+      },
+      "formula": {
+        "status": 200,
+        "value": "(add (* 2 (series \"gas.price.everyday.psv.da.eurmwh\")) (* 0.368 (series \"carbon.eu.price.everyday.eua.1stdec.eurt\")))"
+      },
+      "components": {
+        "status": 200,
+        "value": {
+          "power.it.price.everyday.cgc.da.index.eurmwh": [
+            "gas.price.everyday.psv.da.eurmwh",
+            "carbon.eu.price.everyday.eua.1stdec.eurt"
+          ]
+        }
+      }
+    },
+    {
+      "name": "power.es.price.everyday.cgc.da.index.eurmwh",
+      "asof": {
+        "2024-09-17": {
+          "status": 200,
+          "cutoff": "2024-09-17T08:00:00+02:00",
+          "count": 6,
+          "tail": {
+            "2024-09-11 00:00:00": 95.59020000000001,
+            "2024-09-12 00:00:00": 94.31360000000001,
+            "2024-09-13 00:00:00": 95.02632,
+            "2024-09-16 00:00:00": 92.45627999999999
+          },
+          "previous_civil_day_last": {
+            "time": "2024-09-16 00:00:00",
+            "value": 92.45627999999999
+          }
+        },
+        "2025-09-17": {
+          "status": 200,
+          "cutoff": "2025-09-17T08:00:00+02:00",
+          "count": 7,
+          "tail": {
+            "2025-09-11 00:00:00": 91.19872000000001,
+            "2025-09-12 00:00:00": 92.30336,
+            "2025-09-15 00:00:00": 91.249,
+            "2025-09-16 00:00:00": 92.06668
+          },
+          "previous_civil_day_last": {
+            "time": "2025-09-16 00:00:00",
+            "value": 92.06668
+          }
+        },
+        "2026-09-13": {
+          "status": 200,
+          "cutoff": "2026-09-13T08:00:00+02:00",
+          "count": 6,
+          "tail": {
+            "2026-09-08 00:00:00": 186.44956,
+            "2026-09-09 00:00:00": 193.07276,
+            "2026-09-10 00:00:00": 198.46676,
+            "2026-09-11 00:00:00": 194.28136
+          },
+          "previous_civil_day_last": {
+            "time": "2026-09-11 00:00:00",
+            "value": 194.28136
+          }
+        },
+        "2026-09-16": {
+          "status": 200,
+          "cutoff": "2026-09-16T08:00:00+02:00",
+          "count": 7,
+          "tail": {
+            "2026-09-10 00:00:00": 198.46676,
+            "2026-09-11 00:00:00": 194.28136,
+            "2026-09-14 00:00:00": 203.82831999999996,
+            "2026-09-15 00:00:00": 197.45448
+          },
+          "previous_civil_day_last": {
+            "time": "2026-09-15 00:00:00",
+            "value": 197.45448
+          }
+        }
+      },
+      "metadata": {
+        "status": 200,
+        "value": {
+          "tzaware": false,
+          "index_type": "datetime64[ns]",
+          "value_type": "float64",
+          "index_dtype": "<M8[ns]",
+          "value_dtype": "<f8"
+        }
+      },
+      "interval": {
+        "status": 204,
+        "body": ""
+      },
+      "formula": {
+        "status": 200,
+        "value": "(add (* 2 (series \"gas.price.everyday.spain.da.eurmwh\")) (* 0.368 (series \"carbon.eu.price.everyday.eua.1stdec.eurt\")))"
+      },
+      "components": {
+        "status": 200,
+        "value": {
+          "power.es.price.everyday.cgc.da.index.eurmwh": [
+            "gas.price.everyday.spain.da.eurmwh",
+            "carbon.eu.price.everyday.eua.1stdec.eurt"
+          ]
+        }
+      }
+    },
+    {
+      "name": "power.eu.price.everyday.ccc.da.index.eurmwh",
+      "asof": {
+        "2024-09-17": {
+          "status": 200,
+          "cutoff": "2024-09-17T08:00:00+02:00",
+          "count": 6,
+          "tail": {
+            "2024-09-11 00:00:00": 97.0071066256142,
+            "2024-09-12 00:00:00": 95.42640879238914,
+            "2024-09-13 00:00:00": 95.42151373606032,
+            "2024-09-16 00:00:00": 92.43591183337392
+          },
+          "previous_civil_day_last": {
+            "time": "2024-09-16 00:00:00",
+            "value": 92.43591183337392
+          }
+        },
+        "2025-09-17": {
+          "status": 200,
+          "cutoff": "2025-09-17T08:00:00+02:00",
+          "count": 7,
+          "tail": {
+            "2025-09-11 00:00:00": 96.30577488110458,
+            "2025-09-12 00:00:00": 96.65953393426973,
+            "2025-09-15 00:00:00": 97.37424024262724,
+            "2025-09-16 00:00:00": 98.19709849183752
+          },
+          "previous_civil_day_last": {
+            "time": "2025-09-16 00:00:00",
+            "value": 98.19709849183752
+          }
+        },
+        "2026-09-13": {
+          "status": 200,
+          "cutoff": "2026-09-13T08:00:00+02:00",
+          "count": 6,
+          "tail": {
+            "2026-09-08 00:00:00": 120.00543906920728,
+            "2026-09-09 00:00:00": 120.35233149483383,
+            "2026-09-10 00:00:00": 120.92194007578367,
+            "2026-09-11 00:00:00": 119.969296498331
+          },
+          "previous_civil_day_last": {
+            "time": "2026-09-11 00:00:00",
+            "value": 119.969296498331
+          }
+        },
+        "2026-09-16": {
+          "status": 200,
+          "cutoff": "2026-09-16T08:00:00+02:00",
+          "count": 7,
+          "tail": {
+            "2026-09-10 00:00:00": 120.92194007578367,
+            "2026-09-11 00:00:00": 119.95136020002585,
+            "2026-09-14 00:00:00": 122.49228733641016,
+            "2026-09-15 00:00:00": 120.50559607955923
+          },
+          "previous_civil_day_last": {
+            "time": "2026-09-15 00:00:00",
+            "value": 120.50559607955923
+          }
+        }
+      },
+      "metadata": {
+        "status": 200,
+        "value": {
+          "tzaware": false,
+          "index_type": "datetime64[ns]",
+          "value_type": "float64",
+          "index_dtype": "<M8[ns]",
+          "value_dtype": "<f8"
+        }
+      },
+      "interval": {
+        "status": 204,
+        "body": ""
+      },
+      "formula": {
+        "status": 200,
+        "value": "(add (* 0.376 (div (series \"coal.price.everyday.api2.ma.official.usdt\") (series \"forex.nrjscan.everyday.eurusd\"))) (* 0.874 (series \"carbon.eu.price.everyday.eua.1stdec.eurt\")))"
+      },
+      "components": {
+        "status": 200,
+        "value": {
+          "power.eu.price.everyday.ccc.da.index.eurmwh": [
+            "coal.price.everyday.api2.ma.official.usdt",
+            "forex.nrjscan.everyday.eurusd",
+            "carbon.eu.price.everyday.eua.1stdec.eurt"
+          ]
+        }
+      }
+    },
+    {
+      "name": "ccc.price.mid.api2.everyday.month.1.ice.eurmwh",
+      "asof": {
+        "2024-09-17": {
+          "status": 200,
+          "cutoff": "2024-09-17T08:00:00+02:00",
+          "count": 6,
+          "tail": {
+            "2024-09-11 00:00:00": 98.452350377152,
+            "2024-09-12 00:00:00": 96.79954041028523,
+            "2024-09-13 00:00:00": 96.7948173966398,
+            "2024-09-16 00:00:00": 93.82928866066304
+          },
+          "previous_civil_day_last": {
+            "time": "2024-09-16 00:00:00",
+            "value": 93.82928866066304
+          }
+        },
+        "2025-09-17": {
+          "status": 200,
+          "cutoff": "2025-09-17T08:00:00+02:00",
+          "count": 7,
+          "tail": {
+            "2025-09-11 00:00:00": 97.66488020066687,
+            "2025-09-12 00:00:00": 98.09593710651173,
+            "2025-09-15 00:00:00": 98.84654541706892,
+            "2025-09-16 00:00:00": 99.64684718473916
+          },
+          "previous_civil_day_last": {
+            "time": "2025-09-16 00:00:00",
+            "value": 99.64684718473916
+          }
+        },
+        "2026-09-13": {
+          "status": 200,
+          "cutoff": "2026-09-13T08:00:00+02:00",
+          "count": 6,
+          "tail": {
+            "2026-09-08 00:00:00": 121.6635981969523,
+            "2026-09-09 00:00:00": 122.21668437751515,
+            "2026-09-10 00:00:00": 122.86528125320957,
+            "2026-09-11 00:00:00": 121.87252928868386
+          },
+          "previous_civil_day_last": {
+            "time": "2026-09-11 00:00:00",
+            "value": 121.87252928868386
+          }
+        },
+        "2026-09-16": {
+          "status": 200,
+          "cutoff": "2026-09-16T08:00:00+02:00",
+          "count": 7,
+          "tail": {
+            "2026-09-10 00:00:00": 122.86528125320957,
+            "2026-09-11 00:00:00": 121.85452329581169,
+            "2026-09-14 00:00:00": 124.47103828735543,
+            "2026-09-15 00:00:00": 122.3467466780064
+          },
+          "previous_civil_day_last": {
+            "time": "2026-09-15 00:00:00",
+            "value": 122.3467466780064
+          }
+        }
+      },
+      "metadata": {
+        "status": 200,
+        "value": {
+          "tzaware": false,
+          "index_type": "datetime64[ns]",
+          "value_type": "float64",
+          "index_dtype": "<M8[ns]",
+          "value_dtype": "<f8"
+        }
+      },
+      "interval": {
+        "status": 204,
+        "body": ""
+      },
+      "formula": {
+        "status": 200,
+        "value": "(* 2.63 (add (/ (div (series \"coal.api2.price.everyday.month.1.ice.usdt\") (series \"forex.nrjscan.everyday.eurusd.close\")) 6.9776) (* 0.34 (series \"carbon.eu.price.everyday.eua.ice.1st.dec\"))))"
+      },
+      "components": {
+        "status": 200,
+        "value": {
+          "ccc.price.mid.api2.everyday.month.1.ice.eurmwh": [
+            "coal.api2.price.everyday.month.1.ice.usdt",
+            "forex.nrjscan.everyday.eurusd.close",
+            "carbon.eu.price.everyday.eua.ice.1st.dec"
+          ]
+        }
+      }
+    }
+  ]
+}

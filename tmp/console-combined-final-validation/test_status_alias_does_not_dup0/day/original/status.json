@@ -1,0 +1,1 @@
+{"status": "running", "run_id": "original", "started_at_utc": "2026-09-01T10:00:00Z", "steps": [{"name": "sources", "status": "complete"}, {"name": "nuclear_kalman", "zone": "DE", "status": "running"}]}

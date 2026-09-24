@@ -1,0 +1,23 @@
+{
+  "reports": [
+    {
+      "delivery_day": "2026-09-13",
+      "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\reports\\model_storm\\CWE_Model_Storm_2026-09-13.html",
+      "bytes": 4935789,
+      "sha256": "8f88849f07ddfebe3832aa8e588b1f2504792f827645b5896452fc0fd5da913d",
+      "hourly_rows": 96,
+      "source_delivery_day": "2026-09-15"
+    },
+    {
+      "delivery_day": "2026-09-14",
+      "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\reports\\model_storm\\CWE_Model_Storm_2026-09-14.html",
+      "bytes": 4935940,
+      "sha256": "5cf042a6db762d6c191f718ac49890da08b35064b40582facfb8aed55ba7d165",
+      "hourly_rows": 96,
+      "source_delivery_day": "2026-09-15"
+    }
+  ],
+  "source_files_unchanged": 196,
+  "report_15_unchanged": true,
+  "new_forecast_execution": false
+}

@@ -1,0 +1,18 @@
+[
+  {
+    "path": "/tsview_static/plot_elm.js",
+    "status": 200,
+    "content_type": "application/javascript; charset=utf-8",
+    "bytes": 237051,
+    "route_hints": [
+      "Series selection",
+      "Type some keywords in input bar for selecting time series",
+      "catalog",
+      "series",
+      "the query timed out"
+    ],
+    "catalog_context": [
+      " $elm$http$Http$get(\n\t\t\t{\n\t\t\t\teg: $elm$http$Http$expectString(event),\n\t\t\t\te0: A3(\n\t\t\t\t\t$elm$url$Url$Builder$crossOrigin,\n\t\t\t\t\turlprefix,\n\t\t\t\t\t_List_fromArray(\n\t\t\t\t\t\t['api', dtype, 'catalog']),\n\t\t\t\t\t_List_fromArray(\n\t\t\t\t\t\t[\n\t\t\t\t\t\t\tA2($elm$url$Url$Builder$int, 'allsources', allsources)\n\t\t\t\t\t\t]))\n\t\t\t});\n\t});\nvar $elm$core$List$isEmpty = function (xs) {\n\tif (!xs.b) {\n\t\tr"
+    ]
+  }
+]

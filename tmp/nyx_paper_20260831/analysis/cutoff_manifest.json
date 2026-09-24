@@ -1,0 +1,246 @@
+{
+  "evaluation_cutoff_local": "2026-08-31",
+  "evaluation_start_local": "2025-09-16",
+  "civil_days": 350,
+  "physical_hours_per_country": 8400,
+  "country_hour_pairs": 33600,
+  "common_country_hour_pairs": 33596,
+  "first_utc": "2025-09-15 22:00:00+00:00",
+  "last_utc": "2026-08-31 21:00:00+00:00",
+  "day_lengths": {
+    "24": 348,
+    "25": 1,
+    "23": 1
+  },
+  "split": {
+    "test": {
+      "first": "2026-06-18",
+      "last": "2026-08-31",
+      "days": 75,
+      "country_hour_pairs": 7200
+    },
+    "train": {
+      "first": "2025-09-16",
+      "last": "2026-03-14",
+      "days": 180,
+      "country_hour_pairs": 17284
+    },
+    "validation": {
+      "first": "2026-03-15",
+      "last": "2026-06-17",
+      "days": 95,
+      "country_hour_pairs": 9116
+    }
+  },
+  "bootstrap": {
+    "repetitions": 2000,
+    "block_days": 7,
+    "seed": 20260915,
+    "shared_days_across_countries": true
+  },
+  "residual_configuration_selection": "original saved validation selection; no reselection or refitting",
+  "original_source_test_days": 90,
+  "retained_test_days": 75,
+  "original_fit_count": 151,
+  "retained_fit_count": 145,
+  "retained_validation_fits": 112,
+  "retained_test_fits": 33,
+  "final_test_refit_day": "2026-08-27",
+  "final_test_refit_last_training_day": "2026-08-25",
+  "final_test_refit_retained_forecast_days": 5,
+  "original_run_delivery": "2026-09-16",
+  "snapshot_materialization": "2026-09-15",
+  "snapshot_available_on_cutoff_proven": false,
+  "label_versions": "retrospectively frozen_actual and refreshed observed snapshots; no assertion of August-31 availability",
+  "no_provider_label_fallback_in_evaluation": true,
+  "source_hashes": [
+    {
+      "path": "runs/experiments/nuclear_forecast_v1/2026-09-16/be/civil_pit_v2/report_only/frozen_result/manifest.json",
+      "sha256": "ae78800e7ff031768c0e6c1bf23238d2050fe6a9bd4c71aed894c5d5e7830f4e"
+    },
+    {
+      "path": "runs/experiments/nuclear_forecast_v1/2026-09-16/be/civil_pit_v2/report_only/frozen_result/kalman_backtest.parquet",
+      "sha256": "c1f2df6c7c9b1c4f27ff952b57f0748395d79d35d584a4cdb14e9ede708e7052"
+    },
+    {
+      "path": "runs/experiments/nuclear_forecast_v1/2026-09-16/be/civil_pit_v2/report_only/sources/20260915T120522571976Z_ef008299/statistics_history_audit.json",
+      "sha256": "ac87d37bec5ac047359b7c22e5d95291e5c8110b2ce8fbfc95c0d36662678be7"
+    },
+    {
+      "path": "runs/experiments/nuclear_forecast_v1/2026-09-16/be/civil_pit_v2/report_only/sources/20260915T120522571976Z_ef008299/inputs/observed_latest.parquet",
+      "sha256": "712aba18d4b43adb04689e8c6e4e08efcf0e6337fed166cb683882907d982b18"
+    },
+    {
+      "path": "runs/experiments/nuclear_forecast_v1/2026-09-16/be/civil_pit_v2/report_only/sources/20260915T120522571976Z_ef008299/inputs/storm_dashboard_official_statistics.parquet",
+      "sha256": "cb3c7a4644bef1b683180b2a00c22c5d04e8fad6ec1f4f1a63c6b61e76cdd44c"
+    },
+    {
+      "path": "runs/experiments/nuclear_forecast_v1/2026-09-16/de/civil_pit_v2/report_only/frozen_result/manifest.json",
+      "sha256": "d050824b11486af27096920be85820696cba06fa0d049083538b1cc358e89ecf"
+    },
+    {
+      "path": "runs/experiments/nuclear_forecast_v1/2026-09-16/de/civil_pit_v2/report_only/frozen_result/kalman_backtest.parquet",
+      "sha256": "b6311e468c05b68844c32168e2214eaaf7c85179b34e1abbf9a109f1858a89f2"
+    },
+    {
+      "path": "runs/experiments/nuclear_forecast_v1/2026-09-16/de/civil_pit_v2/report_only/sources/20260915T120607760882Z_f6a6a53e/statistics_history_audit.json",
+      "sha256": "e43c2f5d471f48d4043761ad9f85d759543695f59e4a18bd4926b60b5248d403"
+    },
+    {
+      "path": "runs/experiments/nuclear_forecast_v1/2026-09-16/de/civil_pit_v2/report_only/sources/20260915T120607760882Z_f6a6a53e/inputs/observed_latest.parquet",
+      "sha256": "f0b86d9d73ae4508651a8d9bab4b0d511178148de0ebeb241fdce846d9e03947"
+    },
+    {
+      "path": "runs/experiments/nuclear_forecast_v1/2026-09-16/de/civil_pit_v2/report_only/sources/20260915T120607760882Z_f6a6a53e/inputs/storm_dashboard_official_statistics.parquet",
+      "sha256": "14258a9d5ab2b9e54f1641c9db3065f4919c1416fa6c274861fc40a2f5b4c590"
+    },
+    {
+      "path": "runs/experiments/nuclear_forecast_v1/2026-09-16/fr/civil_pit_v2/report_only/frozen_result/manifest.json",
+      "sha256": "bfa4935d237bd678fd84a69376ae0a6ab40f9b1e3558598c10a90bef9db33d1e"
+    },
+    {
+      "path": "runs/experiments/nuclear_forecast_v1/2026-09-16/fr/civil_pit_v2/report_only/frozen_result/kalman_backtest.parquet",
+      "sha256": "589a3ee9bd239672ce1f611c8602ae1b2f0a2f36a037d578b35a8812115bba5b"
+    },
+    {
+      "path": "runs/experiments/nuclear_forecast_v1/2026-09-16/fr/civil_pit_v2/report_only/sources/20260915T120651322085Z_65a44cc6/statistics_history_audit.json",
+      "sha256": "1b1f3e8307d302530582afc0b8369bbf2606f465700dff4db14647bd9906ceb8"
+    },
+    {
+      "path": "runs/experiments/nuclear_forecast_v1/2026-09-16/fr/civil_pit_v2/report_only/sources/20260915T120651322085Z_65a44cc6/inputs/observed_latest.parquet",
+      "sha256": "3b42a0fd8f5163f424c7c8aa5a79d7a07a657f73616e13f8e1ca171f3f1a5747"
+    },
+    {
+      "path": "runs/experiments/nuclear_forecast_v1/2026-09-16/fr/civil_pit_v2/report_only/sources/20260915T120651322085Z_65a44cc6/inputs/storm_dashboard_official_statistics.parquet",
+      "sha256": "dda8b34ec4bec42989713d7f238c70dfcad8905e038720487d9b813024219a4d"
+    },
+    {
+      "path": "runs/experiments/nuclear_forecast_v1/2026-09-16/nl/civil_pit_v2/report_only/frozen_result/manifest.json",
+      "sha256": "f325836d8d68dd5ee9a3723716d0de8a13c582920e77d977991baf93dbc05975"
+    },
+    {
+      "path": "runs/experiments/nuclear_forecast_v1/2026-09-16/nl/civil_pit_v2/report_only/frozen_result/kalman_backtest.parquet",
+      "sha256": "6d7b1de83e180976029309c2f68cd05a2558f77c31c2856617b1f732e4c1438a"
+    },
+    {
+      "path": "runs/experiments/nuclear_forecast_v1/2026-09-16/nl/civil_pit_v2/report_only/sources/20260915T120734065696Z_6ce38353/statistics_history_audit.json",
+      "sha256": "8e6be1771fe73ab23ad85edfa684e602a91bd1cea0d0a62e7ff31ed673c3f6c3"
+    },
+    {
+      "path": "runs/experiments/nuclear_forecast_v1/2026-09-16/nl/civil_pit_v2/report_only/sources/20260915T120734065696Z_6ce38353/inputs/observed_latest.parquet",
+      "sha256": "612544648dec1ea5aad2797cb7f0e191dbf5e0bb095910cd5adfa9053423d367"
+    },
+    {
+      "path": "runs/experiments/nuclear_forecast_v1/2026-09-16/nl/civil_pit_v2/report_only/sources/20260915T120734065696Z_6ce38353/inputs/storm_dashboard_official_statistics.parquet",
+      "sha256": "74472441da4396caeebffad69d2d07d925df6fc8d3077379c516d02d362db59e"
+    },
+    {
+      "path": "research/tensor_timesfm_20260915/metrics/verified_hourly_pairs.csv.gz",
+      "sha256": "0548b72b6fadcb700d1b863db93fd95d0076670fb5e11bf4ad1c1fe1413a1188"
+    },
+    {
+      "path": "research/tensor_timesfm_20260915/metrics/locked_test_predictions.csv.gz",
+      "sha256": "7ace12d5a7f588457d997c0c3974fbf29b40e66c9245a5593311b8f350dfa400"
+    },
+    {
+      "path": "research/tensor_timesfm_20260915/metrics/extraction_manifest.json",
+      "sha256": "b2786542406944125ff9a006cada018f06c3eb37da813c77e054edb33fee73c1"
+    },
+    {
+      "path": "research/tensor_timesfm_20260915/metrics/validation_selection_locked.json",
+      "sha256": "18b158afbf0a87fb9f6ee45dd46eb8a723aec64d7f3403435bd4a23bdbfaf945"
+    },
+    {
+      "path": "research/tensor_timesfm_20260915/metrics/experiment_summary.json",
+      "sha256": "1d1738698d006eb35cf76cdb73b96e4d3b682ae3690c72dee45f70c094541a2e"
+    },
+    {
+      "path": "research/tensor_timesfm_20260915/metrics/rolling_fit_audit.json",
+      "sha256": "cce2eff6d5fdc351d4357f93860d92f5a5ff9047c4ff8fccfd91c335a83db813"
+    }
+  ],
+  "retained_ukf_selected_country_days": 1,
+  "retained_ukf_selected_hours": 24,
+  "ukf_selected_days": [
+    {
+      "zone": "NL",
+      "day": "2026-02-21",
+      "physical_hours": 24,
+      "weight_min": 0.45,
+      "weight_max": 0.45,
+      "shift_min": -0.7358988572169665,
+      "shift_max": -0.7352998055718687,
+      "sum_absolute_shift": 17.653999104694044,
+      "in_test75": false
+    }
+  ],
+  "thresholds_initial_train_frozen_actual": {
+    "BE": {
+      "q95": 143.32000732421875,
+      "q99": 183.81799316406253
+    },
+    "DE": {
+      "q95": 162.67999267578125,
+      "q99": 249.92399902343757
+    },
+    "FR": {
+      "q95": 125.0999984741211,
+      "q99": 158.46099548339848
+    },
+    "NL": {
+      "q95": 153.5500030517578,
+      "q99": 216.53199462890635
+    }
+  },
+  "initial_train_dependence": {
+    "initial_train_days": 180,
+    "physical_hours_per_country": 4321,
+    "zones": [
+      "BE",
+      "DE",
+      "FR",
+      "NL"
+    ],
+    "correlation": [
+      [
+        1.0,
+        0.5943853487569477,
+        0.42536725753095994,
+        0.7724559134402521
+      ],
+      [
+        0.5943853487569477,
+        1.0,
+        0.18006042446635864,
+        0.7102788756494969
+      ],
+      [
+        0.42536725753095994,
+        0.18006042446635864,
+        1.0,
+        0.24736715464449185
+      ],
+      [
+        0.7724559134402521,
+        0.7102788756494969,
+        0.24736715464449185,
+        1.0
+      ]
+    ],
+    "variance_shares": [
+      0.6570015606911325,
+      0.20189004479838113,
+      0.09941632231676636,
+      0.0416920721937201
+    ],
+    "participation_rank": 2.0659770815379503,
+    "standardized_variance_shares": [
+      0.636491561972023,
+      0.22426718191920372,
+      0.09217196291432339,
+      0.04706929319445002
+    ]
+  },
+  "source_selection_json_sha256": "18b158afbf0a87fb9f6ee45dd46eb8a723aec64d7f3403435bd4a23bdbfaf945",
+  "copied_selection_json_semantically_identical": true
+}

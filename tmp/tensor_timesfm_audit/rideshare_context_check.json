@@ -1,0 +1,69 @@
+{
+  "kind": "structural_gradient_diagnostic_NOT_forecast_benchmark",
+  "upstream_commit": "130fd4787f268cbdd0d46ac5b840290b7c3440dc",
+  "source_sha256": "633119639b65a487448a8cbc7392d93e29f63866c04b0f25fef4ccb7ef8c64c6",
+  "source_lines": {
+    "class": [
+      758,
+      851
+    ],
+    "detached_helper": [
+      625,
+      661
+    ],
+    "split": [
+      1945,
+      1961
+    ],
+    "test_context": [
+      2010,
+      2014
+    ],
+    "reconstruction": [
+      2065,
+      2090
+    ],
+    "forecast_freeze": [
+      2120,
+      2149
+    ],
+    "test_call": [
+      2215,
+      2226
+    ]
+  },
+  "shape_and_parameters": {
+    "T": 541,
+    "C": 210,
+    "H": 168,
+    "diagnostic_rank": 4,
+    "diagnostic_hidden": 16
+  },
+  "train_rows": [
+    0,
+    210
+  ],
+  "validation_rows": [
+    211,
+    372
+  ],
+  "test_rows": [
+    373,
+    540
+  ],
+  "test_context_rows": [
+    163,
+    372
+  ],
+  "test_context_size": 210,
+  "test_context_rows_without_observation_gradient": 162,
+  "test_context_fraction_without_observation_gradient": 0.7714285714285715,
+  "reconstruction_nonzero_time_gradient_row_count": 211,
+  "validation_time_gradient_max_after_reconstruction": 0.0,
+  "time_gradient_after_forecast_supervision": null,
+  "decoder_receives_forecast_supervision": true,
+  "scope_limit": "Index/gradient mechanism verified on a small reimplementation. TimesFM and published metrics not run. Rows may undergo optimizer weight decay; no claim they remain bitwise equal to initialization.",
+  "torch_version": "2.13.0+xpu",
+  "device": "cpu",
+  "seconds": 4.236380699999927
+}

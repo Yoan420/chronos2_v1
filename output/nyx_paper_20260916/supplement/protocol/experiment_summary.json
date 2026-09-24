@@ -1,0 +1,43 @@
+{
+  "protocol": {
+    "initial_train_days": 180,
+    "validation_days": 95,
+    "locked_test_days": 90,
+    "last_label_lag_days": 2,
+    "rolling_fit_max_days": 180,
+    "first_validation_fit_days": 165,
+    "refit_every_days": 7,
+    "issue_frequency": "fresh day-ahead features daily, coefficients refit weekly; not a seven-day forecast issued at refit",
+    "feature_warmup_days": 14,
+    "ridge_ewma_halflife_days": 14,
+    "training_and_validation_labels": "frozen_actual, retrospective source vintage",
+    "test_labels": "both audited latest and frozen_actual",
+    "normalization_imputation_pca_fit": "eligible training rows only at every refit",
+    "late_test_adaptation": "earlier test labels become training data under the fixed D-2 protocol; no hyperparameter reselection",
+    "features": "D-2 same civil-hour four-country residuals, causal country and country-hour EWMA residuals",
+    "dst": "both physical target hours retained; repeated civil-hour lag residuals averaged; missing lag feature imputed using training data only",
+    "corrections": "point median only, no corrected quantiles or uncertainty claims",
+    "bootstrap_repetitions": 2000,
+    "bootstrap_block_days": 7,
+    "bootstrap_seed": 20260915,
+    "delta_sign": "competitor loss minus NYX loss; negative favors competitor",
+    "bootstrap_limits": "conditional on these 90 summer-dominated days and selected hyperparameters; neither vintage uncertainty nor selection uncertainty included"
+  },
+  "primary_family_selected_before_test": "nyx",
+  "validation_selection_sha256": "18b158afbf0a87fb9f6ee45dd46eb8a723aec64d7f3403435bd4a23bdbfaf945",
+  "input_matrix_sha256": "0548b72b6fadcb700d1b863db93fd95d0076670fb5e11bf4ad1c1fe1413a1188",
+  "fit_count": 151,
+  "fit_cutoffs_all_valid": true,
+  "future_label_influence_check_passed": true,
+  "runtime_seconds": 3.4651607999999214,
+  "cpu_seconds": 3.421875,
+  "rss_mb": 178.9921875,
+  "limitations": [
+    "No prospective gain claimed: retrospective frozen prequential forecasts are not actually issued vintages.",
+    "Actual and frozen labels can be revised after historical origins; D-2 alone cannot prove availability.",
+    "Final 90-day holdout covers June-September rather than the entire seasonal cycle.",
+    "Secondary family/country/regime contrasts are descriptive; no multiplicity adjustment.",
+    "Storm official benchmark availability at strict 08:00 cutoff has not been established.",
+    "No Tensor-TimesFM forecasts or training were run; no complementarity claim against that model."
+  ]
+}

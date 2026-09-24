@@ -1,0 +1,122 @@
+{
+  "schema_version": 1,
+  "manifest_kind": "chronos2_exogenous_live_sources",
+  "production_evidence_kind": "prospective_capture",
+  "zones": {
+    "FR": [
+      {
+        "name": "residual_load",
+        "family": "residual_load",
+        "path": "../data/live_capture/fr/residual_load.parquet",
+        "audit_path": "../data/live_capture/fr/residual_load.parquet.audit.json",
+        "value_columns": {
+          "fr_residual_load_fcst": "fr_residual_load_fcst",
+          "de_residual_load_fcst": "de_residual_load_fcst",
+          "be_residual_load_fcst": "be_residual_load_fcst",
+          "nl_residual_load_fcst": "nl_residual_load_fcst",
+          "es_residual_load_fcst": "es_residual_load_fcst"
+        },
+        "cutoff_column": "cutoff_time_utc",
+        "cutoff_timezone": "Europe/Paris",
+        "information_time_columns": ["snapshot_time_utc", "revision_time_utc"],
+        "age_column": "revision_time_utc",
+        "operational_eligibility_column": "operational_eligible",
+        "known_future": true,
+        "consumers": ["chronos"],
+        "production_evidence_kind": "prospective_capture"
+      },
+      {
+        "name": "weather_fr_temperature",
+        "family": "weather",
+        "path": "../data/live_capture/fr/temperature.parquet",
+        "audit_path": "../data/live_capture/fr/temperature.parquet.audit.json",
+        "value_columns": {"fr_temperature_fcst": "value"},
+        "cutoff_column": "snapshot_time_utc",
+        "cutoff_timezone": "Europe/Paris",
+        "information_time_columns": ["snapshot_time_utc", "revision_time_utc"],
+        "age_column": "revision_time_utc",
+        "operational_eligibility_column": "operational_eligible",
+        "known_future": true,
+        "consumers": ["chronos"],
+        "production_evidence_kind": "prospective_capture"
+      },
+      {
+        "name": "weather_fr_wind_generation",
+        "family": "weather",
+        "path": "../data/live_capture/fr/wind_generation.parquet",
+        "audit_path": "../data/live_capture/fr/wind_generation.parquet.audit.json",
+        "value_columns": {"fr_wind_generation_fcst": "value"},
+        "cutoff_column": "snapshot_time_utc",
+        "cutoff_timezone": "Europe/Paris",
+        "information_time_columns": ["snapshot_time_utc", "revision_time_utc"],
+        "age_column": "revision_time_utc",
+        "operational_eligibility_column": "operational_eligible",
+        "known_future": true,
+        "consumers": ["chronos"],
+        "production_evidence_kind": "prospective_capture"
+      },
+      {
+        "name": "weather_fr_solar_generation",
+        "family": "weather",
+        "path": "../data/live_capture/fr/solar_generation.parquet",
+        "audit_path": "../data/live_capture/fr/solar_generation.parquet.audit.json",
+        "value_columns": {"fr_solar_generation_fcst": "value"},
+        "cutoff_column": "snapshot_time_utc",
+        "cutoff_timezone": "Europe/Paris",
+        "information_time_columns": ["snapshot_time_utc", "revision_time_utc"],
+        "age_column": "revision_time_utc",
+        "operational_eligibility_column": "operational_eligible",
+        "known_future": true,
+        "consumers": ["chronos"],
+        "production_evidence_kind": "prospective_capture"
+      },
+      {
+        "name": "fuel_market",
+        "family": "fuel",
+        "path": "../data/live_capture/fr/fuel_market.parquet",
+        "audit_path": "../data/live_capture/fr/fuel_market.parquet.audit.json",
+        "value_columns": {
+          "ttf_m1_eur_mwh_th": "ttf_m1_eur_mwh_th",
+          "eua_first_dec_eur_tco2": "eua_first_dec_eur_tco2",
+          "ttf_change_1d": "ttf_change_1d",
+          "ttf_change_5d": "ttf_change_5d",
+          "eua_change_1d": "eua_change_1d",
+          "eua_change_5d": "eua_change_5d",
+          "fuel_volatility_20d": "fuel_volatility_20d",
+          "ccgt_marginal_cost_eur_mwh": "ccgt_marginal_cost_eur_mwh"
+        },
+        "cutoff_column": "snapshot_time_utc",
+        "cutoff_timezone": "Europe/Paris",
+        "information_time_columns": [
+          "snapshot_time_utc",
+          "revision_time_utc",
+          "market_source_value_time_utc"
+        ],
+        "age_column": "market_source_value_time_utc",
+        "operational_eligibility_column": "operational_eligible",
+        "known_future": true,
+        "consumers": ["chronos"],
+        "production_evidence_kind": "prospective_capture"
+      },
+      {
+        "name": "flowbased_core",
+        "family": "flowbased",
+        "path": "../data/live_capture/fr/flowbased_core.parquet",
+        "audit_path": "../data/live_capture/fr/flowbased_core.parquet.audit.json",
+        "value_columns": {},
+        "cutoff_column": "flowbased_cutoff_time_utc",
+        "cutoff_timezone": "Europe/Paris",
+        "information_time_columns": ["flowbased_source_last_modified_utc"],
+        "age_column": "flowbased_source_last_modified_utc",
+        "eligibility_column": "flowbased_pit_eligible",
+        "operational_eligibility_column": "flowbased_operational_pit_eligible",
+        "stage_column": "flowbased_publication_stage",
+        "allowed_stages": ["initial_computation", "initial_computation_fallback"],
+        "transform": "flowbased_compact",
+        "known_future": true,
+        "consumers": ["chronos"],
+        "production_evidence_kind": "prospective_capture"
+      }
+    ]
+  }
+}

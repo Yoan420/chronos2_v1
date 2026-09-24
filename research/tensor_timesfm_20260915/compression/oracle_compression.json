@@ -1,0 +1,3921 @@
+{
+  "diagnostic": "ORACLE PCA RECONSTRUCTION ONLY \u2014 NOT A FORECAST OR A PREDICTIVE GAIN",
+  "input_path": "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\tensor_timesfm_audit\\metrics\\verified_hourly_pairs.csv.gz",
+  "input_sha256": "0548b72b6fadcb700d1b863db93fd95d0076670fb5e11bf4ad1c1fe1413a1188",
+  "script_sha256": "0dd12849bd150730b32c8823447dd3e57b8e8dca4c3f8b02ef7b77c45bcf8980",
+  "alignment": {
+    "train": {
+      "days": 180,
+      "hours_per_country": 4321,
+      "first_day": "2025-09-16",
+      "last_day": "2026-03-14",
+      "first_utc": "2025-09-15T22:00:00+00:00",
+      "last_utc": "2026-03-14T22:00:00+00:00"
+    },
+    "validation": {
+      "days": 95,
+      "hours_per_country": 2279,
+      "first_day": "2026-03-15",
+      "last_day": "2026-06-17",
+      "first_utc": "2026-03-14T23:00:00+00:00",
+      "last_utc": "2026-06-17T21:00:00+00:00"
+    },
+    "test": {
+      "days": 90,
+      "hours_per_country": 2160,
+      "first_day": "2026-06-18",
+      "last_day": "2026-09-15",
+      "first_utc": "2026-06-17T22:00:00+00:00",
+      "last_utc": "2026-09-15T21:00:00+00:00"
+    },
+    "civil_day_hour_counts": {
+      "23": 1,
+      "24": 363,
+      "25": 1
+    }
+  },
+  "method": {
+    "centering_fit": "train only",
+    "pca_fit": "train only",
+    "standardization": false,
+    "test_latents": "actual future values projected into the frozen training basis",
+    "rank4": "trivial four-dimensional identity, no compression",
+    "error_sign": "reconstruction minus actual target",
+    "rank_selection": "none"
+  },
+  "versions": {
+    "python": "3.11.9",
+    "numpy": "2.4.6",
+    "pandas": "2.3.3"
+  },
+  "spaces": {
+    "observed_price": {
+      "diagnostic": "ORACLE reconstruction, not a forecast",
+      "space": "observed_price",
+      "definition": "actual price",
+      "unit": "EUR/MWh",
+      "standardized": false,
+      "country_order": [
+        "BE",
+        "DE",
+        "FR",
+        "NL"
+      ],
+      "train_center": [
+        87.31991495024309,
+        96.36720087942591,
+        65.04416223096493,
+        92.6170776440638
+      ],
+      "train_eigenvalues_eur_mwh_squared": [
+        5409.554549058964,
+        727.6171895967323,
+        86.80655768185342,
+        36.700825327063654
+      ],
+      "train_explained_variance_fraction": [
+        0.8640523566108993,
+        0.1162201696424382,
+        0.01386535805380375,
+        0.005862115692858813
+      ],
+      "train_cumulative_explained_variance_fraction": [
+        0.8640523566108993,
+        0.9802725262533375,
+        0.9941378843071412,
+        1.0
+      ],
+      "train_component_loadings": [
+        [
+          0.47600622430093237,
+          0.5663365893031507,
+          0.4355312225350865,
+          0.5128289151757516
+        ],
+        [
+          0.0483619760874961,
+          -0.45902068254420714,
+          0.8485673675367922,
+          -0.25863981715358847
+        ],
+        [
+          -0.499376567669724,
+          0.6733647785336314,
+          0.24413770422316008,
+          -0.48744199662052495
+        ],
+        [
+          0.7222895799872018,
+          0.12305590454536582,
+          -0.1750507307194597,
+          -0.6576566343260108
+        ]
+      ],
+      "train_positive_price_thresholds": {
+        "0.95": {
+          "BE": 143.32,
+          "DE": 162.68,
+          "FR": 125.1,
+          "NL": 153.55
+        },
+        "0.99": {
+          "BE": 183.81800000000004,
+          "DE": 249.92400000000006,
+          "FR": 158.46100000000004,
+          "NL": 216.53200000000012
+        }
+      },
+      "rank_results": [
+        {
+          "rank": 1,
+          "train_variance_retained": 0.8640523566108993,
+          "test_reconstruction": {
+            "n": 8640,
+            "mae_eur_mwh": 14.221068246772559,
+            "rmse_eur_mwh": 20.7307069467114,
+            "bias_eur_mwh": -1.159555433790924
+          },
+          "maximum_absolute_reconstruction_error": 305.1321233352197,
+          "test_regimes": {
+            "all": {
+              "n": 8640,
+              "mae_eur_mwh": 14.221068246772559,
+              "rmse_eur_mwh": 20.7307069467114,
+              "bias_eur_mwh": -1.159555433790924
+            },
+            "negative_price": {
+              "n": 522,
+              "mae_eur_mwh": 6.993606093203417,
+              "rmse_eur_mwh": 12.409292247210054,
+              "bias_eur_mwh": 1.6195652526085595
+            },
+            "positive_peak_q95_train": {
+              "n": 3393,
+              "mae_eur_mwh": 18.656631126158345,
+              "rmse_eur_mwh": 26.549903496729918,
+              "bias_eur_mwh": -7.056061441015802
+            },
+            "positive_peak_q99_train": {
+              "n": 1025,
+              "mae_eur_mwh": 28.268349618281018,
+              "rmse_eur_mwh": 38.89292530103309,
+              "bias_eur_mwh": -19.65807803482507
+            }
+          },
+          "countries": {
+            "BE": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 8.198237962004098,
+                "rmse_eur_mwh": 17.046782664206265,
+                "bias_eur_mwh": -6.859911107399254
+              },
+              "negative_price": {
+                "n": 73,
+                "mae_eur_mwh": 5.340905279590405,
+                "rmse_eur_mwh": 5.354273657445481,
+                "bias_eur_mwh": 5.340905279590405
+              },
+              "positive_peak_q95_train": {
+                "n": 988,
+                "mae_eur_mwh": 9.697693749916036,
+                "rmse_eur_mwh": 21.62417724578132,
+                "bias_eur_mwh": -9.236123043998054
+              },
+              "positive_peak_q99_train": {
+                "n": 317,
+                "mae_eur_mwh": 17.599689026429775,
+                "rmse_eur_mwh": 35.52336336025081,
+                "bias_eur_mwh": -17.066667700211745
+              }
+            },
+            "DE": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 15.578907368551073,
+                "rmse_eur_mwh": 19.14164035905803,
+                "bias_eur_mwh": 14.29999301049023
+              },
+              "negative_price": {
+                "n": 165,
+                "mae_eur_mwh": 2.3675162709427475,
+                "rmse_eur_mwh": 6.378969277874856,
+                "bias_eur_mwh": 1.1479646683081262
+              },
+              "positive_peak_q95_train": {
+                "n": 549,
+                "mae_eur_mwh": 21.514619814982126,
+                "rmse_eur_mwh": 24.272070516525712,
+                "bias_eur_mwh": 19.778594904052618
+              },
+              "positive_peak_q99_train": {
+                "n": 53,
+                "mae_eur_mwh": 30.016461634506086,
+                "rmse_eur_mwh": 41.7232647902495,
+                "bias_eur_mwh": 17.72400558987242
+              }
+            },
+            "FR": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 24.776755053371595,
+                "rmse_eur_mwh": 30.193153880120118,
+                "bias_eur_mwh": -17.605369864647116
+              },
+              "negative_price": {
+                "n": 147,
+                "mae_eur_mwh": 12.900685875279782,
+                "rmse_eur_mwh": 19.226534957859144,
+                "bias_eur_mwh": -4.813758372038607
+              },
+              "positive_peak_q95_train": {
+                "n": 1115,
+                "mae_eur_mwh": 31.423125580046822,
+                "rmse_eur_mwh": 36.36378524517973,
+                "bias_eur_mwh": -25.926203072287027
+              },
+              "positive_peak_q99_train": {
+                "n": 557,
+                "mae_eur_mwh": 35.71703259282424,
+                "rmse_eur_mwh": 41.84266975937656,
+                "bias_eur_mwh": -27.172527435011848
+              }
+            },
+            "NL": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 8.330372603163473,
+                "rmse_eur_mwh": 12.264872847971066,
+                "bias_eur_mwh": 5.527066226392445
+              },
+              "negative_price": {
+                "n": 137,
+                "mae_eur_mwh": 7.107556838470094,
+                "rmse_eur_mwh": 11.216597671219079,
+                "bias_eur_mwh": 7.107556838470094
+              },
+              "positive_peak_q95_train": {
+                "n": 741,
+                "mae_eur_mwh": 9.274381492524734,
+                "rmse_eur_mwh": 13.34159001398981,
+                "bias_eur_mwh": 4.363483024802445
+              },
+              "positive_peak_q99_train": {
+                "n": 98,
+                "mae_eur_mwh": 19.496911393141616,
+                "rmse_eur_mwh": 29.09979548370852,
+                "bias_eur_mwh": -5.547661629491964
+              }
+            }
+          },
+          "spreads": {
+            "FR-DE": {
+              "meaning": "ORACLE reconstructed price spread, EUR/MWh",
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 38.388895406459696,
+                "rmse_eur_mwh": 44.60028763775764,
+                "bias_eur_mwh": -31.905362875137346
+              },
+              "train_absolute_spread_q95": 92.52499999999999,
+              "test_large_absolute_spread": {
+                "n": 51,
+                "mae_eur_mwh": 88.89273079979907,
+                "rmse_eur_mwh": 105.49432916971465,
+                "bias_eur_mwh": 67.35319867792687
+              },
+              "actual_test_mean": -9.107429398148149,
+              "oracle_reconstructed_test_mean": -41.01279227328549,
+              "material_actual_nonzero_hours": 1841,
+              "direction_errors_or_erased_spreads": 856
+            },
+            "BE-NL": {
+              "meaning": "ORACLE reconstructed price spread, EUR/MWh",
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 12.82734464900972,
+                "rmse_eur_mwh": 20.03957365632227,
+                "bias_eur_mwh": -12.3869773337917
+              },
+              "train_absolute_spread_q95": 26.999999999999986,
+              "test_large_absolute_spread": {
+                "n": 141,
+                "mae_eur_mwh": 57.67819054631505,
+                "rmse_eur_mwh": 64.98189171065816,
+                "bias_eur_mwh": -57.42482176514306
+              },
+              "actual_test_mean": 4.36207638888889,
+              "oracle_reconstructed_test_mean": -8.024900944902809,
+              "material_actual_nonzero_hours": 1836,
+              "direction_errors_or_erased_spreads": 954
+            }
+          },
+          "negative_price_sign": {
+            "negative_actual_cells": 522,
+            "reconstructed_nonnegative_cells": 228,
+            "fraction_lost": 0.4367816091954023,
+            "near_zero_tolerance_eur_mwh": 1e-09,
+            "material_sign_losses": 228
+          }
+        },
+        {
+          "rank": 2,
+          "train_variance_retained": 0.9802725262533375,
+          "test_reconstruction": {
+            "n": 8640,
+            "mae_eur_mwh": 4.947862617293406,
+            "rmse_eur_mwh": 11.736750281258965,
+            "bias_eur_mwh": -0.11690035704664632
+          },
+          "maximum_absolute_reconstruction_error": 297.91747044478666,
+          "test_regimes": {
+            "all": {
+              "n": 8640,
+              "mae_eur_mwh": 4.947862617293406,
+              "rmse_eur_mwh": 11.736750281258965,
+              "bias_eur_mwh": -0.11690035704664632
+            },
+            "negative_price": {
+              "n": 522,
+              "mae_eur_mwh": 4.392851532840112,
+              "rmse_eur_mwh": 6.417998641823255,
+              "bias_eur_mwh": 0.5563225916391439
+            },
+            "positive_peak_q95_train": {
+              "n": 3393,
+              "mae_eur_mwh": 5.575413342169372,
+              "rmse_eur_mwh": 15.324844511345148,
+              "bias_eur_mwh": -1.1686692219965584
+            },
+            "positive_peak_q99_train": {
+              "n": 1025,
+              "mae_eur_mwh": 10.095777923055937,
+              "rmse_eur_mwh": 26.044503401296662,
+              "bias_eur_mwh": -2.280551414413114
+            }
+          },
+          "countries": {
+            "BE": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 7.359782819381451,
+                "rmse_eur_mwh": 17.081524425334422,
+                "bias_eur_mwh": -5.734788441696353
+              },
+              "negative_price": {
+                "n": 73,
+                "mae_eur_mwh": 5.7846358653117855,
+                "rmse_eur_mwh": 5.794771588449226,
+                "bias_eur_mwh": 5.7846358653117855
+              },
+              "positive_peak_q95_train": {
+                "n": 988,
+                "mae_eur_mwh": 8.324901919778554,
+                "rmse_eur_mwh": 21.91130977013464,
+                "bias_eur_mwh": -7.781351551341883
+              },
+              "positive_peak_q99_train": {
+                "n": 317,
+                "mae_eur_mwh": 16.39135795951744,
+                "rmse_eur_mwh": 36.470861244931676,
+                "bias_eur_mwh": -15.84566338328841
+              }
+            },
+            "DE": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 5.781987320136042,
+                "rmse_eur_mwh": 12.46089026556473,
+                "bias_eur_mwh": 3.6210543951090517
+              },
+              "negative_price": {
+                "n": 165,
+                "mae_eur_mwh": 5.2795536042686315,
+                "rmse_eur_mwh": 6.158947056428582,
+                "bias_eur_mwh": -3.6718039566966865
+              },
+              "positive_peak_q95_train": {
+                "n": 549,
+                "mae_eur_mwh": 8.269693262352835,
+                "rmse_eur_mwh": 19.34669926777262,
+                "bias_eur_mwh": 6.553560353899259
+              },
+              "positive_peak_q99_train": {
+                "n": 53,
+                "mae_eur_mwh": 39.021516081033035,
+                "rmse_eur_mwh": 58.6069110605749,
+                "bias_eur_mwh": 30.118367902787895
+              }
+            },
+            "FR": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 2.829331175490155,
+                "rmse_eur_mwh": 6.442142941006419,
+                "bias_eur_mwh": 2.1362216878605054
+              },
+              "negative_price": {
+                "n": 147,
+                "mae_eur_mwh": 3.0620961764448476,
+                "rmse_eur_mwh": 5.632437386847927,
+                "bias_eur_mwh": -0.5140542300016016
+              },
+              "positive_peak_q95_train": {
+                "n": 1115,
+                "mae_eur_mwh": 2.5519905887999803,
+                "rmse_eur_mwh": 7.34339263390463,
+                "bias_eur_mwh": 2.264179644559812
+              },
+              "positive_peak_q99_train": {
+                "n": 557,
+                "mae_eur_mwh": 3.3981577422697975,
+                "rmse_eur_mwh": 9.610798060984463,
+                "bias_eur_mwh": 2.999167215681084
+              }
+            },
+            "NL": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 3.8203491541659744,
+                "rmse_eur_mwh": 7.902642601208059,
+                "bias_eur_mwh": -0.49008906945978914
+              },
+              "negative_price": {
+                "n": 137,
+                "mae_eur_mwh": 4.0112087542559225,
+                "rmse_eur_mwh": 7.702445770937836,
+                "bias_eur_mwh": 4.0112087542559225
+              },
+              "positive_peak_q95_train": {
+                "n": 741,
+                "mae_eur_mwh": 4.462676471924137,
+                "rmse_eur_mwh": 8.762118457885785,
+                "bias_eur_mwh": -3.2385752705579285
+              },
+              "positive_peak_q99_train": {
+                "n": 98,
+                "mae_eur_mwh": 12.15507840026815,
+                "rmse_eur_mwh": 20.23670314980872,
+                "bias_eur_mwh": -5.931628012787126
+              }
+            }
+          },
+          "spreads": {
+            "FR-DE": {
+              "meaning": "ORACLE reconstructed price spread, EUR/MWh",
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 3.396702806073922,
+                "rmse_eur_mwh": 6.851802958210962,
+                "bias_eur_mwh": -1.4848327072485463
+              },
+              "train_absolute_spread_q95": 92.52499999999999,
+              "test_large_absolute_spread": {
+                "n": 51,
+                "mae_eur_mwh": 23.198299267522703,
+                "rmse_eur_mwh": 31.350994759735862,
+                "bias_eur_mwh": -16.330441390055796
+              },
+              "actual_test_mean": -9.107429398148149,
+              "oracle_reconstructed_test_mean": -10.592262105396696,
+              "material_actual_nonzero_hours": 1841,
+              "direction_errors_or_erased_spreads": 230
+            },
+            "BE-NL": {
+              "meaning": "ORACLE reconstructed price spread, EUR/MWh",
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 7.329121284714645,
+                "rmse_eur_mwh": 17.45524863632026,
+                "bias_eur_mwh": -5.244699372236565
+              },
+              "train_absolute_spread_q95": 26.999999999999986,
+              "test_large_absolute_spread": {
+                "n": 141,
+                "mae_eur_mwh": 49.95757382049446,
+                "rmse_eur_mwh": 60.193403641642256,
+                "bias_eur_mwh": -49.81954094908514
+              },
+              "actual_test_mean": 4.36207638888889,
+              "oracle_reconstructed_test_mean": -0.8826229833476753,
+              "material_actual_nonzero_hours": 1836,
+              "direction_errors_or_erased_spreads": 483
+            }
+          },
+          "negative_price_sign": {
+            "negative_actual_cells": 522,
+            "reconstructed_nonnegative_cells": 201,
+            "fraction_lost": 0.3850574712643678,
+            "near_zero_tolerance_eur_mwh": 1e-09,
+            "material_sign_losses": 201
+          }
+        },
+        {
+          "rank": 3,
+          "train_variance_retained": 0.9941378843071412,
+          "test_reconstruction": {
+            "n": 8640,
+            "mae_eur_mwh": 2.211415745232605,
+            "rmse_eur_mwh": 6.270946978481219,
+            "bias_eur_mwh": -0.011842621429882688
+          },
+          "maximum_absolute_reconstruction_error": 129.65427683048756,
+          "test_regimes": {
+            "all": {
+              "n": 8640,
+              "mae_eur_mwh": 2.211415745232605,
+              "rmse_eur_mwh": 6.270946978481219,
+              "bias_eur_mwh": -0.011842621429882688
+            },
+            "negative_price": {
+              "n": 522,
+              "mae_eur_mwh": 1.2952093297444838,
+              "rmse_eur_mwh": 3.4473174395508837,
+              "bias_eur_mwh": 0.42722634830960304
+            },
+            "positive_peak_q95_train": {
+              "n": 3393,
+              "mae_eur_mwh": 1.9736104527702334,
+              "rmse_eur_mwh": 7.037317596519301,
+              "bias_eur_mwh": -0.20077239316078105
+            },
+            "positive_peak_q99_train": {
+              "n": 1025,
+              "mae_eur_mwh": 3.7194609948165467,
+              "rmse_eur_mwh": 11.630469972924846,
+              "bias_eur_mwh": -0.5693881501606834
+            }
+          },
+          "countries": {
+            "BE": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 3.807466612753693,
+                "rmse_eur_mwh": 9.058879318418414,
+                "bias_eur_mwh": -2.707302163832842
+              },
+              "negative_price": {
+                "n": 73,
+                "mae_eur_mwh": 1.8156309103354535,
+                "rmse_eur_mwh": 1.8405800872759932,
+                "bias_eur_mwh": 1.8156309103354535
+              },
+              "positive_peak_q95_train": {
+                "n": 988,
+                "mae_eur_mwh": 3.4256717492482123,
+                "rmse_eur_mwh": 9.842632245397228,
+                "bias_eur_mwh": -2.5906147798098718
+              },
+              "positive_peak_q99_train": {
+                "n": 317,
+                "mae_eur_mwh": 6.384353826970574,
+                "rmse_eur_mwh": 15.698810506754867,
+                "bias_eur_mwh": -5.692567264051761
+              }
+            },
+            "DE": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 0.6486750758151411,
+                "rmse_eur_mwh": 1.5433541055860611,
+                "bias_eur_mwh": -0.46124092867845917
+              },
+              "negative_price": {
+                "n": 165,
+                "mae_eur_mwh": 0.37565150754340043,
+                "rmse_eur_mwh": 0.5387231669370005,
+                "bias_eur_mwh": 0.14610564705712364
+              },
+              "positive_peak_q95_train": {
+                "n": 549,
+                "mae_eur_mwh": 0.5845277411153148,
+                "rmse_eur_mwh": 1.9152395185774034,
+                "bias_eur_mwh": -0.44932612485206874
+              },
+              "positive_peak_q99_train": {
+                "n": 53,
+                "mae_eur_mwh": 3.6059683736748678,
+                "rmse_eur_mwh": 5.873090806704965,
+                "bias_eur_mwh": -3.5184530385583623
+              }
+            },
+            "FR": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 0.9227598337557187,
+                "rmse_eur_mwh": 2.1954677017722637,
+                "bias_eur_mwh": 0.6561291138461857
+              },
+              "negative_price": {
+                "n": 147,
+                "mae_eur_mwh": 0.7662978732786269,
+                "rmse_eur_mwh": 1.5305919459333985,
+                "bias_eur_mwh": 0.16497279941020432
+              },
+              "positive_peak_q95_train": {
+                "n": 1115,
+                "mae_eur_mwh": 0.6267823303105519,
+                "rmse_eur_mwh": 2.1002680995712457,
+                "bias_eur_mwh": 0.4007321025235686
+              },
+              "positive_peak_q99_train": {
+                "n": 557,
+                "mae_eur_mwh": 0.7454489823621909,
+                "rmse_eur_mwh": 2.6311937023688587,
+                "bias_eur_mwh": 0.5307453190906288
+              }
+            },
+            "NL": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 3.4667614586058684,
+                "rmse_eur_mwh": 8.24825976780966,
+                "bias_eur_mwh": 2.4650434929455844
+              },
+              "negative_price": {
+                "n": 137,
+                "mae_eur_mwh": 2.692919179237323,
+                "rmse_eur_mwh": 6.3727732295131,
+                "bias_eur_mwh": 0.3073917086525492
+              },
+              "positive_peak_q95_train": {
+                "n": 741,
+                "mae_eur_mwh": 3.0932908904501955,
+                "rmse_eur_mwh": 9.393718950733486,
+                "bias_eur_mwh": 2.2647374098348587
+              },
+              "positive_peak_q99_train": {
+                "n": 98,
+                "mae_eur_mwh": 12.064040301599796,
+                "rmse_eur_mwh": 23.65562588312806,
+                "bias_eur_mwh": 11.344630990814494
+              }
+            }
+          },
+          "spreads": {
+            "FR-DE": {
+              "meaning": "ORACLE reconstructed price spread, EUR/MWh",
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 1.57143490957086,
+                "rmse_eur_mwh": 3.7388218073583244,
+                "bias_eur_mwh": 1.1173700425246447
+              },
+              "train_absolute_spread_q95": 92.52499999999999,
+              "test_large_absolute_spread": {
+                "n": 51,
+                "mae_eur_mwh": 12.386121006465943,
+                "rmse_eur_mwh": 16.166006404059097,
+                "bias_eur_mwh": 12.386121006465943
+              },
+              "actual_test_mean": -9.107429398148149,
+              "oracle_reconstructed_test_mean": -7.990059355623503,
+              "material_actual_nonzero_hours": 1841,
+              "direction_errors_or_erased_spreads": 125
+            },
+            "BE-NL": {
+              "meaning": "ORACLE reconstructed price spread, EUR/MWh",
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 7.274228071359561,
+                "rmse_eur_mwh": 17.307139086228077,
+                "bias_eur_mwh": -5.172345656778425
+              },
+              "train_absolute_spread_q95": 26.999999999999986,
+              "test_large_absolute_spread": {
+                "n": 141,
+                "mae_eur_mwh": 49.65831765158156,
+                "rmse_eur_mwh": 59.747405934649684,
+                "bias_eur_mwh": -49.51975540023658
+              },
+              "actual_test_mean": 4.36207638888889,
+              "oracle_reconstructed_test_mean": -0.8102692678895366,
+              "material_actual_nonzero_hours": 1836,
+              "direction_errors_or_erased_spreads": 476
+            }
+          },
+          "negative_price_sign": {
+            "negative_actual_cells": 522,
+            "reconstructed_nonnegative_cells": 151,
+            "fraction_lost": 0.289272030651341,
+            "near_zero_tolerance_eur_mwh": 1e-09,
+            "material_sign_losses": 151
+          }
+        },
+        {
+          "rank": 4,
+          "train_variance_retained": 1.0,
+          "test_reconstruction": {
+            "n": 8640,
+            "mae_eur_mwh": 2.6520308492583756e-14,
+            "rmse_eur_mwh": 3.798954186980876e-14,
+            "bias_eur_mwh": 1.5967503620195535e-14
+          },
+          "maximum_absolute_reconstruction_error": 3.410605131648481e-13,
+          "test_regimes": {
+            "all": {
+              "n": 8640,
+              "mae_eur_mwh": 2.6520308492583756e-14,
+              "rmse_eur_mwh": 3.798954186980876e-14,
+              "bias_eur_mwh": 1.5967503620195535e-14
+            },
+            "negative_price": {
+              "n": 522,
+              "mae_eur_mwh": 2.9542320025728463e-14,
+              "rmse_eur_mwh": 3.341087260692533e-14,
+              "bias_eur_mwh": -2.932624060976776e-14
+            },
+            "positive_peak_q95_train": {
+              "n": 3393,
+              "mae_eur_mwh": 4.217185267532242e-14,
+              "rmse_eur_mwh": 5.35741614359671e-14,
+              "bias_eur_mwh": 4.18200366434695e-14
+            },
+            "positive_peak_q99_train": {
+              "n": 1025,
+              "mae_eur_mwh": 6.848938760302234e-14,
+              "rmse_eur_mwh": 7.883456013789426e-14,
+              "bias_eur_mwh": 6.815664563895907e-14
+            }
+          },
+          "countries": {
+            "BE": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 4.149953793995532e-14,
+                "rmse_eur_mwh": 5.1189869310658106e-14,
+                "bias_eur_mwh": 2.3001952628489328e-14
+              },
+              "negative_price": {
+                "n": 73,
+                "mae_eur_mwh": 5.2535482623240134e-14,
+                "rmse_eur_mwh": 5.347042853007292e-14,
+                "bias_eur_mwh": -5.2535482623240134e-14
+              },
+              "positive_peak_q95_train": {
+                "n": 988,
+                "mae_eur_mwh": 5.764889240741866e-14,
+                "rmse_eur_mwh": 6.643365746750918e-14,
+                "bias_eur_mwh": 5.736122328362914e-14
+              },
+              "positive_peak_q99_train": {
+                "n": 317,
+                "mae_eur_mwh": 8.114084238017548e-14,
+                "rmse_eur_mwh": 9.265547130584873e-14,
+                "bias_eur_mwh": 8.078220882269404e-14
+              }
+            },
+            "DE": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 1.7079756060470494e-14,
+                "rmse_eur_mwh": 2.6231069661119273e-14,
+                "bias_eur_mwh": 1.0595913855046238e-14
+              },
+              "negative_price": {
+                "n": 165,
+                "mae_eur_mwh": 2.3491767243598682e-14,
+                "rmse_eur_mwh": 2.603455277622923e-14,
+                "bias_eur_mwh": -2.31632316441999e-14
+              },
+              "positive_peak_q95_train": {
+                "n": 549,
+                "mae_eur_mwh": 2.92500288309258e-14,
+                "rmse_eur_mwh": 4.182682990180094e-14,
+                "bias_eur_mwh": 2.92500288309258e-14
+              },
+              "positive_peak_q99_train": {
+                "n": 53,
+                "mae_eur_mwh": 6.971362690476454e-14,
+                "rmse_eur_mwh": 9.466750327692936e-14,
+                "bias_eur_mwh": 6.971362690476454e-14
+              }
+            },
+            "FR": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 3.806544099827924e-14,
+                "rmse_eur_mwh": 4.526780015960999e-14,
+                "bias_eur_mwh": 2.690645517763622e-14
+              },
+              "negative_price": {
+                "n": 147,
+                "mae_eur_mwh": 3.497884616119661e-14,
+                "rmse_eur_mwh": 3.68530595013738e-14,
+                "bias_eur_mwh": -3.497884616119661e-14
+              },
+              "positive_peak_q95_train": {
+                "n": 1115,
+                "mae_eur_mwh": 5.272673179981228e-14,
+                "rmse_eur_mwh": 5.773966660949019e-14,
+                "bias_eur_mwh": 5.272673179981228e-14
+              },
+              "positive_peak_q99_train": {
+                "n": 557,
+                "mae_eur_mwh": 6.45484065160881e-14,
+                "rmse_eur_mwh": 6.91064307565557e-14,
+                "bias_eur_mwh": 6.45484065160881e-14
+              }
+            },
+            "NL": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 9.436498971629972e-15,
+                "rmse_eur_mwh": 2.0375860693788548e-14,
+                "bias_eur_mwh": 3.365692819610353e-15
+              },
+              "negative_price": {
+                "n": 137,
+                "mae_eur_mwh": 1.874429810981054e-14,
+                "rmse_eur_mwh": 2.1359583749009722e-14,
+                "bias_eur_mwh": -1.8316669779659526e-14
+              },
+              "positive_peak_q95_train": {
+                "n": 741,
+                "mae_eur_mwh": 1.5227285619258286e-14,
+                "rmse_eur_mwh": 3.074331110209477e-14,
+                "bias_eur_mwh": 1.399989735775636e-14
+              },
+              "positive_peak_q99_train": {
+                "n": 98,
+                "mae_eur_mwh": 4.930296533845593e-14,
+                "rmse_eur_mwh": 7.240452605777903e-14,
+                "bias_eur_mwh": 4.698282579311683e-14
+              }
+            }
+          },
+          "spreads": {
+            "FR-DE": {
+              "meaning": "ORACLE reconstructed price spread, EUR/MWh",
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 2.253158918443634e-14,
+                "rmse_eur_mwh": 2.9597041369297746e-14,
+                "bias_eur_mwh": 1.6303768070684648e-14
+              },
+              "train_absolute_spread_q95": 92.52499999999999,
+              "test_large_absolute_spread": {
+                "n": 51,
+                "mae_eur_mwh": 2.842170943040401e-14,
+                "rmse_eur_mwh": 3.7756033416091635e-14,
+                "bias_eur_mwh": 2.7864421010200007e-15
+              },
+              "actual_test_mean": -9.107429398148149,
+              "oracle_reconstructed_test_mean": -9.107429398148131,
+              "material_actual_nonzero_hours": 1841,
+              "direction_errors_or_erased_spreads": 0
+            },
+            "BE-NL": {
+              "meaning": "ORACLE reconstructed price spread, EUR/MWh",
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 3.429301093833003e-14,
+                "rmse_eur_mwh": 4.1884620699944886e-14,
+                "bias_eur_mwh": 1.9642445985385724e-14
+              },
+              "train_absolute_spread_q95": 26.999999999999986,
+              "test_large_absolute_spread": {
+                "n": 141,
+                "mae_eur_mwh": 2.9454768017856633e-14,
+                "rmse_eur_mwh": 4.388960725390734e-14,
+                "bias_eur_mwh": -9.499099694381482e-15
+              },
+              "actual_test_mean": 4.36207638888889,
+              "oracle_reconstructed_test_mean": 4.362076388888909,
+              "material_actual_nonzero_hours": 1836,
+              "direction_errors_or_erased_spreads": 0
+            }
+          },
+          "negative_price_sign": {
+            "negative_actual_cells": 522,
+            "reconstructed_nonnegative_cells": 0,
+            "fraction_lost": 0.0,
+            "near_zero_tolerance_eur_mwh": 1e-09,
+            "material_sign_losses": 0
+          }
+        }
+      ]
+    },
+    "observed_minus_nyx": {
+      "diagnostic": "ORACLE reconstruction, not a forecast",
+      "space": "observed_minus_nyx",
+      "definition": "actual - nyx",
+      "unit": "EUR/MWh",
+      "standardized": false,
+      "country_order": [
+        "BE",
+        "DE",
+        "FR",
+        "NL"
+      ],
+      "train_center": [
+        0.5218415835483814,
+        0.2089901714358453,
+        -0.08749778659502837,
+        0.10242625257706303
+      ],
+      "train_eigenvalues_eur_mwh_squared": [
+        572.8542436028881,
+        176.03241122025338,
+        86.683298077165,
+        36.35224314482044
+      ],
+      "train_explained_variance_fraction": [
+        0.6570015606911326,
+        0.20189004479838096,
+        0.09941632231676627,
+        0.04169207219372014
+      ],
+      "train_cumulative_explained_variance_fraction": [
+        0.6570015606911326,
+        0.8588916054895135,
+        0.9583079278062797,
+        0.9999999999999999
+      ],
+      "train_component_loadings": [
+        [
+          0.4436112479982166,
+          0.6362730001916487,
+          0.22849828555685706,
+          0.5883487599835329
+        ],
+        [
+          0.18961024461076245,
+          -0.36648417912440395,
+          0.9055764212282624,
+          -0.0983292779673077
+        ],
+        [
+          -0.4209416277841703,
+          0.6726458321346322,
+          0.30305121106273836,
+          -0.5277458611715766
+        ],
+        [
+          0.7681569903258868,
+          0.0916165934235646,
+          -0.18941975157411137,
+          -0.6046994259436157
+        ]
+      ],
+      "train_positive_price_thresholds": {
+        "0.95": {
+          "BE": 143.32,
+          "DE": 162.68,
+          "FR": 125.1,
+          "NL": 153.55
+        },
+        "0.99": {
+          "BE": 183.81800000000004,
+          "DE": 249.92400000000006,
+          "FR": 158.46100000000004,
+          "NL": 216.53200000000012
+        }
+      },
+      "rank_results": [
+        {
+          "rank": 1,
+          "train_variance_retained": 0.6570015606911326,
+          "test_reconstruction": {
+            "n": 8640,
+            "mae_eur_mwh": 7.417646321372725,
+            "rmse_eur_mwh": 13.643624587238564,
+            "bias_eur_mwh": 0.009724965927945344
+          },
+          "maximum_absolute_reconstruction_error": 283.6618365800148,
+          "test_regimes": {
+            "all": {
+              "n": 8640,
+              "mae_eur_mwh": 7.417646321372725,
+              "rmse_eur_mwh": 13.643624587238564,
+              "bias_eur_mwh": 0.009724965927945344
+            },
+            "negative_price": {
+              "n": 522,
+              "mae_eur_mwh": 4.739715537002676,
+              "rmse_eur_mwh": 8.197178587669102,
+              "bias_eur_mwh": 0.43550161140225796
+            },
+            "positive_peak_q95_train": {
+              "n": 3393,
+              "mae_eur_mwh": 8.25094039910664,
+              "rmse_eur_mwh": 16.865649406426158,
+              "bias_eur_mwh": -1.1253019776960496
+            },
+            "positive_peak_q99_train": {
+              "n": 1025,
+              "mae_eur_mwh": 13.944213921147705,
+              "rmse_eur_mwh": 27.110739836121404,
+              "bias_eur_mwh": -2.6624975637852306
+            },
+            "absolute_residual_q95_train": {
+              "n": 932,
+              "mae_eur_mwh": 24.259605579008163,
+              "rmse_eur_mwh": 34.43795155585378,
+              "bias_eur_mwh": 0.8009293954815473
+            },
+            "absolute_residual_q99_train": {
+              "n": 305,
+              "mae_eur_mwh": 39.328072825591036,
+              "rmse_eur_mwh": 52.36072634851291,
+              "bias_eur_mwh": -0.28173805059337886
+            }
+          },
+          "countries": {
+            "BE": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 7.902590351429845,
+                "rmse_eur_mwh": 16.69039833863232,
+                "bias_eur_mwh": -0.45469529194109515
+              },
+              "negative_price": {
+                "n": 73,
+                "mae_eur_mwh": 3.8168716102801454,
+                "rmse_eur_mwh": 6.211923784214116,
+                "bias_eur_mwh": 0.5790249175247866
+              },
+              "positive_peak_q95_train": {
+                "n": 988,
+                "mae_eur_mwh": 8.820425756756103,
+                "rmse_eur_mwh": 21.847144809411546,
+                "bias_eur_mwh": -2.6330379908862387
+              },
+              "positive_peak_q99_train": {
+                "n": 317,
+                "mae_eur_mwh": 16.708210841543693,
+                "rmse_eur_mwh": 36.58063380891455,
+                "bias_eur_mwh": -8.792096709707012
+              },
+              "absolute_residual_q95_train": {
+                "n": 318,
+                "mae_eur_mwh": 26.01819357586319,
+                "rmse_eur_mwh": 40.18410399361256,
+                "bias_eur_mwh": -7.024566178478848
+              },
+              "absolute_residual_q99_train": {
+                "n": 125,
+                "mae_eur_mwh": 42.329506251437905,
+                "rmse_eur_mwh": 60.085651345059915,
+                "bias_eur_mwh": -18.361115386026263
+              }
+            },
+            "DE": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 6.074868908485171,
+                "rmse_eur_mwh": 11.513529559660975,
+                "bias_eur_mwh": 0.18156501888560553
+              },
+              "negative_price": {
+                "n": 165,
+                "mae_eur_mwh": 4.471393676516525,
+                "rmse_eur_mwh": 6.9886801123589395,
+                "bias_eur_mwh": 0.3596589636308764
+              },
+              "positive_peak_q95_train": {
+                "n": 549,
+                "mae_eur_mwh": 8.123310365069617,
+                "rmse_eur_mwh": 17.96608678373083,
+                "bias_eur_mwh": 0.9488728335496259
+              },
+              "positive_peak_q99_train": {
+                "n": 53,
+                "mae_eur_mwh": 33.86463282737506,
+                "rmse_eur_mwh": 51.25838911125863,
+                "bias_eur_mwh": 14.484444414234524
+              },
+              "absolute_residual_q95_train": {
+                "n": 151,
+                "mae_eur_mwh": 21.67185311375416,
+                "rmse_eur_mwh": 34.13850868172917,
+                "bias_eur_mwh": 3.7764458052476386
+              },
+              "absolute_residual_q99_train": {
+                "n": 34,
+                "mae_eur_mwh": 48.02771301795859,
+                "rmse_eur_mwh": 63.21975210642635,
+                "bias_eur_mwh": 16.244520923661042
+              }
+            },
+            "FR": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 11.589765108873195,
+                "rmse_eur_mwh": 16.82915647187672,
+                "bias_eur_mwh": 0.2706666361326542
+              },
+              "negative_price": {
+                "n": 147,
+                "mae_eur_mwh": 6.435274057231421,
+                "rmse_eur_mwh": 10.950256200777156,
+                "bias_eur_mwh": 0.7831356289075675
+              },
+              "positive_peak_q95_train": {
+                "n": 1115,
+                "mae_eur_mwh": 10.645724266860455,
+                "rmse_eur_mwh": 15.643560474916704,
+                "bias_eur_mwh": -1.7469068656310436
+              },
+              "positive_peak_q99_train": {
+                "n": 557,
+                "mae_eur_mwh": 11.270176133753827,
+                "rmse_eur_mwh": 17.00566709594272,
+                "bias_eur_mwh": -1.7650649968407655
+              },
+              "absolute_residual_q95_train": {
+                "n": 266,
+                "mae_eur_mwh": 33.65288309573047,
+                "rmse_eur_mwh": 36.75730892287646,
+                "bias_eur_mwh": 7.024221493062951
+              },
+              "absolute_residual_q99_train": {
+                "n": 98,
+                "mae_eur_mwh": 44.58936416840483,
+                "rmse_eur_mwh": 47.31676314987758,
+                "bias_eur_mwh": 12.616482475713399
+              }
+            },
+            "NL": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 4.10336091670269,
+                "rmse_eur_mwh": 7.088208541774496,
+                "bias_eur_mwh": 0.04136350063461678
+              },
+              "negative_price": {
+                "n": 137,
+                "mae_eur_mwh": 3.7352893410708075,
+                "rmse_eur_mwh": 6.926539630069588,
+                "bias_eur_mwh": 0.07736026076030784
+              },
+              "positive_peak_q95_train": {
+                "n": 741,
+                "mae_eur_mwh": 3.9826992962498893,
+                "rmse_eur_mwh": 7.6617826782474685,
+                "bias_eur_mwh": 0.2836192904625861
+              },
+              "positive_peak_q99_train": {
+                "n": 98,
+                "mae_eur_mwh": 9.428599857707027,
+                "rmse_eur_mwh": 17.155361614660787,
+                "bias_eur_mwh": 2.7908194222769183
+              },
+              "absolute_residual_q95_train": {
+                "n": 197,
+                "mae_eur_mwh": 10.721066593248372,
+                "rmse_eur_mwh": 16.928987679065315,
+                "bias_eur_mwh": 2.7491980081113594
+              },
+              "absolute_residual_q99_train": {
+                "n": 48,
+                "mae_eur_mwh": 14.607791651276363,
+                "rmse_eur_mwh": 24.84004033357456,
+                "bias_eur_mwh": 8.760006745789882
+              }
+            }
+          },
+          "spreads": {
+            "FR-DE": {
+              "meaning": "ORACLE reconstructed price spread, EUR/MWh",
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 14.326575021669132,
+                "rmse_eur_mwh": 20.84597349654456,
+                "bias_eur_mwh": 0.08910161724704874
+              },
+              "train_absolute_spread_q95": 92.52499999999999,
+              "test_large_absolute_spread": {
+                "n": 51,
+                "mae_eur_mwh": 50.26682836565142,
+                "rmse_eur_mwh": 64.27261470981428,
+                "bias_eur_mwh": 21.859113030951015
+              },
+              "actual_test_mean": -9.107429398148149,
+              "oracle_reconstructed_test_mean": -9.0183277809011,
+              "material_actual_nonzero_hours": 1841,
+              "direction_errors_or_erased_spreads": 520
+            },
+            "BE-NL": {
+              "meaning": "ORACLE reconstructed price spread, EUR/MWh",
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 9.736324359821863,
+                "rmse_eur_mwh": 18.80603129025228,
+                "bias_eur_mwh": -0.4960587925757116
+              },
+              "train_absolute_spread_q95": 26.999999999999986,
+              "test_large_absolute_spread": {
+                "n": 141,
+                "mae_eur_mwh": 38.78231866845471,
+                "rmse_eur_mwh": 55.899215532143145,
+                "bias_eur_mwh": -35.474559858765836
+              },
+              "actual_test_mean": 4.36207638888889,
+              "oracle_reconstructed_test_mean": 3.8660175963131778,
+              "material_actual_nonzero_hours": 1836,
+              "direction_errors_or_erased_spreads": 713
+            }
+          },
+          "negative_price_sign": {
+            "negative_actual_cells": 522,
+            "reconstructed_nonnegative_cells": 209,
+            "fraction_lost": 0.4003831417624521,
+            "near_zero_tolerance_eur_mwh": 1e-09,
+            "material_sign_losses": 209
+          }
+        },
+        {
+          "rank": 2,
+          "train_variance_retained": 0.8588916054895135,
+          "test_reconstruction": {
+            "n": 8640,
+            "mae_eur_mwh": 4.9707938207407505,
+            "rmse_eur_mwh": 10.886488500932472,
+            "bias_eur_mwh": -0.004188393271943465
+          },
+          "maximum_absolute_reconstruction_error": 279.4369410208834,
+          "test_regimes": {
+            "all": {
+              "n": 8640,
+              "mae_eur_mwh": 4.9707938207407505,
+              "rmse_eur_mwh": 10.886488500932472,
+              "bias_eur_mwh": -0.004188393271943465
+            },
+            "negative_price": {
+              "n": 522,
+              "mae_eur_mwh": 3.3518937508214366,
+              "rmse_eur_mwh": 5.6864148225604465,
+              "bias_eur_mwh": 0.5923694132111689
+            },
+            "positive_peak_q95_train": {
+              "n": 3393,
+              "mae_eur_mwh": 5.5575793642775,
+              "rmse_eur_mwh": 14.775704946704014,
+              "bias_eur_mwh": -0.49348733629260655
+            },
+            "positive_peak_q99_train": {
+              "n": 1025,
+              "mae_eur_mwh": 9.794062592707512,
+              "rmse_eur_mwh": 24.944678838378174,
+              "bias_eur_mwh": -1.1940969369359793
+            },
+            "absolute_residual_q95_train": {
+              "n": 932,
+              "mae_eur_mwh": 15.597550581192205,
+              "rmse_eur_mwh": 28.563687163620603,
+              "bias_eur_mwh": -0.430845710255385
+            },
+            "absolute_residual_q99_train": {
+              "n": 305,
+              "mae_eur_mwh": 27.501743035913243,
+              "rmse_eur_mwh": 45.81334231809539,
+              "bias_eur_mwh": -3.4259781343332656
+            }
+          },
+          "countries": {
+            "BE": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 7.891569590732398,
+                "rmse_eur_mwh": 16.46187835869163,
+                "bias_eur_mwh": -0.4714353145476447
+              },
+              "negative_price": {
+                "n": 73,
+                "mae_eur_mwh": 4.0253690523171315,
+                "rmse_eur_mwh": 5.767428582726938,
+                "bias_eur_mwh": 0.9617923732650162
+              },
+              "positive_peak_q95_train": {
+                "n": 988,
+                "mae_eur_mwh": 8.881466075329936,
+                "rmse_eur_mwh": 21.760447656522796,
+                "bias_eur_mwh": -2.436092148539017
+              },
+              "positive_peak_q99_train": {
+                "n": 317,
+                "mae_eur_mwh": 16.659080395685802,
+                "rmse_eur_mwh": 36.45464877104099,
+                "bias_eur_mwh": -8.51542583096492
+              },
+              "absolute_residual_q95_train": {
+                "n": 318,
+                "mae_eur_mwh": 24.28223687739525,
+                "rmse_eur_mwh": 39.26090659938517,
+                "bias_eur_mwh": -7.975040542234497
+              },
+              "absolute_residual_q99_train": {
+                "n": 125,
+                "mae_eur_mwh": 40.074967221807306,
+                "rmse_eur_mwh": 59.14281027736763,
+                "bias_eur_mwh": -19.567996367389526
+              }
+            },
+            "DE": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 5.073529973155936,
+                "rmse_eur_mwh": 10.33672138093122,
+                "bias_eur_mwh": 0.2139206200087374
+              },
+              "negative_price": {
+                "n": 165,
+                "mae_eur_mwh": 3.4470816995538343,
+                "rmse_eur_mwh": 4.963824202778774,
+                "bias_eur_mwh": 0.5206638553015218
+              },
+              "positive_peak_q95_train": {
+                "n": 549,
+                "mae_eur_mwh": 7.1051342034413665,
+                "rmse_eur_mwh": 16.450398829276065,
+                "bias_eur_mwh": 0.4880086766402988
+              },
+              "positive_peak_q99_train": {
+                "n": 53,
+                "mae_eur_mwh": 31.64553436629299,
+                "rmse_eur_mwh": 47.172392992583276,
+                "bias_eur_mwh": 14.865521425034096
+              },
+              "absolute_residual_q95_train": {
+                "n": 151,
+                "mae_eur_mwh": 18.58368513587212,
+                "rmse_eur_mwh": 31.060858021317017,
+                "bias_eur_mwh": 5.692547528882752
+              },
+              "absolute_residual_q99_train": {
+                "n": 34,
+                "mae_eur_mwh": 45.58518255064555,
+                "rmse_eur_mwh": 58.473933298709355,
+                "bias_eur_mwh": 17.865372057137908
+              }
+            },
+            "FR": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 3.3597246483913588,
+                "rmse_eur_mwh": 7.159720343852428,
+                "bias_eur_mwh": 0.19071647418629392
+              },
+              "negative_price": {
+                "n": 147,
+                "mae_eur_mwh": 2.8296254545057025,
+                "rmse_eur_mwh": 5.703517321423717,
+                "bias_eur_mwh": 1.006661770048717
+              },
+              "positive_peak_q95_train": {
+                "n": 1115,
+                "mae_eur_mwh": 3.238152668074597,
+                "rmse_eur_mwh": 8.526729954395186,
+                "bias_eur_mwh": 0.2966197397963125
+              },
+              "positive_peak_q99_train": {
+                "n": 557,
+                "mae_eur_mwh": 4.0294269256188695,
+                "rmse_eur_mwh": 11.023229137430803,
+                "bias_eur_mwh": 0.7395320873094362
+              },
+              "absolute_residual_q95_train": {
+                "n": 266,
+                "mae_eur_mwh": 7.830442929064651,
+                "rmse_eur_mwh": 16.114862841910778,
+                "bias_eur_mwh": 2.339981094962295
+              },
+              "absolute_residual_q99_train": {
+                "n": 98,
+                "mae_eur_mwh": 12.026069195376417,
+                "rmse_eur_mwh": 23.978686536687192,
+                "bias_eur_mwh": 3.7469048741233184
+              }
+            },
+            "NL": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 3.55835107068331,
+                "rmse_eur_mwh": 6.705198290744645,
+                "bias_eur_mwh": 0.05004464726483958
+              },
+              "negative_price": {
+                "n": 137,
+                "mae_eur_mwh": 3.4387822983278697,
+                "rmse_eur_mwh": 6.395348264719153,
+                "bias_eur_mwh": 0.03735163595599564
+              },
+              "positive_peak_q95_train": {
+                "n": 741,
+                "mae_eur_mwh": 3.469256947334808,
+                "rmse_eur_mwh": 7.64386411584527,
+                "bias_eur_mwh": 0.18057859293835637
+              },
+              "positive_peak_q99_train": {
+                "n": 98,
+                "mae_eur_mwh": 8.534505643975125,
+                "rmse_eur_mwh": 17.756605783078097,
+                "bias_eur_mwh": 2.8127410193708
+              },
+              "absolute_residual_q95_train": {
+                "n": 197,
+                "mae_eur_mwh": 9.777317461987622,
+                "rmse_eur_mwh": 16.780818882653886,
+                "bias_eur_mwh": 3.3122083368085553
+              },
+              "absolute_residual_q99_train": {
+                "n": 48,
+                "mae_eur_mwh": 13.546036153308087,
+                "rmse_eur_mwh": 25.132314561062856,
+                "bias_eur_mwh": 8.884518486359818
+              }
+            }
+          },
+          "spreads": {
+            "FR-DE": {
+              "meaning": "ORACLE reconstructed price spread, EUR/MWh",
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 2.359150486432982,
+                "rmse_eur_mwh": 4.412625827198223,
+                "bias_eur_mwh": -0.023204145822443848
+              },
+              "train_absolute_spread_q95": 92.52499999999999,
+              "test_large_absolute_spread": {
+                "n": 51,
+                "mae_eur_mwh": 10.767526718477097,
+                "rmse_eur_mwh": 16.75962962324535,
+                "bias_eur_mwh": -2.929174454492364
+              },
+              "actual_test_mean": -9.107429398148149,
+              "oracle_reconstructed_test_mean": -9.13063354397059,
+              "material_actual_nonzero_hours": 1841,
+              "direction_errors_or_erased_spreads": 201
+            },
+            "BE-NL": {
+              "meaning": "ORACLE reconstructed price spread, EUR/MWh",
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 9.191714456382616,
+                "rmse_eur_mwh": 18.07461504434472,
+                "bias_eur_mwh": -0.5214799618124842
+              },
+              "train_absolute_spread_q95": 26.999999999999986,
+              "test_large_absolute_spread": {
+                "n": 141,
+                "mae_eur_mwh": 36.128139468399624,
+                "rmse_eur_mwh": 53.011168377134666,
+                "bias_eur_mwh": -33.04905835524926
+              },
+              "actual_test_mean": 4.36207638888889,
+              "oracle_reconstructed_test_mean": 3.840596427076404,
+              "material_actual_nonzero_hours": 1836,
+              "direction_errors_or_erased_spreads": 631
+            }
+          },
+          "negative_price_sign": {
+            "negative_actual_cells": 522,
+            "reconstructed_nonnegative_cells": 207,
+            "fraction_lost": 0.39655172413793105,
+            "near_zero_tolerance_eur_mwh": 1e-09,
+            "material_sign_losses": 207
+          }
+        },
+        {
+          "rank": 3,
+          "train_variance_retained": 0.9583079278062797,
+          "test_reconstruction": {
+            "n": 8640,
+            "mae_eur_mwh": 2.917939537229207,
+            "rmse_eur_mwh": 7.019132402816452,
+            "bias_eur_mwh": -0.006711933502868669
+          },
+          "maximum_absolute_reconstruction_error": 168.55730722216754,
+          "test_regimes": {
+            "all": {
+              "n": 8640,
+              "mae_eur_mwh": 2.917939537229207,
+              "rmse_eur_mwh": 7.019132402816452,
+              "bias_eur_mwh": -0.006711933502868669
+            },
+            "negative_price": {
+              "n": 522,
+              "mae_eur_mwh": 1.766772791426705,
+              "rmse_eur_mwh": 3.259995486163873,
+              "bias_eur_mwh": 0.18673149580989246
+            },
+            "positive_peak_q95_train": {
+              "n": 3393,
+              "mae_eur_mwh": 3.226819153633701,
+              "rmse_eur_mwh": 9.331539806059029,
+              "bias_eur_mwh": -0.1781933130079803
+            },
+            "positive_peak_q99_train": {
+              "n": 1025,
+              "mae_eur_mwh": 5.798830082239198,
+              "rmse_eur_mwh": 15.74708875532329,
+              "bias_eur_mwh": -0.6230648315991082
+            },
+            "absolute_residual_q95_train": {
+              "n": 932,
+              "mae_eur_mwh": 9.590765802647594,
+              "rmse_eur_mwh": 18.384384626507263,
+              "bias_eur_mwh": -0.31727205784955215
+            },
+            "absolute_residual_q99_train": {
+              "n": 305,
+              "mae_eur_mwh": 17.43661540832161,
+              "rmse_eur_mwh": 29.407290795886503,
+              "bias_eur_mwh": -2.298949869282463
+            }
+          },
+          "countries": {
+            "BE": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 5.4209939250318895,
+                "rmse_eur_mwh": 10.783591242492783,
+                "bias_eur_mwh": -0.31411866680416295
+              },
+              "negative_price": {
+                "n": 73,
+                "mae_eur_mwh": 2.916306295628436,
+                "rmse_eur_mwh": 3.857739175052559,
+                "bias_eur_mwh": 0.8803265787165031
+              },
+              "positive_peak_q95_train": {
+                "n": 988,
+                "mae_eur_mwh": 5.679291973008825,
+                "rmse_eur_mwh": 13.488523067091258,
+                "bias_eur_mwh": -1.6092699699523878
+              },
+              "positive_peak_q99_train": {
+                "n": 317,
+                "mae_eur_mwh": 10.508239981642467,
+                "rmse_eur_mwh": 22.492963167929396,
+                "bias_eur_mwh": -5.4587590614937715
+              },
+              "absolute_residual_q95_train": {
+                "n": 318,
+                "mae_eur_mwh": 15.861080496674782,
+                "rmse_eur_mwh": 24.868071043956768,
+                "bias_eur_mwh": -5.72665483537839
+              },
+              "absolute_residual_q99_train": {
+                "n": 125,
+                "mae_eur_mwh": 25.550455923854265,
+                "rmse_eur_mwh": 36.87011967793469,
+                "bias_eur_mwh": -13.158783541007779
+              }
+            },
+            "DE": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 0.6465514245604341,
+                "rmse_eur_mwh": 1.2861379990699886,
+                "bias_eur_mwh": -0.03746432375905158
+              },
+              "negative_price": {
+                "n": 165,
+                "mae_eur_mwh": 0.48881822164706024,
+                "rmse_eur_mwh": 0.6678779180079079,
+                "bias_eur_mwh": 0.1713285234113839
+              },
+              "positive_peak_q95_train": {
+                "n": 549,
+                "mae_eur_mwh": 0.7843167226299901,
+                "rmse_eur_mwh": 1.9794750448750886,
+                "bias_eur_mwh": -0.20183768077425296
+              },
+              "positive_peak_q99_train": {
+                "n": 53,
+                "mae_eur_mwh": 3.8100437481996847,
+                "rmse_eur_mwh": 5.803014412146295,
+                "bias_eur_mwh": -2.8756986250050764
+              },
+              "absolute_residual_q95_train": {
+                "n": 151,
+                "mae_eur_mwh": 2.10612139527057,
+                "rmse_eur_mwh": 3.697224698115168,
+                "bias_eur_mwh": -0.9242062672504638
+              },
+              "absolute_residual_q99_train": {
+                "n": 34,
+                "mae_eur_mwh": 5.6371726961834705,
+                "rmse_eur_mwh": 7.2745385085688365,
+                "bias_eur_mwh": -3.4496736438416313
+              }
+            },
+            "FR": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 1.3367623226714034,
+                "rmse_eur_mwh": 2.659124632014578,
+                "bias_eur_mwh": 0.07745848905910942
+              },
+              "negative_price": {
+                "n": 147,
+                "mae_eur_mwh": 1.0816790379965058,
+                "rmse_eur_mwh": 1.998760785245486,
+                "bias_eur_mwh": 0.13066747768753836
+              },
+              "positive_peak_q95_train": {
+                "n": 1115,
+                "mae_eur_mwh": 1.1554472770630948,
+                "rmse_eur_mwh": 2.975199411070674,
+                "bias_eur_mwh": 0.16589355753376134
+              },
+              "positive_peak_q99_train": {
+                "n": 557,
+                "mae_eur_mwh": 1.4217198511037727,
+                "rmse_eur_mwh": 3.8354927919237323,
+                "bias_eur_mwh": 0.37242841865021703
+              },
+              "absolute_residual_q95_train": {
+                "n": 266,
+                "mae_eur_mwh": 2.905117508496594,
+                "rmse_eur_mwh": 5.698077946733659,
+                "bias_eur_mwh": 0.9656596322232788
+              },
+              "absolute_residual_q99_train": {
+                "n": 98,
+                "mae_eur_mwh": 4.287937264313023,
+                "rmse_eur_mwh": 8.270392839038099,
+                "bias_eur_mwh": 1.6846298761903475
+              }
+            },
+            "NL": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 4.267450476653099,
+                "rmse_eur_mwh": 8.488930669210696,
+                "bias_eur_mwh": 0.24727676749263036
+              },
+              "negative_price": {
+                "n": 137,
+                "mae_eur_mwh": 3.4284906013621383,
+                "rmse_eur_mwh": 5.266838243675138,
+                "bias_eur_mwh": -0.10414105851450603
+              },
+              "positive_peak_q95_train": {
+                "n": 741,
+                "mae_eur_mwh": 4.88332432428774,
+                "rmse_eur_mwh": 11.828538664103647,
+                "bias_eur_mwh": 1.2296712407176829
+              },
+              "positive_peak_q99_train": {
+                "n": 98,
+                "mae_eur_mwh": 16.518964126480945,
+                "rmse_eur_mwh": 29.243939819470576,
+                "bias_eur_mwh": 10.579128245321819
+              },
+              "absolute_residual_q95_train": {
+                "n": 197,
+                "mae_eur_mwh": 14.233424071974758,
+                "rmse_eur_mwh": 23.375559969682914,
+                "bias_eur_mwh": 7.147555146791743
+              },
+              "absolute_residual_q99_train": {
+                "n": 48,
+                "mae_eur_mwh": 31.509978864237365,
+                "rmse_eur_mwh": 42.163488791537645,
+                "bias_eur_mwh": 18.663821010807975
+              }
+            }
+          },
+          "spreads": {
+            "FR-DE": {
+              "meaning": "ORACLE reconstructed price spread, EUR/MWh",
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 1.9833137472318374,
+                "rmse_eur_mwh": 3.945262631084567,
+                "bias_eur_mwh": 0.11492281281816077
+              },
+              "train_absolute_spread_q95": 92.52499999999999,
+              "test_large_absolute_spread": {
+                "n": 51,
+                "mae_eur_mwh": 14.359955884003334,
+                "rmse_eur_mwh": 18.974048349790287,
+                "bias_eur_mwh": 11.454308840520321
+              },
+              "actual_test_mean": -9.107429398148149,
+              "oracle_reconstructed_test_mean": -8.992506585329988,
+              "material_actual_nonzero_hours": 1841,
+              "direction_errors_or_erased_spreads": 181
+            },
+            "BE-NL": {
+              "meaning": "ORACLE reconstructed price spread, EUR/MWh",
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 9.68844440168499,
+                "rmse_eur_mwh": 19.272521911703482,
+                "bias_eur_mwh": -0.5613954342967932
+              },
+              "train_absolute_spread_q95": 26.999999999999986,
+              "test_large_absolute_spread": {
+                "n": 141,
+                "mae_eur_mwh": 37.71685189998179,
+                "rmse_eur_mwh": 56.53929336855755,
+                "bias_eur_mwh": -34.4318748021707
+              },
+              "actual_test_mean": 4.36207638888889,
+              "oracle_reconstructed_test_mean": 3.8006809545920963,
+              "material_actual_nonzero_hours": 1836,
+              "direction_errors_or_erased_spreads": 641
+            }
+          },
+          "negative_price_sign": {
+            "negative_actual_cells": 522,
+            "reconstructed_nonnegative_cells": 161,
+            "fraction_lost": 0.30842911877394635,
+            "near_zero_tolerance_eur_mwh": 1e-09,
+            "material_sign_losses": 161
+          }
+        },
+        {
+          "rank": 4,
+          "train_variance_retained": 0.9999999999999999,
+          "test_reconstruction": {
+            "n": 8640,
+            "mae_eur_mwh": 9.63479794275213e-15,
+            "rmse_eur_mwh": 2.1343129867229505e-14,
+            "bias_eur_mwh": 1.2564337109302294e-15
+          },
+          "maximum_absolute_reconstruction_error": 3.979039320256561e-13,
+          "test_regimes": {
+            "all": {
+              "n": 8640,
+              "mae_eur_mwh": 9.63479794275213e-15,
+              "rmse_eur_mwh": 2.1343129867229505e-14,
+              "bias_eur_mwh": 1.2564337109302294e-15
+            },
+            "negative_price": {
+              "n": 522,
+              "mae_eur_mwh": 4.79061500983759e-15,
+              "rmse_eur_mwh": 7.44053234414577e-15,
+              "bias_eur_mwh": -9.688264452077979e-16
+            },
+            "positive_peak_q95_train": {
+              "n": 3393,
+              "mae_eur_mwh": 1.1509676042906753e-14,
+              "rmse_eur_mwh": 3.017108139505264e-14,
+              "bias_eur_mwh": 4.615708051549196e-15
+            },
+            "positive_peak_q99_train": {
+              "n": 1025,
+              "mae_eur_mwh": 2.088168391588297e-14,
+              "rmse_eur_mwh": 5.132733701040194e-14,
+              "bias_eur_mwh": 1.2800126812143246e-14
+            },
+            "absolute_residual_q95_train": {
+              "n": 932,
+              "mae_eur_mwh": 3.567580184537971e-14,
+              "rmse_eur_mwh": 5.974107743161852e-14,
+              "bias_eur_mwh": 5.172781611729914e-15
+            },
+            "absolute_residual_q99_train": {
+              "n": 305,
+              "mae_eur_mwh": 6.390225325212967e-14,
+              "rmse_eur_mwh": 9.766991863442487e-14,
+              "bias_eur_mwh": 2.4065267083284705e-14
+            }
+          },
+          "countries": {
+            "BE": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 4.405596900666261e-15,
+                "rmse_eur_mwh": 8.9491141826603e-15,
+                "bias_eur_mwh": 7.901954553653686e-16
+              },
+              "negative_price": {
+                "n": 73,
+                "mae_eur_mwh": 1.619708933186016e-15,
+                "rmse_eur_mwh": 2.3177584664196375e-15,
+                "bias_eur_mwh": 2.1291948417468754e-17
+              },
+              "positive_peak_q95_train": {
+                "n": 988,
+                "mae_eur_mwh": 4.956111994037705e-15,
+                "rmse_eur_mwh": 1.150784915205649e-14,
+                "bias_eur_mwh": 1.994917951029393e-15
+              },
+              "positive_peak_q99_train": {
+                "n": 317,
+                "mae_eur_mwh": 8.729084752604858e-15,
+                "rmse_eur_mwh": 1.914021709285256e-14,
+                "bias_eur_mwh": 4.916852063947184e-15
+              },
+              "absolute_residual_q95_train": {
+                "n": 318,
+                "mae_eur_mwh": 1.2479186098176602e-14,
+                "rmse_eur_mwh": 2.0859858359158954e-14,
+                "bias_eur_mwh": 1.3518187268391844e-15
+              },
+              "absolute_residual_q99_train": {
+                "n": 125,
+                "mae_eur_mwh": 2.086153472191654e-14,
+                "rmse_eur_mwh": 3.14249524357933e-14,
+                "bias_eur_mwh": 5.513811629498378e-15
+              }
+            },
+            "DE": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 1.1908381945145038e-14,
+                "rmse_eur_mwh": 2.739463949071956e-14,
+                "bias_eur_mwh": 2.0359421453257725e-15
+              },
+              "negative_price": {
+                "n": 165,
+                "mae_eur_mwh": 5.341939012349816e-15,
+                "rmse_eur_mwh": 7.228886332532388e-15,
+                "bias_eur_mwh": -1.5574242232563654e-15
+              },
+              "positive_peak_q95_train": {
+                "n": 549,
+                "mae_eur_mwh": 1.9334210411581274e-14,
+                "rmse_eur_mwh": 4.9473159040417657e-14,
+                "bias_eur_mwh": 9.138864528523062e-15
+              },
+              "positive_peak_q99_train": {
+                "n": 53,
+                "mae_eur_mwh": 1.0741093549184817e-13,
+                "rmse_eur_mwh": 1.502859454980963e-13,
+                "bias_eur_mwh": 8.48545552481431e-14
+              },
+              "absolute_residual_q95_train": {
+                "n": 151,
+                "mae_eur_mwh": 6.354887183072949e-14,
+                "rmse_eur_mwh": 9.606172262682335e-14,
+                "bias_eur_mwh": 1.668128475675202e-14
+              },
+              "absolute_residual_q99_train": {
+                "n": 34,
+                "mae_eur_mwh": 1.6885839132181205e-13,
+                "rmse_eur_mwh": 1.9168392728368335e-13,
+                "bias_eur_mwh": 1.1535870298222802e-13
+              }
+            },
+            "FR": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 1.1868306620399094e-14,
+                "rmse_eur_mwh": 1.7151100031992976e-14,
+                "bias_eur_mwh": 4.564603581944824e-16
+              },
+              "negative_price": {
+                "n": 147,
+                "mae_eur_mwh": 5.8733724610983994e-15,
+                "rmse_eur_mwh": 9.542511713622674e-15,
+                "bias_eur_mwh": -6.238868076730738e-16
+              },
+              "positive_peak_q95_train": {
+                "n": 1115,
+                "mae_eur_mwh": 1.105370155148684e-14,
+                "rmse_eur_mwh": 1.604284374060871e-14,
+                "bias_eur_mwh": 3.28243909382589e-15
+              },
+              "positive_peak_q99_train": {
+                "n": 557,
+                "mae_eur_mwh": 1.2138629419396373e-14,
+                "rmse_eur_mwh": 1.8698402484816415e-14,
+                "bias_eur_mwh": 4.762323589539431e-15
+              },
+              "absolute_residual_q95_train": {
+                "n": 266,
+                "mae_eur_mwh": 3.659562210493749e-14,
+                "rmse_eur_mwh": 4.0079692857730996e-14,
+                "bias_eur_mwh": -3.045183153257572e-15
+              },
+              "absolute_residual_q99_train": {
+                "n": 98,
+                "mae_eur_mwh": 5.075305255429287e-14,
+                "rmse_eur_mwh": 5.4179923613294405e-14,
+                "bias_eur_mwh": -5.220313977012981e-15
+              }
+            },
+            "NL": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 1.0356906304798131e-14,
+                "rmse_eur_mwh": 2.640840056363663e-14,
+                "bias_eur_mwh": 1.7431368848352946e-15
+              },
+              "negative_price": {
+                "n": 137,
+                "mae_eur_mwh": 4.654427694842764e-15,
+                "rmse_eur_mwh": 6.887222621653997e-15,
+                "bias_eur_mwh": -1.1576303581584206e-15
+              },
+              "positive_peak_q95_train": {
+                "n": 741,
+                "mae_eur_mwh": 1.5136752250482343e-14,
+                "rmse_eur_mwh": 4.231950815172731e-14,
+                "bias_eur_mwh": 6.765131265201557e-15
+              },
+              "positive_peak_q99_train": {
+                "n": 98,
+                "mae_eur_mwh": 6.308785693400583e-14,
+                "rmse_eur_mwh": 1.103071179197646e-13,
+                "bias_eur_mwh": 4.501614500663798e-14
+              },
+              "absolute_residual_q95_train": {
+                "n": 197,
+                "mae_eur_mwh": 5.0513456925483265e-14,
+                "rmse_eur_mwh": 8.330813932666798e-14,
+                "bias_eur_mwh": 1.361573008880395e-14
+              },
+              "absolute_residual_q99_train": {
+                "n": 48,
+                "mae_eur_mwh": 1.2848981138328478e-13,
+                "rmse_eur_mwh": 1.6131954424672491e-13,
+                "bias_eur_mwh": 6.750155989720952e-14
+              }
+            }
+          },
+          "spreads": {
+            "FR-DE": {
+              "meaning": "ORACLE reconstructed price spread, EUR/MWh",
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 1.158274543664626e-14,
+                "rmse_eur_mwh": 2.6584919093231886e-14,
+                "bias_eur_mwh": -1.419708936317504e-15
+              },
+              "train_absolute_spread_q95": 92.52499999999999,
+              "test_large_absolute_spread": {
+                "n": 51,
+                "mae_eur_mwh": 1.0672073246906603e-13,
+                "rmse_eur_mwh": 1.379947296422704e-13,
+                "bias_eur_mwh": -8.108546513968202e-14
+              },
+              "actual_test_mean": -9.107429398148149,
+              "oracle_reconstructed_test_mean": -9.10742939814815,
+              "material_actual_nonzero_hours": 1841,
+              "direction_errors_or_erased_spreads": 0
+            },
+            "BE-NL": {
+              "meaning": "ORACLE reconstructed price spread, EUR/MWh",
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 6.468408185942566e-15,
+                "rmse_eur_mwh": 2.1475406810033687e-14,
+                "bias_eur_mwh": -1.3884323137576383e-15
+              },
+              "train_absolute_spread_q95": 26.999999999999986,
+              "test_large_absolute_spread": {
+                "n": 141,
+                "mae_eur_mwh": 1.9980864874388633e-14,
+                "rmse_eur_mwh": 4.466593795699938e-14,
+                "bias_eur_mwh": -1.1414037563805865e-14
+              },
+              "actual_test_mean": 4.36207638888889,
+              "oracle_reconstructed_test_mean": 4.362076388888887,
+              "material_actual_nonzero_hours": 1836,
+              "direction_errors_or_erased_spreads": 0
+            }
+          },
+          "negative_price_sign": {
+            "negative_actual_cells": 522,
+            "reconstructed_nonnegative_cells": 0,
+            "fraction_lost": 0.0,
+            "near_zero_tolerance_eur_mwh": 1e-09,
+            "material_sign_losses": 0
+          }
+        }
+      ]
+    },
+    "frozen_price": {
+      "diagnostic": "ORACLE reconstruction, not a forecast",
+      "space": "frozen_price",
+      "definition": "actual price",
+      "unit": "EUR/MWh",
+      "standardized": false,
+      "country_order": [
+        "BE",
+        "DE",
+        "FR",
+        "NL"
+      ],
+      "train_center": [
+        87.31991495024309,
+        96.36720087942591,
+        65.04416223096493,
+        92.6170776440638
+      ],
+      "train_eigenvalues_eur_mwh_squared": [
+        5409.554549058964,
+        727.6171895967333,
+        86.80655768185342,
+        36.700825327063654
+      ],
+      "train_explained_variance_fraction": [
+        0.8640523566108991,
+        0.11622016964243834,
+        0.013865358053803746,
+        0.005862115692858811
+      ],
+      "train_cumulative_explained_variance_fraction": [
+        0.8640523566108991,
+        0.9802725262533374,
+        0.9941378843071411,
+        0.9999999999999999
+      ],
+      "train_component_loadings": [
+        [
+          0.4760062243009323,
+          0.5663365893031507,
+          0.4355312225350866,
+          0.5128289151757516
+        ],
+        [
+          0.04836197608749603,
+          -0.4590206825442078,
+          0.8485673675367925,
+          -0.2586398171535882
+        ],
+        [
+          -0.4993765676697243,
+          0.6733647785336315,
+          0.24413770422316036,
+          -0.48744199662052484
+        ],
+        [
+          0.722289579987202,
+          0.12305590454536572,
+          -0.1750507307194598,
+          -0.6576566343260111
+        ]
+      ],
+      "train_positive_price_thresholds": {
+        "0.95": {
+          "BE": 143.32,
+          "DE": 162.68,
+          "FR": 125.1,
+          "NL": 153.55
+        },
+        "0.99": {
+          "BE": 183.81800000000004,
+          "DE": 249.92400000000006,
+          "FR": 158.46100000000004,
+          "NL": 216.53200000000012
+        }
+      },
+      "rank_results": [
+        {
+          "rank": 1,
+          "train_variance_retained": 0.8640523566108991,
+          "test_reconstruction": {
+            "n": 8640,
+            "mae_eur_mwh": 14.22106824677256,
+            "rmse_eur_mwh": 20.7307069467114,
+            "bias_eur_mwh": -1.1595554337909237
+          },
+          "maximum_absolute_reconstruction_error": 305.1321233352198,
+          "test_regimes": {
+            "all": {
+              "n": 8640,
+              "mae_eur_mwh": 14.22106824677256,
+              "rmse_eur_mwh": 20.7307069467114,
+              "bias_eur_mwh": -1.1595554337909237
+            },
+            "negative_price": {
+              "n": 522,
+              "mae_eur_mwh": 6.993606093203421,
+              "rmse_eur_mwh": 12.409292247210056,
+              "bias_eur_mwh": 1.6195652526085593
+            },
+            "positive_peak_q95_train": {
+              "n": 3393,
+              "mae_eur_mwh": 18.656631126158345,
+              "rmse_eur_mwh": 26.549903496729918,
+              "bias_eur_mwh": -7.056061441015802
+            },
+            "positive_peak_q99_train": {
+              "n": 1025,
+              "mae_eur_mwh": 28.268349618281015,
+              "rmse_eur_mwh": 38.89292530103309,
+              "bias_eur_mwh": -19.658078034825067
+            }
+          },
+          "countries": {
+            "BE": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 8.198237962004104,
+                "rmse_eur_mwh": 17.046782664206273,
+                "bias_eur_mwh": -6.859911107399259
+              },
+              "negative_price": {
+                "n": 73,
+                "mae_eur_mwh": 5.340905279590417,
+                "rmse_eur_mwh": 5.354273657445493,
+                "bias_eur_mwh": 5.340905279590417
+              },
+              "positive_peak_q95_train": {
+                "n": 988,
+                "mae_eur_mwh": 9.697693749916045,
+                "rmse_eur_mwh": 21.62417724578133,
+                "bias_eur_mwh": -9.236123043998061
+              },
+              "positive_peak_q99_train": {
+                "n": 317,
+                "mae_eur_mwh": 17.59968902642979,
+                "rmse_eur_mwh": 35.52336336025082,
+                "bias_eur_mwh": -17.06666770021176
+              }
+            },
+            "DE": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 15.578907368551077,
+                "rmse_eur_mwh": 19.14164035905803,
+                "bias_eur_mwh": 14.29999301049023
+              },
+              "negative_price": {
+                "n": 165,
+                "mae_eur_mwh": 2.3675162709427466,
+                "rmse_eur_mwh": 6.378969277874855,
+                "bias_eur_mwh": 1.147964668308127
+              },
+              "positive_peak_q95_train": {
+                "n": 549,
+                "mae_eur_mwh": 21.514619814982126,
+                "rmse_eur_mwh": 24.272070516525716,
+                "bias_eur_mwh": 19.778594904052618
+              },
+              "positive_peak_q99_train": {
+                "n": 53,
+                "mae_eur_mwh": 30.01646163450609,
+                "rmse_eur_mwh": 41.72326479024951,
+                "bias_eur_mwh": 17.72400558987242
+              }
+            },
+            "FR": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 24.776755053371588,
+                "rmse_eur_mwh": 30.193153880120118,
+                "bias_eur_mwh": -17.60536986464711
+              },
+              "negative_price": {
+                "n": 147,
+                "mae_eur_mwh": 12.90068587527979,
+                "rmse_eur_mwh": 19.22653495785915,
+                "bias_eur_mwh": -4.813758372038617
+              },
+              "positive_peak_q95_train": {
+                "n": 1115,
+                "mae_eur_mwh": 31.423125580046808,
+                "rmse_eur_mwh": 36.36378524517973,
+                "bias_eur_mwh": -25.92620307228702
+              },
+              "positive_peak_q99_train": {
+                "n": 557,
+                "mae_eur_mwh": 35.71703259282423,
+                "rmse_eur_mwh": 41.84266975937655,
+                "bias_eur_mwh": -27.172527435011837
+              }
+            },
+            "NL": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 8.330372603163475,
+                "rmse_eur_mwh": 12.264872847971066,
+                "bias_eur_mwh": 5.527066226392445
+              },
+              "negative_price": {
+                "n": 137,
+                "mae_eur_mwh": 7.107556838470096,
+                "rmse_eur_mwh": 11.216597671219079,
+                "bias_eur_mwh": 7.107556838470096
+              },
+              "positive_peak_q95_train": {
+                "n": 741,
+                "mae_eur_mwh": 9.274381492524734,
+                "rmse_eur_mwh": 13.341590013989808,
+                "bias_eur_mwh": 4.363483024802444
+              },
+              "positive_peak_q99_train": {
+                "n": 98,
+                "mae_eur_mwh": 19.49691139314162,
+                "rmse_eur_mwh": 29.09979548370852,
+                "bias_eur_mwh": -5.547661629491969
+              }
+            }
+          },
+          "spreads": {
+            "FR-DE": {
+              "meaning": "ORACLE reconstructed price spread, EUR/MWh",
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 38.388895406459696,
+                "rmse_eur_mwh": 44.60028763775763,
+                "bias_eur_mwh": -31.905362875137346
+              },
+              "train_absolute_spread_q95": 92.52499999999999,
+              "test_large_absolute_spread": {
+                "n": 51,
+                "mae_eur_mwh": 88.89273079979908,
+                "rmse_eur_mwh": 105.49432916971466,
+                "bias_eur_mwh": 67.35319867792687
+              },
+              "actual_test_mean": -9.107429398148149,
+              "oracle_reconstructed_test_mean": -41.012792273285484,
+              "material_actual_nonzero_hours": 1841,
+              "direction_errors_or_erased_spreads": 856
+            },
+            "BE-NL": {
+              "meaning": "ORACLE reconstructed price spread, EUR/MWh",
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 12.827344649009726,
+                "rmse_eur_mwh": 20.039573656322272,
+                "bias_eur_mwh": -12.386977333791704
+              },
+              "train_absolute_spread_q95": 27.0,
+              "test_large_absolute_spread": {
+                "n": 140,
+                "mae_eur_mwh": 57.88421774247487,
+                "rmse_eur_mwh": 65.16800812646072,
+                "bias_eur_mwh": -57.62903918429451
+              },
+              "actual_test_mean": 4.362076388888889,
+              "oracle_reconstructed_test_mean": -8.024900944902814,
+              "material_actual_nonzero_hours": 1836,
+              "direction_errors_or_erased_spreads": 954
+            }
+          },
+          "negative_price_sign": {
+            "negative_actual_cells": 522,
+            "reconstructed_nonnegative_cells": 228,
+            "fraction_lost": 0.4367816091954023,
+            "near_zero_tolerance_eur_mwh": 1e-09,
+            "material_sign_losses": 228
+          }
+        },
+        {
+          "rank": 2,
+          "train_variance_retained": 0.9802725262533374,
+          "test_reconstruction": {
+            "n": 8640,
+            "mae_eur_mwh": 4.947862617293406,
+            "rmse_eur_mwh": 11.736750281258967,
+            "bias_eur_mwh": -0.11690035704664664
+          },
+          "maximum_absolute_reconstruction_error": 297.9174704447868,
+          "test_regimes": {
+            "all": {
+              "n": 8640,
+              "mae_eur_mwh": 4.947862617293406,
+              "rmse_eur_mwh": 11.736750281258967,
+              "bias_eur_mwh": -0.11690035704664664
+            },
+            "negative_price": {
+              "n": 522,
+              "mae_eur_mwh": 4.3928515328401145,
+              "rmse_eur_mwh": 6.417998641823257,
+              "bias_eur_mwh": 0.5563225916391424
+            },
+            "positive_peak_q95_train": {
+              "n": 3393,
+              "mae_eur_mwh": 5.5754133421693775,
+              "rmse_eur_mwh": 15.324844511345153,
+              "bias_eur_mwh": -1.1686692219965553
+            },
+            "positive_peak_q99_train": {
+              "n": 1025,
+              "mae_eur_mwh": 10.095777923055953,
+              "rmse_eur_mwh": 26.044503401296673,
+              "bias_eur_mwh": -2.280551414413106
+            }
+          },
+          "countries": {
+            "BE": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 7.359782819381455,
+                "rmse_eur_mwh": 17.081524425334425,
+                "bias_eur_mwh": -5.734788441696359
+              },
+              "negative_price": {
+                "n": 73,
+                "mae_eur_mwh": 5.784635865311797,
+                "rmse_eur_mwh": 5.794771588449237,
+                "bias_eur_mwh": 5.784635865311797
+              },
+              "positive_peak_q95_train": {
+                "n": 988,
+                "mae_eur_mwh": 8.324901919778565,
+                "rmse_eur_mwh": 21.911309770134647,
+                "bias_eur_mwh": -7.781351551341896
+              },
+              "positive_peak_q99_train": {
+                "n": 317,
+                "mae_eur_mwh": 16.391357959517453,
+                "rmse_eur_mwh": 36.47086124493168,
+                "bias_eur_mwh": -15.845663383288429
+              }
+            },
+            "DE": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 5.781987320136033,
+                "rmse_eur_mwh": 12.460890265564732,
+                "bias_eur_mwh": 3.6210543951090344
+              },
+              "negative_price": {
+                "n": 165,
+                "mae_eur_mwh": 5.279553604268646,
+                "rmse_eur_mwh": 6.15894705642859,
+                "bias_eur_mwh": -3.6718039566967042
+              },
+              "positive_peak_q95_train": {
+                "n": 549,
+                "mae_eur_mwh": 8.26969326235282,
+                "rmse_eur_mwh": 19.346699267772635,
+                "bias_eur_mwh": 6.553560353899246
+              },
+              "positive_peak_q99_train": {
+                "n": 53,
+                "mae_eur_mwh": 39.02151608103308,
+                "rmse_eur_mwh": 58.606911060574966,
+                "bias_eur_mwh": 30.118367902787934
+              }
+            },
+            "FR": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 2.8293311754901644,
+                "rmse_eur_mwh": 6.442142941006416,
+                "bias_eur_mwh": 2.1362216878605214
+              },
+              "negative_price": {
+                "n": 147,
+                "mae_eur_mwh": 3.062096176444836,
+                "rmse_eur_mwh": 5.6324373868479185,
+                "bias_eur_mwh": -0.5140542300015909
+              },
+              "positive_peak_q95_train": {
+                "n": 1115,
+                "mae_eur_mwh": 2.5519905887999994,
+                "rmse_eur_mwh": 7.3433926339046245,
+                "bias_eur_mwh": 2.2641796445598317
+              },
+              "positive_peak_q99_train": {
+                "n": 557,
+                "mae_eur_mwh": 3.3981577422698175,
+                "rmse_eur_mwh": 9.610798060984454,
+                "bias_eur_mwh": 2.9991672156811036
+              }
+            },
+            "NL": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 3.8203491541659704,
+                "rmse_eur_mwh": 7.90264260120806,
+                "bias_eur_mwh": -0.4900890694597834
+              },
+              "negative_price": {
+                "n": 137,
+                "mae_eur_mwh": 4.0112087542559225,
+                "rmse_eur_mwh": 7.702445770937838,
+                "bias_eur_mwh": 4.0112087542559225
+              },
+              "positive_peak_q95_train": {
+                "n": 741,
+                "mae_eur_mwh": 4.462676471924128,
+                "rmse_eur_mwh": 8.762118457885784,
+                "bias_eur_mwh": -3.2385752705579187
+              },
+              "positive_peak_q99_train": {
+                "n": 98,
+                "mae_eur_mwh": 12.15507840026815,
+                "rmse_eur_mwh": 20.236703149808722,
+                "bias_eur_mwh": -5.931628012787117
+              }
+            }
+          },
+          "spreads": {
+            "FR-DE": {
+              "meaning": "ORACLE reconstructed price spread, EUR/MWh",
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 3.396702806073909,
+                "rmse_eur_mwh": 6.851802958210966,
+                "bias_eur_mwh": -1.4848327072485137
+              },
+              "train_absolute_spread_q95": 92.52499999999999,
+              "test_large_absolute_spread": {
+                "n": 51,
+                "mae_eur_mwh": 23.198299267522806,
+                "rmse_eur_mwh": 31.350994759735954,
+                "bias_eur_mwh": -16.330441390055913
+              },
+              "actual_test_mean": -9.107429398148149,
+              "oracle_reconstructed_test_mean": -10.592262105396664,
+              "material_actual_nonzero_hours": 1841,
+              "direction_errors_or_erased_spreads": 230
+            },
+            "BE-NL": {
+              "meaning": "ORACLE reconstructed price spread, EUR/MWh",
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 7.3291212847146445,
+                "rmse_eur_mwh": 17.455248636320263,
+                "bias_eur_mwh": -5.244699372236575
+              },
+              "train_absolute_spread_q95": 27.0,
+              "test_large_absolute_spread": {
+                "n": 140,
+                "mae_eur_mwh": 50.1494836506557,
+                "rmse_eur_mwh": 60.37646812719864,
+                "bias_eur_mwh": -50.01046483016488
+              },
+              "actual_test_mean": 4.362076388888889,
+              "oracle_reconstructed_test_mean": -0.8826229833476864,
+              "material_actual_nonzero_hours": 1836,
+              "direction_errors_or_erased_spreads": 483
+            }
+          },
+          "negative_price_sign": {
+            "negative_actual_cells": 522,
+            "reconstructed_nonnegative_cells": 201,
+            "fraction_lost": 0.3850574712643678,
+            "near_zero_tolerance_eur_mwh": 1e-09,
+            "material_sign_losses": 201
+          }
+        },
+        {
+          "rank": 3,
+          "train_variance_retained": 0.9941378843071411,
+          "test_reconstruction": {
+            "n": 8640,
+            "mae_eur_mwh": 2.2114157452326015,
+            "rmse_eur_mwh": 6.270946978481217,
+            "bias_eur_mwh": -0.01184262142988327
+          },
+          "maximum_absolute_reconstruction_error": 129.65427683048756,
+          "test_regimes": {
+            "all": {
+              "n": 8640,
+              "mae_eur_mwh": 2.2114157452326015,
+              "rmse_eur_mwh": 6.270946978481217,
+              "bias_eur_mwh": -0.01184262142988327
+            },
+            "negative_price": {
+              "n": 522,
+              "mae_eur_mwh": 1.2952093297444776,
+              "rmse_eur_mwh": 3.447317439550884,
+              "bias_eur_mwh": 0.42722634830960066
+            },
+            "positive_peak_q95_train": {
+              "n": 3393,
+              "mae_eur_mwh": 1.9736104527702263,
+              "rmse_eur_mwh": 7.037317596519296,
+              "bias_eur_mwh": -0.20077239316077883
+            },
+            "positive_peak_q99_train": {
+              "n": 1025,
+              "mae_eur_mwh": 3.7194609948165382,
+              "rmse_eur_mwh": 11.630469972924837,
+              "bias_eur_mwh": -0.5693881501606746
+            }
+          },
+          "countries": {
+            "BE": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 3.80746661275369,
+                "rmse_eur_mwh": 9.058879318418413,
+                "bias_eur_mwh": -2.7073021638328476
+              },
+              "negative_price": {
+                "n": 73,
+                "mae_eur_mwh": 1.815630910335466,
+                "rmse_eur_mwh": 1.8405800872760054,
+                "bias_eur_mwh": 1.815630910335466
+              },
+              "positive_peak_q95_train": {
+                "n": 988,
+                "mae_eur_mwh": 3.4256717492482074,
+                "rmse_eur_mwh": 9.842632245397224,
+                "bias_eur_mwh": -2.5906147798098873
+              },
+              "positive_peak_q99_train": {
+                "n": 317,
+                "mae_eur_mwh": 6.384353826970575,
+                "rmse_eur_mwh": 15.698810506754862,
+                "bias_eur_mwh": -5.692567264051777
+              }
+            },
+            "DE": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 0.6486750758151372,
+                "rmse_eur_mwh": 1.5433541055860622,
+                "bias_eur_mwh": -0.46124092867847294
+              },
+              "negative_price": {
+                "n": 165,
+                "mae_eur_mwh": 0.37565150754338555,
+                "rmse_eur_mwh": 0.5387231669369965,
+                "bias_eur_mwh": 0.14610564705709908
+              },
+              "positive_peak_q95_train": {
+                "n": 549,
+                "mae_eur_mwh": 0.5845277411153065,
+                "rmse_eur_mwh": 1.915239518577385,
+                "bias_eur_mwh": -0.4493261248520742
+              },
+              "positive_peak_q99_train": {
+                "n": 53,
+                "mae_eur_mwh": 3.605968373674829,
+                "rmse_eur_mwh": 5.873090806704906,
+                "bias_eur_mwh": -3.5184530385583193
+              }
+            },
+            "FR": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 0.9227598337557096,
+                "rmse_eur_mwh": 2.1954677017722566,
+                "bias_eur_mwh": 0.6561291138462017
+              },
+              "negative_price": {
+                "n": 147,
+                "mae_eur_mwh": 0.7662978732786158,
+                "rmse_eur_mwh": 1.5305919459333859,
+                "bias_eur_mwh": 0.16497279941021264
+              },
+              "positive_peak_q95_train": {
+                "n": 1115,
+                "mae_eur_mwh": 0.6267823303105391,
+                "rmse_eur_mwh": 2.1002680995712315,
+                "bias_eur_mwh": 0.400732102523591
+              },
+              "positive_peak_q99_train": {
+                "n": 557,
+                "mae_eur_mwh": 0.745448982362178,
+                "rmse_eur_mwh": 2.6311937023688365,
+                "bias_eur_mwh": 0.5307453190906516
+              }
+            },
+            "NL": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 3.466761458605868,
+                "rmse_eur_mwh": 8.24825976780966,
+                "bias_eur_mwh": 2.465043492945586
+              },
+              "negative_price": {
+                "n": 137,
+                "mae_eur_mwh": 2.692919179237322,
+                "rmse_eur_mwh": 6.372773229513103,
+                "bias_eur_mwh": 0.30739170865255433
+              },
+              "positive_peak_q95_train": {
+                "n": 741,
+                "mae_eur_mwh": 3.0932908904501955,
+                "rmse_eur_mwh": 9.393718950733483,
+                "bias_eur_mwh": 2.264737409834859
+              },
+              "positive_peak_q99_train": {
+                "n": 98,
+                "mae_eur_mwh": 12.064040301599794,
+                "rmse_eur_mwh": 23.65562588312805,
+                "bias_eur_mwh": 11.344630990814489
+              }
+            }
+          },
+          "spreads": {
+            "FR-DE": {
+              "meaning": "ORACLE reconstructed price spread, EUR/MWh",
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 1.5714349095708466,
+                "rmse_eur_mwh": 3.7388218073583186,
+                "bias_eur_mwh": 1.1173700425246744
+              },
+              "train_absolute_spread_q95": 92.52499999999999,
+              "test_large_absolute_spread": {
+                "n": 51,
+                "mae_eur_mwh": 12.386121006465814,
+                "rmse_eur_mwh": 16.166006404058965,
+                "bias_eur_mwh": 12.386121006465814
+              },
+              "actual_test_mean": -9.107429398148149,
+              "oracle_reconstructed_test_mean": -7.9900593556234725,
+              "material_actual_nonzero_hours": 1841,
+              "direction_errors_or_erased_spreads": 125
+            },
+            "BE-NL": {
+              "meaning": "ORACLE reconstructed price spread, EUR/MWh",
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 7.274228071359557,
+                "rmse_eur_mwh": 17.307139086228073,
+                "bias_eur_mwh": -5.172345656778434
+              },
+              "train_absolute_spread_q95": 27.0,
+              "test_large_absolute_spread": {
+                "n": 140,
+                "mae_eur_mwh": 49.84903253273633,
+                "rmse_eur_mwh": 59.9290070609135,
+                "bias_eur_mwh": -49.70948055102459
+              },
+              "actual_test_mean": 4.362076388888889,
+              "oracle_reconstructed_test_mean": -0.810269267889545,
+              "material_actual_nonzero_hours": 1836,
+              "direction_errors_or_erased_spreads": 476
+            }
+          },
+          "negative_price_sign": {
+            "negative_actual_cells": 522,
+            "reconstructed_nonnegative_cells": 151,
+            "fraction_lost": 0.289272030651341,
+            "near_zero_tolerance_eur_mwh": 1e-09,
+            "material_sign_losses": 151
+          }
+        },
+        {
+          "rank": 4,
+          "train_variance_retained": 0.9999999999999999,
+          "test_reconstruction": {
+            "n": 8640,
+            "mae_eur_mwh": 2.770461505165485e-14,
+            "rmse_eur_mwh": 4.099940201644804e-14,
+            "bias_eur_mwh": 1.5039628944953474e-14
+          },
+          "maximum_absolute_reconstruction_error": 4.547473508864641e-13,
+          "test_regimes": {
+            "all": {
+              "n": 8640,
+              "mae_eur_mwh": 2.770461505165485e-14,
+              "rmse_eur_mwh": 4.099940201644804e-14,
+              "bias_eur_mwh": 1.5039628944953474e-14
+            },
+            "negative_price": {
+              "n": 522,
+              "mae_eur_mwh": 3.340184048757328e-14,
+              "rmse_eur_mwh": 3.690038731407425e-14,
+              "bias_eur_mwh": -3.333549894590484e-14
+            },
+            "positive_peak_q95_train": {
+              "n": 3393,
+              "mae_eur_mwh": 4.3386455642433705e-14,
+              "rmse_eur_mwh": 5.775594662653326e-14,
+              "bias_eur_mwh": 4.2791719017158526e-14
+            },
+            "positive_peak_q99_train": {
+              "n": 1025,
+              "mae_eur_mwh": 7.409054399808733e-14,
+              "rmse_eur_mwh": 8.686302988568269e-14,
+              "bias_eur_mwh": 7.33141460819397e-14
+            }
+          },
+          "countries": {
+            "BE": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 1.967245529607286e-14,
+                "rmse_eur_mwh": 2.9479682003840994e-14,
+                "bias_eur_mwh": 1.2355590043244619e-14
+              },
+              "negative_price": {
+                "n": 73,
+                "mae_eur_mwh": 2.796761585639797e-14,
+                "rmse_eur_mwh": 3.004739170163922e-14,
+                "bias_eur_mwh": -2.782161392439247e-14
+              },
+              "positive_peak_q95_train": {
+                "n": 988,
+                "mae_eur_mwh": 2.7990205744719736e-14,
+                "rmse_eur_mwh": 3.898624590013549e-14,
+                "bias_eur_mwh": 2.7990205744719736e-14
+              },
+              "positive_peak_q99_train": {
+                "n": 317,
+                "mae_eur_mwh": 4.294636850840227e-14,
+                "rmse_eur_mwh": 5.841318036902043e-14,
+                "bias_eur_mwh": 4.294636850840227e-14
+              }
+            },
+            "DE": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 1.8810517781397766e-14,
+                "rmse_eur_mwh": 3.3308824948507264e-14,
+                "bias_eur_mwh": -3.961490423892711e-15
+              },
+              "negative_price": {
+                "n": 165,
+                "mae_eur_mwh": 4.4964184942715214e-14,
+                "rmse_eur_mwh": 4.660504998238127e-14,
+                "bias_eur_mwh": -4.4964184942715214e-14
+              },
+              "positive_peak_q95_train": {
+                "n": 549,
+                "mae_eur_mwh": 2.293409340194713e-14,
+                "rmse_eur_mwh": 4.9138094751882673e-14,
+                "bias_eur_mwh": 2.138099452596877e-14
+              },
+              "positive_peak_q99_train": {
+                "n": 53,
+                "mae_eur_mwh": 9.759907766667037e-14,
+                "rmse_eur_mwh": 1.3989260975254796e-13,
+                "bias_eur_mwh": 9.759907766667037e-14
+              }
+            },
+            "FR": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 5.465144456294171e-14,
+                "rmse_eur_mwh": 6.345922363517074e-14,
+                "bias_eur_mwh": 4.263852585210742e-14
+              },
+              "negative_price": {
+                "n": 147,
+                "mae_eur_mwh": 3.069951936276128e-14,
+                "rmse_eur_mwh": 3.493118438673625e-14,
+                "bias_eur_mwh": -3.0628584513685794e-14
+              },
+              "positive_peak_q95_train": {
+                "n": 1115,
+                "mae_eur_mwh": 7.712097029747742e-14,
+                "rmse_eur_mwh": 8.139740367889133e-14,
+                "bias_eur_mwh": 7.612684772547226e-14
+              },
+              "positive_peak_q99_train": {
+                "n": 557,
+                "mae_eur_mwh": 9.128624447215937e-14,
+                "rmse_eur_mwh": 9.483168410365577e-14,
+                "bias_eur_mwh": 8.995955785601843e-14
+              }
+            },
+            "NL": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 1.7684042566207052e-14,
+                "rmse_eur_mwh": 2.6799278496795335e-14,
+                "bias_eur_mwh": 9.125890308354562e-15
+              },
+              "negative_price": {
+                "n": 137,
+                "mae_eur_mwh": 2.5271568723520293e-14,
+                "rmse_eur_mwh": 2.7961777207904352e-14,
+                "bias_eur_mwh": -2.517270214760477e-14
+              },
+              "positive_peak_q95_train": {
+                "n": 741,
+                "mae_eur_mwh": 2.83066417808882e-14,
+                "rmse_eur_mwh": 3.858925914012029e-14,
+                "bias_eur_mwh": 2.8229930014544333e-14
+              },
+              "positive_peak_q99_train": {
+                "n": 98,
+                "mae_eur_mwh": 6.43838723831601e-14,
+                "rmse_eur_mwh": 7.862629092478644e-14,
+                "bias_eur_mwh": 6.380383749682532e-14
+              }
+            }
+          },
+          "spreads": {
+            "FR-DE": {
+              "meaning": "ORACLE reconstructed price spread, EUR/MWh",
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 5.770150785932715e-14,
+                "rmse_eur_mwh": 6.911980853113867e-14,
+                "bias_eur_mwh": 4.655185059448746e-14
+              },
+              "train_absolute_spread_q95": 92.52499999999999,
+              "test_large_absolute_spread": {
+                "n": 51,
+                "mae_eur_mwh": 1.4684549872375405e-13,
+                "rmse_eur_mwh": 1.8182447486241802e-13,
+                "bias_eur_mwh": -1.1285090509131003e-13
+              },
+              "actual_test_mean": -9.107429398148149,
+              "oracle_reconstructed_test_mean": -9.107429398148101,
+              "material_actual_nonzero_hours": 1841,
+              "direction_errors_or_erased_spreads": 0
+            },
+            "BE-NL": {
+              "meaning": "ORACLE reconstructed price spread, EUR/MWh",
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 1.1628940681099525e-14,
+                "rmse_eur_mwh": 1.867464056112817e-14,
+                "bias_eur_mwh": 3.2344868890379395e-15
+              },
+              "train_absolute_spread_q95": 27.0,
+              "test_large_absolute_spread": {
+                "n": 140,
+                "mae_eur_mwh": 2.0478856705657173e-14,
+                "rmse_eur_mwh": 2.958885552868318e-14,
+                "bias_eur_mwh": 2.002207923266854e-14
+              },
+              "actual_test_mean": 4.362076388888889,
+              "oracle_reconstructed_test_mean": 4.362076388888892,
+              "material_actual_nonzero_hours": 1836,
+              "direction_errors_or_erased_spreads": 0
+            }
+          },
+          "negative_price_sign": {
+            "negative_actual_cells": 522,
+            "reconstructed_nonnegative_cells": 0,
+            "fraction_lost": 0.0,
+            "near_zero_tolerance_eur_mwh": 1e-09,
+            "material_sign_losses": 0
+          }
+        }
+      ]
+    },
+    "frozen_minus_nyx": {
+      "diagnostic": "ORACLE reconstruction, not a forecast",
+      "space": "frozen_minus_nyx",
+      "definition": "actual - nyx",
+      "unit": "EUR/MWh",
+      "standardized": false,
+      "country_order": [
+        "BE",
+        "DE",
+        "FR",
+        "NL"
+      ],
+      "train_center": [
+        0.5218415835483816,
+        0.208990171435845,
+        -0.08749778659502826,
+        0.10242625257706311
+      ],
+      "train_eigenvalues_eur_mwh_squared": [
+        572.8542436028881,
+        176.03241122025338,
+        86.683298077165,
+        36.35224314482044
+      ],
+      "train_explained_variance_fraction": [
+        0.6570015606911326,
+        0.20189004479838096,
+        0.09941632231676627,
+        0.04169207219372014
+      ],
+      "train_cumulative_explained_variance_fraction": [
+        0.6570015606911326,
+        0.8588916054895135,
+        0.9583079278062797,
+        0.9999999999999999
+      ],
+      "train_component_loadings": [
+        [
+          0.4436112479982166,
+          0.6362730001916487,
+          0.22849828555685706,
+          0.5883487599835328
+        ],
+        [
+          0.18961024461076245,
+          -0.3664841791244041,
+          0.9055764212282624,
+          -0.09832927796730753
+        ],
+        [
+          -0.4209416277841703,
+          0.6726458321346321,
+          0.30305121106273847,
+          -0.5277458611715766
+        ],
+        [
+          0.7681569903258868,
+          0.09161659342356468,
+          -0.18941975157411134,
+          -0.6046994259436158
+        ]
+      ],
+      "train_positive_price_thresholds": {
+        "0.95": {
+          "BE": 143.32,
+          "DE": 162.68,
+          "FR": 125.1,
+          "NL": 153.55
+        },
+        "0.99": {
+          "BE": 183.81800000000004,
+          "DE": 249.92400000000006,
+          "FR": 158.46100000000004,
+          "NL": 216.53200000000012
+        }
+      },
+      "rank_results": [
+        {
+          "rank": 1,
+          "train_variance_retained": 0.6570015606911326,
+          "test_reconstruction": {
+            "n": 8640,
+            "mae_eur_mwh": 7.417646321372725,
+            "rmse_eur_mwh": 13.643624587238564,
+            "bias_eur_mwh": 0.009724965927945061
+          },
+          "maximum_absolute_reconstruction_error": 283.66183658001484,
+          "test_regimes": {
+            "all": {
+              "n": 8640,
+              "mae_eur_mwh": 7.417646321372725,
+              "rmse_eur_mwh": 13.643624587238564,
+              "bias_eur_mwh": 0.009724965927945061
+            },
+            "negative_price": {
+              "n": 522,
+              "mae_eur_mwh": 4.7397155370026764,
+              "rmse_eur_mwh": 8.197178587669102,
+              "bias_eur_mwh": 0.43550161140225796
+            },
+            "positive_peak_q95_train": {
+              "n": 3393,
+              "mae_eur_mwh": 8.25094039910664,
+              "rmse_eur_mwh": 16.865649406426158,
+              "bias_eur_mwh": -1.1253019776960504
+            },
+            "positive_peak_q99_train": {
+              "n": 1025,
+              "mae_eur_mwh": 13.944213921147705,
+              "rmse_eur_mwh": 27.110739836121404,
+              "bias_eur_mwh": -2.6624975637852324
+            },
+            "absolute_residual_q95_train": {
+              "n": 932,
+              "mae_eur_mwh": 24.259605579008163,
+              "rmse_eur_mwh": 34.43795155585378,
+              "bias_eur_mwh": 0.8009293954815462
+            },
+            "absolute_residual_q99_train": {
+              "n": 305,
+              "mae_eur_mwh": 39.328072825591036,
+              "rmse_eur_mwh": 52.36072634851293,
+              "bias_eur_mwh": -0.2817380505933836
+            }
+          },
+          "countries": {
+            "BE": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 7.902590351429845,
+                "rmse_eur_mwh": 16.690398338632324,
+                "bias_eur_mwh": -0.4546952919410948
+              },
+              "negative_price": {
+                "n": 73,
+                "mae_eur_mwh": 3.8168716102801463,
+                "rmse_eur_mwh": 6.211923784214116,
+                "bias_eur_mwh": 0.5790249175247869
+              },
+              "positive_peak_q95_train": {
+                "n": 988,
+                "mae_eur_mwh": 8.820425756756103,
+                "rmse_eur_mwh": 21.84714480941155,
+                "bias_eur_mwh": -2.633037990886239
+              },
+              "positive_peak_q99_train": {
+                "n": 317,
+                "mae_eur_mwh": 16.708210841543696,
+                "rmse_eur_mwh": 36.58063380891455,
+                "bias_eur_mwh": -8.792096709707012
+              },
+              "absolute_residual_q95_train": {
+                "n": 318,
+                "mae_eur_mwh": 26.018193575863197,
+                "rmse_eur_mwh": 40.18410399361257,
+                "bias_eur_mwh": -7.024566178478847
+              },
+              "absolute_residual_q99_train": {
+                "n": 125,
+                "mae_eur_mwh": 42.32950625143791,
+                "rmse_eur_mwh": 60.08565134505993,
+                "bias_eur_mwh": -18.361115386026263
+              }
+            },
+            "DE": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 6.074868908485171,
+                "rmse_eur_mwh": 11.513529559660974,
+                "bias_eur_mwh": 0.18156501888560472
+              },
+              "negative_price": {
+                "n": 165,
+                "mae_eur_mwh": 4.471393676516525,
+                "rmse_eur_mwh": 6.9886801123589395,
+                "bias_eur_mwh": 0.35965896363087574
+              },
+              "positive_peak_q95_train": {
+                "n": 549,
+                "mae_eur_mwh": 8.123310365069614,
+                "rmse_eur_mwh": 17.966086783730823,
+                "bias_eur_mwh": 0.948872833549624
+              },
+              "positive_peak_q99_train": {
+                "n": 53,
+                "mae_eur_mwh": 33.86463282737505,
+                "rmse_eur_mwh": 51.25838911125862,
+                "bias_eur_mwh": 14.484444414234517
+              },
+              "absolute_residual_q95_train": {
+                "n": 151,
+                "mae_eur_mwh": 21.671853113754157,
+                "rmse_eur_mwh": 34.138508681729164,
+                "bias_eur_mwh": 3.7764458052476355
+              },
+              "absolute_residual_q99_train": {
+                "n": 34,
+                "mae_eur_mwh": 48.02771301795857,
+                "rmse_eur_mwh": 63.219752106426334,
+                "bias_eur_mwh": 16.244520923661025
+              }
+            },
+            "FR": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 11.589765108873195,
+                "rmse_eur_mwh": 16.82915647187672,
+                "bias_eur_mwh": 0.2706666361326543
+              },
+              "negative_price": {
+                "n": 147,
+                "mae_eur_mwh": 6.435274057231423,
+                "rmse_eur_mwh": 10.950256200777156,
+                "bias_eur_mwh": 0.7831356289075677
+              },
+              "positive_peak_q95_train": {
+                "n": 1115,
+                "mae_eur_mwh": 10.645724266860455,
+                "rmse_eur_mwh": 15.643560474916704,
+                "bias_eur_mwh": -1.7469068656310431
+              },
+              "positive_peak_q99_train": {
+                "n": 557,
+                "mae_eur_mwh": 11.270176133753827,
+                "rmse_eur_mwh": 17.00566709594272,
+                "bias_eur_mwh": -1.7650649968407652
+              },
+              "absolute_residual_q95_train": {
+                "n": 266,
+                "mae_eur_mwh": 33.65288309573047,
+                "rmse_eur_mwh": 36.757308922876454,
+                "bias_eur_mwh": 7.02422149306295
+              },
+              "absolute_residual_q99_train": {
+                "n": 98,
+                "mae_eur_mwh": 44.58936416840483,
+                "rmse_eur_mwh": 47.31676314987758,
+                "bias_eur_mwh": 12.616482475713399
+              }
+            },
+            "NL": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 4.10336091670269,
+                "rmse_eur_mwh": 7.088208541774495,
+                "bias_eur_mwh": 0.041363500634616246
+              },
+              "negative_price": {
+                "n": 137,
+                "mae_eur_mwh": 3.7352893410708075,
+                "rmse_eur_mwh": 6.926539630069588,
+                "bias_eur_mwh": 0.07736026076030816
+              },
+              "positive_peak_q95_train": {
+                "n": 741,
+                "mae_eur_mwh": 3.9826992962498897,
+                "rmse_eur_mwh": 7.661782678247468,
+                "bias_eur_mwh": 0.28361929046258383
+              },
+              "positive_peak_q99_train": {
+                "n": 98,
+                "mae_eur_mwh": 9.42859985770703,
+                "rmse_eur_mwh": 17.155361614660787,
+                "bias_eur_mwh": 2.7908194222769036
+              },
+              "absolute_residual_q95_train": {
+                "n": 197,
+                "mae_eur_mwh": 10.721066593248374,
+                "rmse_eur_mwh": 16.928987679065315,
+                "bias_eur_mwh": 2.749198008111356
+              },
+              "absolute_residual_q99_train": {
+                "n": 48,
+                "mae_eur_mwh": 14.607791651276374,
+                "rmse_eur_mwh": 24.840040333574557,
+                "bias_eur_mwh": 8.760006745789862
+              }
+            }
+          },
+          "spreads": {
+            "FR-DE": {
+              "meaning": "ORACLE reconstructed price spread, EUR/MWh",
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 14.326575021669132,
+                "rmse_eur_mwh": 20.84597349654456,
+                "bias_eur_mwh": 0.08910161724704985
+              },
+              "train_absolute_spread_q95": 92.52499999999999,
+              "test_large_absolute_spread": {
+                "n": 51,
+                "mae_eur_mwh": 50.26682836565142,
+                "rmse_eur_mwh": 64.27261470981426,
+                "bias_eur_mwh": 21.85911303095103
+              },
+              "actual_test_mean": -9.107429398148149,
+              "oracle_reconstructed_test_mean": -9.0183277809011,
+              "material_actual_nonzero_hours": 1841,
+              "direction_errors_or_erased_spreads": 520
+            },
+            "BE-NL": {
+              "meaning": "ORACLE reconstructed price spread, EUR/MWh",
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 9.736324359821861,
+                "rmse_eur_mwh": 18.806031290252278,
+                "bias_eur_mwh": -0.496058792575711
+              },
+              "train_absolute_spread_q95": 27.0,
+              "test_large_absolute_spread": {
+                "n": 140,
+                "mae_eur_mwh": 38.885432014143106,
+                "rmse_eur_mwh": 56.06075111949772,
+                "bias_eur_mwh": -35.90185278827186
+              },
+              "actual_test_mean": 4.362076388888889,
+              "oracle_reconstructed_test_mean": 3.8660175963131778,
+              "material_actual_nonzero_hours": 1836,
+              "direction_errors_or_erased_spreads": 713
+            }
+          },
+          "negative_price_sign": {
+            "negative_actual_cells": 522,
+            "reconstructed_nonnegative_cells": 209,
+            "fraction_lost": 0.4003831417624521,
+            "near_zero_tolerance_eur_mwh": 1e-09,
+            "material_sign_losses": 209
+          }
+        },
+        {
+          "rank": 2,
+          "train_variance_retained": 0.8588916054895135,
+          "test_reconstruction": {
+            "n": 8640,
+            "mae_eur_mwh": 4.9707938207407505,
+            "rmse_eur_mwh": 10.886488500932472,
+            "bias_eur_mwh": -0.004188393271943767
+          },
+          "maximum_absolute_reconstruction_error": 279.4369410208835,
+          "test_regimes": {
+            "all": {
+              "n": 8640,
+              "mae_eur_mwh": 4.9707938207407505,
+              "rmse_eur_mwh": 10.886488500932472,
+              "bias_eur_mwh": -0.004188393271943767
+            },
+            "negative_price": {
+              "n": 522,
+              "mae_eur_mwh": 3.351893750821437,
+              "rmse_eur_mwh": 5.6864148225604465,
+              "bias_eur_mwh": 0.592369413211169
+            },
+            "positive_peak_q95_train": {
+              "n": 3393,
+              "mae_eur_mwh": 5.5575793642775,
+              "rmse_eur_mwh": 14.775704946704014,
+              "bias_eur_mwh": -0.4934873362926074
+            },
+            "positive_peak_q99_train": {
+              "n": 1025,
+              "mae_eur_mwh": 9.794062592707512,
+              "rmse_eur_mwh": 24.944678838378174,
+              "bias_eur_mwh": -1.1940969369359813
+            },
+            "absolute_residual_q95_train": {
+              "n": 932,
+              "mae_eur_mwh": 15.59755058119221,
+              "rmse_eur_mwh": 28.563687163620603,
+              "bias_eur_mwh": -0.4308457102553864
+            },
+            "absolute_residual_q99_train": {
+              "n": 305,
+              "mae_eur_mwh": 27.501743035913243,
+              "rmse_eur_mwh": 45.81334231809539,
+              "bias_eur_mwh": -3.4259781343332723
+            }
+          },
+          "countries": {
+            "BE": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 7.891569590732398,
+                "rmse_eur_mwh": 16.461878358691635,
+                "bias_eur_mwh": -0.4714353145476446
+              },
+              "negative_price": {
+                "n": 73,
+                "mae_eur_mwh": 4.025369052317132,
+                "rmse_eur_mwh": 5.767428582726938,
+                "bias_eur_mwh": 0.9617923732650163
+              },
+              "positive_peak_q95_train": {
+                "n": 988,
+                "mae_eur_mwh": 8.881466075329937,
+                "rmse_eur_mwh": 21.760447656522796,
+                "bias_eur_mwh": -2.436092148539017
+              },
+              "positive_peak_q99_train": {
+                "n": 317,
+                "mae_eur_mwh": 16.659080395685802,
+                "rmse_eur_mwh": 36.454648771041,
+                "bias_eur_mwh": -8.51542583096492
+              },
+              "absolute_residual_q95_train": {
+                "n": 318,
+                "mae_eur_mwh": 24.282236877395253,
+                "rmse_eur_mwh": 39.26090659938517,
+                "bias_eur_mwh": -7.975040542234497
+              },
+              "absolute_residual_q99_train": {
+                "n": 125,
+                "mae_eur_mwh": 40.074967221807306,
+                "rmse_eur_mwh": 59.14281027736764,
+                "bias_eur_mwh": -19.567996367389533
+              }
+            },
+            "DE": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 5.073529973155935,
+                "rmse_eur_mwh": 10.336721380931214,
+                "bias_eur_mwh": 0.21392062000873693
+              },
+              "negative_price": {
+                "n": 165,
+                "mae_eur_mwh": 3.4470816995538343,
+                "rmse_eur_mwh": 4.963824202778772,
+                "bias_eur_mwh": 0.5206638553015214
+              },
+              "positive_peak_q95_train": {
+                "n": 549,
+                "mae_eur_mwh": 7.105134203441366,
+                "rmse_eur_mwh": 16.450398829276054,
+                "bias_eur_mwh": 0.4880086766402975
+              },
+              "positive_peak_q99_train": {
+                "n": 53,
+                "mae_eur_mwh": 31.64553436629297,
+                "rmse_eur_mwh": 47.17239299258325,
+                "bias_eur_mwh": 14.865521425034089
+              },
+              "absolute_residual_q95_train": {
+                "n": 151,
+                "mae_eur_mwh": 18.583685135872116,
+                "rmse_eur_mwh": 31.060858021317003,
+                "bias_eur_mwh": 5.692547528882749
+              },
+              "absolute_residual_q99_train": {
+                "n": 34,
+                "mae_eur_mwh": 45.58518255064552,
+                "rmse_eur_mwh": 58.473933298709326,
+                "bias_eur_mwh": 17.865372057137904
+              }
+            },
+            "FR": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 3.3597246483913596,
+                "rmse_eur_mwh": 7.159720343852429,
+                "bias_eur_mwh": 0.19071647418629367
+              },
+              "negative_price": {
+                "n": 147,
+                "mae_eur_mwh": 2.829625454505703,
+                "rmse_eur_mwh": 5.703517321423718,
+                "bias_eur_mwh": 1.0066617700487175
+              },
+              "positive_peak_q95_train": {
+                "n": 1115,
+                "mae_eur_mwh": 3.2381526680745973,
+                "rmse_eur_mwh": 8.526729954395188,
+                "bias_eur_mwh": 0.29661973979631234
+              },
+              "positive_peak_q99_train": {
+                "n": 557,
+                "mae_eur_mwh": 4.0294269256188695,
+                "rmse_eur_mwh": 11.023229137430803,
+                "bias_eur_mwh": 0.7395320873094361
+              },
+              "absolute_residual_q95_train": {
+                "n": 266,
+                "mae_eur_mwh": 7.830442929064651,
+                "rmse_eur_mwh": 16.11486284191078,
+                "bias_eur_mwh": 2.3399810949622943
+              },
+              "absolute_residual_q99_train": {
+                "n": 98,
+                "mae_eur_mwh": 12.02606919537642,
+                "rmse_eur_mwh": 23.978686536687196,
+                "bias_eur_mwh": 3.746904874123318
+              }
+            },
+            "NL": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 3.5583510706833112,
+                "rmse_eur_mwh": 6.7051982907446455,
+                "bias_eur_mwh": 0.05004464726483892
+              },
+              "negative_price": {
+                "n": 137,
+                "mae_eur_mwh": 3.438782298327871,
+                "rmse_eur_mwh": 6.395348264719155,
+                "bias_eur_mwh": 0.037351635955995846
+              },
+              "positive_peak_q95_train": {
+                "n": 741,
+                "mae_eur_mwh": 3.46925694733481,
+                "rmse_eur_mwh": 7.64386411584527,
+                "bias_eur_mwh": 0.18057859293835415
+              },
+              "positive_peak_q99_train": {
+                "n": 98,
+                "mae_eur_mwh": 8.534505643975129,
+                "rmse_eur_mwh": 17.756605783078093,
+                "bias_eur_mwh": 2.8127410193707854
+              },
+              "absolute_residual_q95_train": {
+                "n": 197,
+                "mae_eur_mwh": 9.777317461987627,
+                "rmse_eur_mwh": 16.78081888265389,
+                "bias_eur_mwh": 3.31220833680855
+              },
+              "absolute_residual_q99_train": {
+                "n": 48,
+                "mae_eur_mwh": 13.5460361533081,
+                "rmse_eur_mwh": 25.132314561062856,
+                "bias_eur_mwh": 8.884518486359795
+              }
+            }
+          },
+          "spreads": {
+            "FR-DE": {
+              "meaning": "ORACLE reconstructed price spread, EUR/MWh",
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 2.3591504864329806,
+                "rmse_eur_mwh": 4.4126258271982195,
+                "bias_eur_mwh": -0.023204145822443394
+              },
+              "train_absolute_spread_q95": 92.52499999999999,
+              "test_large_absolute_spread": {
+                "n": 51,
+                "mae_eur_mwh": 10.767526718477079,
+                "rmse_eur_mwh": 16.759629623245313,
+                "bias_eur_mwh": -2.9291744544923604
+              },
+              "actual_test_mean": -9.107429398148149,
+              "oracle_reconstructed_test_mean": -9.13063354397059,
+              "material_actual_nonzero_hours": 1841,
+              "direction_errors_or_erased_spreads": 201
+            },
+            "BE-NL": {
+              "meaning": "ORACLE reconstructed price spread, EUR/MWh",
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 9.191714456382615,
+                "rmse_eur_mwh": 18.074615044344718,
+                "bias_eur_mwh": -0.5214799618124837
+              },
+              "train_absolute_spread_q95": 27.0,
+              "test_large_absolute_spread": {
+                "n": 140,
+                "mae_eur_mwh": 36.228024889189946,
+                "rmse_eur_mwh": 53.167227783085075,
+                "bias_eur_mwh": -33.44329577605644
+              },
+              "actual_test_mean": 4.362076388888889,
+              "oracle_reconstructed_test_mean": 3.840596427076406,
+              "material_actual_nonzero_hours": 1836,
+              "direction_errors_or_erased_spreads": 631
+            }
+          },
+          "negative_price_sign": {
+            "negative_actual_cells": 522,
+            "reconstructed_nonnegative_cells": 207,
+            "fraction_lost": 0.39655172413793105,
+            "near_zero_tolerance_eur_mwh": 1e-09,
+            "material_sign_losses": 207
+          }
+        },
+        {
+          "rank": 3,
+          "train_variance_retained": 0.9583079278062797,
+          "test_reconstruction": {
+            "n": 8640,
+            "mae_eur_mwh": 2.917939537229206,
+            "rmse_eur_mwh": 7.01913240281645,
+            "bias_eur_mwh": -0.006711933502868989
+          },
+          "maximum_absolute_reconstruction_error": 168.5573072221676,
+          "test_regimes": {
+            "all": {
+              "n": 8640,
+              "mae_eur_mwh": 2.917939537229206,
+              "rmse_eur_mwh": 7.01913240281645,
+              "bias_eur_mwh": -0.006711933502868989
+            },
+            "negative_price": {
+              "n": 522,
+              "mae_eur_mwh": 1.766772791426705,
+              "rmse_eur_mwh": 3.259995486163873,
+              "bias_eur_mwh": 0.1867314958098925
+            },
+            "positive_peak_q95_train": {
+              "n": 3393,
+              "mae_eur_mwh": 3.226819153633701,
+              "rmse_eur_mwh": 9.331539806059029,
+              "bias_eur_mwh": -0.1781933130079811
+            },
+            "positive_peak_q99_train": {
+              "n": 1025,
+              "mae_eur_mwh": 5.798830082239198,
+              "rmse_eur_mwh": 15.747088755323288,
+              "bias_eur_mwh": -0.6230648315991104
+            },
+            "absolute_residual_q95_train": {
+              "n": 932,
+              "mae_eur_mwh": 9.590765802647594,
+              "rmse_eur_mwh": 18.38438462650726,
+              "bias_eur_mwh": -0.3172720578495536
+            },
+            "absolute_residual_q99_train": {
+              "n": 305,
+              "mae_eur_mwh": 17.436615408321607,
+              "rmse_eur_mwh": 29.407290795886496,
+              "bias_eur_mwh": -2.298949869282469
+            }
+          },
+          "countries": {
+            "BE": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 5.4209939250318895,
+                "rmse_eur_mwh": 10.783591242492783,
+                "bias_eur_mwh": -0.31411866680416295
+              },
+              "negative_price": {
+                "n": 73,
+                "mae_eur_mwh": 2.9163062956284365,
+                "rmse_eur_mwh": 3.8577391750525596,
+                "bias_eur_mwh": 0.8803265787165027
+              },
+              "positive_peak_q95_train": {
+                "n": 988,
+                "mae_eur_mwh": 5.679291973008825,
+                "rmse_eur_mwh": 13.488523067091261,
+                "bias_eur_mwh": -1.6092699699523882
+              },
+              "positive_peak_q99_train": {
+                "n": 317,
+                "mae_eur_mwh": 10.508239981642467,
+                "rmse_eur_mwh": 22.4929631679294,
+                "bias_eur_mwh": -5.458759061493773
+              },
+              "absolute_residual_q95_train": {
+                "n": 318,
+                "mae_eur_mwh": 15.861080496674782,
+                "rmse_eur_mwh": 24.86807104395677,
+                "bias_eur_mwh": -5.726654835378391
+              },
+              "absolute_residual_q99_train": {
+                "n": 125,
+                "mae_eur_mwh": 25.550455923854265,
+                "rmse_eur_mwh": 36.870119677934696,
+                "bias_eur_mwh": -13.15878354100778
+              }
+            },
+            "DE": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 0.6465514245604342,
+                "rmse_eur_mwh": 1.2861379990699913,
+                "bias_eur_mwh": -0.03746432375905193
+              },
+              "negative_price": {
+                "n": 165,
+                "mae_eur_mwh": 0.48881822164706007,
+                "rmse_eur_mwh": 0.6678779180079079,
+                "bias_eur_mwh": 0.1713285234113839
+              },
+              "positive_peak_q95_train": {
+                "n": 549,
+                "mae_eur_mwh": 0.7843167226299911,
+                "rmse_eur_mwh": 1.9794750448750953,
+                "bias_eur_mwh": -0.20183768077425449
+              },
+              "positive_peak_q99_train": {
+                "n": 53,
+                "mae_eur_mwh": 3.8100437481996976,
+                "rmse_eur_mwh": 5.803014412146318,
+                "bias_eur_mwh": -2.8756986250050915
+              },
+              "absolute_residual_q95_train": {
+                "n": 151,
+                "mae_eur_mwh": 2.1061213952705753,
+                "rmse_eur_mwh": 3.6972246981151815,
+                "bias_eur_mwh": -0.9242062672504671
+              },
+              "absolute_residual_q99_train": {
+                "n": 34,
+                "mae_eur_mwh": 5.637172696183493,
+                "rmse_eur_mwh": 7.274538508568866,
+                "bias_eur_mwh": -3.4496736438416513
+              }
+            },
+            "FR": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 1.3367623226714025,
+                "rmse_eur_mwh": 2.659124632014576,
+                "bias_eur_mwh": 0.07745848905910925
+              },
+              "negative_price": {
+                "n": 147,
+                "mae_eur_mwh": 1.0816790379965053,
+                "rmse_eur_mwh": 1.9987607852454854,
+                "bias_eur_mwh": 0.13066747768753845
+              },
+              "positive_peak_q95_train": {
+                "n": 1115,
+                "mae_eur_mwh": 1.155447277063094,
+                "rmse_eur_mwh": 2.9751994110706717,
+                "bias_eur_mwh": 0.16589355753376106
+              },
+              "positive_peak_q99_train": {
+                "n": 557,
+                "mae_eur_mwh": 1.4217198511037714,
+                "rmse_eur_mwh": 3.8354927919237283,
+                "bias_eur_mwh": 0.37242841865021664
+              },
+              "absolute_residual_q95_train": {
+                "n": 266,
+                "mae_eur_mwh": 2.905117508496592,
+                "rmse_eur_mwh": 5.698077946733654,
+                "bias_eur_mwh": 0.9656596322232781
+              },
+              "absolute_residual_q99_train": {
+                "n": 98,
+                "mae_eur_mwh": 4.287937264313021,
+                "rmse_eur_mwh": 8.270392839038092,
+                "bias_eur_mwh": 1.6846298761903464
+              }
+            },
+            "NL": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 4.2674504766530985,
+                "rmse_eur_mwh": 8.488930669210692,
+                "bias_eur_mwh": 0.24727676749262958
+              },
+              "negative_price": {
+                "n": 137,
+                "mae_eur_mwh": 3.428490601362138,
+                "rmse_eur_mwh": 5.266838243675139,
+                "bias_eur_mwh": -0.10414105851450599
+              },
+              "positive_peak_q95_train": {
+                "n": 741,
+                "mae_eur_mwh": 4.883324324287737,
+                "rmse_eur_mwh": 11.82853866410364,
+                "bias_eur_mwh": 1.2296712407176813
+              },
+              "positive_peak_q99_train": {
+                "n": 98,
+                "mae_eur_mwh": 16.51896412648093,
+                "rmse_eur_mwh": 29.24393981947055,
+                "bias_eur_mwh": 10.579128245321805
+              },
+              "absolute_residual_q95_train": {
+                "n": 197,
+                "mae_eur_mwh": 14.233424071974751,
+                "rmse_eur_mwh": 23.3755599696829,
+                "bias_eur_mwh": 7.14755514679174
+              },
+              "absolute_residual_q99_train": {
+                "n": 48,
+                "mae_eur_mwh": 31.50997886423734,
+                "rmse_eur_mwh": 42.16348879153761,
+                "bias_eur_mwh": 18.663821010807958
+              }
+            }
+          },
+          "spreads": {
+            "FR-DE": {
+              "meaning": "ORACLE reconstructed price spread, EUR/MWh",
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 1.9833137472318367,
+                "rmse_eur_mwh": 3.9452626310845678,
+                "bias_eur_mwh": 0.11492281281816097
+              },
+              "train_absolute_spread_q95": 92.52499999999999,
+              "test_large_absolute_spread": {
+                "n": 51,
+                "mae_eur_mwh": 14.359955884003336,
+                "rmse_eur_mwh": 18.974048349790298,
+                "bias_eur_mwh": 11.454308840520323
+              },
+              "actual_test_mean": -9.107429398148149,
+              "oracle_reconstructed_test_mean": -8.992506585329986,
+              "material_actual_nonzero_hours": 1841,
+              "direction_errors_or_erased_spreads": 181
+            },
+            "BE-NL": {
+              "meaning": "ORACLE reconstructed price spread, EUR/MWh",
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 9.68844440168499,
+                "rmse_eur_mwh": 19.272521911703475,
+                "bias_eur_mwh": -0.5613954342967923
+              },
+              "train_absolute_spread_q95": 27.0,
+              "test_large_absolute_spread": {
+                "n": 140,
+                "mae_eur_mwh": 37.832471059857845,
+                "rmse_eur_mwh": 56.71167558935945,
+                "bias_eur_mwh": -34.83160369016715
+              },
+              "actual_test_mean": 4.362076388888889,
+              "oracle_reconstructed_test_mean": 3.8006809545920963,
+              "material_actual_nonzero_hours": 1836,
+              "direction_errors_or_erased_spreads": 641
+            }
+          },
+          "negative_price_sign": {
+            "negative_actual_cells": 522,
+            "reconstructed_nonnegative_cells": 161,
+            "fraction_lost": 0.30842911877394635,
+            "near_zero_tolerance_eur_mwh": 1e-09,
+            "material_sign_losses": 161
+          }
+        },
+        {
+          "rank": 4,
+          "train_variance_retained": 0.9999999999999999,
+          "test_reconstruction": {
+            "n": 8640,
+            "mae_eur_mwh": 8.35372714289943e-15,
+            "rmse_eur_mwh": 1.8019132821526257e-14,
+            "bias_eur_mwh": 9.316581392676754e-16
+          },
+          "maximum_absolute_reconstruction_error": 3.410605131648481e-13,
+          "test_regimes": {
+            "all": {
+              "n": 8640,
+              "mae_eur_mwh": 8.35372714289943e-15,
+              "rmse_eur_mwh": 1.8019132821526257e-14,
+              "bias_eur_mwh": 9.316581392676754e-16
+            },
+            "negative_price": {
+              "n": 522,
+              "mae_eur_mwh": 4.280805701403395e-15,
+              "rmse_eur_mwh": 6.864286748194124e-15,
+              "bias_eur_mwh": -8.388218812610303e-16
+            },
+            "positive_peak_q95_train": {
+              "n": 3393,
+              "mae_eur_mwh": 9.914523928896896e-15,
+              "rmse_eur_mwh": 2.4900599010450633e-14,
+              "bias_eur_mwh": 3.728736218174831e-15
+            },
+            "positive_peak_q99_train": {
+              "n": 1025,
+              "mae_eur_mwh": 1.7783403476088796e-14,
+              "rmse_eur_mwh": 4.2105890191218405e-14,
+              "bias_eur_mwh": 1.019865763656365e-14
+            },
+            "absolute_residual_q95_train": {
+              "n": 932,
+              "mae_eur_mwh": 3.0586882573707315e-14,
+              "rmse_eur_mwh": 4.990923332554347e-14,
+              "bias_eur_mwh": 3.4307320932622862e-15
+            },
+            "absolute_residual_q99_train": {
+              "n": 305,
+              "mae_eur_mwh": 5.376828308637086e-14,
+              "rmse_eur_mwh": 8.072162493042845e-14,
+              "bias_eur_mwh": 1.737917642219786e-14
+            }
+          },
+          "countries": {
+            "BE": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 3.5246914697617126e-15,
+                "rmse_eur_mwh": 6.796905467314468e-15,
+                "bias_eur_mwh": 4.75452367805547e-16
+              },
+              "negative_price": {
+                "n": 73,
+                "mae_eur_mwh": 1.3193403751538675e-15,
+                "rmse_eur_mwh": 1.793137663542509e-15,
+                "bias_eur_mwh": -1.330746776091797e-16
+              },
+              "positive_peak_q95_train": {
+                "n": 988,
+                "mae_eur_mwh": 3.829539025072169e-15,
+                "rmse_eur_mwh": 8.49971765722833e-15,
+                "bias_eur_mwh": 1.4186245520627823e-15
+              },
+              "positive_peak_q99_train": {
+                "n": 317,
+                "mae_eur_mwh": 6.14947980374789e-15,
+                "rmse_eur_mwh": 1.3846268260293356e-14,
+                "bias_eur_mwh": 3.772481801182925e-15
+              },
+              "absolute_residual_q95_train": {
+                "n": 318,
+                "mae_eur_mwh": 9.027020919719511e-15,
+                "rmse_eur_mwh": 1.5390795063846057e-14,
+                "bias_eur_mwh": 7.820438915598587e-16
+              },
+              "absolute_residual_q99_train": {
+                "n": 125,
+                "mae_eur_mwh": 1.494981916039251e-14,
+                "rmse_eur_mwh": 2.3046133520987915e-14,
+                "bias_eur_mwh": 3.922195901395753e-15
+              }
+            },
+            "DE": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 1.0326930925623427e-14,
+                "rmse_eur_mwh": 2.3952907842916294e-14,
+                "bias_eur_mwh": 1.6764303422822236e-15
+              },
+              "negative_price": {
+                "n": 165,
+                "mae_eur_mwh": 4.664198320499095e-15,
+                "rmse_eur_mwh": 6.361419272886995e-15,
+                "bias_eur_mwh": -1.6763526593790906e-15
+              },
+              "positive_peak_q95_train": {
+                "n": 549,
+                "mae_eur_mwh": 1.6981558842777463e-14,
+                "rmse_eur_mwh": 4.3332434947470825e-14,
+                "bias_eur_mwh": 7.712409945654264e-15
+              },
+              "positive_peak_q99_train": {
+                "n": 53,
+                "mae_eur_mwh": 9.597354357778523e-14,
+                "rmse_eur_mwh": 1.317146747444972e-13,
+                "bias_eur_mwh": 7.366853458493868e-14
+              },
+              "absolute_residual_q95_train": {
+                "n": 151,
+                "mae_eur_mwh": 5.641991656797087e-14,
+                "rmse_eur_mwh": 8.412622186401135e-14,
+                "bias_eur_mwh": 1.4775524438984865e-14
+              },
+              "absolute_residual_q99_train": {
+                "n": 34,
+                "mae_eur_mwh": 1.5130380608538603e-13,
+                "rmse_eur_mwh": 1.6796838469579978e-13,
+                "bias_eur_mwh": 9.947598300641403e-14
+              }
+            },
+            "FR": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 1.2065184885118936e-14,
+                "rmse_eur_mwh": 1.7275022390795738e-14,
+                "bias_eur_mwh": 3.3680941266442287e-16
+              },
+              "negative_price": {
+                "n": 147,
+                "mae_eur_mwh": 6.184253789337399e-15,
+                "rmse_eur_mwh": 9.906726957813222e-15,
+                "bias_eur_mwh": -4.194962593470989e-16
+              },
+              "positive_peak_q95_train": {
+                "n": 1115,
+                "mae_eur_mwh": 1.1088539155140717e-14,
+                "rmse_eur_mwh": 1.570043500342978e-14,
+                "bias_eur_mwh": 3.1934594480518403e-15
+              },
+              "positive_peak_q99_train": {
+                "n": 557,
+                "mae_eur_mwh": 1.194668242249978e-14,
+                "rmse_eur_mwh": 1.7850759004222485e-14,
+                "bias_eur_mwh": 4.428608885952596e-15
+              },
+              "absolute_residual_q95_train": {
+                "n": 266,
+                "mae_eur_mwh": 3.686274343417061e-14,
+                "rmse_eur_mwh": 4.004534508940187e-14,
+                "bias_eur_mwh": -3.766410742186997e-15
+              },
+              "absolute_residual_q99_train": {
+                "n": 98,
+                "mae_eur_mwh": 5.039053075033364e-14,
+                "rmse_eur_mwh": 5.343792735587219e-14,
+                "bias_eur_mwh": -7.032922996809155e-15
+              }
+            },
+            "NL": {
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 7.498101291093641e-15,
+                "rmse_eur_mwh": 1.9503601562118594e-14,
+                "bias_eur_mwh": 1.2379404343185083e-15
+              },
+              "negative_price": {
+                "n": 137,
+                "mae_eur_mwh": 3.3546766338057763e-15,
+                "rmse_eur_mwh": 4.8757425364862725e-15,
+                "bias_eur_mwh": -6.561053403738266e-16
+              },
+              "positive_peak_q95_train": {
+                "n": 741,
+                "mae_eur_mwh": 1.1025368652239054e-14,
+                "rmse_eur_mwh": 3.131633156995481e-14,
+                "bias_eur_mwh": 4.6628617895913376e-15
+              },
+              "positive_peak_q99_train": {
+                "n": 98,
+                "mae_eur_mwh": 4.630309741069326e-14,
+                "rmse_eur_mwh": 8.203295755726231e-14,
+                "bias_eur_mwh": 2.9454896571687825e-14
+              },
+              "absolute_residual_q95_train": {
+                "n": 197,
+                "mae_eur_mwh": 3.7114135791733153e-14,
+                "rmse_eur_mwh": 6.174269441444345e-14,
+                "bias_eur_mwh": 8.728494520504783e-15
+              },
+              "absolute_residual_q99_train": {
+                "n": 48,
+                "mae_eur_mwh": 9.26666151220464e-14,
+                "rmse_eur_mwh": 1.1918811677856137e-13,
+                "bias_eur_mwh": 4.4112861511772884e-14
+              }
+            }
+          },
+          "spreads": {
+            "FR-DE": {
+              "meaning": "ORACLE reconstructed price spread, EUR/MWh",
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 1.2493059249144937e-14,
+                "rmse_eur_mwh": 2.578328147822328e-14,
+                "bias_eur_mwh": -1.2328422747696654e-15
+              },
+              "train_absolute_spread_q95": 92.52499999999999,
+              "test_large_absolute_spread": {
+                "n": 51,
+                "mae_eur_mwh": 1.0365564615794402e-13,
+                "rmse_eur_mwh": 1.2350321143473235e-13,
+                "bias_eur_mwh": -7.523393672754002e-14
+              },
+              "actual_test_mean": -9.107429398148149,
+              "oracle_reconstructed_test_mean": -9.107429398148149,
+              "material_actual_nonzero_hours": 1841,
+              "direction_errors_or_erased_spreads": 0
+            },
+            "BE-NL": {
+              "meaning": "ORACLE reconstructed price spread, EUR/MWh",
+              "all": {
+                "n": 2160,
+                "mae_eur_mwh": 4.186870958279936e-15,
+                "rmse_eur_mwh": 1.6873328832860233e-14,
+                "bias_eur_mwh": -9.572121821386185e-16
+              },
+              "train_absolute_spread_q95": 27.0,
+              "test_large_absolute_spread": {
+                "n": 140,
+                "mae_eur_mwh": 1.542892797650503e-14,
+                "rmse_eur_mwh": 3.8280386851997087e-14,
+                "bias_eur_mwh": -7.714463988252516e-15
+              },
+              "actual_test_mean": 4.362076388888889,
+              "oracle_reconstructed_test_mean": 4.362076388888887,
+              "material_actual_nonzero_hours": 1836,
+              "direction_errors_or_erased_spreads": 0
+            }
+          },
+          "negative_price_sign": {
+            "negative_actual_cells": 522,
+            "reconstructed_nonnegative_cells": 0,
+            "fraction_lost": 0.0,
+            "near_zero_tolerance_eur_mwh": 1e-09,
+            "material_sign_losses": 0
+          }
+        }
+      ]
+    }
+  }
+}

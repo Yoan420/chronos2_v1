@@ -1,0 +1,12 @@
+{
+  "checked_at_utc": "2026-09-16T07:29:00Z",
+  "scope": "Read-only catalogue discovery and bounded public endpoint probes; no credentials purchased, no authentication bypass, no full history downloaded.",
+  "curves_retrieved": 0,
+  "sources": [
+    {"name":"Saturn","status":"no_day_ahead_bid_curve_identified","detail":"Catalogue HTTP 200 : 166580 noms examinés. Aucun nom demand_response, effacement, NEBEF, DSR, orderbook ou elastic. Les bids identifiés concernent surtout équilibrage/intraday, les curves surtout forwards. Recherche limitée au catalogue accessible ; ne prouve pas une absence dans toute l’organisation."},
+    {"name":"Nord Pool — courbes agrégées","status":"authentication_required_401","detail":"Swagger public HTTP 200 ; endpoint GET /api/v2/Auction/DayAhead/BidCurves/ByRegion, region=Germany, date=2026-09-14 : HTTP 401. L’énumération inclut aussi Belgium, France, Netherlands. Aucun prix-volume récupéré. Droits/licence et authentification requis ; aucun published_at identifié dans le schéma principal.","url":"https://data-api.nordpoolgroup.com/index.html"},
+    {"name":"EPEX — courbes all-exchanges","status":"public_page_access_denied_403","detail":"Page DE du 14/09/2026 : HTTP 403. Spécification SFTP juillet 2024 : CSV FR/DE/BE/NL achat/vente prix-volume, publication indicative vers 13h15 APRÈS enchère. Format15min actuel et droits à qualifier. Les courbes de l’enchère cible ne sont jamais des entrées à08h.","url":"https://webshop.eex-group.com/sites/default/files/2024-07/EPEXSPOT_SFTP_file_specifications_2024-07_105.pdf"},
+    {"name":"RTE Demand Response","status":"not_a_price_volume_curve","detail":"Programmes retenus et effacements réalisés agrégés France : pas de paliers de consentement à payer, pas d’équivalent DE/BE/NL. Ne pas substituer des réalisations ou capacités annuelles à des offres horaires.","url":"https://data.rte-france.org/"},
+    {"name":"Expert physique local","status":"partial_unqualified_stack_and_network","detail":"Parc national non attesté complet, puissance mobilisable/rampes et énergie stockée manquantes. Référence RAM et frontières non qualifiées. Déficit de pile partielle ≠ destruction réelle de demande."}
+  ]
+}

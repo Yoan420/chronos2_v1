@@ -1,0 +1,3 @@
+[Nuclear] ECHEC : Saturn ProxyError: HTTPSConnectionPool(host='saturn.fixture.invalid', port=443): ProxyError('Unable to connect to proxy', NewConnectionError(HTTPConnection(host='127.0.0.1', port=9): connection refused))
+[Nuclear Kalman] ECHEC sources : returncode=2
+Journal et statut du batch : runs/logs/nuclear_kalman/explicit_fixture

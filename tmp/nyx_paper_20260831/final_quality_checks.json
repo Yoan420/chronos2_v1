@@ -1,0 +1,12 @@
+{
+  "pages": 22,
+  "tables": 10,
+  "figures": 5,
+  "numbered_equations": 29,
+  "native_math_objects": 115,
+  "stale_result_labels_absent": true,
+  "native_equation_arrays": true,
+  "accents_corrected": true,
+  "zip_crc_pass": true,
+  "all_page_visual_review": "PASS"
+}

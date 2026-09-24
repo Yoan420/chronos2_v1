@@ -1,0 +1,72 @@
+[
+  {
+    "slide": 1,
+    "duration": "0:35",
+    "timeRange": "0:00-0:35",
+    "script": "Bonjour. Mon mémoire porte sur les Transformers et les modèles de fondation pour la prévision des séries temporelles. Prévoir une consommation, des ventes ou une activité consiste à exploiter le passé, alors que les régularités peuvent changer. Ma question est donc double : comment ces modèles apprennent-ils à prévoir, et dans quelles conditions leurs connaissances sont-elles transférables à de nouvelles données ? Je vais relier leurs mécanismes aux conditions d’une évaluation fiable.",
+    "sources": "Mémoire, p. 1–5."
+  },
+  {
+    "slide": 2,
+    "duration": "0:55",
+    "timeRange": "0:35-1:30",
+    "script": "Pour répondre à cette question, j’ai réalisé une revue de littérature, principalement à partir des articles d’origine et des travaux consultés jusqu’au 9 septembre 2026. Mon objectif n’était pas de recenser tous les modèles, mais de comprendre les choix qui les distinguent. J’ai suivi une même grille : comment les données sont préparées, ce que représente un token, quelles informations interagissent, puis comment la prévision est produite. Les résultats chiffrés du mémoire proviennent des publications. Je n’ai pas mené de nouvelle campagne expérimentale. Ma contribution est cette comparaison critique et la proposition de protocoles pour approfondir les limites identifiées. Commençons par le mécanisme commun.",
+    "sources": "Mémoire, p. 2, 5 et 27."
+  },
+  {
+    "slide": 3,
+    "duration": "1:05",
+    "timeRange": "1:30-2:35",
+    "script": "Le mécanisme central du Transformer est l’attention. Chaque élément de la séquence devient d’abord un vecteur, appelé token. Le réseau en tire trois représentations : une requête, une clé et une valeur. La requête est comparée aux clés pour calculer des scores de compatibilité. Une fonction transforme ces scores en poids, puis le modèle combine les valeurs avec ces poids. Cela permet de construire une représentation qui tient compte des autres éléments accessibles. Plusieurs têtes peuvent effectuer des combinaisons différentes. Mais l’attention seule ne suffit pas : il faut aussi transmettre l’ordre temporel et empêcher l’accès à une cible future inconnue. Enfin, un poids d’attention élevé décrit un calcul du modèle ; il ne démontre pas une relation causale. Pour les séries temporelles, le choix suivant est décisif : que représente chaque token ?",
+    "sources": "Mémoire, p. 6–10 et 15."
+  },
+  {
+    "slide": 4,
+    "duration": "1:10",
+    "timeRange": "2:35-3:45",
+    "script": "Deux architectures illustrent bien ce choix. PatchTST découpe l’historique de chaque variable en segments, ou patches. Chaque segment devient un token. L’attention relie donc des morceaux d’une même série, ce qui réduit le nombre d’éléments à comparer. Les paramètres sont partagés entre les variables, mais leurs représentations n’échangent pas directement d’information. iTransformer fait un autre choix : l’historique complet d’une variable devient un token. L’attention compare alors les variables entre elles, à partir de leurs historiques représentés. Ce changement modifie à la fois les interactions possibles et le coût du calcul. On comprend ainsi pourquoi deux modèles utilisant l’attention ne traitent pas nécessairement le même problème de la même façon. Il faut examiner la représentation avant d’attribuer une amélioration au Transformer. Le préentraînement ajoute ensuite une nouvelle dimension.",
+    "sources": "Mémoire, p. 12–14 et 16."
+  },
+  {
+    "slide": 5,
+    "duration": "1:05",
+    "timeRange": "3:45-4:50",
+    "script": "Un modèle spécialisé apprend sur les données d’une tâche donnée. Un modèle de fondation cherche à réutiliser un apprentissage réalisé sur de nombreuses séries, issues de domaines et de fréquences variés. Pendant le préentraînement, une fenêtre d’historique sert d’entrée et les observations suivantes fournissent une cible. Le réseau apprend ainsi une fonction de prévision partageable. Lorsqu’on lui présente une nouvelle série, on peut conserver ses paramètres fixes : c’est le fonctionnement en zero-shot. Fournir un historique différent ou plus long change le contexte, sans constituer un ajustement des paramètres. À l’inverse, le fine-tuning modifie tout ou partie des paramètres sur les données cibles. Cette distinction est essentielle pour comparer les performances. Mais même avec un objectif commun de réutilisation, les familles de modèles représentent le futur différemment.",
+    "sources": "Mémoire, p. 16 et 18."
+  },
+  {
+    "slide": 6,
+    "duration": "1:10",
+    "timeRange": "4:50-6:00",
+    "script": "Prenons trois exemples. Le Chronos initial transforme les valeurs normalisées en classes d’un vocabulaire fini. Il apprend à prévoir les tokens suivants, puis peut échantillonner plusieurs trajectoires. Cette formulation rapproche la prévision d’une génération séquentielle, avec des limites liées à la quantification et aux générations successives. Le TimesFM initial conserve des valeurs continues, regroupées en patches. Il produit des blocs de valeurs futures et se concentre sur la prévision ponctuelle. Chronos-2 change la méthode de sa première génération : il utilise des patches continus et alterne des interactions temporelles et entre séries d’un groupe. Sa sortie fournit directement des quantiles. Ces exemples montrent que les entrées, les interactions et les objectifs d’apprentissage doivent être lus ensemble. Une valeur centrale, des quantiles et des trajectoires ne décrivent pas le même objet statistique.",
+    "sources": "Mémoire, p. 18–20."
+  },
+  {
+    "slide": 7,
+    "duration": "1:10",
+    "timeRange": "6:00-7:10",
+    "script": "Comment interpréter leurs scores ? Premièrement, le zero-shot signifie généralement qu’on ne met pas à jour les paramètres sur la tâche cible. Il ne garantit pas que les données étaient absentes du préentraînement. Il faut examiner les sources, les périodes et les relations entre séries. Deuxièmement, les modèles doivent recevoir des informations comparables. Une covariable future n’est admissible que si elle est connue au moment de prévoir, comme un calendrier. Sinon, l’avantage peut venir d’une information inaccessible en pratique. Troisièmement, il faut rapporter la qualité au coût : durée, mémoire et, si possible, énergie. Une référence simple reste utile pour interpréter les écarts. Enfin, une baisse sur des observations nouvelles peut résulter d’un changement du phénomène ; elle ne prouve pas une contamination passée.",
+    "sources": "Mémoire, p. 12, 24–25."
+  },
+  {
+    "slide": 8,
+    "duration": "1:00",
+    "timeRange": "7:10-8:10",
+    "script": "Une autre limite concerne la forme de la prévision. Une bande de quantiles décrit l’incertitude à chaque horizon, mais pas nécessairement la dépendance entre les horizons. Prenons deux événements qui ont chacun une probabilité de cinquante pour cent. S’ils sont indépendants, ils se produisent ensemble avec une probabilité de vingt-cinq pour cent. S’ils coïncident toujours, cette probabilité atteint cinquante pour cent. Les probabilités individuelles sont pourtant identiques. Cette distinction compte lorsqu’on veut prévoir une somme, un maximum ou un dépassement persistant. Une bonne évaluation à chaque date ne suffit donc pas pour juger tous les scénarios. La métrique doit correspondre à l’usage envisagé, et les trajectoires demandent aussi une évaluation de leur dépendance.",
+    "sources": "Mémoire, p. 17 et 25–26."
+  },
+  {
+    "slide": 9,
+    "duration": "1:05",
+    "timeRange": "8:10-9:15",
+    "script": "À partir de ces limites, je propose quatre pistes expérimentales, qui restent à réaliser. H1 testerait le transfert sur des observations collectées après le gel du modèle, avec des prévisions enregistrées avant l’arrivée des cibles. H2 comparerait la cible seule à des covariables correctes, retardées ou perturbées, pour mesurer leur utilité et la sensibilité à leur qualité. H3 comparerait plusieurs adaptations en mesurant la précision, le coût et l’oubli sur des tâches anciennes. Enfin, H4 comparerait différentes dépendances entre horizons en imposant les mêmes distributions marginales, puis évaluerait des événements comme un dépassement persistant. Pour chaque expérience, les critères et budgets seraient fixés avant le test. Des intervalles de confiance permettraient de distinguer une conclusion étayée d’un résultat encore incertain.",
+    "sources": "Mémoire, p. 27–29."
+  },
+  {
+    "slide": 10,
+    "duration": "0:45",
+    "timeRange": "9:15-10:00",
+    "script": "Pour conclure, les Transformers offrent plusieurs façons de mettre en relation les observations, et le préentraînement permet d’envisager une réutilisation sur de nouvelles séries. Mais le transfert dépend autant de la préparation des données, des informations disponibles et de la sortie attendue que de l’architecture. Mon mémoire propose une grille de lecture pour comprendre ces choix et examiner la portée des évaluations. L’étape suivante serait de mettre en œuvre les quatre protocoles proposés, afin d’identifier quand le préentraînement apporte un gain utile. Je vous remercie.",
+    "sources": "Mémoire, p. 30."
+  }
+]

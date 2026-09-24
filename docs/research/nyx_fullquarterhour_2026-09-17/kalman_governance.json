@@ -1,0 +1,37 @@
+[
+  {
+    "zone": "BE",
+    "days": 90,
+    "selected_filters": {
+      "identity": 90
+    },
+    "positive_weight_days": 0
+  },
+  {
+    "zone": "DE",
+    "days": 90,
+    "selected_filters": {
+      "identity": 89,
+      "linear_scale": 1
+    },
+    "positive_weight_days": 1
+  },
+  {
+    "zone": "FR",
+    "days": 90,
+    "selected_filters": {
+      "identity": 84,
+      "linear_market": 6
+    },
+    "positive_weight_days": 6
+  },
+  {
+    "zone": "NL",
+    "days": 90,
+    "selected_filters": {
+      "identity": 84,
+      "linear_market": 6
+    },
+    "positive_weight_days": 6
+  }
+]

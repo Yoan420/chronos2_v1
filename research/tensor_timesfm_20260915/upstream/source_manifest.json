@@ -1,0 +1,155 @@
+{
+  "commit": "130fd4787f268cbdd0d46ac5b840290b7c3440dc",
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 12868,
+      "sha256": "2f8f5d6d17deaafca21182558aa1d011544997a8af157568b338e64ee1e87dbe",
+      "url": "https://raw.githubusercontent.com/LarryC01/Tensor-TimesFM-ECML-2026/130fd4787f268cbdd0d46ac5b840290b7c3440dc/README.md"
+    },
+    {
+      "path": "LICENSE",
+      "bytes": 1063,
+      "sha256": "9d435c48cacbec39ca91df1af263adffd8b045a9b45e8d3e67b0d4b192f9be84",
+      "url": "https://raw.githubusercontent.com/LarryC01/Tensor-TimesFM-ECML-2026/130fd4787f268cbdd0d46ac5b840290b7c3440dc/LICENSE"
+    },
+    {
+      "path": "LICENSE.gluon-ts",
+      "bytes": 10141,
+      "sha256": "c8858a5a76440bbca484e134cf7df46385d090dd18b2c58e650f939258802e5b",
+      "url": "https://raw.githubusercontent.com/LarryC01/Tensor-TimesFM-ECML-2026/130fd4787f268cbdd0d46ac5b840290b7c3440dc/LICENSE.gluon-ts"
+    },
+    {
+      "path": "environment.yml",
+      "bytes": 1583,
+      "sha256": "8b6a669286ef5d8ca19978f90a2e9ba83d0ed635d88c1a79b9c709da93628063",
+      "url": "https://raw.githubusercontent.com/LarryC01/Tensor-TimesFM-ECML-2026/130fd4787f268cbdd0d46ac5b840290b7c3440dc/environment.yml"
+    },
+    {
+      "path": "setup.py",
+      "bytes": 828,
+      "sha256": "fd3e7a133b1c732d9e18168a0d2d4092ab8e48e90283f00b142361f031130d57",
+      "url": "https://raw.githubusercontent.com/LarryC01/Tensor-TimesFM-ECML-2026/130fd4787f268cbdd0d46ac5b840290b7c3440dc/setup.py"
+    },
+    {
+      "path": "CITATION.cff",
+      "bytes": 260,
+      "sha256": "5bf545e1b043e167d3d5785053339ce8db30b0b5ab61f026949483e9e28c75b8",
+      "url": "https://raw.githubusercontent.com/LarryC01/Tensor-TimesFM-ECML-2026/130fd4787f268cbdd0d46ac5b840290b7c3440dc/CITATION.cff"
+    },
+    {
+      "path": "dataset_truncation_description.txt",
+      "bytes": 1664,
+      "sha256": "a54b89ad1e59a9215cc833974f43c1b5e483a3a54ca2d08427f422ff2c278f79",
+      "url": "https://raw.githubusercontent.com/LarryC01/Tensor-TimesFM-ECML-2026/130fd4787f268cbdd0d46ac5b840290b7c3440dc/dataset_truncation_description.txt"
+    },
+    {
+      "path": "examples/EPS_TimesFM_debug_best.py",
+      "bytes": 181624,
+      "sha256": "2e5985af0d1abca7278f46e2a1d6bd76a44b046efa4aaf0fa333f2410f8d2030",
+      "url": "https://raw.githubusercontent.com/LarryC01/Tensor-TimesFM-ECML-2026/130fd4787f268cbdd0d46ac5b840290b7c3440dc/examples/EPS_TimesFM_debug_best.py"
+    },
+    {
+      "path": "examples/full_command_EPS_best.sh",
+      "bytes": 6032,
+      "sha256": "20bcec6156036998bc5aba812facac18d31b2dfb6bd7344ba4a6275dea8923af",
+      "url": "https://raw.githubusercontent.com/LarryC01/Tensor-TimesFM-ECML-2026/130fd4787f268cbdd0d46ac5b840290b7c3440dc/examples/full_command_EPS_best.sh"
+    },
+    {
+      "path": "examples/rideshare_3d_tensor/Rideshare_TimesFM_debug_Sept22_3losses_ortho_multi_step.py",
+      "bytes": 90876,
+      "sha256": "633119639b65a487448a8cbc7392d93e29f63866c04b0f25fef4ccb7ef8c64c6",
+      "url": "https://raw.githubusercontent.com/LarryC01/Tensor-TimesFM-ECML-2026/130fd4787f268cbdd0d46ac5b840290b7c3440dc/examples/rideshare_3d_tensor/Rideshare_TimesFM_debug_Sept22_3losses_ortho_multi_step.py"
+    },
+    {
+      "path": "examples/rideshare_3d_tensor/sweep_Rideshare_TimesFM_Sept23_multi_step.yaml",
+      "bytes": 2624,
+      "sha256": "73d18d05b49962e6521d7a4af0b6bc10c56094e53f9a4bac49341b88d860f520",
+      "url": "https://raw.githubusercontent.com/LarryC01/Tensor-TimesFM-ECML-2026/130fd4787f268cbdd0d46ac5b840290b7c3440dc/examples/rideshare_3d_tensor/sweep_Rideshare_TimesFM_Sept23_multi_step.yaml"
+    },
+    {
+      "path": "walmart_lagp_TimesFM_debug_Nov_17.py",
+      "bytes": 82891,
+      "sha256": "261a8ae247d773308a4297c4ab8a897a6c379b368bf7dfce42ef4f9cf3f2a841",
+      "url": "https://raw.githubusercontent.com/LarryC01/Tensor-TimesFM-ECML-2026/130fd4787f268cbdd0d46ac5b840290b7c3440dc/walmart_lagp_TimesFM_debug_Nov_17.py"
+    },
+    {
+      "path": "walmart_lagp_sales_sweep_Nov17.yaml",
+      "bytes": 1353,
+      "sha256": "b5bed35748233b0e80d49254344a2799a279d405b0d00feb04425d588d23b8f8",
+      "url": "https://raw.githubusercontent.com/LarryC01/Tensor-TimesFM-ECML-2026/130fd4787f268cbdd0d46ac5b840290b7c3440dc/walmart_lagp_sales_sweep_Nov17.yaml"
+    },
+    {
+      "path": "examples/MC_tensor_generation_Jan15.py",
+      "bytes": 14634,
+      "sha256": "83f42d5533456781a394e5debd191fcb5fdf3eda84ed6196b59e33a9e46a8503",
+      "url": "https://raw.githubusercontent.com/LarryC01/Tensor-TimesFM-ECML-2026/130fd4787f268cbdd0d46ac5b840290b7c3440dc/examples/MC_tensor_generation_Jan15.py"
+    },
+    {
+      "path": "examples/cp_reconstruction_Jan16.py",
+      "bytes": 21698,
+      "sha256": "d7c5513569f6f285061c5f0b91f9d460acb11fee1533ca8d3a68b69aae5fbdca",
+      "url": "https://raw.githubusercontent.com/LarryC01/Tensor-TimesFM-ECML-2026/130fd4787f268cbdd0d46ac5b840290b7c3440dc/examples/cp_reconstruction_Jan16.py"
+    },
+    {
+      "path": "examples/our_tensor_reconstruction_Jan16.py",
+      "bytes": 14153,
+      "sha256": "b5a3a18d58e344f48e72a58234634ff1a7882cf89e4a79ad6d6fc04ee903bb6e",
+      "url": "https://raw.githubusercontent.com/LarryC01/Tensor-TimesFM-ECML-2026/130fd4787f268cbdd0d46ac5b840290b7c3440dc/examples/our_tensor_reconstruction_Jan16.py"
+    },
+    {
+      "path": "examples/run_cpmlp_grid.sh",
+      "bytes": 625,
+      "sha256": "d5bbcde02d9d42b4f752cbc5010842b010dec0fe6e2b531addca7b9b5ff1f431",
+      "url": "https://raw.githubusercontent.com/LarryC01/Tensor-TimesFM-ECML-2026/130fd4787f268cbdd0d46ac5b840290b7c3440dc/examples/run_cpmlp_grid.sh"
+    },
+    {
+      "path": "examples/ablation_studies/EPS/TimesFM_EPS.py",
+      "bytes": 19823,
+      "sha256": "fd7027f0fcc4af9adde832e9b3b48aea91dc33570c6d0e47c3f50208b0e5a196",
+      "url": "https://raw.githubusercontent.com/LarryC01/Tensor-TimesFM-ECML-2026/130fd4787f268cbdd0d46ac5b840290b7c3440dc/examples/ablation_studies/EPS/TimesFM_EPS.py"
+    },
+    {
+      "path": "examples/ablation_studies/Rideshare/rideshare_TimesFM_original.py",
+      "bytes": 17535,
+      "sha256": "ae986b5749fb48e9f61f04f4fd4bc1f2e64be3ed6fd295c9d933d0b15d5fc6eb",
+      "url": "https://raw.githubusercontent.com/LarryC01/Tensor-TimesFM-ECML-2026/130fd4787f268cbdd0d46ac5b840290b7c3440dc/examples/ablation_studies/Rideshare/rideshare_TimesFM_original.py"
+    },
+    {
+      "path": "examples/ablation_studies/Walmart/TimesFM_Walmart.py",
+      "bytes": 22133,
+      "sha256": "02c64b9ca27abdfb29ec911be1c89447427f2745566534d4514ebc98cf2ce570",
+      "url": "https://raw.githubusercontent.com/LarryC01/Tensor-TimesFM-ECML-2026/130fd4787f268cbdd0d46ac5b840290b7c3440dc/examples/ablation_studies/Walmart/TimesFM_Walmart.py"
+    },
+    {
+      "path": "examples/baselines/Tensorcast_debug_Sept21.py",
+      "bytes": 16655,
+      "sha256": "45b0691fbd14c648301c1051a6bd4ac1929f315e9d62b2be6e5feb6b06eee152",
+      "url": "https://raw.githubusercontent.com/LarryC01/Tensor-TimesFM-ECML-2026/130fd4787f268cbdd0d46ac5b840290b7c3440dc/examples/baselines/Tensorcast_debug_Sept21.py"
+    },
+    {
+      "path": "examples/find_lowest_rmse.py",
+      "bytes": 8089,
+      "sha256": "aef396d0182e2ec8442c2aad5fca2c99f67ec0ed9894b7f7af50d3f95b013708",
+      "url": "https://raw.githubusercontent.com/LarryC01/Tensor-TimesFM-ECML-2026/130fd4787f268cbdd0d46ac5b840290b7c3440dc/examples/find_lowest_rmse.py"
+    },
+    {
+      "path": "get_best_r2.py",
+      "bytes": 4086,
+      "sha256": "ce29d901e7c1b815e4c32fd764afd1af204077ac4e4ff7f1c313669d1ca1a502",
+      "url": "https://raw.githubusercontent.com/LarryC01/Tensor-TimesFM-ECML-2026/130fd4787f268cbdd0d46ac5b840290b7c3440dc/get_best_r2.py"
+    },
+    {
+      "path": "getbestr2csv.py",
+      "bytes": 11239,
+      "sha256": "716da4ce7f8bf27ab40173a90a54cc6537b73fd95f4de72fe413479e2a913e14",
+      "url": "https://raw.githubusercontent.com/LarryC01/Tensor-TimesFM-ECML-2026/130fd4787f268cbdd0d46ac5b840290b7c3440dc/getbestr2csv.py"
+    },
+    {
+      "path": "examples/sweep_TimesFM_Feb_27.yaml",
+      "bytes": 2782,
+      "sha256": "f390d184e9793bfcc94d0a3ebefc31894acdd554b437640a724b2ab46ae74402",
+      "url": "https://raw.githubusercontent.com/LarryC01/Tensor-TimesFM-ECML-2026/130fd4787f268cbdd0d46ac5b840290b7c3440dc/examples/sweep_TimesFM_Feb_27.yaml"
+    }
+  ]
+}

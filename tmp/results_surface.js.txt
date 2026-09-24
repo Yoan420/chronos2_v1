@@ -1,0 +1,18 @@
+function renderResults(content, run, preferredPath) {
+  const metrics = Object.entries(run.metrics || {});
+  const files = (run.artifacts || []).filter(a => a.kind !== 'log');
+  const reports = files.filter(a => ['report', 'image'].includes(a.kind));
+  const forecasts = files.filter(a => a.kind === 'forecast');
+  const dataFiles = files.filter(a => !['report', 'image'].includes(a.kind));
+  const featuredMetrics = metrics.filter(([key]) => /(?:^|[._])(mae|rmse|bias)$/.test(key)).slice(0, 4);
+  const chosen = forecasts.find(a => a.path === preferredPath)?.path || forecasts[0]?.path;
+  content.innerHTML =
+    (run.warnings?.length ? `<details class="result-notes"><summary>Informations sur ces résultats (${run.warnings.length})</summary>${warnings(run.warnings)}</details>` : '') +
+    (featuredMetrics.length ? `<div class="result-metrics">${featuredMetrics.map(([key,value]) => `<article><span>${esc(key)}</span><strong>${num(value)}</strong><small>Métrique publiée</small></article>`).join('')}</div>` : '') +
+    (reports.length ? `<div class="section-heading"><h2>Rapports et visuels</h2><span class="secondary">${reports.length} document(s) disponible(s)</span></div><div class="artifact-grid">${reports.map(a => artifactCard(run.id, a)).join('')}</div>` : '') +
+    (forecasts.length ? `<div class="section-heading"><h2>Observations et prévisions</h2></div><label>Résultat à explorer<select id="forecast-select">${forecasts.map(a => `<option value="${esc(a.path)}" ${a.path===chosen?'selected':''}>${esc(a.name||a.path)}</option>`).join('')}</select></label><div id="forecast-notice"></div><div id="forecast-chart" class="chart"></div><div id="error-chart" class="chart"></div>` : '') +
+    (metrics.length ? `<details class="result-notes" ${!forecasts.length&&!reports.length?'open':''}><summary>Toutes les métriques (${metrics.length})</summary><div class="panel table-wrap"><table><thead><tr><th>MÉTRIQUE</th><th>VALEUR PUBLIÉE</th></tr></thead><tbody>${metrics.map(([key,value]) => `<tr><td>${esc(key)}</td><td class="mono">${num(value)}</td></tr>`).join('')}</tbody></table></div></details>` : '') +
+    (dataFiles.length ? `<details class="result-notes"><summary>Données exportées (${dataFiles.length})</summary><div class="artifact-grid">${dataFiles.map(a => artifactCard(run.id, a)).join('')}</div></details>` : '') +
+    (!files.length&&!metrics.length ? `<div class="panel">${empty('Aucun résultat publié',active(run)?'Les prévisions et rapports apparaîtront ici dès leur publication.':'Le dossier ne contient pas de résultat disponible ou reconnu.','','')}</div>` : '');
+  if (chosen) loadChart(run.id, chosen);
+}

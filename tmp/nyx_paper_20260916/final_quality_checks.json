@@ -1,0 +1,12 @@
+{
+  "pages": 18,
+  "table_labels_present": 10,
+  "figure_labels_present": 5,
+  "raw_directives_absent": true,
+  "docx_native_math": 20,
+  "zip_crc_pass": true,
+  "supplement_files": 52,
+  "main_visual_review_pages_1_to_9": "PASS",
+  "other_visual_review": "PASS pages 10-18 independently inspected",
+  "all_18_pages_visually_verified": true
+}

@@ -1,0 +1,12 @@
+{
+  "upstream_files_sha256_verified": 25,
+  "original_nyx_manifests_backtests_source_audits_unchanged": 12,
+  "input_and_validation_selection_hashes_verified": true,
+  "research_scripts_syntax_checked": 4,
+  "local_file_links_checked": 96,
+  "independent_reviews": [
+    "NYX numerical evidence and causal scope reviewed; two overstatements corrected",
+    "Upstream versions and methodological conclusions reviewed"
+  ],
+  "limitations": "No full upstream benchmark or new model forecast tested. Existing original file hashes checked; no claim concerning unrelated workspace files."
+}

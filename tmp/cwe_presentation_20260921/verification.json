@@ -1,0 +1,18 @@
+[
+  {
+    "report": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\reports\\model_storm\\CWE_Model_Storm_2026-09-19.html",
+    "backup": "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\cwe_presentation_20260921\\CWE_Model_Storm_2026-09-19.html",
+    "metrics_unchanged": true,
+    "outside_rolling_unchanged": true,
+    "before_sha256": "d175726dfa928f7a905c94a55a2d195c547e2b314749c16cf7d366767a8568e9",
+    "after_sha256": "f626e9680a136ae092522cfb1db478fe6f55915ea00a2507fb6e695f4e8279b2"
+  },
+  {
+    "report": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\reports\\model_storm\\CWE_Model_Storm_2026-09-22.html",
+    "backup": "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\cwe_presentation_20260921\\CWE_Model_Storm_2026-09-22.html",
+    "metrics_unchanged": true,
+    "outside_rolling_unchanged": true,
+    "before_sha256": "d98abd0a36da52475def317be7189b3de9de11821b8b92aceb995fff20fe99c4",
+    "after_sha256": "27a1dd87ab9663c4b70aac7195b2a7164004409c722f08cba5e0bca3514193f1"
+  }
+]

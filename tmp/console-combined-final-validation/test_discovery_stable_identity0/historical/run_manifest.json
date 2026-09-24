@@ -1,0 +1,1 @@
+{"model_id": "fixture_only", "zone": "FR", "target_column": "spot_price", "target_contract": "hourly_utc_no_interpolation", "delivery_horizon": "dynamic_23_24_25", "config": "missing_original.yaml"}

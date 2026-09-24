@@ -1,0 +1,478 @@
+[
+  {
+    "name": "power.stp.DA.de.volume.cleared.mwh.h.epex_sftp",
+    "metadata": {
+      "http_status": 200,
+      "payload": {
+        "tzaware": true,
+        "index_type": "datetime64[ns, UTC]",
+        "value_type": "float64",
+        "index_dtype": "|M8[ns]",
+        "value_dtype": "<f8",
+        "supervision_status": "unsupervised"
+      }
+    },
+    "interval": {
+      "http_status": 200,
+      "payload": [
+        true,
+        "2023-12-31T23:00:00+00:00",
+        "2025-09-30T21:00:00+00:00"
+      ]
+    }
+  },
+  {
+    "name": "power.stp.DA.be.volume.cleared.mwh.h.epex_sftp",
+    "metadata": {
+      "http_status": 200,
+      "payload": {
+        "tzaware": true,
+        "index_type": "datetime64[ns, UTC]",
+        "value_type": "float64",
+        "index_dtype": "|M8[ns]",
+        "value_dtype": "<f8",
+        "supervision_status": "unsupervised"
+      }
+    },
+    "interval": {
+      "http_status": 200,
+      "payload": [
+        true,
+        "2023-12-31T23:00:00+00:00",
+        "2025-09-30T21:00:00+00:00"
+      ]
+    }
+  },
+  {
+    "name": "power.stp.DA.fr.volume.cleared.mwh.h.epex_sftp",
+    "metadata": {
+      "http_status": 200,
+      "payload": {
+        "tzaware": true,
+        "index_type": "datetime64[ns, UTC]",
+        "value_type": "float64",
+        "index_dtype": "|M8[ns]",
+        "value_dtype": "<f8",
+        "supervision_status": "unsupervised"
+      }
+    },
+    "interval": {
+      "http_status": 200,
+      "payload": [
+        true,
+        "2023-12-31T23:00:00+00:00",
+        "2025-09-30T21:00:00+00:00"
+      ]
+    }
+  },
+  {
+    "name": "power.stp.DA.nl.volume.cleared.mwh.h.epex_sftp",
+    "metadata": {
+      "http_status": 200,
+      "payload": {
+        "tzaware": true,
+        "index_type": "datetime64[ns, UTC]",
+        "value_type": "float64",
+        "index_dtype": "|M8[ns]",
+        "value_dtype": "<f8",
+        "supervision_status": "unsupervised"
+      }
+    },
+    "interval": {
+      "http_status": 200,
+      "payload": [
+        true,
+        "2023-12-31T23:00:00+00:00",
+        "2025-09-30T21:00:00+00:00"
+      ]
+    }
+  },
+  {
+    "name": "power.stp.da_volume.de.mw.qh.obs.epex",
+    "metadata": {
+      "http_status": 200,
+      "payload": {
+        "tzaware": true,
+        "index_type": "datetime64[ns, UTC]",
+        "value_type": "float64",
+        "index_dtype": "|M8[ns]",
+        "value_dtype": "<f8"
+      }
+    },
+    "interval": {
+      "http_status": 418,
+      "payload": null
+    },
+    "formula": {
+      "http_status": 200,
+      "payload": "(pointconnect \"165349547\")"
+    }
+  },
+  {
+    "name": "power.stp.da_price.de.eurmwh.qh.obs.epex",
+    "metadata": {
+      "http_status": 200,
+      "payload": {
+        "tzaware": true,
+        "index_type": "datetime64[ns, UTC]",
+        "value_type": "float64",
+        "index_dtype": "|M8[ns]",
+        "value_dtype": "<f8"
+      }
+    },
+    "interval": {
+      "http_status": 418,
+      "payload": null
+    },
+    "formula": {
+      "http_status": 200,
+      "payload": "(resample (series \"53305\") \"15min\" #:method \"ffill\")"
+    }
+  },
+  {
+    "name": "power.price.base.bid.de.euromwh.d.obs.algotrading",
+    "metadata": {
+      "http_status": 200,
+      "payload": {
+        "tzaware": false,
+        "index_type": "datetime64[ns]",
+        "value_type": "float64",
+        "index_dtype": "<M8[ns]",
+        "index_names": [
+          "Maturity"
+        ],
+        "value_dtype": "<f8",
+        "supervision_status": "unsupervised"
+      }
+    },
+    "interval": {
+      "http_status": 200,
+      "payload": [
+        false,
+        "2018-02-02T00:00:00",
+        "2023-10-13T00:00:00"
+      ]
+    }
+  },
+  {
+    "name": "power.price.base.ask.de.euromwh.d.obs.algotrading",
+    "metadata": {
+      "http_status": 200,
+      "payload": {
+        "tzaware": false,
+        "index_type": "datetime64[ns]",
+        "value_type": "float64",
+        "index_dtype": "<M8[ns]",
+        "index_names": [
+          "Maturity"
+        ],
+        "value_dtype": "<f8",
+        "supervision_status": "unsupervised"
+      }
+    },
+    "interval": {
+      "http_status": 200,
+      "payload": [
+        false,
+        "2018-02-02T00:00:00",
+        "2023-10-13T00:00:00"
+      ]
+    }
+  },
+  {
+    "name": "power.eu.bidvolume.hupx.auction.mwh",
+    "metadata": {
+      "http_status": 200,
+      "payload": {
+        "tzaware": false,
+        "index_type": "datetime64[ns]",
+        "value_type": "float64",
+        "index_dtype": "<M8[ns]",
+        "value_dtype": "<f8",
+        "supervision_status": "unsupervised"
+      }
+    },
+    "interval": {
+      "http_status": 200,
+      "payload": [
+        false,
+        "2022-09-20T00:00:00",
+        "2024-09-17T00:00:00"
+      ]
+    }
+  },
+  {
+    "name": "power.nrjscan.eu.bidvolume.hupx.auction.mwh",
+    "metadata": {
+      "http_status": 200,
+      "payload": {
+        "tzaware": false,
+        "index_type": "datetime64[ns]",
+        "value_type": "float64",
+        "index_dtype": "<M8[ns]",
+        "value_dtype": "<f8"
+      }
+    },
+    "interval": {
+      "http_status": 204,
+      "payload": null
+    },
+    "formula": {
+      "http_status": 200,
+      "payload": "(series \"power.eu.bidvolume.hupx.auction.mwh\")"
+    }
+  },
+  {
+    "name": "power.volume.ro.da.qh.mw.buy.opcom.obs.utc",
+    "metadata": {
+      "http_status": 200,
+      "payload": {
+        "tzaware": true,
+        "index_type": "datetime64[ns, UTC]",
+        "value_type": "float64",
+        "index_dtype": "|M8[ns]",
+        "value_dtype": "<f8",
+        "supervision_status": "unsupervised"
+      }
+    },
+    "interval": {
+      "http_status": 200,
+      "payload": [
+        true,
+        "2025-09-30T22:00:00+00:00",
+        "2026-09-16T21:45:00+00:00"
+      ]
+    }
+  },
+  {
+    "name": "power.price.de.clearing-price.da.pnl",
+    "metadata": {
+      "http_status": 200,
+      "payload": {
+        "tzaware": true,
+        "index_type": "datetime64[ns, UTC]",
+        "value_type": "float64",
+        "index_dtype": "|M8[ns]",
+        "value_dtype": "<f8",
+        "supervision_status": "unsupervised"
+      }
+    },
+    "interval": {
+      "http_status": 200,
+      "payload": [
+        true,
+        "2025-01-01T23:00:00+00:00",
+        "2026-02-01T22:00:00+00:00"
+      ]
+    }
+  },
+  {
+    "name": "power.stp.DA.de.volume.cleared.mwh.h.epex_sftp",
+    "sample_delivery_day": "2026-09-14",
+    "asof": "None",
+    "shape": [
+      0
+    ],
+    "dtype": "float64",
+    "index_type": "DatetimeIndex",
+    "index_tz": "UTC",
+    "first": null,
+    "last": null,
+    "sample": []
+  },
+  {
+    "name": "power.stp.DA.de.volume.cleared.mwh.h.epex_sftp",
+    "sample_delivery_day": "2026-09-14",
+    "asof": "2026-09-13 06:00:00+00:00",
+    "shape": [
+      0
+    ],
+    "dtype": "float64",
+    "index_type": "DatetimeIndex",
+    "index_tz": "UTC",
+    "first": null,
+    "last": null,
+    "sample": []
+  },
+  {
+    "name": "power.stp.DA.be.volume.cleared.mwh.h.epex_sftp",
+    "sample_delivery_day": "2026-09-14",
+    "asof": "None",
+    "shape": [
+      0
+    ],
+    "dtype": "float64",
+    "index_type": "DatetimeIndex",
+    "index_tz": "UTC",
+    "first": null,
+    "last": null,
+    "sample": []
+  },
+  {
+    "name": "power.stp.DA.be.volume.cleared.mwh.h.epex_sftp",
+    "sample_delivery_day": "2026-09-14",
+    "asof": "2026-09-13 06:00:00+00:00",
+    "shape": [
+      0
+    ],
+    "dtype": "float64",
+    "index_type": "DatetimeIndex",
+    "index_tz": "UTC",
+    "first": null,
+    "last": null,
+    "sample": []
+  },
+  {
+    "name": "power.stp.DA.fr.volume.cleared.mwh.h.epex_sftp",
+    "sample_delivery_day": "2026-09-14",
+    "asof": "None",
+    "shape": [
+      0
+    ],
+    "dtype": "float64",
+    "index_type": "DatetimeIndex",
+    "index_tz": "UTC",
+    "first": null,
+    "last": null,
+    "sample": []
+  },
+  {
+    "name": "power.stp.DA.fr.volume.cleared.mwh.h.epex_sftp",
+    "sample_delivery_day": "2026-09-14",
+    "asof": "2026-09-13 06:00:00+00:00",
+    "shape": [
+      0
+    ],
+    "dtype": "float64",
+    "index_type": "DatetimeIndex",
+    "index_tz": "UTC",
+    "first": null,
+    "last": null,
+    "sample": []
+  },
+  {
+    "name": "power.stp.DA.nl.volume.cleared.mwh.h.epex_sftp",
+    "sample_delivery_day": "2026-09-14",
+    "asof": "None",
+    "shape": [
+      0
+    ],
+    "dtype": "float64",
+    "index_type": "DatetimeIndex",
+    "index_tz": "UTC",
+    "first": null,
+    "last": null,
+    "sample": []
+  },
+  {
+    "name": "power.stp.DA.nl.volume.cleared.mwh.h.epex_sftp",
+    "sample_delivery_day": "2026-09-14",
+    "asof": "2026-09-13 06:00:00+00:00",
+    "shape": [
+      0
+    ],
+    "dtype": "float64",
+    "index_type": "DatetimeIndex",
+    "index_tz": "UTC",
+    "first": null,
+    "last": null,
+    "sample": []
+  },
+  {
+    "name": "power.stp.da_volume.de.mw.qh.obs.epex",
+    "sample_delivery_day": "2026-09-14",
+    "asof": "None",
+    "shape": [
+      96
+    ],
+    "dtype": "float64",
+    "index_type": "DatetimeIndex",
+    "index_tz": "UTC",
+    "first": "2026-09-14 00:00:00+00:00",
+    "last": "2026-09-14 23:45:00+00:00",
+    "sample": [
+      {
+        "time": "2026-09-14 00:00:00+00:00",
+        "value": 6922.825
+      },
+      {
+        "time": "2026-09-14 00:15:00+00:00",
+        "value": 6942.75
+      },
+      {
+        "time": "2026-09-14 00:30:00+00:00",
+        "value": 6945.425
+      }
+    ]
+  },
+  {
+    "name": "power.stp.da_volume.de.mw.qh.obs.epex",
+    "sample_delivery_day": "2026-09-14",
+    "asof": "2026-09-13 06:00:00+00:00",
+    "shape": [
+      0
+    ],
+    "dtype": "float64",
+    "index_type": "DatetimeIndex",
+    "index_tz": "UTC",
+    "first": null,
+    "last": null,
+    "sample": []
+  },
+  {
+    "name": "power.price.base.bid.de.euromwh.d.obs.algotrading",
+    "sample_delivery_day": "2026-09-14",
+    "asof": "None",
+    "shape": [
+      0
+    ],
+    "dtype": "float64",
+    "index_type": "DatetimeIndex",
+    "index_tz": "None",
+    "first": null,
+    "last": null,
+    "sample": []
+  },
+  {
+    "name": "power.price.base.bid.de.euromwh.d.obs.algotrading",
+    "sample_delivery_day": "2026-09-14",
+    "asof": "2026-09-13 06:00:00+00:00",
+    "shape": [
+      0
+    ],
+    "dtype": "float64",
+    "index_type": "DatetimeIndex",
+    "index_tz": "None",
+    "first": null,
+    "last": null,
+    "sample": []
+  },
+  {
+    "name": "power.eu.bidvolume.hupx.auction.mwh",
+    "sample_delivery_day": "2026-09-14",
+    "asof": "None",
+    "shape": [
+      0
+    ],
+    "dtype": "float64",
+    "index_type": "DatetimeIndex",
+    "index_tz": "None",
+    "first": null,
+    "last": null,
+    "sample": []
+  },
+  {
+    "name": "power.eu.bidvolume.hupx.auction.mwh",
+    "sample_delivery_day": "2026-09-14",
+    "asof": "2026-09-13 06:00:00+00:00",
+    "shape": [
+      0
+    ],
+    "dtype": "float64",
+    "index_type": "DatetimeIndex",
+    "index_tz": "None",
+    "first": null,
+    "last": null,
+    "sample": []
+  }
+]

@@ -1,0 +1,75 @@
+{
+  "status": "insufficient_data",
+  "reason": "missing_matched_control",
+  "decision": {
+    "status": "not_encouraging",
+    "encouraging": false,
+    "promotion_allowed": false,
+    "candidate_family": "full_quarterhour",
+    "matched_control_family": "matched_full_hourly",
+    "matched_control_verified": false,
+    "comparisons": {
+      "nyx": {
+        "available": true,
+        "mae_improvement_at_least_2pct": false,
+        "mae_ci_upper_below_zero": false,
+        "rmse_within_1pct": true,
+        "every_country_mae_within_5pct": true
+      },
+      "matched_full_hourly": {
+        "available": false
+      }
+    },
+    "reasons": [
+      "vs_nyx:mae_improvement_at_least_2pct",
+      "vs_nyx:mae_ci_upper_below_zero",
+      "vs_nyx:DE:above_train_q95:mae_degradation_over_5pct",
+      "missing_matched_control"
+    ],
+    "critical_regimes": {
+      "minimum_hours": 30,
+      "minimum_distinct_days": 5,
+      "maximum_mae_degradation": 0.05,
+      "evidence_available": true,
+      "coverage_complete": true,
+      "insufficient_regimes": []
+    },
+    "interpretation": "Exploratory historical point-forecast comparison; no calibrated quantile claim or production promotion."
+  },
+  "protocol": {
+    "start_day": "2026-06-18",
+    "end_day": "2026-09-15",
+    "days": 90,
+    "zones": [
+      "BE",
+      "DE",
+      "FR",
+      "NL"
+    ],
+    "paired_hours_per_zone": 2160,
+    "paired_points_per_family": 8640,
+    "timezone": "Europe/Paris",
+    "bootstrap_block_days": 7,
+    "bootstrap_repetitions": 1000,
+    "bootstrap_seed": 20260916,
+    "exploratory_history_already_reviewed": true,
+    "automatic_model_selection": false,
+    "calibrated_quantiles_produced": false,
+    "q95_thresholds_supplied_from_training": {
+      "BE": 143.19000244140625,
+      "DE": 162.70399475097653,
+      "FR": 124.80400085449219,
+      "NL": 153.37400207519528
+    },
+    "q95_thresholds_computed_from_test": false,
+    "point_aggregation_contract": "mean of four finite points; no distribution or quantile aggregation",
+    "native_resolution_and_vintages_verified_here": false
+  },
+  "analysis_date": "2026-09-17",
+  "provisional": true,
+  "source_run": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_fullquarterhour_v1\\20260916T111425Z_dff7f605",
+  "source_protocol_identity": "6d9552cd7a066ec1617461b6c81569c65c9d3f13fe0079dc655fb90095fc3b4d",
+  "fitted_models": false,
+  "missing_family": "matched_full_hourly",
+  "production_modified": false
+}

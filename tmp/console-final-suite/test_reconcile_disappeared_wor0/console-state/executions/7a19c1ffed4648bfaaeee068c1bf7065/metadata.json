@@ -1,0 +1,51 @@
+{
+  "command": [
+    "C:\\Users\\BQ6757\\venvs\\pricefm311\\Scripts\\python.exe",
+    "-u",
+    "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-final-suite\\test_reconcile_disappeared_wor0\\explicit test fixture ; $literal.py",
+    "success",
+    "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-final-suite\\test_reconcile_disappeared_wor0\\console-state\\executions\\7a19c1ffed4648bfaaeee068c1bf7065\\results",
+    "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-final-suite\\test_reconcile_disappeared_wor0\\never-released"
+  ],
+  "cwd": "C:\\Users\\BQ6757\\chronos2_v1",
+  "output_dir": "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-final-suite\\test_reconcile_disappeared_wor0\\console-state\\executions\\7a19c1ffed4648bfaaeee068c1bf7065\\results",
+  "config": {
+    "fixture": true,
+    "mode": "success",
+    "resource": null
+  },
+  "type": "fixture",
+  "model": "explicit-test-fixture",
+  "resource_keys": [],
+  "warnings": [
+    "Explicit test fixture; contains no real scientific results."
+  ],
+  "id": "7a19c1ffed4648bfaaeee068c1bf7065",
+  "run_dir": "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-final-suite\\test_reconcile_disappeared_wor0\\console-state\\executions\\7a19c1ffed4648bfaaeee068c1bf7065",
+  "created_at": "2026-09-11T08:23:03.307609+00:00",
+  "request": {
+    "type": "fixture",
+    "name": "Explicit process test"
+  },
+  "name": "Explicit process test",
+  "description": "",
+  "python_executable": "C:\\Users\\BQ6757\\venvs\\pricefm311\\Scripts\\python.exe",
+  "source": "managed",
+  "source_key": "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-final-suite\\test_reconcile_disappeared_wor0\\console-state\\executions\\7a19c1ffed4648bfaaeee068c1bf7065",
+  "status": "queued",
+  "started_at": null,
+  "finished_at": null,
+  "duration_seconds": null,
+  "return_code": null,
+  "cancel_requested": false,
+  "tags": [],
+  "note": "",
+  "activity": "En attente d’une place ou d’une ressource",
+  "git": {
+    "commit": "900d8fc36a5f7d44e91f895786e49e4ed7614086",
+    "dirty_tracked_files": true
+  },
+  "log_paths": [
+    "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-final-suite\\test_reconcile_disappeared_wor0\\console-state\\executions\\7a19c1ffed4648bfaaeee068c1bf7065\\console.log"
+  ]
+}

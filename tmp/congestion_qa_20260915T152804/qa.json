@@ -1,0 +1,23 @@
+{
+  "status": "passed",
+  "report": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_congestion_v1\\snapshots\\20260915T150242Z_5b87c16a\\reports\\20260915T152804Z_278d8148\\nyx_congestion_report.html",
+  "filters": [
+    "ALL/365",
+    "ALL/7",
+    "BE/365",
+    "BE/7",
+    "DE/365",
+    "DE/7",
+    "FR/365",
+    "FR/7",
+    "NL/365",
+    "NL/7"
+  ],
+  "errors": [],
+  "network_blocked": true,
+  "constraint_choices": 11,
+  "case_text": "BE\t441,74\t370,58\t286,78\t345,42\t286,78\t286,78\t286,78\t286,78\nDE\t697,31\t421,70\t324,59\t419,01\t324,59\t324,59\t324,59\t324,59\nFR\t298,01\t296,47\t284,41\t286,04\t284,41\t284,41\t284,41\t284,41\nNL\t400,00\t412,32\t307,18\t323,59\t307,18\t307,18\t307,18\t307,18",
+  "classification": "Expert congestion\t0,01880\t0,4784\t2,81 %\t9 718\t345 261\nPrior historique\t0,02736\t0,0278\t2,81 %\t9 718\t345 261",
+  "regional": "Pression régionale sévère\t0,12836\t0,5683\t21,47 %\t19 380\t31,37\t31,62\t40,08\nPrior historique\t0,17236\t0,1916\t21,47 %\t19 380\t—\t—\t40,08",
+  "regional_case": "BE\t143,44\tOui\t30,84 %\t138,32\t42,66\tOui\nDE\t398,50\tOui\t73,76 %\t147,22\t108,60\tOui\nFR\t0,00\tNon\t0,18 %\t103,14\t0,18\tOui\nNL\t101,79\tOui\t43,01 %\t115,21\t49,56\tOui"
+}

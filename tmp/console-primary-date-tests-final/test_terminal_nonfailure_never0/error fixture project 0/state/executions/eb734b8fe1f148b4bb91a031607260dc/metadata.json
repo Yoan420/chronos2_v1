@@ -1,0 +1,51 @@
+{
+  "command": [
+    "C:\\Users\\BQ6757\\venvs\\pricefm311\\Scripts\\python.exe",
+    "-u",
+    "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-primary-date-tests-final\\test_terminal_nonfailure_never0\\error fixture project 0\\explicit_error_summary_fixture.py",
+    "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-primary-date-tests-final\\test_terminal_nonfailure_never0\\error fixture project 0\\state\\executions\\eb734b8fe1f148b4bb91a031607260dc\\output",
+    "failure"
+  ],
+  "cwd": "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-primary-date-tests-final\\test_terminal_nonfailure_never0\\error fixture project 0",
+  "output_dir": "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-primary-date-tests-final\\test_terminal_nonfailure_never0\\error fixture project 0\\state\\executions\\eb734b8fe1f148b4bb91a031607260dc\\output",
+  "config": {
+    "fixture": true
+  },
+  "delivery_day": "2026-09-12",
+  "type": "fixture",
+  "model": "explicit-error-summary-fixture",
+  "resource_keys": [
+    "canonical-publications",
+    "nyx-primary-pipeline",
+    "scientific-cache"
+  ],
+  "warnings": [],
+  "id": "eb734b8fe1f148b4bb91a031607260dc",
+  "adapter_id": "primary_nuclear_kalman",
+  "source": "managed",
+  "source_key": "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-primary-date-tests-final\\test_terminal_nonfailure_never0\\error fixture project 0\\state\\executions\\eb734b8fe1f148b4bb91a031607260dc",
+  "run_dir": "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-primary-date-tests-final\\test_terminal_nonfailure_never0\\error fixture project 0\\state\\executions\\eb734b8fe1f148b4bb91a031607260dc",
+  "created_at": "2026-09-11T13:51:14.925194+00:00",
+  "request": {
+    "adapter_id": "primary_nuclear_kalman"
+  },
+  "name": "NYX · Nuclear Kalman",
+  "description": "NuclearKalman.ps1 avec ses paramètres scientifiques par défaut et -NoOpen.",
+  "python_executable": "C:\\Users\\BQ6757\\venvs\\pricefm311\\Scripts\\python.exe",
+  "status": "queued",
+  "started_at": null,
+  "finished_at": null,
+  "duration_seconds": null,
+  "return_code": null,
+  "cancel_requested": false,
+  "tags": [],
+  "note": "",
+  "activity": "En attente des ressources scientifiques",
+  "git": {
+    "commit": "900d8fc36a5f7d44e91f895786e49e4ed7614086",
+    "dirty_tracked_files": true
+  },
+  "log_paths": [
+    "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-primary-date-tests-final\\test_terminal_nonfailure_never0\\error fixture project 0\\state\\executions\\eb734b8fe1f148b4bb91a031607260dc\\console.log"
+  ]
+}

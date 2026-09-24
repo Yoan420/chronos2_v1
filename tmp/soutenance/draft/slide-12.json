@@ -1,0 +1,1400 @@
+{
+  "schema": "openai.presentation.layout/v4",
+  "unit": "px",
+  "slide": {
+    "aid": "sl/soutenance-12",
+    "id": "soutenance-12",
+    "slide": 12,
+    "layoutId": "/ppt/slideLayouts/slideLayout6.xml",
+    "layoutName": "Title Only",
+    "masterLayoutId": "/ppt/slideMasters/slideMaster1.xml",
+    "frame": {
+      "left": 0,
+      "top": 0,
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "theme": {
+    "colorSchemeName": "Codex Colors",
+    "colors": {
+      "accent1": "#6DCBF4",
+      "accent2": "#3D8DFF",
+      "accent3": "#47E2C2",
+      "accent4": "#85DF7B",
+      "accent5": "#F7CB59",
+      "accent6": "#F67576",
+      "dk1": "#000000",
+      "lt1": "#FFFFFF",
+      "dk2": "#00264F",
+      "lt2": "#D0EDFA",
+      "hlink": "#000000",
+      "folHlink": "#0097A7"
+    },
+    "fontScheme": {
+      "name": "Helvetica Neue",
+      "majorFont": {
+        "latinTypeface": "Helvetica Neue"
+      },
+      "minorFont": {
+        "latinTypeface": "Helvetica Neue"
+      }
+    },
+    "typefaces": [
+      "Helvetica Neue"
+    ]
+  },
+  "inheritedLayers": [
+    {
+      "scope": "layout",
+      "id": "/ppt/slideLayouts/slideLayout6.xml",
+      "name": "Title Only",
+      "parentLayoutId": "/ppt/slideMasters/slideMaster1.xml",
+      "elements": [
+        {
+          "order": 1,
+          "kind": "shape",
+          "scope": "layout",
+          "aid": "template/layout//ppt/slideLayouts/slideLayout6.xml/8",
+          "id": "8",
+          "name": "Footer Placeholder 4",
+          "bbox": [
+            41.33,
+            659.31,
+            374.67,
+            25.33
+          ],
+          "geometry": "rect",
+          "resolvedTextStyle": {
+            "anchor": 3,
+            "vertical": 1,
+            "verticalAlignment": "bottom",
+            "insets": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          }
+        },
+        {
+          "order": 2,
+          "kind": "shape",
+          "scope": "layout",
+          "aid": "template/layout//ppt/slideLayouts/slideLayout6.xml/9",
+          "id": "9",
+          "name": "Slide Number Placeholder 5",
+          "bbox": [
+            1184.18,
+            659.24,
+            54.48,
+            25.33
+          ],
+          "geometry": "rect",
+          "text": "‹#›",
+          "textPreview": "‹#›",
+          "resolvedTextStyle": {
+            "anchor": 3,
+            "vertical": 1,
+            "verticalAlignment": "bottom",
+            "insets": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "‹#›",
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "‹#›"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "order": 3,
+          "kind": "shape",
+          "scope": "layout",
+          "aid": "template/layout//ppt/slideLayouts/slideLayout6.xml/2",
+          "id": "2",
+          "name": "Title Placeholder 1",
+          "bbox": [
+            41.33,
+            36.12,
+            1197.33,
+            109.97
+          ],
+          "geometry": "rect",
+          "text": "Click to edit Master title style",
+          "textPreview": "Click to edit Master title style",
+          "resolvedTextStyle": {
+            "anchor": 1,
+            "vertical": 1,
+            "verticalAlignment": "top",
+            "autoFit": "shrinkText",
+            "insets": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "Click to edit Master title style",
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Click to edit Master title style"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "scope": "master",
+      "id": "/ppt/slideMasters/slideMaster1.xml",
+      "type": "master",
+      "elements": [
+        {
+          "order": 1,
+          "kind": "shape",
+          "scope": "master",
+          "aid": "template/master//ppt/slideMasters/slideMaster1.xml/2",
+          "id": "2",
+          "name": "Title Placeholder 1",
+          "bbox": [
+            41.33,
+            36.12,
+            1197.33,
+            109.97
+          ],
+          "geometry": "rect",
+          "text": "Click to edit Master title style",
+          "textPreview": "Click to edit Master title style",
+          "resolvedTextStyle": {
+            "anchor": 1,
+            "vertical": 1,
+            "verticalAlignment": "top",
+            "autoFit": "shrinkText",
+            "insets": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "Click to edit Master title style",
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Click to edit Master title style"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "order": 2,
+          "kind": "shape",
+          "scope": "master",
+          "aid": "template/master//ppt/slideMasters/slideMaster1.xml/3",
+          "id": "3",
+          "name": "Text Placeholder 2",
+          "bbox": [
+            41.33,
+            213.33,
+            1197.33,
+            416
+          ],
+          "geometry": "rect",
+          "text": "Click to edit Master text styles\nSecond level\nThird level\nFourth level\nFifth level",
+          "textPreview": "Click to edit Master text styles | Second level | Third level | Fourth level | Fifth level",
+          "resolvedTextStyle": {
+            "vertical": 1,
+            "autoFit": "shrinkText",
+            "insets": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "Click to edit Master text styles",
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Click to edit Master text styles"
+                }
+              ]
+            },
+            {
+              "index": 2,
+              "text": "Second level",
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Second level"
+                }
+              ]
+            },
+            {
+              "index": 3,
+              "text": "Third level",
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Third level"
+                }
+              ]
+            },
+            {
+              "index": 4,
+              "text": "Fourth level",
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Fourth level"
+                }
+              ]
+            },
+            {
+              "index": 5,
+              "text": "Fifth level",
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Fifth level"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "order": 3,
+          "kind": "shape",
+          "scope": "master",
+          "aid": "template/master//ppt/slideMasters/slideMaster1.xml/5",
+          "id": "5",
+          "name": "Footer Placeholder 4",
+          "bbox": [
+            41.33,
+            659.31,
+            374.67,
+            25.33
+          ],
+          "geometry": "rect",
+          "resolvedTextStyle": {
+            "anchor": 3,
+            "vertical": 1,
+            "verticalAlignment": "bottom",
+            "insets": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          }
+        },
+        {
+          "order": 4,
+          "kind": "shape",
+          "scope": "master",
+          "aid": "template/master//ppt/slideMasters/slideMaster1.xml/6",
+          "id": "6",
+          "name": "Slide Number Placeholder 5",
+          "bbox": [
+            1184.18,
+            659.24,
+            54.48,
+            25.33
+          ],
+          "geometry": "rect",
+          "text": "‹#›",
+          "textPreview": "‹#›",
+          "resolvedTextStyle": {
+            "anchor": 3,
+            "vertical": 1,
+            "verticalAlignment": "bottom",
+            "insets": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "‹#›",
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "‹#›"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "elements": [
+    {
+      "order": 1,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/z2tgvyh8",
+      "id": "3",
+      "name": "Footer Placeholder 2",
+      "bbox": [
+        41.33,
+        659.31,
+        374.67,
+        25.33
+      ],
+      "text": "Annexe B. Seuils proposés, aucun résultat observé",
+      "textPreview": "Annexe B. Seuils proposés, aucun résultat observé",
+      "resolvedFontSize": 13.33,
+      "resolvedTextStyle": {
+        "anchor": 3,
+        "vertical": 1,
+        "fontSize": 13.33,
+        "typeface": "Helvetica Neue",
+        "color": "#000000",
+        "alignment": "left",
+        "verticalAlignment": "bottom",
+        "wrap": "square",
+        "autoFit": "none",
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Annexe B. Seuils proposés, aucun résultat observé"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Annexe B. Seuils proposés, aucun résultat observé",
+          "bulletCharacter": "",
+          "marginLeft": 0,
+          "indent": 0,
+          "spaceBefore": 0,
+          "spaceAfter": 0,
+          "resolvedTextStyle": {
+            "fontSize": 13.33,
+            "typeface": "Helvetica Neue",
+            "color": "#000000",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Annexe B. Seuils proposés, aucun résultat observé",
+              "fontSize": 13.33,
+              "typeface": "Helvetica Neue",
+              "color": "#000000",
+              "alignment": "left"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "order": 2,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/ipc3ml8b",
+      "id": "532",
+      "name": "Google Shape;532;p58",
+      "bbox": [
+        1184.18,
+        659.24,
+        54.48,
+        25.33
+      ],
+      "text": "12",
+      "textPreview": "12",
+      "resolvedFontSize": 13.33,
+      "resolvedTextStyle": {
+        "anchor": 3,
+        "vertical": 1,
+        "fontSize": 13.33,
+        "typeface": "Helvetica Neue",
+        "color": "#000000",
+        "alignment": "right",
+        "verticalAlignment": "bottom",
+        "wrap": "square",
+        "autoFit": "none",
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "useParagraphSpacing": true
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "12"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "12",
+          "bulletCharacter": "",
+          "marginLeft": 0,
+          "indent": 0,
+          "spaceBefore": 0,
+          "spaceAfter": 0,
+          "resolvedTextStyle": {
+            "anchor": 3,
+            "vertical": 1,
+            "fontSize": 13.33,
+            "typeface": "Helvetica Neue",
+            "color": "#000000",
+            "alignment": "right",
+            "verticalAlignment": "bottom",
+            "wrap": "square",
+            "autoFit": "none",
+            "insets": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            },
+            "useParagraphSpacing": true
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "12",
+              "fontSize": 13.33,
+              "typeface": "Helvetica Neue",
+              "color": "#000000",
+              "alignment": "right"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "order": 3,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/3q54fq9w",
+      "id": "533",
+      "name": "Google Shape;533;p58",
+      "bbox": [
+        41.33,
+        36.12,
+        1197.33,
+        109.97
+      ],
+      "text": "Protocoles : critères proposés",
+      "textPreview": "Protocoles : critères proposés",
+      "resolvedFontSize": 38.67,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "vertical": 1,
+        "fontSize": 38.67,
+        "typeface": "Helvetica Neue",
+        "color": "#000000",
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "wrap": "square",
+        "autoFit": "none",
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "useParagraphSpacing": true
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Protocoles : critères proposés"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Protocoles : critères proposés",
+          "bulletCharacter": "",
+          "marginLeft": 0,
+          "indent": 0,
+          "spaceBefore": 0,
+          "spaceAfter": 0,
+          "resolvedTextStyle": {
+            "anchor": 1,
+            "vertical": 1,
+            "fontSize": 38.67,
+            "typeface": "Helvetica Neue",
+            "color": "#000000",
+            "alignment": "left",
+            "verticalAlignment": "top",
+            "wrap": "square",
+            "autoFit": "none",
+            "insets": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            },
+            "useParagraphSpacing": true
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Protocoles : critères proposés",
+              "fontSize": 38.67,
+              "typeface": "Helvetica Neue",
+              "color": "#000000",
+              "alignment": "left"
+            }
+          ],
+          "lineSpacingPercent": 90000
+        }
+      ]
+    },
+    {
+      "order": 4,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/g3ulkbql",
+      "id": "534",
+      "name": "Les marges restent à justifier selon les tâches.",
+      "bbox": [
+        41.33,
+        143,
+        1197.33,
+        50
+      ],
+      "geometry": "rect",
+      "text": "Les marges restent à justifier selon les tâches.",
+      "textPreview": "Les marges restent à justifier selon les tâches.",
+      "resolvedFontSize": 28,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 28,
+        "typeface": "Helvetica Neue",
+        "color": "#000000",
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "wrap": "square",
+        "autoFit": "none",
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Les marges restent à justifier selon les tâches."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Les marges restent à justifier selon les tâches.",
+          "bulletCharacter": "",
+          "marginLeft": 0,
+          "indent": 0,
+          "spaceBefore": 0,
+          "spaceAfter": 0,
+          "resolvedTextStyle": {
+            "fontSize": 28,
+            "typeface": "Helvetica Neue",
+            "color": "#000000",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Les marges restent à justifier selon les tâches.",
+              "fontSize": 28,
+              "typeface": "Helvetica Neue",
+              "color": "#000000",
+              "alignment": "left"
+            }
+          ]
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 5,
+      "kind": "table",
+      "scope": "slide",
+      "aid": "tb/apsnmdsr",
+      "id": "535",
+      "bbox": [
+        41.33,
+        214,
+        1197,
+        389
+      ],
+      "text": "Hypothèse | Critère principal proposé | Contrôle essentiel\nH1  Transfert | Gain prospectif moyen positif | Modèle et référence figés\nPrévisions horodatées\nH2  Covariables | Gain ≥ 2 % avec les bonnes variables\nDégradation ≤ 5 % sous perturbation | Entrées correctes, retardées,\npermutées et contrôle aléatoire\nH3  Adaptation | Surcroît de perte ≤ 2 % face au complet\nOubli ≤ 5 % et coût réduit | Même modèle initial\nEssais inclus dans le coût\nH4  Trajectoires | Baisse moyenne du score de Brier\nface à l’indépendance | Marges et nombre de scénarios\nidentiques",
+      "textPreview": "Hypothèse | Critère principal proposé | Contrôle essentiel | H1  Transfert | Gain prospectif moyen positif | Modèle et référence figés | ...",
+      "rows": 5,
+      "cols": 3,
+      "cells": [
+        {
+          "index": 1,
+          "row": 1,
+          "column": 1,
+          "bbox": [
+            41.33,
+            214,
+            245,
+            58
+          ],
+          "text": "Hypothèse",
+          "textPreview": "Hypothèse",
+          "fillColor": "#EAEAEA",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "Hypothèse",
+              "resolvedTextStyle": {
+                "fontSize": 22,
+                "typeface": "Helvetica Neue",
+                "color": "#000000",
+                "bold": true
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Hypothèse",
+                  "fontSize": 22,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000",
+                  "bold": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "row": 1,
+          "column": 2,
+          "bbox": [
+            286.33,
+            214,
+            540,
+            58
+          ],
+          "text": "Critère principal proposé",
+          "textPreview": "Critère principal proposé",
+          "fillColor": "#EAEAEA",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "Critère principal proposé",
+              "resolvedTextStyle": {
+                "fontSize": 22,
+                "typeface": "Helvetica Neue",
+                "color": "#000000",
+                "bold": true
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Critère principal proposé",
+                  "fontSize": 22,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000",
+                  "bold": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "row": 1,
+          "column": 3,
+          "bbox": [
+            826.33,
+            214,
+            412,
+            58
+          ],
+          "text": "Contrôle essentiel",
+          "textPreview": "Contrôle essentiel",
+          "fillColor": "#EAEAEA",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "Contrôle essentiel",
+              "resolvedTextStyle": {
+                "fontSize": 22,
+                "typeface": "Helvetica Neue",
+                "color": "#000000",
+                "bold": true
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Contrôle essentiel",
+                  "fontSize": 22,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000",
+                  "bold": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 4,
+          "row": 2,
+          "column": 1,
+          "bbox": [
+            41.33,
+            272,
+            245,
+            82.75
+          ],
+          "text": "H1  Transfert",
+          "textPreview": "H1  Transfert",
+          "fillColor": "#F6F6F6",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "H1  Transfert",
+              "resolvedTextStyle": {
+                "fontSize": 22,
+                "typeface": "Helvetica Neue",
+                "color": "#000000"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "H1  Transfert",
+                  "fontSize": 22,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 5,
+          "row": 2,
+          "column": 2,
+          "bbox": [
+            286.33,
+            272,
+            540,
+            82.75
+          ],
+          "text": "Gain prospectif moyen positif",
+          "textPreview": "Gain prospectif moyen positif",
+          "fillColor": "#F6F6F6",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "Gain prospectif moyen positif",
+              "resolvedTextStyle": {
+                "fontSize": 22,
+                "typeface": "Helvetica Neue",
+                "color": "#000000"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Gain prospectif moyen positif",
+                  "fontSize": 22,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 6,
+          "row": 2,
+          "column": 3,
+          "bbox": [
+            826.33,
+            272,
+            412,
+            82.75
+          ],
+          "text": "Modèle et référence figés\nPrévisions horodatées",
+          "textPreview": "Modèle et référence figés | Prévisions horodatées",
+          "fillColor": "#F6F6F6",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "Modèle et référence figés",
+              "resolvedTextStyle": {
+                "fontSize": 22,
+                "typeface": "Helvetica Neue",
+                "color": "#000000"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Modèle et référence figés",
+                  "fontSize": 22,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            },
+            {
+              "index": 2,
+              "text": "Prévisions horodatées",
+              "resolvedTextStyle": {
+                "fontSize": 22,
+                "typeface": "Helvetica Neue",
+                "color": "#000000"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Prévisions horodatées",
+                  "fontSize": 22,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 7,
+          "row": 3,
+          "column": 1,
+          "bbox": [
+            41.33,
+            354.75,
+            245,
+            82.75
+          ],
+          "text": "H2  Covariables",
+          "textPreview": "H2  Covariables",
+          "fillColor": "#FFFFFF",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "H2  Covariables",
+              "resolvedTextStyle": {
+                "fontSize": 22,
+                "typeface": "Helvetica Neue",
+                "color": "#000000"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "H2  Covariables",
+                  "fontSize": 22,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 8,
+          "row": 3,
+          "column": 2,
+          "bbox": [
+            286.33,
+            354.75,
+            540,
+            82.75
+          ],
+          "text": "Gain ≥ 2 % avec les bonnes variables\nDégradation ≤ 5 % sous perturbation",
+          "textPreview": "Gain ≥ 2 % avec les bonnes variables | Dégradation ≤ 5 % sous perturbation",
+          "fillColor": "#FFFFFF",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "Gain ≥ 2 % avec les bonnes variables",
+              "resolvedTextStyle": {
+                "fontSize": 22,
+                "typeface": "Helvetica Neue",
+                "color": "#000000"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Gain ≥ 2 % avec les bonnes variables",
+                  "fontSize": 22,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            },
+            {
+              "index": 2,
+              "text": "Dégradation ≤ 5 % sous perturbation",
+              "resolvedTextStyle": {
+                "fontSize": 22,
+                "typeface": "Helvetica Neue",
+                "color": "#000000"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Dégradation ≤ 5 % sous perturbation",
+                  "fontSize": 22,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 9,
+          "row": 3,
+          "column": 3,
+          "bbox": [
+            826.33,
+            354.75,
+            412,
+            82.75
+          ],
+          "text": "Entrées correctes, retardées,\npermutées et contrôle aléatoire",
+          "textPreview": "Entrées correctes, retardées, | permutées et contrôle aléatoire",
+          "fillColor": "#FFFFFF",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "Entrées correctes, retardées,",
+              "resolvedTextStyle": {
+                "fontSize": 22,
+                "typeface": "Helvetica Neue",
+                "color": "#000000"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Entrées correctes, retardées,",
+                  "fontSize": 22,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            },
+            {
+              "index": 2,
+              "text": "permutées et contrôle aléatoire",
+              "resolvedTextStyle": {
+                "fontSize": 22,
+                "typeface": "Helvetica Neue",
+                "color": "#000000"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "permutées et contrôle aléatoire",
+                  "fontSize": 22,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 10,
+          "row": 4,
+          "column": 1,
+          "bbox": [
+            41.33,
+            437.5,
+            245,
+            82.75
+          ],
+          "text": "H3  Adaptation",
+          "textPreview": "H3  Adaptation",
+          "fillColor": "#F6F6F6",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "H3  Adaptation",
+              "resolvedTextStyle": {
+                "fontSize": 22,
+                "typeface": "Helvetica Neue",
+                "color": "#000000"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "H3  Adaptation",
+                  "fontSize": 22,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 11,
+          "row": 4,
+          "column": 2,
+          "bbox": [
+            286.33,
+            437.5,
+            540,
+            82.75
+          ],
+          "text": "Surcroît de perte ≤ 2 % face au complet\nOubli ≤ 5 % et coût réduit",
+          "textPreview": "Surcroît de perte ≤ 2 % face au complet | Oubli ≤ 5 % et coût réduit",
+          "fillColor": "#F6F6F6",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "Surcroît de perte ≤ 2 % face au complet",
+              "resolvedTextStyle": {
+                "fontSize": 22,
+                "typeface": "Helvetica Neue",
+                "color": "#000000"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Surcroît de perte ≤ 2 % face au complet",
+                  "fontSize": 22,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            },
+            {
+              "index": 2,
+              "text": "Oubli ≤ 5 % et coût réduit",
+              "resolvedTextStyle": {
+                "fontSize": 22,
+                "typeface": "Helvetica Neue",
+                "color": "#000000"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Oubli ≤ 5 % et coût réduit",
+                  "fontSize": 22,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 12,
+          "row": 4,
+          "column": 3,
+          "bbox": [
+            826.33,
+            437.5,
+            412,
+            82.75
+          ],
+          "text": "Même modèle initial\nEssais inclus dans le coût",
+          "textPreview": "Même modèle initial | Essais inclus dans le coût",
+          "fillColor": "#F6F6F6",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "Même modèle initial",
+              "resolvedTextStyle": {
+                "fontSize": 22,
+                "typeface": "Helvetica Neue",
+                "color": "#000000"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Même modèle initial",
+                  "fontSize": 22,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            },
+            {
+              "index": 2,
+              "text": "Essais inclus dans le coût",
+              "resolvedTextStyle": {
+                "fontSize": 22,
+                "typeface": "Helvetica Neue",
+                "color": "#000000"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Essais inclus dans le coût",
+                  "fontSize": 22,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 13,
+          "row": 5,
+          "column": 1,
+          "bbox": [
+            41.33,
+            520.25,
+            245,
+            82.75
+          ],
+          "text": "H4  Trajectoires",
+          "textPreview": "H4  Trajectoires",
+          "fillColor": "#FFFFFF",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "H4  Trajectoires",
+              "resolvedTextStyle": {
+                "fontSize": 22,
+                "typeface": "Helvetica Neue",
+                "color": "#000000"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "H4  Trajectoires",
+                  "fontSize": 22,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 14,
+          "row": 5,
+          "column": 2,
+          "bbox": [
+            286.33,
+            520.25,
+            540,
+            82.75
+          ],
+          "text": "Baisse moyenne du score de Brier\nface à l’indépendance",
+          "textPreview": "Baisse moyenne du score de Brier | face à l’indépendance",
+          "fillColor": "#FFFFFF",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "Baisse moyenne du score de Brier",
+              "resolvedTextStyle": {
+                "fontSize": 22,
+                "typeface": "Helvetica Neue",
+                "color": "#000000"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Baisse moyenne du score de Brier",
+                  "fontSize": 22,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            },
+            {
+              "index": 2,
+              "text": "face à l’indépendance",
+              "resolvedTextStyle": {
+                "fontSize": 22,
+                "typeface": "Helvetica Neue",
+                "color": "#000000"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "face à l’indépendance",
+                  "fontSize": 22,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 15,
+          "row": 5,
+          "column": 3,
+          "bbox": [
+            826.33,
+            520.25,
+            412,
+            82.75
+          ],
+          "text": "Marges et nombre de scénarios\nidentiques",
+          "textPreview": "Marges et nombre de scénarios | identiques",
+          "fillColor": "#FFFFFF",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "Marges et nombre de scénarios",
+              "resolvedTextStyle": {
+                "fontSize": 22,
+                "typeface": "Helvetica Neue",
+                "color": "#000000"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Marges et nombre de scénarios",
+                  "fontSize": 22,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            },
+            {
+              "index": 2,
+              "text": "identiques",
+              "resolvedTextStyle": {
+                "fontSize": 22,
+                "typeface": "Helvetica Neue",
+                "color": "#000000"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "identiques",
+                  "fontSize": 22,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "order": 6,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/u1c3i18f",
+      "id": "536",
+      "name": "Un intervalle qui recouvre zéro ou la marge pertin",
+      "bbox": [
+        41.33,
+        619,
+        1197.33,
+        30
+      ],
+      "geometry": "rect",
+      "text": "Un intervalle qui recouvre zéro ou la marge pertinente reste non concluant.",
+      "textPreview": "Un intervalle qui recouvre zéro ou la marge pertinente reste non concluant.",
+      "resolvedFontSize": 23,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 23,
+        "typeface": "Helvetica Neue",
+        "color": "#000000",
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "wrap": "square",
+        "autoFit": "none",
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Un intervalle qui recouvre zéro ou la marge pertinente reste non concluant."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Un intervalle qui recouvre zéro ou la marge pertinente reste non concluant.",
+          "bulletCharacter": "",
+          "marginLeft": 0,
+          "indent": 0,
+          "spaceBefore": 0,
+          "spaceAfter": 0,
+          "resolvedTextStyle": {
+            "fontSize": 23,
+            "typeface": "Helvetica Neue",
+            "color": "#000000",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Un intervalle qui recouvre zéro ou la marge pertinente reste non concluant.",
+              "fontSize": 23,
+              "typeface": "Helvetica Neue",
+              "color": "#000000",
+              "alignment": "left"
+            }
+          ]
+        }
+      ],
+      "lineWidth": 0
+    }
+  ],
+  "composeRuns": []
+}

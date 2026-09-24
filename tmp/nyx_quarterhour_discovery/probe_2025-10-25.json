@@ -1,0 +1,86 @@
+[
+  {
+    "series": "60451",
+    "start_day": "2025-10-25",
+    "end_day": "2025-10-27",
+    "vintage": "latest_observations",
+    "raw_rows": 317,
+    "raw_timezone": "UTC",
+    "raw_start": "2025-10-24 19:00:00+00:00",
+    "raw_end": "2025-10-28 02:00:00+00:00",
+    "step_seconds": {
+      "900.0": 316
+    },
+    "minutes": [
+      0,
+      15,
+      30,
+      45
+    ],
+    "nulls": 0,
+    "duplicates": 0
+  },
+  {
+    "series": "60452",
+    "start_day": "2025-10-25",
+    "end_day": "2025-10-27",
+    "vintage": "latest_observations",
+    "raw_rows": 317,
+    "raw_timezone": "UTC",
+    "raw_start": "2025-10-24 19:00:00+00:00",
+    "raw_end": "2025-10-28 02:00:00+00:00",
+    "step_seconds": {
+      "900.0": 316
+    },
+    "minutes": [
+      0,
+      15,
+      30,
+      45
+    ],
+    "nulls": 0,
+    "duplicates": 0
+  },
+  {
+    "series": "60454",
+    "start_day": "2025-10-25",
+    "end_day": "2025-10-27",
+    "vintage": "latest_observations",
+    "raw_rows": 317,
+    "raw_timezone": "UTC",
+    "raw_start": "2025-10-24 19:00:00+00:00",
+    "raw_end": "2025-10-28 02:00:00+00:00",
+    "step_seconds": {
+      "900.0": 316
+    },
+    "minutes": [
+      0,
+      15,
+      30,
+      45
+    ],
+    "nulls": 0,
+    "duplicates": 0
+  },
+  {
+    "series": "60453",
+    "start_day": "2025-10-25",
+    "end_day": "2025-10-27",
+    "vintage": "latest_observations",
+    "raw_rows": 317,
+    "raw_timezone": "UTC",
+    "raw_start": "2025-10-24 19:00:00+00:00",
+    "raw_end": "2025-10-28 02:00:00+00:00",
+    "step_seconds": {
+      "900.0": 316
+    },
+    "minutes": [
+      0,
+      15,
+      30,
+      45
+    ],
+    "nulls": 0,
+    "duplicates": 0
+  }
+]

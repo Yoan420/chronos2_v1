@@ -1,0 +1,603 @@
+{
+  "data_description": {
+    "caption": "Table 1. Descriptive statistics of the evaluated hourly price series",
+    "headers": [
+      "Zone",
+      "Mean",
+      "SD",
+      "Minimum",
+      "Median",
+      "Maximum",
+      "Negative hours"
+    ],
+    "rows": [
+      [
+        "BE",
+        "97.51",
+        "56.95",
+        "-497.90",
+        "97.23",
+        "933.28",
+        "330"
+      ],
+      [
+        "DE",
+        "101.58",
+        "59.81",
+        "-499.00",
+        "102.09",
+        "697.31",
+        "527"
+      ],
+      [
+        "FR",
+        "72.47",
+        "57.04",
+        "-496.86",
+        "74.09",
+        "338.86",
+        "577"
+      ],
+      [
+        "NL",
+        "100.10",
+        "57.58",
+        "-498.44",
+        "99.83",
+        "799.36",
+        "439"
+      ]
+    ],
+    "widths": [
+      0.5,
+      0.8,
+      0.8,
+      0.9,
+      0.85,
+      0.9,
+      1.15
+    ],
+    "note": "Prices are in EUR/MWh; sample standard deviation. Each country has 8,760 observations over 365 delivery days. Negative hours have an observed price below zero."
+  },
+  "inputs": {
+    "caption": "Table 2. Evaluated inputs and their declared information timing",
+    "headers": [
+      "Variable group",
+      "Unit",
+      "Use and timing"
+    ],
+    "rows": [
+      [
+        "Country day-ahead prices",
+        "EUR/MWh",
+        "Historical hourly target; context through the end of D−1. Publication vintages are not independently certified."
+      ],
+      [
+        "Residual-load forecasts for FR, DE, BE, NL and ES",
+        "GW",
+        "Five forecast channels, in historical context and future covariates; reconstructed D−1 08:00 cutoff."
+      ],
+      [
+        "French nuclear-generation forecast",
+        "GW",
+        "Sixth forecast channel for every target country; same reconstructed cutoff."
+      ],
+      [
+        "Calendar variables",
+        "Unitless",
+        "Deterministic hourly and calendar information."
+      ],
+      [
+        "Storm reporting composite",
+        "EUR/MWh",
+        "External comparator only; cached forecasts plus recomputed missing periods."
+      ]
+    ],
+    "widths": [
+      1.65,
+      0.8,
+      4.25
+    ],
+    "note": "No realized future fundamentals or Storm forecasts are intended as NYX inputs. The as-of metadata reflect the implemented query protocol, not verified provider publication timestamps."
+  },
+  "configuration": {
+    "caption": "Table 3. Effective settings of the evaluated pipeline",
+    "headers": [
+      "Stage",
+      "Setting",
+      "Value"
+    ],
+    "rows": [
+      [
+        "Chronos-2",
+        "Foundation weights; context",
+        "Frozen pinned checkpoint; 2,048 physical hours"
+      ],
+      [
+        "Chronos-2",
+        "Output; task interaction",
+        "Nine deciles requested; q10/q50/q90 retained; cross_learning=False"
+      ],
+      [
+        "CatBoost residual",
+        "Loss; daily fitting window",
+        "MAE; previous 365 civil days; minimum 720 rows"
+      ],
+      [
+        "CatBoost residual",
+        "Iterations; depth; learning rate",
+        "700; 6; 0.03"
+      ],
+      [
+        "CatBoost residual",
+        "L2; random seed; time order",
+        "15; 42; has_time=True"
+      ],
+      [
+        "CatBoost residual",
+        "Shift bound",
+        "±40 EUR/MWh, applied equally to each quantile"
+      ],
+      [
+        "Governed filter",
+        "Replay; candidates",
+        "Previous 365 civil days; five candidates"
+      ],
+      [
+        "Governed filter",
+        "Selection history; weight grid",
+        "At most 60 days; minimum 14; weights 0 to 1 by 0.05"
+      ],
+      [
+        "Governed filter",
+        "Required improvement; raw cap",
+        "max(0.05 EUR/MWh, 0.5% of upstream MAE); ±20 EUR/MWh"
+      ]
+    ],
+    "widths": [
+      1.05,
+      2.05,
+      3.6
+    ],
+    "note": "There is no LoRA or foundation-model fine-tuning. Appendix B specifies filter dynamics. Settings are reported as executed, without treating unused configuration entries as active hyperparameters."
+  },
+  "annual_stages": {
+    "caption": "Table 4. Annual MAE across the retained NYX stages",
+    "headers": [
+      "Zone",
+      "Chronos-2",
+      "After CatBoost",
+      "NYX",
+      "MAE reduction (%)"
+    ],
+    "rows": [
+      [
+        "BE",
+        "12.029",
+        "11.264",
+        "11.165",
+        "7.18"
+      ],
+      [
+        "DE",
+        "12.390",
+        "11.209",
+        "11.120",
+        "10.25"
+      ],
+      [
+        "FR",
+        "12.977",
+        "12.234",
+        "12.087",
+        "6.86"
+      ],
+      [
+        "NL",
+        "12.297",
+        "11.219",
+        "11.172",
+        "9.15"
+      ],
+      [
+        "POOLED",
+        "12.423",
+        "11.482",
+        "11.386",
+        "8.35"
+      ]
+    ],
+    "widths": [
+      0.7,
+      1.35,
+      1.45,
+      1.25,
+      1.55
+    ],
+    "note": "MAE in EUR/MWh. All three stages use the same 8,759 hours per country as Table 5. Reduction is relative to the Chronos-2 stage. Pooled n = 35,036."
+  },
+  "annual_benchmark": {
+    "caption": "Table 5. Annual NYX and Storm reporting-composite performance",
+    "headers": [
+      "Zone",
+      "NYX MAE",
+      "Storm MAE",
+      "NYX RMSE",
+      "Storm RMSE",
+      "NYX bias",
+      "Storm bias"
+    ],
+    "rows": [
+      [
+        "BE",
+        "11.165",
+        "10.936",
+        "23.824",
+        "23.499",
+        "-1.048",
+        "-2.819"
+      ],
+      [
+        "DE",
+        "11.120",
+        "11.444",
+        "22.071",
+        "20.174",
+        "-0.712",
+        "-1.798"
+      ],
+      [
+        "FR",
+        "12.087",
+        "11.857",
+        "19.060",
+        "18.501",
+        "-0.088",
+        "-1.915"
+      ],
+      [
+        "NL",
+        "11.172",
+        "11.000",
+        "22.486",
+        "20.594",
+        "-0.757",
+        "-1.775"
+      ],
+      [
+        "Pooled",
+        "11.386",
+        "11.309",
+        "21.929",
+        "20.770",
+        "-0.652",
+        "-2.077"
+      ]
+    ],
+    "widths": [
+      0.64,
+      1.01,
+      1.01,
+      1.01,
+      1.01,
+      1.01,
+      1.01
+    ],
+    "note": "All errors in EUR/MWh on 35,036 paired observations. Bias = forecast − observation. Storm includes recomputed fallback hours; Table 9 checks sensitivity to their exclusion."
+  },
+  "extremes": {
+    "caption": "Table 6. NYX errors within realized extreme-price regimes",
+    "headers": [
+      "Zone",
+      "Realized regime",
+      "Hours",
+      "MAE",
+      "Bias",
+      "Coverage (%)"
+    ],
+    "rows": [
+      [
+        "BE",
+        "Negative",
+        "330",
+        "17.79",
+        "4.80",
+        "85.15"
+      ],
+      [
+        "BE",
+        "Above initial q99",
+        "388",
+        "39.81",
+        "-26.44",
+        "61.34"
+      ],
+      [
+        "DE",
+        "Negative",
+        "527",
+        "13.81",
+        "4.13",
+        "88.99"
+      ],
+      [
+        "DE",
+        "Above initial q99",
+        "104",
+        "102.26",
+        "-87.46",
+        "33.65"
+      ],
+      [
+        "FR",
+        "Negative",
+        "577",
+        "13.36",
+        "2.55",
+        "85.44"
+      ],
+      [
+        "FR",
+        "Above initial q99",
+        "626",
+        "14.96",
+        "-7.15",
+        "70.61"
+      ],
+      [
+        "NL",
+        "Negative",
+        "439",
+        "15.64",
+        "3.79",
+        "87.47"
+      ],
+      [
+        "NL",
+        "Above initial q99",
+        "155",
+        "73.23",
+        "-55.05",
+        "52.26"
+      ]
+    ],
+    "widths": [
+      0.5,
+      1.7,
+      0.7,
+      1.05,
+      1.05,
+      1.5
+    ],
+    "note": "Errors in EUR/MWh. Negative: y < 0. High: y exceeds its country-specific initial-sample q99, held fixed thereafter. P10–P90 coverage is conditional on the realized regime and is not a stand-alone test of conditional calibration."
+  },
+  "intervals": {
+    "caption": "Table 7. Annual NYX interval evaluation",
+    "headers": [
+      "Zone",
+      "Coverage (%)",
+      "Mean width",
+      "Mean IS80",
+      "Mean WIS80"
+    ],
+    "rows": [
+      [
+        "BE",
+        "74.46",
+        "30.68",
+        "58.45",
+        "7.619"
+      ],
+      [
+        "DE",
+        "74.34",
+        "30.98",
+        "58.79",
+        "7.625"
+      ],
+      [
+        "FR",
+        "72.99",
+        "33.28",
+        "60.17",
+        "8.040"
+      ],
+      [
+        "NL",
+        "75.87",
+        "31.69",
+        "58.29",
+        "7.610"
+      ]
+    ],
+    "widths": [
+      0.7,
+      1.5,
+      1.5,
+      1.5,
+      1.5
+    ],
+    "note": "Coverage target: 80%; n = 8,760 per country. Width and scores are in EUR/MWh. WIS80 includes one interval plus the median and is not a complete-distribution score."
+  },
+  "residual_test": {
+    "caption": "Table 8. Validation-selected residual configurations on the reserved 90 days",
+    "headers": [
+      "Model and selected setting",
+      "Validation MAE",
+      "Test MAE",
+      "Test RMSE",
+      "Test bias",
+      "ΔMAE [95% interval]"
+    ],
+    "rows": [
+      [
+        "NYX (identity)",
+        "12.315",
+        "14.191",
+        "30.196",
+        "-1.852",
+        "0 (reference)"
+      ],
+      [
+        "EWMA country (28 d)",
+        "12.411",
+        "14.224",
+        "30.218",
+        "-0.195",
+        "+0.032\n[−0.111, +0.192]"
+      ],
+      [
+        "EWMA country × hour (28 d)",
+        "12.654",
+        "14.463",
+        "30.262",
+        "-0.194",
+        "+0.271\n[+0.107, +0.474]"
+      ],
+      [
+        "Univariate ridge (α = 100)",
+        "12.426",
+        "14.486",
+        "30.185",
+        "-1.263",
+        "+0.295\n[+0.140, +0.482]"
+      ],
+      [
+        "Multivariate ridge (α = 100)",
+        "12.691",
+        "14.659",
+        "30.399",
+        "-0.657",
+        "+0.467\n[+0.219, +0.741]"
+      ],
+      [
+        "PCA ridge (rank 1, α = 100)",
+        "12.494",
+        "14.366",
+        "30.139",
+        "-1.090",
+        "+0.175\n[+0.026, +0.351]"
+      ],
+      [
+        "Storm reporting composite",
+        "—",
+        "12.758",
+        "27.575",
+        "-4.046",
+        "−1.433\n[−3.618, +0.199]"
+      ]
+    ],
+    "widths": [
+      1.7,
+      0.85,
+      0.82,
+      0.85,
+      0.78,
+      1.6
+    ],
+    "note": "n = 8,640 country–hours in the reserved segment. Errors in EUR/MWh; positive ΔMAE means worse than NYX. Validation uses frozen labels; test uses refreshed labels. Paired moving-block intervals use 2,000 replicates and seven-day blocks. Storm is not part of residual-model selection."
+  },
+  "provenance_sensitivity": {
+    "caption": "Table 9. Pooled MAE sensitivity to source provenance",
+    "headers": [
+      "Period",
+      "Included support",
+      "Pairs",
+      "NYX MAE",
+      "Storm MAE"
+    ],
+    "rows": [
+      [
+        "Annual",
+        "All common hours",
+        "35,036",
+        "11.386",
+        "11.309"
+      ],
+      [
+        "Annual",
+        "Exclude Storm recomputation",
+        "33,068",
+        "11.213",
+        "11.056"
+      ],
+      [
+        "Annual",
+        "Also exclude EPEX label fallback",
+        "32,996",
+        "11.196",
+        "11.030"
+      ],
+      [
+        "Reserved 90 d",
+        "All common hours",
+        "8,640",
+        "14.191",
+        "12.758"
+      ],
+      [
+        "Reserved 90 d",
+        "Exclude Storm recomputation",
+        "8,208",
+        "14.013",
+        "12.490"
+      ],
+      [
+        "Reserved 90 d",
+        "Also exclude EPEX label fallback",
+        "8,136",
+        "13.972",
+        "12.396"
+      ]
+    ],
+    "widths": [
+      1.1,
+      2.3,
+      1,
+      1.15,
+      1.05
+    ],
+    "note": "Errors in EUR/MWh. Samples are matched within each row and weighted by country–hour. Excluding fallback values does not independently certify the remaining source vintages."
+  },
+  "filters": {
+    "caption": "Table 10. Candidate additive corrections relative to the upstream median",
+    "headers": [
+      "Candidate",
+      "State size",
+      "Proposed correction"
+    ],
+    "rows": [
+      [
+        "Linear bias",
+        "1",
+        "MATH:b_0"
+      ],
+      [
+        "Linear harmonic",
+        "3",
+        "MATH:b_0+a_s\\sin(2\\pi h/24)+a_c\\cos(2\\pi h/24)"
+      ],
+      [
+        "Linear market",
+        "14",
+        "Linear combination of intercept, hour sine/cosine and 11 standardized market inputs"
+      ],
+      [
+        "Linear scale",
+        "2",
+        "MATH:b_0+(s-1)a,\\quad 0.5\\leq s\\leq1.5"
+      ],
+      [
+        "Unscented scale",
+        "2",
+        "MATH:b_0+(s(u)-1)a,\\quad s(u)=0.5+(1+e^{-u})^{-1}"
+      ]
+    ],
+    "widths": [
+      1.2,
+      0.8,
+      4.7
+    ],
+    "note": "The 11 market inputs are upstream median, interval width, CatBoost shift, five residual-load forecasts, their mean and range, and the French nuclear forecast. Symbols in this table describe candidate states; the final bounded weighted shift is b in Equation (11)."
+  }
+}

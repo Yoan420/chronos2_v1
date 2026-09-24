@@ -1,0 +1,70 @@
+{
+  "portable_scripts_executed_successfully": true,
+  "workspace_modes_tested": [
+    "--workspace",
+    "NYX_WORKSPACE"
+  ],
+  "no_training_or_source_writes": true,
+  "csv_comparisons": [
+    {
+      "file": "source_fallback_counts.csv",
+      "rows": 4,
+      "columns": 14,
+      "parsed_table_exactly_equal": true,
+      "max_abs_numeric_difference": 0.0
+    },
+    {
+      "file": "stage_paired_block_bootstrap.csv",
+      "rows": 56,
+      "columns": 14,
+      "parsed_table_exactly_equal": true,
+      "max_abs_numeric_difference": 0.0
+    },
+    {
+      "file": "storm_provenance_sensitivity.csv",
+      "rows": 80,
+      "columns": 9,
+      "parsed_table_exactly_equal": true,
+      "max_abs_numeric_difference": 0.0
+    },
+    {
+      "file": "verified_interval_metrics.csv",
+      "rows": 5,
+      "columns": 8,
+      "parsed_table_exactly_equal": true,
+      "max_abs_numeric_difference": 0.0
+    },
+    {
+      "file": "verified_residual_test_metrics.csv",
+      "rows": 70,
+      "columns": 17,
+      "parsed_table_exactly_equal": true,
+      "max_abs_numeric_difference": 0.0
+    },
+    {
+      "file": "verified_stage_metrics.csv",
+      "rows": 140,
+      "columns": 8,
+      "parsed_table_exactly_equal": true,
+      "max_abs_numeric_difference": 0.0
+    },
+    {
+      "file": "weekly_naive_matched_metrics.csv",
+      "rows": 90,
+      "columns": 11,
+      "parsed_table_exactly_equal": true,
+      "max_abs_numeric_difference": 0.0
+    },
+    {
+      "file": "weekly_naive_paired_bootstrap.csv",
+      "rows": 35,
+      "columns": 14,
+      "parsed_table_exactly_equal": true,
+      "max_abs_numeric_difference": 0.0
+    }
+  ],
+  "saved_residual_scores_max_abs_difference": 7.105427357601002e-15,
+  "saved_residual_bootstrap_max_abs_difference": 1.7676832220203664e-14,
+  "bundle_and_input_hash_checks_passed": true,
+  "packaged_raw_matrices_or_model_weights": false
+}

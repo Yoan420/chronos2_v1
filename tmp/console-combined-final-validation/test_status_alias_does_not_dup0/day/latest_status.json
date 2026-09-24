@@ -1,0 +1,1 @@
+{"status": "running", "run_id": "original", "started_at_utc": "2026-09-01T10:00:00Z", "steps": [{"name": "sources", "status": "complete"}, {"name": "nuclear_kalman", "zone": "DE", "status": "running"}], "status_file": "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-combined-final-validation\\test_status_alias_does_not_dup0\\day\\original\\status.json"}

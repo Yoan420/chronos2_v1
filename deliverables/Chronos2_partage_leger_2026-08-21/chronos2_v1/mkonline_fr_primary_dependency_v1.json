@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "audited_at_local": "2026-08-12T17:52:00+02:00",
+  "read_only_audit": true,
+  "saturn_url": "https://saturn-energyscan.gem.myengie.com//api",
+  "wrapper_series": "power.price.fr.euromwh.h.fcst.mkonline.ecop",
+  "wrapper_type": "formula",
+  "wrapper_formula": "(series \"41551_native\")",
+  "wrapper_formula_sha256": "8f7f8e638c8ae840bfa72c537772874134ff029548b7658f09effa476d927d1d",
+  "expanded_formula_sha256": "b00a9d060a68ea866077c6a9ea7fe122f4f5e956954d6f620e7bc3764c0a7e10",
+  "formula_components_sha256": "111c1444855b9d14c2c9e94d88b62a3a173090001790875f7c2e352df7dc0572",
+  "terminal_series": "41551_native",
+  "terminal_type": "primary",
+  "terminal_formula": null,
+  "terminal_formula_response_sha256": "38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed",
+  "terminal_metadata_response_sha256": "8d6675882405ad49055ae190d95070daf6a648d7b33ef04486a2be3871317701",
+  "terminal_metadata": {
+    "mercure:label": "FR_EC00_OP_HOURLY_INSTANTPRICE_FORECAST",
+    "mercure:source": "WATTSIGHT",
+    "mercure:provider": "MKONLINE",
+    "mercure:country": "FRANCE",
+    "mercure:description": "Instant spot price forecast: France: EC00 Op"
+  },
+  "storm_token_found": false,
+  "dependency_gate_passed": true,
+  "historical_query_contract": "Saturn state requested with revision_date equal to the civil D-1 08:00 Europe/Paris cutoff",
+  "revision_marker_semantics": "The materialized snapshot_time_utc and revision_time_utc record the explicit as-of query cutoff, not the provider insertion timestamp.",
+  "commercial_entitlement_status": "UNCONFIRMED: MKOnline/WattSight entitlement and replacement rights must be confirmed before production use.",
+  "source_audit": "runs/tmp/saturn_fr_price_nonstorm/formula_dependency_audit.json"
+}

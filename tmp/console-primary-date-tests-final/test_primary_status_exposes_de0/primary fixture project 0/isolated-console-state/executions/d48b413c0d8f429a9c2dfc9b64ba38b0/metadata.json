@@ -1,0 +1,79 @@
+{
+  "command": [
+    "C:\\Users\\BQ6757\\venvs\\pricefm311\\Scripts\\python.exe",
+    "-u",
+    "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-primary-date-tests-final\\test_primary_status_exposes_de0\\primary fixture project 0\\explicit_primary_process_fixture.py",
+    "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-primary-date-tests-final\\test_primary_status_exposes_de0\\primary fixture project 0\\isolated-console-state\\executions\\d48b413c0d8f429a9c2dfc9b64ba38b0\\fixture-results",
+    "success"
+  ],
+  "cwd": "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-primary-date-tests-final\\test_primary_status_exposes_de0\\primary fixture project 0",
+  "output_dir": "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-primary-date-tests-final\\test_primary_status_exposes_de0\\primary fixture project 0\\isolated-console-state\\executions\\d48b413c0d8f429a9c2dfc9b64ba38b0\\fixture-results",
+  "config": {
+    "delivery_day": "2026-09-12",
+    "countries": [
+      "BE",
+      "DE",
+      "FR",
+      "NL"
+    ],
+    "device": "auto",
+    "threads": 4,
+    "workers": 4,
+    "sync_enabled": true,
+    "attribution_enabled": false
+  },
+  "config_path": "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-primary-date-tests-final\\test_primary_status_exposes_de0\\primary fixture project 0\\isolated-console-state\\executions\\d48b413c0d8f429a9c2dfc9b64ba38b0\\config.json",
+  "primary_defaults": {
+    "delivery_day": "2026-09-12",
+    "countries": [
+      "BE",
+      "DE",
+      "FR",
+      "NL"
+    ],
+    "device": "auto",
+    "threads": 4,
+    "workers": 4,
+    "sync_enabled": true,
+    "attribution_enabled": false
+  },
+  "delivery_day": "2026-09-12",
+  "type": "fixture",
+  "model": "explicit-primary-fixture",
+  "resource_keys": [
+    "canonical-publications",
+    "nyx-primary-pipeline",
+    "scientific-cache"
+  ],
+  "warnings": [
+    "Explicit primary process fixture; no scientific results."
+  ],
+  "id": "d48b413c0d8f429a9c2dfc9b64ba38b0",
+  "adapter_id": "primary_nuclear_kalman",
+  "source": "managed",
+  "source_key": "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-primary-date-tests-final\\test_primary_status_exposes_de0\\primary fixture project 0\\isolated-console-state\\executions\\d48b413c0d8f429a9c2dfc9b64ba38b0",
+  "run_dir": "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-primary-date-tests-final\\test_primary_status_exposes_de0\\primary fixture project 0\\isolated-console-state\\executions\\d48b413c0d8f429a9c2dfc9b64ba38b0",
+  "created_at": "2026-09-11T13:50:16.936357+00:00",
+  "request": {
+    "adapter_id": "primary_nuclear_kalman"
+  },
+  "name": "NYX · Nuclear Kalman",
+  "description": "NuclearKalman.ps1 avec ses paramètres scientifiques par défaut et -NoOpen.",
+  "python_executable": "C:\\Users\\BQ6757\\venvs\\pricefm311\\Scripts\\python.exe",
+  "status": "queued",
+  "started_at": null,
+  "finished_at": null,
+  "duration_seconds": null,
+  "return_code": null,
+  "cancel_requested": false,
+  "tags": [],
+  "note": "",
+  "activity": "En attente des ressources scientifiques",
+  "git": {
+    "commit": "900d8fc36a5f7d44e91f895786e49e4ed7614086",
+    "dirty_tracked_files": true
+  },
+  "log_paths": [
+    "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-primary-date-tests-final\\test_primary_status_exposes_de0\\primary fixture project 0\\isolated-console-state\\executions\\d48b413c0d8f429a9c2dfc9b64ba38b0\\console.log"
+  ]
+}

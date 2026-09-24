@@ -1,0 +1,122 @@
+[
+  {
+    "series": "power.stp.wind_production.be.mw.qh.fcst.cet.meteologica",
+    "kind": "formula",
+    "source": "power",
+    "metadata_http_status": 200,
+    "metadata": {
+      "tzaware": false,
+      "index_type": "datetime64[ns]",
+      "value_type": "float64",
+      "index_dtype": "<M8[ns]",
+      "value_dtype": "<f8"
+    },
+    "formula_http_status": 200,
+    "formula": "(naive (resample (series \"38840\") \"15min\" #:method \"ffill\") \"UTC\")"
+  },
+  {
+    "series": "power.stp.wind_production.de.mw.qh.fcst.cet.meteologica",
+    "kind": "formula",
+    "source": "power",
+    "metadata_http_status": 200,
+    "metadata": {
+      "tzaware": false,
+      "index_type": "datetime64[ns]",
+      "value_type": "float64",
+      "index_dtype": "<M8[ns]",
+      "value_dtype": "<f8"
+    },
+    "formula_http_status": 200,
+    "formula": "(naive (resample (series \"28217\") \"15min\" #:method \"ffill\") \"UTC\")"
+  },
+  {
+    "series": "power.stp.wind_production.fr.mw.qh.fcst.cet.meteologica",
+    "kind": "formula",
+    "source": "power",
+    "metadata_http_status": 200,
+    "metadata": {
+      "tzaware": false,
+      "index_type": "datetime64[ns]",
+      "value_type": "float64",
+      "index_dtype": "<M8[ns]",
+      "value_dtype": "<f8"
+    },
+    "formula_http_status": 200,
+    "formula": "(naive (resample (series \"28211\") \"15min\" #:method \"ffill\") \"UTC\")"
+  },
+  {
+    "series": "power.stp.wind_production.nl.mw.qh.fcst.cet.meteologica",
+    "kind": "formula",
+    "source": "power",
+    "metadata_http_status": 200,
+    "metadata": {
+      "tzaware": false,
+      "index_type": "datetime64[ns]",
+      "value_type": "float64",
+      "index_dtype": "<M8[ns]",
+      "value_dtype": "<f8"
+    },
+    "formula_http_status": 200,
+    "formula": "(naive (resample (series \"28226\") \"15min\" #:method \"ffill\") \"UTC\")"
+  },
+  {
+    "series": "power.stp.da_solar_production.be.mw.qh.fcst.elia",
+    "kind": "formula",
+    "source": "power",
+    "metadata_http_status": 200,
+    "metadata": {
+      "tzaware": true,
+      "index_type": "datetime64[ns, UTC]",
+      "value_type": "float64",
+      "index_dtype": "|M8[ns]",
+      "value_dtype": "<f8"
+    },
+    "formula_http_status": 200,
+    "formula": "(resample (series \"23259\") \"15min\" #:method \"ffill\")"
+  },
+  {
+    "series": "power.stp.da_total_load.be.mw.qh.fcst.cet.elia",
+    "kind": "formula",
+    "source": "power",
+    "metadata_http_status": 200,
+    "metadata": {
+      "tzaware": false,
+      "index_type": "datetime64[ns]",
+      "value_type": "float64",
+      "index_dtype": "<M8[ns]",
+      "value_dtype": "<f8"
+    },
+    "formula_http_status": 200,
+    "formula": "(resample (series \"38100\") \"15min\" #:method \"ffill\")"
+  },
+  {
+    "series": "power.stp.da_total_load.nl.mw.qh.fcst.cet.entsoe",
+    "kind": "formula",
+    "source": "power",
+    "metadata_http_status": 200,
+    "metadata": {
+      "tzaware": false,
+      "index_type": "datetime64[ns]",
+      "value_type": "float64",
+      "index_dtype": "<M8[ns]",
+      "value_dtype": "<f8"
+    },
+    "formula_http_status": 200,
+    "formula": "(resample (series \"41271\") \"15min\" #:method \"ffill\")"
+  },
+  {
+    "series": "power.fr.demand.peak.gw.fcst.quarter.hourly",
+    "kind": "formula",
+    "source": "energyscan",
+    "metadata_http_status": 200,
+    "metadata": {
+      "tzaware": false,
+      "index_type": "datetime64[ns]",
+      "value_type": "float64",
+      "index_dtype": "<M8[ns]",
+      "value_dtype": "<f8"
+    },
+    "formula_http_status": 200,
+    "formula": "(* 0.001 (series \"20747\"))"
+  }
+]

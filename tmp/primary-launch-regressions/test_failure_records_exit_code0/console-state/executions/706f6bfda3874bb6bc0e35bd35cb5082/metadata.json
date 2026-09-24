@@ -1,0 +1,52 @@
+{
+  "command": [
+    "C:\\Users\\BQ6757\\venvs\\pricefm311\\Scripts\\python.exe",
+    "-u",
+    "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\primary-launch-regressions\\test_failure_records_exit_code0\\explicit test fixture ; $literal.py",
+    "fail",
+    "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\primary-launch-regressions\\test_failure_records_exit_code0\\console-state\\executions\\706f6bfda3874bb6bc0e35bd35cb5082\\results",
+    "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\primary-launch-regressions\\test_failure_records_exit_code0\\never-released"
+  ],
+  "cwd": "C:\\Users\\BQ6757\\chronos2_v1",
+  "output_dir": "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\primary-launch-regressions\\test_failure_records_exit_code0\\console-state\\executions\\706f6bfda3874bb6bc0e35bd35cb5082\\results",
+  "config": {
+    "fixture": true,
+    "mode": "fail",
+    "resource": null
+  },
+  "type": "fixture",
+  "model": "explicit-test-fixture",
+  "resource_keys": [],
+  "warnings": [
+    "Explicit test fixture; contains no real scientific results."
+  ],
+  "id": "706f6bfda3874bb6bc0e35bd35cb5082",
+  "run_dir": "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\primary-launch-regressions\\test_failure_records_exit_code0\\console-state\\executions\\706f6bfda3874bb6bc0e35bd35cb5082",
+  "created_at": "2026-09-11T12:38:38.301785+00:00",
+  "request": {
+    "type": "fixture",
+    "name": "Explicit process test",
+    "mode": "fail"
+  },
+  "name": "Explicit process test",
+  "description": "",
+  "python_executable": "C:\\Users\\BQ6757\\venvs\\pricefm311\\Scripts\\python.exe",
+  "source": "managed",
+  "source_key": "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\primary-launch-regressions\\test_failure_records_exit_code0\\console-state\\executions\\706f6bfda3874bb6bc0e35bd35cb5082",
+  "status": "queued",
+  "started_at": null,
+  "finished_at": null,
+  "duration_seconds": null,
+  "return_code": null,
+  "cancel_requested": false,
+  "tags": [],
+  "note": "",
+  "activity": "En attente d’une place ou d’une ressource",
+  "git": {
+    "commit": "900d8fc36a5f7d44e91f895786e49e4ed7614086",
+    "dirty_tracked_files": true
+  },
+  "log_paths": [
+    "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\primary-launch-regressions\\test_failure_records_exit_code0\\console-state\\executions\\706f6bfda3874bb6bc0e35bd35cb5082\\console.log"
+  ]
+}

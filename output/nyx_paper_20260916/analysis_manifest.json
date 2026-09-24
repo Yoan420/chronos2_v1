@@ -1,0 +1,21 @@
+{
+  "source_matrix_sha256": "0548b72b6fadcb700d1b863db93fd95d0076670fb5e11bf4ad1c1fe1413a1188",
+  "source_manifest_sha256": "b2786542406944125ff9a006cada018f06c3eb37da813c77e054edb33fee73c1",
+  "rows": 35040,
+  "countries": [
+    "BE",
+    "DE",
+    "FR",
+    "NL"
+  ],
+  "analysis_date": "2026-09-16",
+  "matplotlib": "3.11.2",
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "figures": [
+    "figure1_design.png",
+    "figure2_monthly_mae.png",
+    "figure3_interval_coverage.png",
+    "figure4_residual_dependence.png",
+    "figure5_test_uncertainty.png"
+  ]
+}

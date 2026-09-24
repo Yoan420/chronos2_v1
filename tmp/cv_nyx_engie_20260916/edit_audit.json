@@ -1,0 +1,17 @@
+{
+  "source_sha256": "4763d10026b0566282007a5b5705886022db45e0d62a69aa65441b70a8b7fd60",
+  "source_preserved": true,
+  "changed_part": "word/document.xml",
+  "changed_original_paragraphs": [
+    7,
+    20,
+    21
+  ],
+  "moved_paragraphs_under_engie": [
+    9,
+    10
+  ],
+  "removed_duplicate_generic_bullet": 22,
+  "manual_user_edits_preserved": true,
+  "output": "C:\\Users\\BQ6757\\chronos2_v1\\output\\cv_nyx_engie_20260916\\Yoan_Kesraoui_CV_These_SODA_NYX.docx"
+}

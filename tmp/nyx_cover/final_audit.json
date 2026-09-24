@@ -1,0 +1,106 @@
+{
+  "source_hash": "ebbaff8d0bf7701a95159ec954261c7505569ade482210d95e9220dab1e5db8f",
+  "body_paragraphs_preserved": 545,
+  "math_objects_preserved": 115,
+  "tables_source": 10,
+  "tables_body_output": 10,
+  "all_original_media_preserved": true,
+  "sections": 3,
+  "pdf_pages": 24,
+  "contents_text": " \nContents \nAbstract .................................................................................................................................................................. 1 \nPractitioner summary ........................................................................................................................................... 1 \n1 Introduction ........................................................................................................................................................ 2 \n2 Data and methodology ....................................................................................................................................... 2 \n2.1 Forecast target and evaluation sample .......................................................................................................... 2 \n2.2 Input variables and information timing ......................................................................................................... 3 \n2.3 Mathematical formulation of the NYX pipeline ........................................................................................... 4 \n2.4 Comparators and additional residual models ................................................................................................ 9 \n2.5 Error measures and statistical uncertainty .................................................................................................. 11 \n3 Experimental results ........................................................................................................................................ 12 \n3.1 Point forecasting performance through August 2026 ................................................................................. 12 \n3.2 Extreme prices and interval reliability ........................................................................................................ 13 \n3.3 Residual dependence and further correction ............................................................................................... 15 \n3.4 Sensitivity to observation and comparator provenance .............................................................................. 16 \n4 Discussion .......................................................................................................................................................... 17 \n4.1 What the hybrid structure contributes ......................................................................................................... 17 \n4.2 Reliability and operational interpretation ................................................................................................... 17 \n4.3 Scope and threats to validity ....................................................................................................................... 18 \n5 Conclusion ......................................................................................................................................................... 19 \nAuthor declarations ............................................................................................................................................ 19 \nReferences ............................................................................................................................................................ 20 \nAppendix A Reproducibility details .................................................................................................................. 21 \nAppendix B State space candidates and numerical limitation ........................................................................ 21 \n \n",
+  "first_body_page_tail": "ces and hourly aggregates, including the period after \nthe transition to 15-minute market clearing. ",
+  "toc_verified_entries": [
+    {
+      "heading": "Abstract",
+      "page": 1
+    },
+    {
+      "heading": "Practitioner summary",
+      "page": 1
+    },
+    {
+      "heading": "1 Introduction",
+      "page": 2
+    },
+    {
+      "heading": "2 Data and methodology",
+      "page": 2
+    },
+    {
+      "heading": "2.1 Forecast target and evaluation sample",
+      "page": 2
+    },
+    {
+      "heading": "2.2 Input variables and information timing",
+      "page": 3
+    },
+    {
+      "heading": "2.3 Mathematical formulation of the NYX pipeline",
+      "page": 4
+    },
+    {
+      "heading": "2.4 Comparators and additional residual models",
+      "page": 9
+    },
+    {
+      "heading": "2.5 Error measures and statistical uncertainty",
+      "page": 11
+    },
+    {
+      "heading": "3 Experimental results",
+      "page": 12
+    },
+    {
+      "heading": "3.1 Point forecasting performance through August 2026",
+      "page": 12
+    },
+    {
+      "heading": "3.2 Extreme prices and interval reliability",
+      "page": 13
+    },
+    {
+      "heading": "3.3 Residual dependence and further correction",
+      "page": 15
+    },
+    {
+      "heading": "3.4 Sensitivity to observation and comparator provenance",
+      "page": 16
+    },
+    {
+      "heading": "4 Discussion",
+      "page": 17
+    },
+    {
+      "heading": "4.1 What the hybrid structure contributes",
+      "page": 17
+    },
+    {
+      "heading": "4.2 Reliability and operational interpretation",
+      "page": 17
+    },
+    {
+      "heading": "4.3 Scope and threats to validity",
+      "page": 18
+    },
+    {
+      "heading": "5 Conclusion",
+      "page": 19
+    },
+    {
+      "heading": "Author declarations",
+      "page": 19
+    },
+    {
+      "heading": "References",
+      "page": 20
+    },
+    {
+      "heading": "Appendix A Reproducibility details",
+      "page": 21
+    },
+    {
+      "heading": "Appendix B State space candidates and numerical limitation",
+      "page": 21
+    }
+  ]
+}

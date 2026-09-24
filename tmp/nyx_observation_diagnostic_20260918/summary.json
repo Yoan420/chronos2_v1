@@ -1,0 +1,78 @@
+[
+  {
+    "zone": "BE",
+    "extracted_at_utc": "2026-09-18T07:07:06.676157+00:00",
+    "canonical_source": "power.price.da.be.bzn.hourly.entsoe.utc.cdh.eurmwh",
+    "post_auction_source": "power.price.be.euromwh.h.obs.epex",
+    "canonical_last": "2026-09-18 21:00:00+00:00",
+    "post_auction_last": "2026-09-18 21:00:00+00:00",
+    "missing_canonical_hours": 24,
+    "fillable_hours": 0,
+    "missing_historical_hours": 0,
+    "current_canonical_hours": 0,
+    "current_post_auction_hours": 0,
+    "paired_hours": 216,
+    "max_difference": 7.142499999999984,
+    "divergent_hours": 24,
+    "divergent_days": [
+      "2026-09-13"
+    ]
+  },
+  {
+    "zone": "DE",
+    "extracted_at_utc": "2026-09-18T07:07:12.026801+00:00",
+    "canonical_source": "power.price.da.de_lu.bzn.hourly.entsoe.utc.cdh.eurmwh",
+    "post_auction_source": "power.price.de.euromwh.h.obs.epex",
+    "canonical_last": "2026-09-18 21:00:00+00:00",
+    "post_auction_last": "2026-09-18 21:00:00+00:00",
+    "missing_canonical_hours": 24,
+    "fillable_hours": 0,
+    "missing_historical_hours": 0,
+    "current_canonical_hours": 0,
+    "current_post_auction_hours": 0,
+    "paired_hours": 216,
+    "max_difference": 0.0049999999999954525,
+    "divergent_hours": 14,
+    "divergent_days": [
+      "2026-09-13"
+    ]
+  },
+  {
+    "zone": "FR",
+    "extracted_at_utc": "2026-09-18T07:07:17.250333+00:00",
+    "canonical_source": "power.price.da.fr.bzn.hourly.entsoe.utc.cdh.eurmwh",
+    "post_auction_source": "power.price.fr.euromwh.h.obs.epex",
+    "canonical_last": "2026-09-18 21:00:00+00:00",
+    "post_auction_last": "2026-09-18 21:00:00+00:00",
+    "missing_canonical_hours": 24,
+    "fillable_hours": 0,
+    "missing_historical_hours": 0,
+    "current_canonical_hours": 0,
+    "current_post_auction_hours": 0,
+    "paired_hours": 216,
+    "max_difference": 20.797500000000014,
+    "divergent_hours": 20,
+    "divergent_days": [
+      "2026-09-13"
+    ]
+  },
+  {
+    "zone": "NL",
+    "extracted_at_utc": "2026-09-18T07:07:22.194696+00:00",
+    "canonical_source": "power.price.da.nl.bzn.hourly.entsoe.utc.cdh.eurmwh",
+    "post_auction_source": "power.price.nl.euromwh.h.obs.epex",
+    "canonical_last": "2026-09-18 21:00:00+00:00",
+    "post_auction_last": "2026-09-18 21:00:00+00:00",
+    "missing_canonical_hours": 24,
+    "fillable_hours": 0,
+    "missing_historical_hours": 0,
+    "current_canonical_hours": 0,
+    "current_post_auction_hours": 0,
+    "paired_hours": 216,
+    "max_difference": 0.005000000000023874,
+    "divergent_hours": 14,
+    "divergent_days": [
+      "2026-09-13"
+    ]
+  }
+]

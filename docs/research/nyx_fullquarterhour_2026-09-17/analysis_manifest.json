@@ -1,0 +1,20 @@
+{
+  "provisional": true,
+  "source_protocol_identity": "6d9552cd7a066ec1617461b6c81569c65c9d3f13fe0079dc655fb90095fc3b4d",
+  "files": {
+    "analyze.py": "5166e578f981222abfb2d02e5f7d2b3a6be53aa7581acb1338458760f2902478",
+    "kalman_governance.json": "310f6d83afcbfcac6bb670339fa6edf08b7795f42d7491cd708b4e02a51e81e9",
+    "mae_by_country.png": "5ad83f225006acd435d99376aa02ef9b8ad9f3c0654a81346dd2cf85d2c122ff",
+    "mae_by_country.svg": "a5d65859a118f07b991fa61002c5f17098625d75aa83c0a2132c83e8099e3951",
+    "metrics.csv": "53f0ddf39a80765b354ae43d5501954198e4aaa28829d1c3d39c4c3c5bae1842",
+    "metrics.parquet": "0968a6448391b34404485fae60bf407d166aa75dc5d7a357b73917873eb7abe6",
+    "paired_deltas.csv": "08a27cf79822ef96ff279169c0e54f05d381d0ab2853ce01a82a473ed0c300d9",
+    "paired_deltas.parquet": "c02b4f29039793e11f260d344566f02815369ad9412171bdd9d255cc45547292",
+    "predictions.csv": "db6f5e055b19de61c56b4dc4fb4a73bcba9a7bbfd3dfd826041b370e1a309801",
+    "predictions.parquet": "7536b5641488768dbe4488e2936361f7de9739e4c9c52623aead8deed214d5c0",
+    "regime_checks.csv": "9434c1de333b4c38ef7dc6ed2c15a1481ef22c2fe5de0c8e0a946cf7f6930c5e",
+    "regime_checks.parquet": "bdd2150131c1a0b70b45d9b1429fb77526c0346dd234b54088bd7461da2a8c97",
+    "report.html": "be141ce30d1dbc1b1ded0abae93b4dc10652bf6fcc14996c10c5d9baacb172a0",
+    "summary.json": "09b6fbc2b2713becd572784435d11e23ddc925a34b6baed353b13de4cbffe101"
+  }
+}

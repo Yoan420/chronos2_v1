@@ -1,0 +1,210 @@
+{
+  "selection_label": "frozen_actual",
+  "selection_objective": "pooled paired MAE over all four zones, validation only",
+  "validation_days": [
+    "2026-03-15",
+    "2026-06-17"
+  ],
+  "locked_final_test_days": [
+    "2026-06-18",
+    "2026-09-15"
+  ],
+  "all_candidates": [
+    {
+      "spec": {
+        "family": "nyx"
+      },
+      "n": 9116,
+      "mae": 12.314574385815927,
+      "rmse": 23.89025075894756,
+      "bias": -0.4009773187555048
+    },
+    {
+      "spec": {
+        "family": "ewma_country",
+        "halflife": 7
+      },
+      "n": 9116,
+      "mae": 12.668125215828002,
+      "rmse": 24.080738624773822,
+      "bias": 0.2662338389562267
+    },
+    {
+      "spec": {
+        "family": "ewma_country",
+        "halflife": 28
+      },
+      "n": 9116,
+      "mae": 12.411051568240826,
+      "rmse": 23.944312732566143,
+      "bias": 0.05414102941084049
+    },
+    {
+      "spec": {
+        "family": "ewma_country_hour",
+        "halflife": 7
+      },
+      "n": 9116,
+      "mae": 13.234017834800564,
+      "rmse": 24.42586488274777,
+      "bias": 0.2687743035152266
+    },
+    {
+      "spec": {
+        "family": "ewma_country_hour",
+        "halflife": 28
+      },
+      "n": 9116,
+      "mae": 12.653820510481676,
+      "rmse": 24.034975449063367,
+      "bias": 0.056026542939058295
+    },
+    {
+      "spec": {
+        "family": "ridge_univariate",
+        "alpha": 10
+      },
+      "n": 9116,
+      "mae": 12.43466837645825,
+      "rmse": 23.9884143294111,
+      "bias": -0.36285066811949107
+    },
+    {
+      "spec": {
+        "family": "ridge_univariate",
+        "alpha": 100
+      },
+      "n": 9116,
+      "mae": 12.425765096769698,
+      "rmse": 23.980304844108105,
+      "bias": -0.36213040962771303
+    },
+    {
+      "spec": {
+        "family": "ridge_multivariate",
+        "alpha": 10
+      },
+      "n": 9116,
+      "mae": 12.752424508790119,
+      "rmse": 24.326204870213484,
+      "bias": -0.8542749741053293
+    },
+    {
+      "spec": {
+        "family": "ridge_multivariate",
+        "alpha": 100
+      },
+      "n": 9116,
+      "mae": 12.690869577108812,
+      "rmse": 24.27687893804291,
+      "bias": -0.6566231885701477
+    },
+    {
+      "spec": {
+        "family": "pca_ridge",
+        "rank": 1,
+        "alpha": 10
+      },
+      "n": 9116,
+      "mae": 12.507909921139397,
+      "rmse": 24.04770265599651,
+      "bias": -0.4090937513636354
+    },
+    {
+      "spec": {
+        "family": "pca_ridge",
+        "rank": 1,
+        "alpha": 100
+      },
+      "n": 9116,
+      "mae": 12.493781513918599,
+      "rmse": 24.03471067923247,
+      "bias": -0.40762496160741973
+    },
+    {
+      "spec": {
+        "family": "pca_ridge",
+        "rank": 2,
+        "alpha": 10
+      },
+      "n": 9116,
+      "mae": 12.521119319248738,
+      "rmse": 24.07407789840338,
+      "bias": -0.5606153050574346
+    },
+    {
+      "spec": {
+        "family": "pca_ridge",
+        "rank": 2,
+        "alpha": 100
+      },
+      "n": 9116,
+      "mae": 12.503612292276545,
+      "rmse": 24.057274106388306,
+      "bias": -0.5472145678472898
+    }
+  ],
+  "selected_per_family": {
+    "nyx": {
+      "spec": {
+        "family": "nyx"
+      },
+      "n": 9116,
+      "mae": 12.314574385815927,
+      "rmse": 23.89025075894756,
+      "bias": -0.4009773187555048
+    },
+    "ewma_country": {
+      "spec": {
+        "family": "ewma_country",
+        "halflife": 28
+      },
+      "n": 9116,
+      "mae": 12.411051568240826,
+      "rmse": 23.944312732566143,
+      "bias": 0.05414102941084049
+    },
+    "ewma_country_hour": {
+      "spec": {
+        "family": "ewma_country_hour",
+        "halflife": 28
+      },
+      "n": 9116,
+      "mae": 12.653820510481676,
+      "rmse": 24.034975449063367,
+      "bias": 0.056026542939058295
+    },
+    "ridge_univariate": {
+      "spec": {
+        "family": "ridge_univariate",
+        "alpha": 100
+      },
+      "n": 9116,
+      "mae": 12.425765096769698,
+      "rmse": 23.980304844108105,
+      "bias": -0.36213040962771303
+    },
+    "ridge_multivariate": {
+      "spec": {
+        "family": "ridge_multivariate",
+        "alpha": 100
+      },
+      "n": 9116,
+      "mae": 12.690869577108812,
+      "rmse": 24.27687893804291,
+      "bias": -0.6566231885701477
+    },
+    "pca_ridge": {
+      "spec": {
+        "family": "pca_ridge",
+        "rank": 1,
+        "alpha": 100
+      },
+      "n": 9116,
+      "mae": 12.493781513918599,
+      "rmse": 24.03471067923247,
+      "bias": -0.40762496160741973
+    }
+  },
+  "primary_family_selected_before_test": "nyx"
+}

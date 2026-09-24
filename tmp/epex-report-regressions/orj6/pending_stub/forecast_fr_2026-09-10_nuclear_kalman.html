@@ -1,0 +1,75 @@
+<html><main><section data-report-section="actual-price-reference"><p><strong>Prix réalisés et référence des scores : EPEX via Saturn.</strong> Les observations affichées et les métriques NYX/Storm utilisent les mêmes prix horaires du snapshot vérifié, y compris pour les dates historiques. Extraction du snapshot : 18/09/2026 14:50 CEST.</p></section><details data-report-section="nuclear-methodology"><summary>Variante nucléaire — méthode et traçabilité</summary><section data-report-section="nuclear-diagnostic" data-diagnostic-only="true" data-production="false"><h2>Variante nucléaire</h2><p>Variante intégrée au lancement Forecast; ses sorties restent distinctes des modèles historiques. Cette publication ne constitue pas à elle seule une validation prospective en production. Aucun entraînement n'est effectué par le rapport.</p><p>Scores FINAL365: 2025-09-10 au 2026-09-09, 8760 heures physiques observées. Le jour de livraison n'entre pas dans ces scores de backtest.</p><p>Warm-up: 365 jours de sorties du correcteur avant FINAL365; 365 jours de sorties Chronos-2 avant FINAL365. Le Kalman reçoit le correcteur nucléaire recalculé; son warm-up précède le FINAL365 et n'est pas inclus dans les scores affichés.</p><p>Statistics: 365 jours observés glissants, plus le jour de livraison s'il est encore sans observations; mêmes heures physiques et mêmes prix observés pour les deux variantes. Storm indisponible: aucune série ou statistique Storm n'est reconstruite.</p><p>DST: toute duplication de l'heure d'automne concerne uniquement la covariable nucléaire dérivée lorsque sa source l'exige; elle ne crée ni prix observé ni prévision supplémentaire. Les heures physiques distinctes restent identifiées en UTC. La traçabilité des vintages d'entrée reste soumise à l'audit source.</p><p>P10/P50/P90 sont conservés; les déciles intermédiaires et le CRPS du moteur de rapport sont une approximation linéaire d'affichage.</p><details><summary>Audit du rapport</summary><pre>{
+  &quot;schema_version&quot;: 1,
+  &quot;diagnostic_only&quot;: true,
+  &quot;production&quot;: false,
+  &quot;publication_mode&quot;: &quot;forecast_run&quot;,
+  &quot;report_variants&quot;: [
+    &quot;kalman&quot;
+  ],
+  &quot;zone&quot;: &quot;FR&quot;,
+  &quot;timezone&quot;: &quot;Europe/Paris&quot;,
+  &quot;delivery_day&quot;: &quot;2026-09-10&quot;,
+  &quot;evaluation_start_day&quot;: &quot;2025-09-10&quot;,
+  &quot;evaluation_end_day&quot;: &quot;2026-09-09&quot;,
+  &quot;evaluation_days&quot;: 365,
+  &quot;evaluation_hours&quot;: 8760,
+  &quot;same_actual_hours&quot;: true,
+  &quot;actual_price_reference&quot;: {
+    &quot;status&quot;: &quot;verified&quot;,
+    &quot;mode&quot;: &quot;latest_report_only_refresh&quot;,
+    &quot;compared_hours&quot;: 8784,
+    &quot;actual_reference&quot;: &quot;EPEX&quot;,
+    &quot;actual_reference_label&quot;: &quot;EPEX&quot;,
+    &quot;source_kind&quot;: &quot;saturn_epex_latest_extraction&quot;,
+    &quot;policy&quot;: &quot;epex_only_v1&quot;,
+    &quot;series&quot;: &quot;power.price.fr.euromwh.h.obs.epex&quot;,
+    &quot;extracted_at_utc&quot;: &quot;2026-09-18 12:50:52.060976+00:00&quot;,
+    &quot;artifact_sha256&quot;: &quot;cba82f009495b9d66e7a07418e8e1397c3a9a1459e1e6db4977e7f99cae68daf&quot;,
+    &quot;artifact_path&quot;: &quot;C:\\Users\\BQ6757\\chronos2_v1\\tmp\\epex-report-regressions\\orj6\\runs\\experiments\\nuclear_forecast_v1\\2026-09-10\\fr\\civil_pit_v2\\report_only\\sources\\20260918T125052060976Z_caeebb4c\\inputs\\observed_latest.parquet&quot;,
+    &quot;used_for_prediction&quot;: false,
+    &quot;calibration_inputs_modified&quot;: false
+  },
+  &quot;historical_observation_precision&quot;: {
+    &quot;mode&quot;: &quot;verified_latest_canonical_reporting_observations&quot;,
+    &quot;compared_hours&quot;: 8760,
+    &quot;changed_hours&quot;: 8760,
+    &quot;max_absolute_revision_eur_mwh&quot;: 50.999999998977735,
+    &quot;training_inputs_modified&quot;: false,
+    &quot;source&quot;: {
+      &quot;status&quot;: &quot;verified&quot;,
+      &quot;mode&quot;: &quot;latest_report_only_refresh&quot;,
+      &quot;compared_hours&quot;: 8784,
+      &quot;actual_reference&quot;: &quot;EPEX&quot;,
+      &quot;actual_reference_label&quot;: &quot;EPEX&quot;,
+      &quot;source_kind&quot;: &quot;saturn_epex_latest_extraction&quot;,
+      &quot;policy&quot;: &quot;epex_only_v1&quot;,
+      &quot;series&quot;: &quot;power.price.fr.euromwh.h.obs.epex&quot;,
+      &quot;extracted_at_utc&quot;: &quot;2026-09-18 12:50:52.060976+00:00&quot;,
+      &quot;artifact_sha256&quot;: &quot;cba82f009495b9d66e7a07418e8e1397c3a9a1459e1e6db4977e7f99cae68daf&quot;,
+      &quot;artifact_path&quot;: &quot;C:\\Users\\BQ6757\\chronos2_v1\\tmp\\epex-report-regressions\\orj6\\runs\\experiments\\nuclear_forecast_v1\\2026-09-10\\fr\\civil_pit_v2\\report_only\\sources\\20260918T125052060976Z_caeebb4c\\inputs\\observed_latest.parquet&quot;,
+      &quot;used_for_prediction&quot;: false,
+      &quot;calibration_inputs_modified&quot;: false
+    }
+  },
+  &quot;delivery_day_observed_hours&quot;: 0,
+  &quot;delivery_day_placeholder_hours&quot;: 24,
+  &quot;delivery_day_actual_reason&quot;: null,
+  &quot;delivery_day_actual_extracted_at_utc&quot;: &quot;2026-09-18 12:50:52.060976+00:00&quot;,
+  &quot;statistics_window&quot;: &quot;latest_365_observed_local_days_plus_unobserved_delivery_placeholder&quot;,
+  &quot;storm_status&quot;: &quot;unavailable_no_verified_comparator_loaded&quot;,
+  &quot;storm_hourly_comparison&quot;: {
+    &quot;status&quot;: &quot;unavailable&quot;
+  },
+  &quot;storm_used_as_input&quot;: false,
+  &quot;warmup&quot;: {
+    &quot;residual_days_before_final365&quot;: 365,
+    &quot;raw_days_before_final365&quot;: 365,
+    &quot;excluded_from_report_metrics&quot;: true
+  },
+  &quot;dst_policy&quot;: &quot;source-audited duplication of derived nuclear covariate only; UTC physical-hour pairing&quot;,
+  &quot;engine_audit&quot;: {
+    &quot;diagnostic_only&quot;: true,
+    &quot;production&quot;: false
+  },
+  &quot;source_audit&quot;: {}
+}</pre></details></section></details>Chronos-2 + nucl. + correcteur + Kalman<p>Prévision opérationnelle du jour</p></main></html>

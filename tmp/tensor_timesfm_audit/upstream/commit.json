@@ -1,0 +1,123 @@
+{
+  "sha": "130fd4787f268cbdd0d46ac5b840290b7c3440dc",
+  "node_id": "C_kwDOS_t-gNoAKDEzMGZkNDc4N2YyNjhjYmRkMGQ0NmFjNWI4NDAyOTBiN2MzNDQwZGM",
+  "commit": {
+    "author": {
+      "name": "Larry L Chen",
+      "email": "lc525@njit.edu",
+      "date": "2026-06-19T23:40:30Z"
+    },
+    "committer": {
+      "name": "Larry L Chen",
+      "email": "lc525@njit.edu",
+      "date": "2026-06-19T23:40:30Z"
+    },
+    "message": "Update README and add model architecture figure",
+    "tree": {
+      "sha": "bef877480d89b57a5fcf3669148a273cd5bedf39",
+      "url": "https://api.github.com/repos/LarryC01/Tensor-TimesFM-ECML-2026/git/trees/bef877480d89b57a5fcf3669148a273cd5bedf39"
+    },
+    "url": "https://api.github.com/repos/LarryC01/Tensor-TimesFM-ECML-2026/git/commits/130fd4787f268cbdd0d46ac5b840290b7c3440dc",
+    "comment_count": 0,
+    "verification": {
+      "verified": false,
+      "reason": "unsigned",
+      "signature": null,
+      "payload": null,
+      "verified_at": null
+    }
+  },
+  "url": "https://api.github.com/repos/LarryC01/Tensor-TimesFM-ECML-2026/commits/130fd4787f268cbdd0d46ac5b840290b7c3440dc",
+  "html_url": "https://github.com/LarryC01/Tensor-TimesFM-ECML-2026/commit/130fd4787f268cbdd0d46ac5b840290b7c3440dc",
+  "comments_url": "https://api.github.com/repos/LarryC01/Tensor-TimesFM-ECML-2026/commits/130fd4787f268cbdd0d46ac5b840290b7c3440dc/comments",
+  "author": {
+    "login": "LarryC01",
+    "id": 66997456,
+    "node_id": "MDQ6VXNlcjY2OTk3NDU2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/66997456?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/LarryC01",
+    "html_url": "https://github.com/LarryC01",
+    "followers_url": "https://api.github.com/users/LarryC01/followers",
+    "following_url": "https://api.github.com/users/LarryC01/following{/other_user}",
+    "gists_url": "https://api.github.com/users/LarryC01/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/LarryC01/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/LarryC01/subscriptions",
+    "organizations_url": "https://api.github.com/users/LarryC01/orgs",
+    "repos_url": "https://api.github.com/users/LarryC01/repos",
+    "events_url": "https://api.github.com/users/LarryC01/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/LarryC01/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "committer": {
+    "login": "LarryC01",
+    "id": 66997456,
+    "node_id": "MDQ6VXNlcjY2OTk3NDU2",
+    "avatar_url": "https://avatars.githubusercontent.com/u/66997456?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/LarryC01",
+    "html_url": "https://github.com/LarryC01",
+    "followers_url": "https://api.github.com/users/LarryC01/followers",
+    "following_url": "https://api.github.com/users/LarryC01/following{/other_user}",
+    "gists_url": "https://api.github.com/users/LarryC01/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/LarryC01/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/LarryC01/subscriptions",
+    "organizations_url": "https://api.github.com/users/LarryC01/orgs",
+    "repos_url": "https://api.github.com/users/LarryC01/repos",
+    "events_url": "https://api.github.com/users/LarryC01/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/LarryC01/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "parents": [
+    {
+      "sha": "59e8e4607da51170b5c1e86516d81e6b40195c9e",
+      "url": "https://api.github.com/repos/LarryC01/Tensor-TimesFM-ECML-2026/commits/59e8e4607da51170b5c1e86516d81e6b40195c9e",
+      "html_url": "https://github.com/LarryC01/Tensor-TimesFM-ECML-2026/commit/59e8e4607da51170b5c1e86516d81e6b40195c9e"
+    }
+  ],
+  "stats": {
+    "total": 4526,
+    "additions": 4438,
+    "deletions": 88
+  },
+  "files": [
+    {
+      "sha": "3f31ac9e21d7a0f882009a755ec33f862ae99591",
+      "filename": "README.md",
+      "status": "modified",
+      "additions": 294,
+      "deletions": 88,
+      "changes": 382,
+      "blob_url": "https://github.com/LarryC01/Tensor-TimesFM-ECML-2026/blob/130fd4787f268cbdd0d46ac5b840290b7c3440dc/README.md",
+      "raw_url": "https://github.com/LarryC01/Tensor-TimesFM-ECML-2026/raw/130fd4787f268cbdd0d46ac5b840290b7c3440dc/README.md",
+      "contents_url": "https://api.github.com/repos/LarryC01/Tensor-TimesFM-ECML-2026/contents/README.md?ref=130fd4787f268cbdd0d46ac5b840290b7c3440dc",
+      "patch": "@@ -1,105 +1,281 @@\n-# Monte Carlo Tensor Simulation & Reconstruction\n+# Tensor-TimesFM: High-dimensional Sparse Time Series Forecasting with Tensor Decoders and Latent Dynamics Prediction\n \n-This project provides a **Monte Carlo (MC) tensor simulation pipeline** together with two in-sample reconstruction methods:\n+> **ECML PKDD 2026** - Research Track  \n+> Anonymous Authors\n \n-1. **Standard CP decomposition** (baseline)\n-2. **Our tensor reconstruction method (CP-MLP)**\n+---\n+\n+## Overview\n+\n+**Tensor-TimesFM** is an end-to-end framework for forecasting high-dimensional sparse time-series tensors. It couples a nonlinear tensor decoder with a frozen time-series foundation model, **TimesFM**, so that forecasting is performed in a denoised latent factor space rather than directly on sparse, noisy, high-dimensional observations.\n+\n+The central idea is to decompose a tensor into static structural factors and dynamic temporal factors, forecast the temporal factors with TimesFM, and decode future tensor entries with an MLP-based tensor decoder. This preserves tensor structure, handles missing observations through mask-aware losses, and improves robustness on sparse business and financial forecasting tasks.\n \n-The README is written for running **different tensor sizes** on a local device (laptop / desktop), while keeping the same experimental logic, data split, and metrics as the large-scale setting `(150, 9500, 14)`.\n+![Tensor-TimesFM model architecture](assets/TensorTimesFM_model.svg)\n \n ---\n \n-## Project Overview\n+## Key Results\n \n-The pipeline has three main stages:\n+Tensor-TimesFM is evaluated on synthetic tensors and three real-world datasets: EPS, Walmart sales, and Rideshare. The results below report mean +/- standard deviation over 10 seeds when available.\n \n-1. **Monte Carlo tensor generation**\n-   - Generate synthetic tensors with **high covariance** and **no/low covariance**\n-2. **CP reconstruction (baseline)**\n-   - In-sample reconstruction on the first 80% of time steps\n-3. **Tensor reconstruction (our method)**\n-   - Same in-sample split and evaluation metric\n+| Dataset | Comparison | Baseline RMSE | Baseline R2 | Tensor-TimesFM RMSE | Tensor-TimesFM R2 |\n+|---|---|---:|---:|---:|---:|\n+| EPS | Tensor-GRU | 0.8534 +/- 0.0027 | 0.5929 +/- 0.0026 | **0.5534 +/- 0.0032** | **0.8288 +/- 0.0020** |\n+| EPS | TimesFM | 0.7671 +/- 0.0001 | 0.6711 +/- 0.0001 | **0.5534 +/- 0.0032** | **0.8288 +/- 0.0020** |\n+| Walmart | TensorCast | 2.7884 +/- 0.0710 | 0.4073 +/- 0.0304 | **2.2787 +/- 0.0493** | **0.5993 +/- 0.0017** |\n+| Walmart | TimesFM | 2.2904 +/- 0.0023 | **0.6007 +/- 0.0008** | **2.2787 +/- 0.0493** | 0.5993 +/- 0.0017 |\n+| Rideshare | TimesFM | 2.4568 +/- 0.0043 | 0.9341 +/- 0.0004 | **2.1040 +/- 0.0419** | **0.9475 +/- 0.0021** |\n \n-All experiments are designed to be:\n-- reproducible (fixed random seeds)\n-- logged to CSV (no need to rerun just to collect results)\n+The largest gains appear in sparse settings such as EPS and Rideshare, where tensor-structured latent representations help TimesFM operate on cleaner temporal trajectories.\n \n ---\n \n-## Repository Structure (relevant files)\n+## Contributions\n \n-```\n-.\n-\u251c\u2500\u2500 environment.yml\n-\u251c\u2500\u2500 examples/\n-\u2502   \u251c\u2500\u2500 MC_tensor_generation_Jan15.py\n-\u2502   \u251c\u2500\u2500 cp_reconstruction_Jan16.py\n-\u2502   \u2514\u2500\u2500 run_cpmlp_grid.sh\n-\u251c\u2500\u2500 results/\n-\u2502   \u251c\u2500\u2500 cp_optionB_results.csv\n-\u2502   \u2514\u2500\u2500 cp_mlp_optionB_results.csv\n-\u2514\u2500\u2500 README.md\n+- **Tensor decoder for sparse forecasting.** A nonlinear MLP-based decoder learns latent factor matrices with SGD and computes loss only on observed entries.\n+- **Latent-space foundation-model forecasting.** TimesFM forecasts temporal latent factors instead of flattened raw observations, improving robustness under sparsity.\n+- **Mask-aware tensor prediction.** The framework supports sparse reconstruction, multi-step forecasting, and downstream target prediction with regression losses.\n+- **Empirical validation across domains.** Experiments cover synthetic tensors, retail demand, EPS forecasting, and rideshare demand with missing values and heterogeneous tensor shapes.\n+\n+---\n+\n+## Repository Structure\n+\n+```text\n+Tensor-TimesFM-ECML-2026/\n+|\n+|-- README.md\n+|-- TensorTimesFM_model.pdf\n+|-- assets/\n+|   |-- TensorTimesFM_model.png\n+|   `-- TensorTimesFM_model.svg\n+|-- ECML2026datasets.zip\n+|-- dataset_truncation_description.txt\n+|-- environment.yml\n+|\n+|-- examples/\n+|   |-- full_command_EPS_best.sh\n+|   |-- EPS_TimesFM_debug_best.py\n+|   |-- MC_tensor_generation_Jan15.py\n+|   |-- cp_reconstruction_Jan16.py\n+|   |-- run_cpmlp_grid.sh\n+|   `-- rideshare_3d_tensor/\n+|       |-- Rideshare_TimesFM_debug_Sept22_3losses_ortho_multi_step.py\n+|       `-- sweep_Rideshare_TimesFM_Sept23_multi_step.yaml\n+|\n+|-- walmart_lagp_sales_sweep_Nov17.yaml\n+|-- walmart_lagp_TimesFM_debug_Nov_17.py\n+`-- LICENSE\n ```\n \n ---\n \n-## Step 0) Environment Setup\n+## Installation\n+\n+### Requirements\n \n-### I use `environment.yml` and \n+- Python 3.11\n+- CUDA-capable NVIDIA GPU recommended\n+- Conda or Mamba for environment management\n+- W&B account for sweep-based experiments\n+\n+### Setup\n \n ```bash\n-pip install tensorly\n+git clone git@github.com:LarryC01/Tensor-TimesFM-ECML-2026.git\n+cd Tensor-TimesFM-ECML-2026\n ```\n \n+Create and activate the environment:\n \n----\n+```bash\n+conda create -n tensorts python=3.11 \"pip>=24\"\n+conda activate tensorts\n+```\n \n-## Step 1) Monte Carlo Tensor Generation\n+Install the PyTorch + CUDA runtime:\n \n-### 1.1 Configure a smaller tensor\n+```bash\n+conda install -c nvidia -c pytorch pytorch pytorch-mutex=*=cuda pytorch-cuda=11.8 cuda-nvcc\n+```\n \n-Open the generator script:\n+Install the scientific Python stack:\n \n+```bash\n+conda install -c conda-forge numpy scipy pandas scikit-learn scikit-image einops sympy sentencepiece\n ```\n-examples/MC_tensor_generation_Jan15.py\n+\n+Install sparse tensor support:\n+\n+```bash\n+conda install -c pyg -c pytorch -c conda-forge pytorch-sparse~=0.6.18\n ```\n \n-In the configuration section near the top, change the tensor size to something smaller than the full experiment.\n+Install the Hugging Face and forecasting stack:\n \n+```bash\n+conda install -c conda-forge transformers datasets accelerate evaluate \"tokenizers>=0.13.1\" peft sktime\n+```\n \n+Install Lightning and metrics:\n \n-Make sure a **random seed** is set for reproducibility.\n+```bash\n+conda install -c conda-forge lightning~=2.2.5 torchmetrics\n+```\n \n----\n+Install experiment, visualization, and utility packages:\n \n-### 1.2 Run tensor generation\n+```bash\n+conda install -c conda-forge psutil nvtop tqdm rich attrs tabulate typing_extensions absl-py python-dotenv ruamel.yaml omegaconf typed-argument-parser hydra-core hydra-submitit-launcher jsonargparse \"typeshed-client>=2.1.0\" openpyxl pandarallel patool torchinfo plotly matplotlib seaborn moviepy jupyter wandb tensorboardx click setuptools_scm twine blackd mypy bump2version watchdog flake8 tox coverage sphinx\n+```\n \n-From the repository root:\n+Install pip-only packages:\n \n ```bash\n-time python examples/MC_tensor_generation_Jan15.py\n+pip install bitsandbytes~=0.43.1\n+pip install build datargs sourcery torchopt torch_optimizer separableconv-torch cd2root omegaconf-argparse cookiecutter reformer_pytorch\n+pip install black \"black[jupyter]\"\n+```\n+\n+Optional, only if needed for your GPU setup:\n+\n+```bash\n+pip install flash-attn\n+```\n+\n+Log in to W&B before running sweep experiments:\n+\n+```bash\n+wandb login\n ```\n \n ---\n \n-### 1.3 Output files\n+## Data\n+\n+### Dataset\n+\n+The release includes `ECML2026datasets.zip`, a compact package that preserves the structure of the experimental tensors while protecting large or proprietary data.\n+\n+| File in package | Format | Original shape | Released handling |\n+|---|---|---:|---|\n+| `rideshare_tensor.npy` | NumPy array | `(541, 156, 15)` | Copied without changes |\n+| `tensor_1_units.pt` | PyTorch tensor | `(1941, 3049, 10)` | Truncated to 10% along axis 0 |\n+| `tensor_2_price.pt` | PyTorch tensor | `(1941, 3049, 10)` | Truncated to 10% along axis 0 |\n+| `tensor_3_event.pt` | PyTorch tensor | `(1941, 41)` | Copied without changes |\n+| `fundamentals_analyst_forecast_EPS_regression.npy` | NumPy array | `(158, 9583, 14)` | Truncated to 10% along axis 0 |\n \n-After successful execution, the following files are generated in the **repository root (`./`)**:\n+The packaging logic is documented in `dataset_truncation_description.txt`. The full EPS tensor is proprietary and requires institutional WRDS access.\n \n-- `verify_high_covar_nonlinear.npy`\n-- `verify_no_covar_nonlinear.npy`\n+### Real-world Dataset Statistics\n \n-These correspond to **high-covariance** and **no/low-covariance** tensor settings.\n+| Dataset | Shape | Total entries | Non-missing ratio | Zero-value ratio | Forecast horizon |\n+|---|---:|---:|---:|---:|---:|\n+| EPS | `(158, 9583, 14)` | 21,197,596 | 18.99% | 3.66% | 1 |\n+| Walmart Sales Tensor | `(1941, 3049, 10)` | 59,181,090 | 100.00% | 68.00% | 28 |\n+| Walmart Prices Tensor | `(1941, 3049, 10)` | 59,181,090 | 79.22% | 0.00% | 28 |\n+| Walmart Event Matrix | `(1941, 41)` | 79,581 | 100.00% | 97.15% | 28 |\n+| Rideshare | `(541, 156, 15)` | 1,265,940 | 59.39% | 5.89% | 168 |\n \n ---\n \n-## Step 2) CP Reconstruction (Baseline)\n+## Training\n+\n+### Walmart Experiment\n+\n+The Walmart experiment uses a W&B sweep file and the corresponding TimesFM training script:\n+\n+```bash\n+wandb sweep ./walmart_lagp_sales_sweep_Nov17.yaml\n+```\n+\n+The sweep launches:\n+\n+```text\n+./walmart_lagp_TimesFM_debug_Nov_17.py\n+```\n+\n+After W&B creates a sweep ID, start an agent with the command printed by W&B:\n+\n+```bash\n+wandb agent <entity>/<project>/<sweep_id>\n+```\n+\n+### EPS Experiment\n+\n+The released EPS data contains only the shared 10% slice for data-protection reasons. The full EPS benchmark uses proprietary WRDS data.\n+\n+Run from the `examples/` directory:\n+\n+```bash\n+cd examples\n+bash full_command_EPS_best.sh\n+```\n+\n+The shell helper launches:\n+\n+```text\n+examples/EPS_TimesFM_debug_best.py\n+```\n+\n+The script runs the selected EPS Tensor-TimesFM configuration across multiple seeds and summarizes `Forecasted_R2` into CSV files under the configured output directory.\n+\n+### Rideshare Experiment\n+\n+The Rideshare multi-step experiment uses:\n+\n+```text\n+examples/rideshare_3d_tensor/Rideshare_TimesFM_debug_Sept22_3losses_ortho_multi_step.py\n+```\n+\n+W&B sweep file:\n+\n+```text\n+examples/rideshare_3d_tensor/sweep_Rideshare_TimesFM_Sept23_multi_step.yaml\n+```\n+\n+Launch:\n \n-This step runs **standard CP decomposition** using only the **first 80% of time steps** (in-sample).\n+```bash\n+wandb sweep examples/rideshare_3d_tensor/sweep_Rideshare_TimesFM_Sept23_multi_step.yaml\n+wandb agent <entity>/<project>/<sweep_id>\n+```\n+\n+### Synthetic Experiment\n+\n+The synthetic Monte Carlo workflow from the original README is preserved below.\n+\n+#### Step 1: Monte Carlo Tensor Generation\n+\n+Open:\n+\n+```text\n+examples/MC_tensor_generation_Jan15.py\n+```\n \n-### 2.1 Run CP reconstruction\n+In the configuration section near the top, choose a tensor size appropriate for your device. Make sure a random seed is set for reproducibility.\n \n-High-covariance example (rank = 30):\n+Run from the repository root:\n+\n+```bash\n+time python examples/MC_tensor_generation_Jan15.py\n+```\n+\n+After successful execution, the following files are generated in the repository root:\n+\n+```text\n+verify_high_covar_nonlinear.npy\n+verify_no_covar_nonlinear.npy\n+```\n+\n+These correspond to high-covariance and no/low-covariance synthetic tensor settings.\n+\n+#### Step 2: CP Reconstruction Baseline\n+\n+This step runs standard CP decomposition using only the first 80% of time steps.\n+\n+High-covariance example:\n \n ```bash\n time python examples/cp_reconstruction_Jan16.py \\\n@@ -108,7 +284,7 @@ time python examples/cp_reconstruction_Jan16.py \\\n   --seed 123\n ```\n \n-No/low-covariance example (rank = 100):\n+No/low-covariance example:\n \n ```bash\n time python examples/cp_reconstruction_Jan16.py \\\n@@ -117,74 +293,104 @@ time python examples/cp_reconstruction_Jan16.py \\\n   --seed 123\n ```\n \n-Notes:\n-- `--cp_rank` must match the rank used during tensor generation.\n-- `--seed` controls reproducibility.\n+Each run appends results to:\n \n----\n+```text\n+results/cp_optionB_results.csv\n+```\n \n-### 2.2 Result logging (CSV)\n+#### Step 3: Tensor Reconstruction with CP-MLP\n \n-Each run should append **one row per run** to:\n+Run:\n \n-```\n-results/cp_optionB_results.csv\n+```bash\n+time bash examples/run_cpmlp_grid.sh\n ```\n \n+The default settings were tuned for the large tensor `(150, 9500, 14)` and may need smaller `epochs` or `batch_size` for local debugging.\n \n+Each run appends results to:\n \n+```text\n+results/cp_mlp_optionB_results.csv\n+```\n+\n+#### Synthetic Sanity Checks\n+\n+- The same seed should produce identical or nearly identical results.\n+- High-covariance tensors should reconstruct better than no/low-covariance tensors.\n+- CP and CP-MLP should use the same 80% in-sample split.\n+- CSV files should append results after each run.\n \n ---\n \n-## Step 3) Tensor Reconstruction (Our Method: CP-MLP)\n+## Reproducibility\n \n-This step runs **our tensor reconstruction method** using the same **in-sample (first 80%) split** and **evaluation metric**.\n+### Checklist\n \n-### 3.1 Run the grid script\n+- [x] Code for Tensor-TimesFM, CP-TimesFM, Tensor-GRU, TimeGrad, and TimesFM baselines is included.\n+- [x] Public or partially shared dataset package is provided in `ECML2026datasets.zip`.\n+- [x] EPS truncation and data-packaging logic is documented.\n+- [x] Synthetic tensor generation and reconstruction workflows are included.\n+- [x] W&B sweep files are provided for Walmart and Rideshare.\n+- [x] Main reported metrics include RMSE and R2.\n \n-```bash\n-time bash examples/run_cpmlp_grid.sh\n-```\n+### Known Reproducibility Limitations\n \n----\n+- The full EPS dataset is proprietary and cannot be released. Results on the full 21,197,596-entry EPS dataset require institutional access to WRDS.\n+- Training scripts may contain absolute file paths specific to the original compute cluster. These must be updated before running.\n+- Exact numerical results may vary slightly across hardware configurations due to floating-point non-determinism in GPU operations.\n \n-### 3.2 Adjust training parameters for small tensors\n+### Random Seed\n \n-The default training settings were tuned for the large tensor `(150, 9500, 14)` and may not be appropriate for smaller tensors.\n+Set the following before training for reproducibility:\n \n-Adjust `epochs` and `batch_size` in:\n+```python\n+import random\n+import numpy as np\n+import torch\n \n-- `examples/run_cpmlp_grid.sh`, or\n-- the Python training script called by that shell script\n \n+def set_seed(seed: int = 42):\n+    random.seed(seed)\n+    np.random.seed(seed)\n+    torch.manual_seed(seed)\n+    if torch.cuda.is_available():\n+        torch.cuda.manual_seed_all(seed)\n+```\n \n ---\n \n-### 3.3 Result logging (CSV)\n+## Citation\n \n-Each run should append one row to:\n+If you use this repository or build on this work, please cite:\n \n-```\n-results/cp_mlp_optionB_results.csv\n+```bibtex\n+@inproceedings{tensortimesfm2026,\n+  title     = {Tensor-TimesFM: High-dimensional Sparse Time Series Forecasting with Tensor Decoders and Latent Dynamics Prediction},\n+  author    = {Anonymous},\n+  booktitle = {ECML PKDD},\n+  year      = {2026}\n+}\n ```\n \n-\n-\n ---\n \n-## Sanity Checks\n+## Related Work\n+\n+This project builds on and connects to:\n \n-Before analyzing results, verify:\n+- **TimesFM** - A decoder-only foundation model for zero-shot time-series forecasting.\n+- **TensorCast** - Coupled tensor factorization for contextual forecasting.\n+- **TimeGrad** - Autoregressive diffusion modeling for probabilistic time-series forecasting.\n+- **TRMF and tensor autoregressive factorization** - Low-rank temporal factor models for missing-value forecasting.\n+- **DeepGLO** - Global-local deep forecasting with low-dimensional shared representations.\n+- **Classical tensor decomposition** - CP and Tucker decomposition methods for structured multi-way data.\n \n-- Same seed produces identical or nearly identical results\n-- High-covariance tensors reconstruct better than no-covariance tensors\n-- CP baseline and CP-MLP use the same 80% in-sample split\n-- CSV files append results after each run (no reruns needed to collect metrics)\n+Tensor-TimesFM differs from standard foundation-model forecasting by explicitly preserving tensor modes and forecasting learned latent temporal factors instead of flattened raw observations.\n \n ---\n \n-## Notes\n+## License\n \n-- This setup is intended for **debugging, validation, and Monte Carlo experiments**, not final large-scale benchmarks.\n-- Once behavior is verified on small tensors, the same pipeline can be scaled back to larger tensors by adjusting training parameters.\n-- Always log parameters and results to CSV for reproducibility and aggregation.\n+This project is released for research purposes. The code is provided under the [MIT License](LICENSE). Some included or adapted components may be governed by their own licenses, including [LICENSE.gluon-ts](LICENSE.gluon-ts). Datasets remain subject to their original providers' licensing terms, including WRDS/I/B/E/S, Kaggle M5 Walmart data, and the Rideshare source dataset."
+    },
+    {
+      "sha": "5881e197f8b74c883df6f9e1399936c0ada5d365",
+      "filename": "assets/TensorTimesFM_model.png",
+      "status": "added",
+      "additions": 0,
+      "deletions": 0,
+      "changes": 0,
+      "blob_url": "https://github.com/LarryC01/Tensor-TimesFM-ECML-2026/blob/130fd4787f268cbdd0d46ac5b840290b7c3440dc/assets%2FTensorTimesFM_model.png",
+      "raw_url": "https://github.com/LarryC01/Tensor-TimesFM-ECML-2026/raw/130fd4787f268cbdd0d46ac5b840290b7c3440dc/assets%2FTensorTimesFM_model.png",
+      "contents_url": "https://api.github.com/repos/LarryC01/Tensor-TimesFM-ECML-2026/contents/assets%2FTensorTimesFM_model.png?ref=130fd4787f268cbdd0d46ac5b840290b7c3440dc"
+    },
+    {
+      "sha": "b04368e89218ede0588517531b5dd2e3d46744b7",
+      "filename": "assets/TensorTimesFM_model.svg",
+      "status": "added",
+      "additions": 4144,
+      "deletions": 0,
+      "changes": 4144,
+      "blob_url": "https://github.com/LarryC01/Tensor-TimesFM-ECML-2026/blob/130fd4787f268cbdd0d46ac5b840290b7c3440dc/assets%2FTensorTimesFM_model.svg",
+      "raw_url": "https://github.com/LarryC01/Tensor-TimesFM-ECML-2026/raw/130fd4787f268cbdd0d46ac5b840290b7c3440dc/assets%2FTensorTimesFM_model.svg",
+      "contents_url": "https://api.github.com/repos/LarryC01/Tensor-TimesFM-ECML-2026/contents/assets%2FTensorTimesFM_model.svg?ref=130fd4787f268cbdd0d46ac5b840290b7c3440dc"
+    }
+  ]
+}

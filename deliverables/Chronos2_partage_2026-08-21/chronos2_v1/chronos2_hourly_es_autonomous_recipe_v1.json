@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "status": "sealed_before_final_opening",
+  "recipe_mode": "autonomous_only",
+  "prediction_mode": "autonomous_only",
+  "mkonline_enabled": false,
+  "zone": "ES",
+  "timezone": "Europe/Madrid",
+  "source_autonomous_run": "runs/chronos2_hourly_es_residual_extended_v1",
+  "source_autonomous_model": "residual_corrected",
+  "source_autonomous_checksum_manifest_sha256": "ef35805af31c7e3ce7be6f44791620f8717f09865ce26a4c9dae275435422fc1",
+  "source_autonomous_recipe": "runs/chronos2_hourly_es_residual_extended_v1/extended_residual_recipe.json",
+  "source_autonomous_recipe_sha256": "3747732c1b841646f1f02c6d5d75eae59969a84ae9f19a303a1d7a9e1f9e2b97",
+  "final_target_used_for_weight_or_hyperparameters": false,
+  "weights": {
+    "autonomous": 1.0,
+    "mkonline_primary": 0.0
+  },
+  "autonomous_only_reason": "The only discovered ES MKOnline dependency is an experimental monthly fallback, not a promotable ECOP expert; no native official Storm dashboard series exists for ES.",
+  "autonomous_validation": {
+    "approved": true,
+    "final_loaded": false,
+    "reason": "ES is autonomous-only because its monthly MKOnline fallback is explicitly non-promotable; no proxy is substituted for the unavailable official native Storm series.",
+    "dependency_manifest": "mkonline_es_primary_dependency_v1.json",
+    "dependency_status": "experimental_monthly_fallback",
+    "b1_opened": false,
+    "b2_opened": false
+  },
+  "sealed_final_protocol": {
+    "start_local_day": "2025-08-12",
+    "end_local_day": "2026-08-11",
+    "selection_used_final_targets": false
+  }
+}

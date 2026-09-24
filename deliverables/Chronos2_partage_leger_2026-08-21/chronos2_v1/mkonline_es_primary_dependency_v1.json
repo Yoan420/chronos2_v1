@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "zone": "ES",
+  "timezone": "Europe/Madrid",
+  "status": "experimental_monthly_fallback",
+  "wrapper_series": "power.price.es.euromwh.h.fcst.mkonline.monthly",
+  "wrapper_type": "formula",
+  "wrapper_formula": "(series \"58307_native\")",
+  "wrapper_formula_sha256": "85721b0d256e63854727d150c04a46ebb86aac9fde6e576f9ca0e5465463922b",
+  "terminal_series": "58307_native",
+  "terminal_type": "primary",
+  "terminal_formula": null,
+  "terminal_metadata_sha256": "6ab4d53713ffd286faf6475c74b94481938a07cff1bc9017cb78a9f05eaf0752",
+  "terminal_metadata": {
+    "mercure:label": "ES_EC_MONTHLY_HOURLY_INSTANTPRICE_FORECAST",
+    "mercure:source": "WATTSIGHT",
+    "mercure:provider": "MKONLINE",
+    "mercure:country": "SPAIN"
+  },
+  "storm_token_found": false,
+  "dependency_gate_passed": true,
+  "forecast_cutoff": "civil D-1 08:00 Europe/Paris",
+  "commercial_entitlement_status": "UNCONFIRMED: MKOnline/WattSight entitlement and replacement rights must be confirmed before production use.",
+  "limitation": "No MKOnline ECOP series exists for ES; this monthly-model fallback must pass the same B1/B2 gates before any promotion."
+}

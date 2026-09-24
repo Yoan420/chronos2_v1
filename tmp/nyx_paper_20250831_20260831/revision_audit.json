@@ -1,0 +1,34 @@
+{
+  "requested_study_period": [
+    "2025-08-31",
+    "2026-08-31"
+  ],
+  "study_civil_days_inclusive": 366,
+  "verified_evaluation_period": [
+    "2025-09-16",
+    "2026-08-31"
+  ],
+  "evaluated_civil_days": 350,
+  "unscored_initial_days": 16,
+  "original_numerical_results_unchanged": true,
+  "user_edits_preserved": true,
+  "changed_paragraphs": 3,
+  "source_docx_sha256": "79858cacfa4e22cbcef18bafc94b638d1beac111c1067622e78cbf45b5d8b1dd",
+  "docx_sha256": "eb0db6e0f7770ccfa4cca3e87aefc7bdc7e527dac8c35dd77aa3e1621c7bfadb",
+  "changes": [
+    {
+      "old": "Research manuscript · Evaluation cutoff 31 August 2026",
+      "new": "Research manuscript · Study period 31 August 2025 to 31 August 2026"
+    },
+    {
+      "old": "Pretrained time series models can incorporate market fundamentals, but their use in electricity price forecasting requires evaluation beyond average point accuracy. This study examines NYX, a hybrid pipeline combining a frozen Chronos-2 model, a rolling CatBoost residual correction and a governed state space correction. A retrospective prequential evaluation covers Belgium, Germany, France and the Netherlands from 16 September 2025 to 31 August 2026. On 33,596 jointly observed country–hour pairs, NYX achieves a mean absolute error of 11.189 EUR/MWh, compared with 12.197 for the Chronos-2 stage and 11.284 after CatBoost correction, an 8.27% reduction relative to the foundation model stage. A separate industrial reporting composite achieves 11.162 EUR/MWh, with benchmark vintage limitations preventing a strictly prospective comparison. The mathematical formulation distinguishes pretrained quantile inference, supervised nonlinear error adaptation and bounded online state correction. Their shared additive action preserves interval width, and nominal 80% intervals cover only 73.23–76.24% of observations across countries. Although the leading principal component explains 65.70% of simultaneous residual variance in an initial 180-day sample, a subsequent residual-learning experiment selects no additional correction on 95 validation days. None of the tested corrections improves pooled mean absolute error over NYX on the reserved 75-day segment. The evidence is conditional on reconstructed forecasts, available data snapshots and implementation limitations; it does not establish prospective trading value or state-of-the-art performance.",
+      "new": "Pretrained time series models can incorporate market fundamentals, but their use in electricity price forecasting requires evaluation beyond average point accuracy. This study examines NYX, a hybrid pipeline combining a frozen Chronos-2 model, a rolling CatBoost residual correction and a governed state space correction. The study period is 31 August 2025 to 31 August 2026. Available archived NYX forecasts support a retrospective prequential evaluation of Belgium, Germany, France and the Netherlands from 16 September 2025 to 31 August 2026. On 33,596 jointly observed country–hour pairs, NYX achieves a mean absolute error of 11.189 EUR/MWh, compared with 12.197 for the Chronos-2 stage and 11.284 after CatBoost correction, an 8.27% reduction relative to the foundation model stage. A separate industrial reporting composite achieves 11.162 EUR/MWh, with benchmark vintage limitations preventing a strictly prospective comparison. The mathematical formulation distinguishes pretrained quantile inference, supervised nonlinear error adaptation and bounded online state correction. Their shared additive action preserves interval width, and nominal 80% intervals cover only 73.23–76.24% of observations across countries. Although the leading principal component explains 65.70% of simultaneous residual variance in an initial 180-day sample, a subsequent residual-learning experiment selects no additional correction on 95 validation days. None of the tested corrections improves pooled mean absolute error over NYX on the reserved 75-day segment. The evidence is conditional on reconstructed forecasts, available data snapshots and implementation limitations; it does not establish prospective trading value or state-of-the-art performance."
+    },
+    {
+      "old": "The target is the hourly day-ahead electricity price, in EUR/MWh, for Belgium (BE), Germany (DE), France (FR) and the Netherlands (NL). The analysis retains delivery dates from 16 September 2025 through 31 August 2026 inclusive, excluding every later observation. This gives 350 civil days, 8,400 physical hourly observations per country and 33,600 country–hour pairs in total. Delivery days contain 23, 24 or 25 hours as dictated by daylight-saving time; the sample contains one 23-hour day, one 25-hour day and 348 ordinary days. The cutoff limits the evaluated delivery dates; it does not assert that the retrospectively assembled forecast and observation snapshots were already available on that date.",
+      "new": "The target is the hourly day-ahead electricity price, in EUR/MWh, for Belgium (BE), Germany (DE), France (FR) and the Netherlands (NL). The study period runs from 31 August 2025 through 31 August 2026 inclusive, a window of 366 civil days. Complete final NYX forecasts in the retained four-country archive begin on 16 September 2025. The first 16 days of the study window are therefore not scored; they are neither filled nor represented by the reported results. The evaluated sample remains 350 civil days, with 8,400 physical hourly observations per country and 33,600 country–hour pairs in total. It contains one 23-hour day, one 25-hour day and 348 ordinary days. Every evaluated delivery date is no later than 31 August 2026. The study window does not assert that the retrospectively assembled forecast and observation snapshots were already available at their historical forecast origins."
+    }
+  ],
+  "pdf_sha256": "c8e04f3cd29f56259e4c4176606ad9096e9f0a144f0a68fa9673f1ccb00186c5",
+  "pdf_pages": 22
+}

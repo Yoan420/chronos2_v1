@@ -1,0 +1,52 @@
+{
+  "run_id": "a20f5ad7a4aa4f06b4ad51216ef4a4f3",
+  "status": "succeeded",
+  "return_code": 0,
+  "finished_at": "2026-09-18T12:22:26.253845+00:00",
+  "zones": [
+    {
+      "zone": "BE",
+      "coverage": {
+        "storm": 24,
+        "observed": 0,
+        "model": 24
+      },
+      "reason": "post_auction_source_rejected",
+      "extracted_at": "2026-09-18 12:18:36.477776+00:00",
+      "message": "Realized prices are not validated: sources disagree. Forecasts remain available; today's scores are not calculated."
+    },
+    {
+      "zone": "DE",
+      "coverage": {
+        "storm": 24,
+        "observed": 0,
+        "model": 24
+      },
+      "reason": "post_auction_source_rejected",
+      "extracted_at": "2026-09-18 12:19:32.877823+00:00",
+      "message": "Realized prices are not validated: sources disagree. Forecasts remain available; today's scores are not calculated."
+    },
+    {
+      "zone": "FR",
+      "coverage": {
+        "storm": 24,
+        "observed": 0,
+        "model": 24
+      },
+      "reason": "post_auction_source_rejected",
+      "extracted_at": "2026-09-18 12:20:30.238631+00:00",
+      "message": "Realized prices are not validated: sources disagree. Forecasts remain available; today's scores are not calculated."
+    },
+    {
+      "zone": "NL",
+      "coverage": {
+        "storm": 24,
+        "observed": 0,
+        "model": 24
+      },
+      "reason": "post_auction_source_rejected",
+      "extracted_at": "2026-09-18 12:21:27.043548+00:00",
+      "message": "Realized prices are not validated: sources disagree. Forecasts remain available; today's scores are not calculated."
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "diagnostic_only": true,
+  "production": false,
+  "publication_mode": "diagnostic",
+  "report_variants": [
+    "autonomous",
+    "kalman"
+  ],
+  "zone": "FR",
+  "timezone": "Europe/Paris",
+  "delivery_day": "2026-03-29",
+  "evaluation_start_day": "2025-03-29",
+  "evaluation_end_day": "2026-03-28",
+  "evaluation_days": 365,
+  "evaluation_hours": 8760,
+  "same_actual_hours": true,
+  "actual_price_reference": {},
+  "historical_observation_precision": {
+    "mode": "exact",
+    "compared_hours": 8760,
+    "max_absolute_difference_eur_mwh": 0.0,
+    "hours_above_exact_tolerance": 0,
+    "exact_tolerance_eur_mwh": 1e-09,
+    "float32_roundtrip_ceiling_eur_mwh": 5e-05,
+    "float32_representations_equal": true,
+    "inputs_modified": false
+  },
+  "delivery_day_observed_hours": 0,
+  "delivery_day_placeholder_hours": 23,
+  "delivery_day_actual_reason": null,
+  "delivery_day_actual_extracted_at_utc": null,
+  "statistics_window": "latest_365_observed_local_days_plus_unobserved_delivery_placeholder",
+  "storm_status": "unavailable_no_verified_comparator_loaded",
+  "storm_hourly_comparison": {
+    "status": "unavailable"
+  },
+  "storm_used_as_input": false,
+  "warmup": {
+    "residual_days_before_final365": 365,
+    "raw_days_before_final365": 365,
+    "excluded_from_report_metrics": true
+  },
+  "dst_policy": "source-audited duplication of derived nuclear covariate only; UTC physical-hour pairing",
+  "engine_audit": {
+    "diagnostic_only": true,
+    "production": false
+  },
+  "source_audit": {}
+}

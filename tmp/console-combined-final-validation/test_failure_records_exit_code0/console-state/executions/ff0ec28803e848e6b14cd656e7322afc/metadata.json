@@ -1,0 +1,51 @@
+{
+  "command": [
+    "C:\\Users\\BQ6757\\venvs\\pricefm311\\Scripts\\python.exe",
+    "-u",
+    "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-combined-final-validation\\test_failure_records_exit_code0\\explicit test fixture ; $literal.py",
+    "success",
+    "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-combined-final-validation\\test_failure_records_exit_code0\\console-state\\executions\\ff0ec28803e848e6b14cd656e7322afc\\results",
+    "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-combined-final-validation\\test_failure_records_exit_code0\\never-released"
+  ],
+  "cwd": "C:\\Users\\BQ6757\\chronos2_v1",
+  "output_dir": "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-combined-final-validation\\test_failure_records_exit_code0\\console-state\\executions\\ff0ec28803e848e6b14cd656e7322afc\\results",
+  "config": {
+    "fixture": true,
+    "mode": "success",
+    "resource": null
+  },
+  "type": "fixture",
+  "model": "explicit-test-fixture",
+  "resource_keys": [],
+  "warnings": [
+    "Explicit test fixture; contains no real scientific results."
+  ],
+  "id": "ff0ec28803e848e6b14cd656e7322afc",
+  "run_dir": "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-combined-final-validation\\test_failure_records_exit_code0\\console-state\\executions\\ff0ec28803e848e6b14cd656e7322afc",
+  "created_at": "2026-09-11T08:58:28.989766+00:00",
+  "request": {
+    "type": "fixture",
+    "name": "Explicit process test"
+  },
+  "name": "Explicit process test",
+  "description": "",
+  "python_executable": "C:\\Users\\BQ6757\\venvs\\pricefm311\\Scripts\\python.exe",
+  "source": "managed",
+  "source_key": "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-combined-final-validation\\test_failure_records_exit_code0\\console-state\\executions\\ff0ec28803e848e6b14cd656e7322afc",
+  "status": "queued",
+  "started_at": null,
+  "finished_at": null,
+  "duration_seconds": null,
+  "return_code": null,
+  "cancel_requested": false,
+  "tags": [],
+  "note": "",
+  "activity": "En attente d’une place ou d’une ressource",
+  "git": {
+    "commit": "900d8fc36a5f7d44e91f895786e49e4ed7614086",
+    "dirty_tracked_files": true
+  },
+  "log_paths": [
+    "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-combined-final-validation\\test_failure_records_exit_code0\\console-state\\executions\\ff0ec28803e848e6b14cd656e7322afc\\console.log"
+  ]
+}

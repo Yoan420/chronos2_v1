@@ -1,0 +1,661 @@
+{
+  "source": "runs\\reports\\model_storm\\CWE_Model_Storm_2026-09-24.html",
+  "window_days": 90,
+  "zones": {
+    "BE": {
+      "first_day": "2026-06-26",
+      "last_day": "2026-09-23",
+      "days": 90,
+      "providers": {
+        "storm": {
+          "ub_total": 11304.457309210527,
+          "qb_total": 9109.46867763158,
+          "ub_daily": 125.6050812134503,
+          "qb_daily": 101.21631864035088,
+          "proposals": 90,
+          "qb_cycles": 68,
+          "ub_cycles": 90,
+          "qb_rejections": 22,
+          "rejected_profitable": 22,
+          "rejected_losing": 0,
+          "rejected_zero": 0,
+          "forgone_positive_pnl": 2194.9886315789468,
+          "avoided_losses": 0,
+          "rejection_effect_total": -2194.988631578948,
+          "rejection_effect_daily": -24.388762573099424,
+          "mean_selected_limit_slack_eur": 38.13419053030521,
+          "median_selected_limit_slack_eur": 38.109468170526334,
+          "rejected_days": [
+            {
+              "day": "2026-06-27",
+              "unlimited_pnl": 249.3416447368421,
+              "loop_surplus": -327.83082903963145
+            },
+            {
+              "day": "2026-06-29",
+              "unlimited_pnl": 257.55142105263155,
+              "loop_surplus": -735.5733762342106
+            },
+            {
+              "day": "2026-06-30",
+              "unlimited_pnl": 283.15203289473686,
+              "loop_surplus": -515.8815147555263
+            },
+            {
+              "day": "2026-07-01",
+              "unlimited_pnl": 88.84236184210526,
+              "loop_surplus": -20.924286034736813
+            },
+            {
+              "day": "2026-07-08",
+              "unlimited_pnl": 15.893769736842117,
+              "loop_surplus": -40.29094416184209
+            },
+            {
+              "day": "2026-07-09",
+              "unlimited_pnl": 148.31721052631576,
+              "loop_surplus": -14.775896559999982
+            },
+            {
+              "day": "2026-07-13",
+              "unlimited_pnl": 73.35880263157891,
+              "loop_surplus": -6.507867134210546
+            },
+            {
+              "day": "2026-07-14",
+              "unlimited_pnl": 29.640973684210508,
+              "loop_surplus": -16.30606315236837
+            },
+            {
+              "day": "2026-07-31",
+              "unlimited_pnl": 57.710184210526336,
+              "loop_surplus": -9.392290169473648
+            },
+            {
+              "day": "2026-08-03",
+              "unlimited_pnl": 96.8255789473684,
+              "loop_surplus": -16.608703815789475
+            },
+            {
+              "day": "2026-08-07",
+              "unlimited_pnl": 103.96230921052631,
+              "loop_surplus": -41.449214902631574
+            },
+            {
+              "day": "2026-08-14",
+              "unlimited_pnl": 165.7393092105263,
+              "loop_surplus": -28.629430314210513
+            },
+            {
+              "day": "2026-08-17",
+              "unlimited_pnl": 29.225072368421053,
+              "loop_surplus": -9.049625467105262
+            },
+            {
+              "day": "2026-08-19",
+              "unlimited_pnl": 38.68193421052629,
+              "loop_surplus": -21.749340382894765
+            },
+            {
+              "day": "2026-08-20",
+              "unlimited_pnl": 85.24564473684208,
+              "loop_surplus": -49.71751304736845
+            },
+            {
+              "day": "2026-08-24",
+              "unlimited_pnl": 127.22075000000001,
+              "loop_surplus": -2.4314487421052373
+            },
+            {
+              "day": "2026-08-26",
+              "unlimited_pnl": 43.94969736842103,
+              "loop_surplus": -6.801286045263165
+            },
+            {
+              "day": "2026-08-27",
+              "unlimited_pnl": 14.540124999999989,
+              "loop_surplus": -47.109977663986854
+            },
+            {
+              "day": "2026-09-01",
+              "unlimited_pnl": 132.5218486842105,
+              "loop_surplus": -14.329147563157889
+            },
+            {
+              "day": "2026-09-02",
+              "unlimited_pnl": 61.40592763157892,
+              "loop_surplus": -30.29910109605255
+            },
+            {
+              "day": "2026-09-11",
+              "unlimited_pnl": 89.58142763157895,
+              "loop_surplus": -28.42856137894732
+            },
+            {
+              "day": "2026-09-13",
+              "unlimited_pnl": 2.2806052631578666,
+              "loop_surplus": -75.2596591468421
+            }
+          ]
+        },
+        "model": {
+          "ub_total": 11438.732736842107,
+          "qb_total": 11005.186019736844,
+          "ub_daily": 127.09703040935673,
+          "qb_daily": 122.27984466374271,
+          "proposals": 90,
+          "qb_cycles": 84,
+          "ub_cycles": 90,
+          "qb_rejections": 6,
+          "rejected_profitable": 6,
+          "rejected_losing": 0,
+          "rejected_zero": 0,
+          "forgone_positive_pnl": 433.5467171052631,
+          "avoided_losses": 0,
+          "rejection_effect_total": -433.54671710526236,
+          "rejection_effect_daily": -4.817185745614026,
+          "mean_selected_limit_slack_eur": 53.35099828887404,
+          "median_selected_limit_slack_eur": 48.604280552111184,
+          "rejected_days": [
+            {
+              "day": "2026-07-08",
+              "unlimited_pnl": 22.212190789473695,
+              "loop_surplus": -6.792226732813545
+            },
+            {
+              "day": "2026-07-12",
+              "unlimited_pnl": 110.95523026315789,
+              "loop_surplus": -16.36164955830053
+            },
+            {
+              "day": "2026-07-28",
+              "unlimited_pnl": 174.17849342105265,
+              "loop_surplus": -1.2515901959754245
+            },
+            {
+              "day": "2026-07-30",
+              "unlimited_pnl": 88.59586184210525,
+              "loop_surplus": -11.049490200333672
+            },
+            {
+              "day": "2026-08-27",
+              "unlimited_pnl": 34.92696710526312,
+              "loop_surplus": -10.037677856741816
+            },
+            {
+              "day": "2026-09-13",
+              "unlimited_pnl": 2.6779736842104853,
+              "loop_surplus": -52.79427574720798
+            }
+          ]
+        }
+      },
+      "ub_timing_gap_total": 134.27542763157908,
+      "ub_timing_gap_daily": 1.4919491959064342,
+      "differential_rejection_total": 1761.4419144736858,
+      "differential_rejection_daily": 19.571576827485398,
+      "qb_gap_total": 1895.7173421052648,
+      "qb_gap_daily": 21.06352602339183
+    },
+    "DE": {
+      "first_day": "2026-06-26",
+      "last_day": "2026-09-23",
+      "days": 90,
+      "providers": {
+        "storm": {
+          "ub_total": 13075.261677631583,
+          "qb_total": 10996.561749999997,
+          "ub_daily": 145.2806853070176,
+          "qb_daily": 122.18401944444442,
+          "proposals": 90,
+          "qb_cycles": 74,
+          "ub_cycles": 90,
+          "qb_rejections": 16,
+          "rejected_profitable": 16,
+          "rejected_losing": 0,
+          "rejected_zero": 0,
+          "forgone_positive_pnl": 2078.6999276315787,
+          "avoided_losses": 0,
+          "rejection_effect_total": -2078.6999276315855,
+          "rejection_effect_daily": -23.096665862573172,
+          "mean_selected_limit_slack_eur": 37.44921390336594,
+          "median_selected_limit_slack_eur": 35.45546622006907,
+          "rejected_days": [
+            {
+              "day": "2026-06-27",
+              "unlimited_pnl": 178.56317763157892,
+              "loop_surplus": -106.45543469395395
+            },
+            {
+              "day": "2026-06-29",
+              "unlimited_pnl": 170.36517105263155,
+              "loop_surplus": -299.7982042809065
+            },
+            {
+              "day": "2026-06-30",
+              "unlimited_pnl": 349.87649342105266,
+              "loop_surplus": -17.641963872053896
+            },
+            {
+              "day": "2026-07-13",
+              "unlimited_pnl": 114.21604605263155,
+              "loop_surplus": -12.70099327677629
+            },
+            {
+              "day": "2026-07-31",
+              "unlimited_pnl": 70.453,
+              "loop_surplus": -17.91596800641443
+            },
+            {
+              "day": "2026-08-04",
+              "unlimited_pnl": 122.51527631578944,
+              "loop_surplus": -17.03341234824341
+            },
+            {
+              "day": "2026-08-05",
+              "unlimited_pnl": 153.2367434210526,
+              "loop_surplus": -40.11527026690133
+            },
+            {
+              "day": "2026-08-07",
+              "unlimited_pnl": 146.66374342105263,
+              "loop_surplus": -30.071239859796055
+            },
+            {
+              "day": "2026-08-14",
+              "unlimited_pnl": 217.1150657894737,
+              "loop_surplus": -9.755611395263179
+            },
+            {
+              "day": "2026-08-17",
+              "unlimited_pnl": 28.995789473684198,
+              "loop_surplus": -8.916085037256552
+            },
+            {
+              "day": "2026-08-19",
+              "unlimited_pnl": 39.47538157894735,
+              "loop_surplus": -36.14488270288027
+            },
+            {
+              "day": "2026-08-20",
+              "unlimited_pnl": 98.50947368421052,
+              "loop_surplus": -71.56429309224211
+            },
+            {
+              "day": "2026-08-21",
+              "unlimited_pnl": 21.304776315789468,
+              "loop_surplus": -5.040905527051268
+            },
+            {
+              "day": "2026-08-24",
+              "unlimited_pnl": 145.8672894736842,
+              "loop_surplus": -25.93453125460789
+            },
+            {
+              "day": "2026-09-11",
+              "unlimited_pnl": 130.25142105263157,
+              "loop_surplus": -14.443383967776299
+            },
+            {
+              "day": "2026-09-13",
+              "unlimited_pnl": 91.29107894736839,
+              "loop_surplus": -19.48301209145
+            }
+          ]
+        },
+        "model": {
+          "ub_total": 13141.03532894737,
+          "qb_total": 12906.387697368424,
+          "ub_daily": 146.01150365497077,
+          "qb_daily": 143.40430774853803,
+          "proposals": 90,
+          "qb_cycles": 87,
+          "ub_cycles": 90,
+          "qb_rejections": 3,
+          "rejected_profitable": 3,
+          "rejected_losing": 0,
+          "rejected_zero": 0,
+          "forgone_positive_pnl": 234.64763157894734,
+          "avoided_losses": 0,
+          "rejection_effect_total": -234.64763157894595,
+          "rejection_effect_daily": -2.607195906432733,
+          "mean_selected_limit_slack_eur": 46.48150908486885,
+          "median_selected_limit_slack_eur": 42.11732535111276,
+          "rejected_days": [
+            {
+              "day": "2026-07-17",
+              "unlimited_pnl": 22.503855263157902,
+              "loop_surplus": -4.006187794765534
+            },
+            {
+              "day": "2026-08-19",
+              "unlimited_pnl": 39.47538157894735,
+              "loop_surplus": -9.35711945045894
+            },
+            {
+              "day": "2026-09-23",
+              "unlimited_pnl": 172.6683947368421,
+              "loop_surplus": -28.24924512074533
+            }
+          ]
+        }
+      },
+      "ub_timing_gap_total": 65.77365131578699,
+      "ub_timing_gap_daily": 0.7308183479531888,
+      "differential_rejection_total": 1844.0522960526396,
+      "differential_rejection_daily": 20.48946995614044,
+      "qb_gap_total": 1909.8259473684266,
+      "qb_gap_daily": 21.22028830409363
+    },
+    "FR": {
+      "first_day": "2026-06-26",
+      "last_day": "2026-09-23",
+      "days": 90,
+      "providers": {
+        "storm": {
+          "ub_total": 11058.694907894733,
+          "qb_total": 10264.687572368417,
+          "ub_daily": 122.87438786549703,
+          "qb_daily": 114.05208413742686,
+          "proposals": 90,
+          "qb_cycles": 80,
+          "ub_cycles": 90,
+          "qb_rejections": 10,
+          "rejected_profitable": 10,
+          "rejected_losing": 0,
+          "rejected_zero": 0,
+          "forgone_positive_pnl": 794.0073355263157,
+          "avoided_losses": 0,
+          "rejection_effect_total": -794.0073355263157,
+          "rejection_effect_daily": -8.822303728070175,
+          "mean_selected_limit_slack_eur": 35.129126710123806,
+          "median_selected_limit_slack_eur": 35.59348599626482,
+          "rejected_days": [
+            {
+              "day": "2026-07-13",
+              "unlimited_pnl": 72.4583486842105,
+              "loop_surplus": -6.862482431578968
+            },
+            {
+              "day": "2026-07-17",
+              "unlimited_pnl": 28.22478947368421,
+              "loop_surplus": -0.5213023621052617
+            },
+            {
+              "day": "2026-08-07",
+              "unlimited_pnl": 121.10655263157895,
+              "loop_surplus": -5.262154172509872
+            },
+            {
+              "day": "2026-08-14",
+              "unlimited_pnl": 166.49156578947367,
+              "loop_surplus": -8.207501360000016
+            },
+            {
+              "day": "2026-08-17",
+              "unlimited_pnl": 29.372578947368396,
+              "loop_surplus": -8.396939739996721
+            },
+            {
+              "day": "2026-08-19",
+              "unlimited_pnl": 43.84195394736841,
+              "loop_surplus": -25.716101405523034
+            },
+            {
+              "day": "2026-08-20",
+              "unlimited_pnl": 72.59055263157893,
+              "loop_surplus": -37.37117485422371
+            },
+            {
+              "day": "2026-08-26",
+              "unlimited_pnl": 47.253743421052604,
+              "loop_surplus": -5.624501845263158
+            },
+            {
+              "day": "2026-08-27",
+              "unlimited_pnl": 32.735526315789485,
+              "loop_surplus": -34.676876986983544
+            },
+            {
+              "day": "2026-09-15",
+              "unlimited_pnl": 179.9317236842105,
+              "loop_surplus": -0.11335359894738328
+            }
+          ]
+        },
+        "model": {
+          "ub_total": 11236.954749999997,
+          "qb_total": 11031.73361842105,
+          "ub_daily": 124.85505277777774,
+          "qb_daily": 122.57481798245612,
+          "proposals": 90,
+          "qb_cycles": 88,
+          "ub_cycles": 90,
+          "qb_rejections": 2,
+          "rejected_profitable": 2,
+          "rejected_losing": 0,
+          "rejected_zero": 0,
+          "forgone_positive_pnl": 205.22113157894734,
+          "avoided_losses": 0,
+          "rejection_effect_total": -205.22113157894637,
+          "rejection_effect_daily": -2.2802347953216264,
+          "mean_selected_limit_slack_eur": 43.62744916458576,
+          "median_selected_limit_slack_eur": 42.190819670024666,
+          "rejected_days": [
+            {
+              "day": "2026-09-14",
+              "unlimited_pnl": 107.21321052631578,
+              "loop_surplus": -7.132589696169479
+            },
+            {
+              "day": "2026-09-19",
+              "unlimited_pnl": 98.00792105263157,
+              "loop_surplus": -4.8421316359336615
+            }
+          ]
+        }
+      },
+      "ub_timing_gap_total": 178.2598421052644,
+      "ub_timing_gap_daily": 1.9806649122807156,
+      "differential_rejection_total": 588.7862039473694,
+      "differential_rejection_daily": 6.542068932748548,
+      "qb_gap_total": 767.0460460526338,
+      "qb_gap_daily": 8.522733845029263
+    },
+    "NL": {
+      "first_day": "2026-06-26",
+      "last_day": "2026-09-23",
+      "days": 90,
+      "providers": {
+        "storm": {
+          "ub_total": 12747.828717105263,
+          "qb_total": 10208.521572368421,
+          "ub_daily": 141.6425413011696,
+          "qb_daily": 113.42801747076024,
+          "proposals": 90,
+          "qb_cycles": 69,
+          "ub_cycles": 90,
+          "qb_rejections": 21,
+          "rejected_profitable": 21,
+          "rejected_losing": 0,
+          "rejected_zero": 0,
+          "forgone_positive_pnl": 2539.307144736842,
+          "avoided_losses": 0,
+          "rejection_effect_total": -2539.307144736842,
+          "rejection_effect_daily": -28.214523830409355,
+          "mean_selected_limit_slack_eur": 35.3530699344767,
+          "median_selected_limit_slack_eur": 33.721332566052666,
+          "rejected_days": [
+            {
+              "day": "2026-06-27",
+              "unlimited_pnl": 200.98715789473684,
+              "loop_surplus": -173.66565402263154
+            },
+            {
+              "day": "2026-06-29",
+              "unlimited_pnl": 217.77254605263155,
+              "loop_surplus": -466.2319584965368
+            },
+            {
+              "day": "2026-06-30",
+              "unlimited_pnl": 277.552625,
+              "loop_surplus": -266.05331088380785
+            },
+            {
+              "day": "2026-07-01",
+              "unlimited_pnl": 105.48652631578943,
+              "loop_surplus": -4.165641084210541
+            },
+            {
+              "day": "2026-07-31",
+              "unlimited_pnl": 64.36493421052631,
+              "loop_surplus": -15.787619875263136
+            },
+            {
+              "day": "2026-08-04",
+              "unlimited_pnl": 76.23840131578945,
+              "loop_surplus": -29.606286332631626
+            },
+            {
+              "day": "2026-08-05",
+              "unlimited_pnl": 127.18244078947367,
+              "loop_surplus": -18.720839426578948
+            },
+            {
+              "day": "2026-08-07",
+              "unlimited_pnl": 135.1306052631579,
+              "loop_surplus": -34.21865213157899
+            },
+            {
+              "day": "2026-08-14",
+              "unlimited_pnl": 202.01892105263158,
+              "loop_surplus": -15.965091136315774
+            },
+            {
+              "day": "2026-08-16",
+              "unlimited_pnl": 136.24030921052633,
+              "loop_surplus": -4.190406658421037
+            },
+            {
+              "day": "2026-08-17",
+              "unlimited_pnl": 33.26672368421052,
+              "loop_surplus": -7.927554326315793
+            },
+            {
+              "day": "2026-08-19",
+              "unlimited_pnl": 38.95099342105257,
+              "loop_surplus": -30.911464164736834
+            },
+            {
+              "day": "2026-08-20",
+              "unlimited_pnl": 93.90084868421052,
+              "loop_surplus": -67.09249846157896
+            },
+            {
+              "day": "2026-08-21",
+              "unlimited_pnl": 24.8760657894737,
+              "loop_surplus": -3.7468909805263024
+            },
+            {
+              "day": "2026-08-24",
+              "unlimited_pnl": 142.70305263157894,
+              "loop_surplus": -19.280910294210535
+            },
+            {
+              "day": "2026-08-26",
+              "unlimited_pnl": 117.30749342105264,
+              "loop_surplus": -9.667100208421061
+            },
+            {
+              "day": "2026-09-01",
+              "unlimited_pnl": 141.00273684210524,
+              "loop_surplus": -18.4342159289474
+            },
+            {
+              "day": "2026-09-04",
+              "unlimited_pnl": 66.46998684210527,
+              "loop_surplus": -1.4467309849999892
+            },
+            {
+              "day": "2026-09-11",
+              "unlimited_pnl": 108.92440131578948,
+              "loop_surplus": -38.401500784210505
+            },
+            {
+              "day": "2026-09-13",
+              "unlimited_pnl": 37.88060526315789,
+              "loop_surplus": -58.80028727789468
+            },
+            {
+              "day": "2026-09-15",
+              "unlimited_pnl": 191.0497697368421,
+              "loop_surplus": -30.265283343684192
+            }
+          ]
+        },
+        "model": {
+          "ub_total": 12868.665098684209,
+          "qb_total": 12332.309611842105,
+          "ub_daily": 142.98516776315788,
+          "qb_daily": 137.02566235380118,
+          "proposals": 90,
+          "qb_cycles": 83,
+          "ub_cycles": 90,
+          "qb_rejections": 7,
+          "rejected_profitable": 7,
+          "rejected_losing": 0,
+          "rejected_zero": 0,
+          "forgone_positive_pnl": 536.3554868421052,
+          "avoided_losses": 0,
+          "rejection_effect_total": -536.3554868421033,
+          "rejection_effect_daily": -5.959505409356704,
+          "mean_selected_limit_slack_eur": 48.642731461106685,
+          "median_selected_limit_slack_eur": 41.76967448184365,
+          "rejected_days": [
+            {
+              "day": "2026-07-16",
+              "unlimited_pnl": 97.02165789473683,
+              "loop_surplus": -7.662724337957193
+            },
+            {
+              "day": "2026-07-17",
+              "unlimited_pnl": 30.453046052631564,
+              "loop_surplus": -4.0132926768957
+            },
+            {
+              "day": "2026-08-04",
+              "unlimited_pnl": 76.23840131578945,
+              "loop_surplus": -33.82590655782611
+            },
+            {
+              "day": "2026-09-04",
+              "unlimited_pnl": 76.22978289473681,
+              "loop_surplus": -21.04624262630736
+            },
+            {
+              "day": "2026-09-13",
+              "unlimited_pnl": 32.309552631578924,
+              "loop_surplus": -7.42108252508267
+            },
+            {
+              "day": "2026-09-19",
+              "unlimited_pnl": 90.00383552631578,
+              "loop_surplus": -2.056027254556785
+            },
+            {
+              "day": "2026-09-23",
+              "unlimited_pnl": 134.09921052631577,
+              "loop_surplus": -38.88429923628381
+            }
+          ]
+        }
+      },
+      "ub_timing_gap_total": 120.83638157894529,
+      "ub_timing_gap_daily": 1.342626461988281,
+      "differential_rejection_total": 2002.9516578947387,
+      "differential_rejection_daily": 22.25501842105265,
+      "qb_gap_total": 2123.788039473684,
+      "qb_gap_daily": 23.59764488304093
+    }
+  }
+}

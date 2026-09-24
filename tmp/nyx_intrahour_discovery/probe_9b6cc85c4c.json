@@ -1,0 +1,163 @@
+[
+  {
+    "series": "38840",
+    "day": "2026-09-15",
+    "cutoff_utc": "2026-09-14T06:00:00+00:00",
+    "raw_count": 31,
+    "raw_timezone": "None",
+    "raw_min": "2026-09-14 19:00:00",
+    "raw_max": "2026-09-16 01:00:00",
+    "raw_minutes": [
+      0
+    ],
+    "raw_step_seconds": {
+      "3600.0": 30
+    },
+    "nan_count": 0,
+    "duplicate_count": 0,
+    "delivery_count": 24,
+    "delivery_distinct_values": 24,
+    "complete_quarters_expected": 96,
+    "within_hour_nonconstant_count": 6
+  },
+  {
+    "series": "28217",
+    "day": "2026-09-15",
+    "cutoff_utc": "2026-09-14T06:00:00+00:00",
+    "raw_count": 31,
+    "raw_timezone": "None",
+    "raw_min": "2026-09-14 19:00:00",
+    "raw_max": "2026-09-16 01:00:00",
+    "raw_minutes": [
+      0
+    ],
+    "raw_step_seconds": {
+      "3600.0": 30
+    },
+    "nan_count": 0,
+    "duplicate_count": 0,
+    "delivery_count": 24,
+    "delivery_distinct_values": 24,
+    "complete_quarters_expected": 96,
+    "within_hour_nonconstant_count": 6
+  },
+  {
+    "series": "28211",
+    "day": "2026-09-15",
+    "cutoff_utc": "2026-09-14T06:00:00+00:00",
+    "raw_count": 31,
+    "raw_timezone": "None",
+    "raw_min": "2026-09-14 19:00:00",
+    "raw_max": "2026-09-16 01:00:00",
+    "raw_minutes": [
+      0
+    ],
+    "raw_step_seconds": {
+      "3600.0": 30
+    },
+    "nan_count": 0,
+    "duplicate_count": 0,
+    "delivery_count": 24,
+    "delivery_distinct_values": 24,
+    "complete_quarters_expected": 96,
+    "within_hour_nonconstant_count": 6
+  },
+  {
+    "series": "28226",
+    "day": "2026-09-15",
+    "cutoff_utc": "2026-09-14T06:00:00+00:00",
+    "raw_count": 31,
+    "raw_timezone": "UTC",
+    "raw_min": "2026-09-14 19:00:00+00:00",
+    "raw_max": "2026-09-16 01:00:00+00:00",
+    "raw_minutes": [
+      0
+    ],
+    "raw_step_seconds": {
+      "3600.0": 30
+    },
+    "nan_count": 0,
+    "duplicate_count": 0,
+    "delivery_count": 24,
+    "delivery_distinct_values": 24,
+    "complete_quarters_expected": 96,
+    "within_hour_nonconstant_count": 6
+  },
+  {
+    "series": "23259",
+    "day": "2026-09-15",
+    "cutoff_utc": "2026-09-14T06:00:00+00:00",
+    "raw_count": 121,
+    "raw_timezone": "UTC",
+    "raw_min": "2026-09-14 19:00:00+00:00",
+    "raw_max": "2026-09-16 01:00:00+00:00",
+    "raw_minutes": [
+      0,
+      15,
+      30,
+      45
+    ],
+    "raw_step_seconds": {
+      "900.0": 120
+    },
+    "nan_count": 0,
+    "duplicate_count": 0,
+    "delivery_count": 96,
+    "delivery_distinct_values": 52,
+    "complete_quarters_expected": 96,
+    "within_hour_nonconstant_count": 13
+  },
+  {
+    "series": "38100",
+    "day": "2026-09-15",
+    "cutoff_utc": "2026-09-14T06:00:00+00:00",
+    "raw_count": 121,
+    "raw_timezone": "None",
+    "raw_min": "2026-09-14 19:00:00",
+    "raw_max": "2026-09-16 01:00:00",
+    "raw_minutes": [
+      0,
+      15,
+      30,
+      45
+    ],
+    "raw_step_seconds": {
+      "900.0": 120
+    },
+    "nan_count": 0,
+    "duplicate_count": 0,
+    "delivery_count": 96,
+    "delivery_distinct_values": 96,
+    "complete_quarters_expected": 96,
+    "within_hour_nonconstant_count": 24
+  },
+  {
+    "series": "41271",
+    "day": "2026-09-15",
+    "cutoff_utc": "2026-09-14T06:00:00+00:00",
+    "raw_count": 0
+  },
+  {
+    "series": "20747",
+    "day": "2026-09-15",
+    "cutoff_utc": "2026-09-14T06:00:00+00:00",
+    "raw_count": 20,
+    "raw_timezone": "None",
+    "raw_min": "2026-09-14 19:00:00",
+    "raw_max": "2026-09-14 23:45:00",
+    "raw_minutes": [
+      0,
+      15,
+      30,
+      45
+    ],
+    "raw_step_seconds": {
+      "900.0": 19
+    },
+    "nan_count": 0,
+    "duplicate_count": 0,
+    "delivery_count": 0,
+    "delivery_distinct_values": 0,
+    "complete_quarters_expected": 96
+  }
+]

@@ -1,0 +1,18 @@
+{
+  "source_sha256": "ebbaff8d0bf7701a95159ec954261c7505569ade482210d95e9220dab1e5db8f",
+  "prefix_elements": 12,
+  "changed_parts": [
+    "[Content_Types].xml",
+    "word/document.xml",
+    "word/_rels/document.xml.rels",
+    "word/styles.xml"
+  ],
+  "added_parts": [
+    "word/media/nyx_front_image1.png",
+    "word/media/nyx_front_image2.png"
+  ],
+  "source_preserved": true,
+  "original_body_preserved_before_section_restart": true,
+  "original_math_objects": 115,
+  "original_media_preserved": true
+}

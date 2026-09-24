@@ -1,0 +1,46 @@
+[
+  {
+    "zone": "BE",
+    "snapshot": "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\nyx_observation_fix_validation_20260918\\BE\\20260918T070933431732Z_068cecd4",
+    "verification": "verified",
+    "hours": 8784,
+    "historical_missing_hours": 0,
+    "delivery_status": "pending_placeholder",
+    "fallback_status": "not_applied_no_available_observations",
+    "applied_fallback_hours": 0,
+    "observation_attempts": 1
+  },
+  {
+    "zone": "DE",
+    "snapshot": "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\nyx_observation_fix_validation_20260918\\DE\\20260918T070940846411Z_d8dc18de",
+    "verification": "verified",
+    "hours": 8784,
+    "historical_missing_hours": 0,
+    "delivery_status": "pending_placeholder",
+    "fallback_status": "not_applied_no_available_observations",
+    "applied_fallback_hours": 0,
+    "observation_attempts": 1
+  },
+  {
+    "zone": "FR",
+    "snapshot": "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\nyx_observation_fix_validation_20260918\\FR\\20260918T070951246261Z_b230a24f",
+    "verification": "verified",
+    "hours": 8784,
+    "historical_missing_hours": 0,
+    "delivery_status": "pending_placeholder",
+    "fallback_status": "not_applied_no_available_observations",
+    "applied_fallback_hours": 0,
+    "observation_attempts": 1
+  },
+  {
+    "zone": "NL",
+    "snapshot": "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\nyx_observation_fix_validation_20260918\\NL\\20260918T070958324151Z_8b793248",
+    "verification": "verified",
+    "hours": 8784,
+    "historical_missing_hours": 0,
+    "delivery_status": "pending_placeholder",
+    "fallback_status": "not_applied_no_available_observations",
+    "applied_fallback_hours": 0,
+    "observation_attempts": 1
+  }
+]

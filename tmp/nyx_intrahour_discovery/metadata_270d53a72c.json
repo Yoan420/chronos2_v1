@@ -1,0 +1,32 @@
+[
+  {
+    "series": "power.stp.wind_production_onshore_da_fcst.be.mw.qh.fcst.elia",
+    "kind": "formula",
+    "source": "power",
+    "metadata_http_status": 200,
+    "metadata": {
+      "tzaware": true,
+      "index_type": "datetime64[ns, UTC]",
+      "value_type": "float64",
+      "index_dtype": "|M8[ns]",
+      "value_dtype": "<f8"
+    },
+    "formula_http_status": 200,
+    "formula": "(pointconnect \"108845449\")"
+  },
+  {
+    "series": "power.stp.wind_production_offshore_da_fcst.be.mw.qh.fcst.elia",
+    "kind": "formula",
+    "source": "power",
+    "metadata_http_status": 200,
+    "metadata": {
+      "tzaware": true,
+      "index_type": "datetime64[ns, UTC]",
+      "value_type": "float64",
+      "index_dtype": "|M8[ns]",
+      "value_dtype": "<f8"
+    },
+    "formula_http_status": 200,
+    "formula": "(pointconnect \"108845412\")"
+  }
+]

@@ -1,0 +1,3030 @@
+{
+  "snapshot": "runs\\experiments\\nyx_scarcity_v1\\coherent_p50\\snapshots\\20260914T160104Z_d7366f80",
+  "common_hours": 34940,
+  "start": "2025-09-15",
+  "end": "2026-09-14",
+  "top_1_percent_definition": "Ex post observed price >= within-group 99th percentile on identical common support.",
+  "forecast_probability_is_frozen": true,
+  "causality_and_support": {
+    "forest": {
+      "trained_folds": 32,
+      "training_core_rows_min": 6052,
+      "training_core_rows_max": 32256,
+      "ready_common_hours": 20924,
+      "ready_common_p_above_half": 31,
+      "support_quantiles_causal_metadata_checks": "passed"
+    },
+    "empirical": {
+      "trained_folds": 32,
+      "training_core_rows_min": 6052,
+      "training_core_rows_max": 32256,
+      "ready_common_hours": 20924,
+      "ready_common_p_above_half": 31,
+      "support_quantiles_causal_metadata_checks": "passed"
+    }
+  },
+  "groups": {
+    "ALL": {
+      "hours": 34940,
+      "baseline": {
+        "hours": 34940,
+        "mae": 11.367500308448989,
+        "rmse": 21.875529284056935,
+        "forecast_minus_actual_bias": -0.6690254259228464,
+        "observed_le_p10": 0.12346880366342301,
+        "observed_le_p50": 0.4897824842587292,
+        "observed_le_p90": 0.8687750429307384,
+        "coverage_p10_p90": 0.7453062392673154,
+        "mean_interval_width": 31.616248630781342,
+        "pinball10": 2.794116960523599,
+        "pinball50": 5.683750154224494,
+        "pinball90": 3.092300761059456
+      },
+      "storm_mae": 11.317589063480252,
+      "top1_threshold": 232.37,
+      "top1_hours": 352,
+      "top1_baseline_mae": 89.16855719957333,
+      "top1_storm_mae": 66.92004263636363,
+      "models": {
+        "old_fundamental_governed": {
+          "hours": 34940,
+          "mae": 11.367671704767128,
+          "rmse": 21.875865270181112,
+          "forecast_minus_actual_bias": -0.6686625287434659,
+          "observed_le_p10": 0.12338294218660562,
+          "observed_le_p50": 0.4897824842587292,
+          "observed_le_p90": 0.8694619347452777,
+          "coverage_p10_p90": 0.746078992558672,
+          "mean_interval_width": 31.59740582590234,
+          "pinball10": 2.8039570206656066,
+          "pinball50": 5.683835852383564,
+          "pinball90": 3.091918991715668,
+          "mae_gain_vs_nyx": -0.00017139631813914517,
+          "exploratory_day_cluster_gain_ci95": [
+            -0.0005660164455462775,
+            0.0002232238092679872
+          ],
+          "top1_mae": 89.17292531753047,
+          "top1_mae_gain_vs_nyx": -0.004368117957156334,
+          "active_hours": 9,
+          "improved_active_hours": 4,
+          "worsened_active_hours": 5,
+          "active_no_underforecast_hours": 5,
+          "active_outside_error50_hours": 9,
+          "positive_error50_hours": 374,
+          "active_within_error50_hours": 0,
+          "mae_gain_excluding_preidentified_days": -0.00017330094211661455,
+          "signed_total_absolute_error_gain": -5.988587355781732,
+          "active_scores": {
+            "hours": 9,
+            "mae": 22.817909679264446,
+            "rmse": 30.456004908166975,
+            "forecast_minus_actual_bias": 18.392609272397646,
+            "observed_le_p10": 0.4444444444444444,
+            "observed_le_p50": 0.5555555555555556,
+            "observed_le_p90": 1.0,
+            "coverage_p10_p90": 0.5555555555555556,
+            "mean_interval_width": 33.41125341443913,
+            "pinball10": 11.7748464767406,
+            "pinball50": 11.408954839632223,
+            "pinball90": 3.627931641356422
+          },
+          "nyx_on_same_active_scores": {
+            "hours": 9,
+            "mae": 22.152511084177586,
+            "rmse": 29.504238781072605,
+            "forecast_minus_actual_bias": 16.983761778224473,
+            "observed_le_p10": 0.3333333333333333,
+            "observed_le_p50": 0.5555555555555556,
+            "observed_le_p90": 1.0,
+            "coverage_p10_p90": 0.6666666666666666,
+            "mean_interval_width": 85.21745300292972,
+            "pinball10": 7.634816707267291,
+            "pinball50": 11.076255542088793,
+            "pinball90": 7.690790186068976
+          }
+        },
+        "old_fundamental_25": {
+          "hours": 34940,
+          "mae": 11.366933553349146,
+          "rmse": 21.873358376692053,
+          "forecast_minus_actual_bias": -0.6609951946064849,
+          "observed_le_p10": 0.12398397252432741,
+          "observed_le_p50": 0.49012593016599887,
+          "observed_le_p90": 0.8675729822552948,
+          "coverage_p10_p90": 0.7435890097309674,
+          "mean_interval_width": 31.39164269999037,
+          "pinball10": 2.7963897508893303,
+          "pinball50": 5.683466776674573,
+          "pinball90": 3.132410747940414,
+          "mae_gain_vs_nyx": 0.0005667550998438612,
+          "exploratory_day_cluster_gain_ci95": [
+            -0.001072103544687259,
+            0.0022056137443749813
+          ],
+          "top1_mae": 89.07969406288079,
+          "top1_mae_gain_vs_nyx": 0.0888631366925091,
+          "active_hours": 411,
+          "improved_active_hours": 220,
+          "worsened_active_hours": 191,
+          "active_no_underforecast_hours": 185,
+          "active_outside_error50_hours": 388,
+          "positive_error50_hours": 374,
+          "active_within_error50_hours": 23,
+          "mae_gain_excluding_preidentified_days": 0.0005620889175305513,
+          "signed_total_absolute_error_gain": 19.80242318854451,
+          "active_scores": {
+            "hours": 411,
+            "mae": 22.53810403077674,
+            "rmse": 53.77506760988138,
+            "forecast_minus_actual_bias": -10.528761805438142,
+            "observed_le_p10": 0.18004866180048662,
+            "observed_le_p50": 0.4793187347931874,
+            "observed_le_p90": 0.7493917274939172,
+            "coverage_p10_p90": 0.5693430656934306,
+            "mean_interval_width": 28.46157500536561,
+            "pinball10": 4.332735308572056,
+            "pinball50": 11.26905201538837,
+            "pinball90": 11.497914566427019
+          },
+          "nyx_on_same_active_scores": {
+            "hours": 411,
+            "mae": 22.586285109094366,
+            "rmse": 53.85008735707558,
+            "forecast_minus_actual_bias": -11.21142915870742,
+            "observed_le_p10": 0.1362530413625304,
+            "observed_le_p50": 0.45012165450121655,
+            "observed_le_p90": 0.851581508515815,
+            "coverage_p10_p90": 0.7153284671532847,
+            "mean_interval_width": 47.5558115548461,
+            "pinball10": 4.139520477967132,
+            "pinball50": 11.293142554547183,
+            "pinball90": 8.088077725500757
+          }
+        },
+        "regional_25": {
+          "hours": 34940,
+          "mae": 11.347754910759878,
+          "rmse": 21.659962178951254,
+          "forecast_minus_actual_bias": -0.630978037791954,
+          "observed_le_p10": 0.12375500858614769,
+          "observed_le_p50": 0.4899828277046365,
+          "observed_le_p90": 0.8687178019461935,
+          "coverage_p10_p90": 0.7449627933600458,
+          "mean_interval_width": 31.42168091778909,
+          "pinball10": 2.8044073347779492,
+          "pinball50": 5.673877455379939,
+          "pinball90": 3.1188390400773534,
+          "mae_gain_vs_nyx": 0.019745397689109986,
+          "exploratory_day_cluster_gain_ci95": [
+            -0.005670171766344802,
+            0.04516096714456477
+          ],
+          "top1_mae": 86.70998262482043,
+          "top1_mae_gain_vs_nyx": 2.4585745747528964,
+          "active_hours": 53,
+          "improved_active_hours": 40,
+          "worsened_active_hours": 13,
+          "active_no_underforecast_hours": 9,
+          "active_outside_error50_hours": 21,
+          "positive_error50_hours": 374,
+          "active_within_error50_hours": 32,
+          "mae_gain_excluding_preidentified_days": 0.0035145071453683784,
+          "signed_total_absolute_error_gain": 689.9041952575029,
+          "active_scores": {
+            "hours": 53,
+            "mae": 147.90507934206119,
+            "rmse": 205.68894258883122,
+            "forecast_minus_actual_bias": -111.73392802723656,
+            "observed_le_p10": 0.22641509433962265,
+            "observed_le_p50": 0.3018867924528302,
+            "observed_le_p90": 0.39622641509433965,
+            "coverage_p10_p90": 0.16981132075471697,
+            "mean_interval_width": 35.428503079744885,
+            "pinball10": 26.48074486153295,
+            "pinball50": 73.95253967103059,
+            "pinball90": 108.4430891316934
+          },
+          "nyx_on_same_active_scores": {
+            "hours": 53,
+            "mae": 160.9221396299386,
+            "rmse": 220.21543844757443,
+            "forecast_minus_actual_bias": -136.81648918371548,
+            "observed_le_p10": 0.03773584905660377,
+            "observed_le_p50": 0.16981132075471697,
+            "observed_le_p90": 0.4339622641509434,
+            "coverage_p10_p90": 0.39622641509433965,
+            "mean_interval_width": 163.69635009765625,
+            "pinball10": 19.696864173854213,
+            "pinball50": 80.4610698149693,
+            "pinball90": 90.94785386970611
+          }
+        },
+        "forest_direct": {
+          "hours": 34940,
+          "mae": 11.346449120891492,
+          "rmse": 21.579444627167966,
+          "forecast_minus_actual_bias": -0.5519170889896449,
+          "observed_le_p10": 0.12507155123068117,
+          "observed_le_p50": 0.49135661133371494,
+          "observed_le_p90": 0.8696622781911849,
+          "coverage_p10_p90": 0.7445907269605038,
+          "mean_interval_width": 31.439451737163598,
+          "pinball10": 2.8383412624733277,
+          "pinball50": 5.673224560445746,
+          "pinball90": 3.065056924735433,
+          "mae_gain_vs_nyx": 0.021051187557495167,
+          "exploratory_day_cluster_gain_ci95": [
+            -0.021901970286828838,
+            0.06400434540181918
+          ],
+          "top1_mae": 85.2161502927849,
+          "top1_mae_gain_vs_nyx": 3.9524069067884073,
+          "active_hours": 779,
+          "improved_active_hours": 440,
+          "worsened_active_hours": 339,
+          "active_no_underforecast_hours": 300,
+          "active_outside_error50_hours": 703,
+          "positive_error50_hours": 374,
+          "active_within_error50_hours": 76,
+          "mae_gain_excluding_preidentified_days": 0.0061088647974018055,
+          "signed_total_absolute_error_gain": 735.5284932588811,
+          "active_scores": {
+            "hours": 779,
+            "mae": 31.522530646699593,
+            "rmse": 71.72961168820818,
+            "forecast_minus_actual_bias": -13.976997327421442,
+            "observed_le_p10": 0.17715019255455713,
+            "observed_le_p50": 0.4557124518613607,
+            "observed_le_p90": 0.8292682926829268,
+            "coverage_p10_p90": 0.6521181001283697,
+            "mean_interval_width": 47.85650898647804,
+            "pinball10": 7.07270514148638,
+            "pinball50": 15.761265323349797,
+            "pinball90": 13.531847720158964
+          },
+          "nyx_on_same_active_scores": {
+            "hours": 779,
+            "mae": 32.46672640184578,
+            "rmse": 75.64538051085657,
+            "forecast_minus_actual_bias": -19.229584352384293,
+            "observed_le_p10": 0.10526315789473684,
+            "observed_le_p50": 0.3851091142490372,
+            "observed_le_p90": 0.7894736842105263,
+            "coverage_p10_p90": 0.6842105263157895,
+            "mean_interval_width": 55.78626952948711,
+            "pinball10": 5.0891401734202635,
+            "pinball50": 16.23336320092289,
+            "pinball90": 14.753798479031047
+          }
+        },
+        "forest_governed": {
+          "hours": 34940,
+          "mae": 11.353936731948053,
+          "rmse": 21.78837299059977,
+          "forecast_minus_actual_bias": -0.6472638713381057,
+          "observed_le_p10": 0.12361190612478534,
+          "observed_le_p50": 0.48995420721236405,
+          "observed_le_p90": 0.8690326273611906,
+          "coverage_p10_p90": 0.7454207212364052,
+          "mean_interval_width": 31.637328652182273,
+          "pinball10": 2.796090577625107,
+          "pinball50": 5.676968365974027,
+          "pinball90": 3.073580059120401,
+          "mae_gain_vs_nyx": 0.01356357650093668,
+          "exploratory_day_cluster_gain_ci95": [
+            -0.007030009578755414,
+            0.03415716258062877
+          ],
+          "top1_mae": 87.83303571152999,
+          "top1_mae_gain_vs_nyx": 1.335521488043328,
+          "active_hours": 101,
+          "improved_active_hours": 71,
+          "worsened_active_hours": 30,
+          "active_no_underforecast_hours": 26,
+          "active_outside_error50_hours": 84,
+          "positive_error50_hours": 374,
+          "active_within_error50_hours": 17,
+          "mae_gain_excluding_preidentified_days": 0.004333648667724184,
+          "signed_total_absolute_error_gain": 473.9113629427276,
+          "active_scores": {
+            "hours": 101,
+            "mae": 36.018445713562386,
+            "rmse": 67.04593043231179,
+            "forecast_minus_actual_bias": -23.88672598795146,
+            "observed_le_p10": 0.0891089108910891,
+            "observed_le_p50": 0.31683168316831684,
+            "observed_le_p90": 0.8316831683168316,
+            "coverage_p10_p90": 0.7425742574257426,
+            "mean_interval_width": 71.51205094919456,
+            "pinball10": 6.755838149189674,
+            "pinball50": 18.009222856781193,
+            "pinball90": 12.868034851970654
+          },
+          "nyx_on_same_active_scores": {
+            "hours": 101,
+            "mae": 40.71063742586662,
+            "rmse": 76.23426221700572,
+            "forecast_minus_actual_bias": -31.4149311086529,
+            "observed_le_p10": 0.039603960396039604,
+            "observed_le_p50": 0.25742574257425743,
+            "observed_le_p90": 0.7425742574257426,
+            "coverage_p10_p90": 0.7029702970297029,
+            "mean_interval_width": 64.21961582297146,
+            "pinball10": 6.07308387664837,
+            "pinball50": 20.35531871293331,
+            "pinball90": 19.344285601976274
+          }
+        },
+        "empirical_direct": {
+          "hours": 34940,
+          "mae": 11.333714122129605,
+          "rmse": 21.593452508536696,
+          "forecast_minus_actual_bias": -0.6055385988570261,
+          "observed_le_p10": 0.12372638809387522,
+          "observed_le_p50": 0.4901831711505438,
+          "observed_le_p90": 0.8694619347452777,
+          "coverage_p10_p90": 0.7457355466514024,
+          "mean_interval_width": 31.482111559038234,
+          "pinball10": 2.8243358355967803,
+          "pinball50": 5.666857061064802,
+          "pinball90": 3.0738788997902433,
+          "mae_gain_vs_nyx": 0.03378618631938368,
+          "exploratory_day_cluster_gain_ci95": [
+            -0.0032546697733198404,
+            0.0708270424120872
+          ],
+          "top1_mae": 85.7067768598687,
+          "top1_mae_gain_vs_nyx": 3.4617803397046227,
+          "active_hours": 563,
+          "improved_active_hours": 345,
+          "worsened_active_hours": 218,
+          "active_no_underforecast_hours": 210,
+          "active_outside_error50_hours": 497,
+          "positive_error50_hours": 374,
+          "active_within_error50_hours": 66,
+          "mae_gain_excluding_preidentified_days": 0.020029899624824953,
+          "signed_total_absolute_error_gain": 1180.4893499992659,
+          "active_scores": {
+            "hours": 563,
+            "mae": 36.53049330827211,
+            "rmse": 83.20692689987523,
+            "forecast_minus_actual_bias": -19.913723574102747,
+            "observed_le_p10": 0.12433392539964476,
+            "observed_le_p50": 0.3978685612788632,
+            "observed_le_p90": 0.8241563055062167,
+            "coverage_p10_p90": 0.6998223801065719,
+            "mean_interval_width": 52.971078225511505,
+            "pinball10": 7.872367242552358,
+            "pinball50": 18.265246654136057,
+            "pinball90": 17.218122435301822
+          },
+          "nyx_on_same_active_scores": {
+            "hours": 563,
+            "mae": 38.62727723367046,
+            "rmse": 87.66043443030652,
+            "forecast_minus_actual_bias": -23.853740870159168,
+            "observed_le_p10": 0.108348134991119,
+            "observed_le_p50": 0.37300177619893427,
+            "observed_le_p90": 0.7815275310834814,
+            "coverage_p10_p90": 0.6731793960923623,
+            "mean_interval_width": 61.295677313796155,
+            "pinball10": 5.99697204706932,
+            "pinball50": 19.31363861683523,
+            "pinball90": 18.361390344265015
+          }
+        },
+        "empirical_governed": {
+          "hours": 34940,
+          "mae": 11.351514261786843,
+          "rmse": 21.73924269686115,
+          "forecast_minus_actual_bias": -0.6347894456337522,
+          "observed_le_p10": 0.12378362907842015,
+          "observed_le_p50": 0.48995420721236405,
+          "observed_le_p90": 0.869118488838008,
+          "coverage_p10_p90": 0.7453348597595879,
+          "mean_interval_width": 31.456282241727937,
+          "pinball10": 2.825013635558491,
+          "pinball50": 5.675757130893421,
+          "pinball90": 3.070704557115223,
+          "mae_gain_vs_nyx": 0.01598604666214626,
+          "exploratory_day_cluster_gain_ci95": [
+            -0.006942674367121402,
+            0.03891476769141393
+          ],
+          "top1_mae": 87.51552781377177,
+          "top1_mae_gain_vs_nyx": 1.6530293858015377,
+          "active_hours": 122,
+          "improved_active_hours": 76,
+          "worsened_active_hours": 46,
+          "active_no_underforecast_hours": 41,
+          "active_outside_error50_hours": 101,
+          "positive_error50_hours": 374,
+          "active_within_error50_hours": 21,
+          "mae_gain_excluding_preidentified_days": 0.007038755657507565,
+          "signed_total_absolute_error_gain": 558.5524703753904,
+          "active_scores": {
+            "hours": 122,
+            "mae": 51.54695722357315,
+            "rmse": 88.78373529600921,
+            "forecast_minus_actual_bias": -9.961838198432181,
+            "observed_le_p10": 0.1885245901639344,
+            "observed_le_p50": 0.38524590163934425,
+            "observed_le_p90": 0.8360655737704918,
+            "coverage_p10_p90": 0.6475409836065574,
+            "mean_interval_width": 73.79799200354896,
+            "pinball10": 17.514058252520066,
+            "pinball50": 25.773478611786576,
+            "pinball90": 16.663481641770137
+          },
+          "nyx_on_same_active_scores": {
+            "hours": 122,
+            "mae": 56.12525616107635,
+            "rmse": 97.90252973318694,
+            "forecast_minus_actual_bias": -19.76679845499737,
+            "observed_le_p10": 0.09836065573770492,
+            "observed_le_p50": 0.3360655737704918,
+            "observed_le_p90": 0.7377049180327869,
+            "coverage_p10_p90": 0.639344262295082,
+            "mean_interval_width": 119.61131686851627,
+            "pinball10": 8.665453123674872,
+            "pinball50": 28.062628080538175,
+            "pinball90": 22.848492836946342
+          }
+        }
+      }
+    },
+    "BE": {
+      "hours": 8735,
+      "baseline": {
+        "hours": 8735,
+        "mae": 11.150388962758024,
+        "rmse": 23.674577432222833,
+        "forecast_minus_actual_bias": -1.0288037955249012,
+        "observed_le_p10": 0.1204350314825415,
+        "observed_le_p50": 0.4911276473955352,
+        "observed_le_p90": 0.866971951917573,
+        "coverage_p10_p90": 0.7465369204350315,
+        "mean_interval_width": 30.64269856418551,
+        "pinball10": 2.599955517477278,
+        "pinball50": 5.575194481379012,
+        "pinball90": 3.2373311696386318
+      },
+      "storm_mae": 10.946671310017173,
+      "top1_threshold": 224.98645,
+      "top1_hours": 88,
+      "top1_baseline_mae": 102.73537533893601,
+      "top1_storm_mae": 83.97774785227271,
+      "models": {
+        "old_fundamental_governed": {
+          "hours": 8735,
+          "mae": 11.150388962758024,
+          "rmse": 23.674577432222833,
+          "forecast_minus_actual_bias": -1.0288037955249012,
+          "observed_le_p10": 0.1204350314825415,
+          "observed_le_p50": 0.4911276473955352,
+          "observed_le_p90": 0.866971951917573,
+          "coverage_p10_p90": 0.7465369204350315,
+          "mean_interval_width": 30.64269856418551,
+          "pinball10": 2.599955517477278,
+          "pinball50": 5.575194481379012,
+          "pinball90": 3.2373311696386318,
+          "mae_gain_vs_nyx": 0.0,
+          "exploratory_day_cluster_gain_ci95": [
+            0.0,
+            0.0
+          ],
+          "top1_mae": 102.73537533893601,
+          "top1_mae_gain_vs_nyx": 0.0,
+          "active_hours": 0,
+          "improved_active_hours": 0,
+          "worsened_active_hours": 0,
+          "active_no_underforecast_hours": 0,
+          "active_outside_error50_hours": 0,
+          "positive_error50_hours": 106,
+          "active_within_error50_hours": 0,
+          "mae_gain_excluding_preidentified_days": 0.0,
+          "signed_total_absolute_error_gain": 0.0,
+          "active_scores": {
+            "hours": 0
+          },
+          "nyx_on_same_active_scores": {
+            "hours": 0
+          }
+        },
+        "old_fundamental_25": {
+          "hours": 8735,
+          "mae": 11.14952141809054,
+          "rmse": 23.67388873087793,
+          "forecast_minus_actual_bias": -1.0260168397649576,
+          "observed_le_p10": 0.12077847738981111,
+          "observed_le_p50": 0.4911276473955352,
+          "observed_le_p90": 0.8658271322266743,
+          "coverage_p10_p90": 0.7450486548368632,
+          "mean_interval_width": 30.516770638108202,
+          "pinball10": 2.6012909709807683,
+          "pinball50": 5.57476070904527,
+          "pinball90": 3.2534747643059956,
+          "mae_gain_vs_nyx": 0.0008675446674823359,
+          "exploratory_day_cluster_gain_ci95": [
+            -0.0002825529334719659,
+            0.0020176422684366375
+          ],
+          "top1_mae": 102.70920018386447,
+          "top1_mae_gain_vs_nyx": 0.026175155071541667,
+          "active_hours": 67,
+          "improved_active_hours": 41,
+          "worsened_active_hours": 26,
+          "active_no_underforecast_hours": 26,
+          "active_outside_error50_hours": 66,
+          "positive_error50_hours": 106,
+          "active_within_error50_hours": 1,
+          "mae_gain_excluding_preidentified_days": 0.0008771851684753101,
+          "signed_total_absolute_error_gain": 7.578002670458204,
+          "active_scores": {
+            "hours": 67,
+            "mae": 12.85477529877602,
+            "rmse": 23.353890301914557,
+            "forecast_minus_actual_bias": -5.747181872170926,
+            "observed_le_p10": 0.13432835820895522,
+            "observed_le_p50": 0.3880597014925373,
+            "observed_le_p90": 0.7761194029850746,
+            "coverage_p10_p90": 0.6417910447761194,
+            "mean_interval_width": 23.16508649198276,
+            "pinball10": 2.587263735742957,
+            "pinball50": 6.42738764938801,
+            "pinball90": 4.253829939634278
+          },
+          "nyx_on_same_active_scores": {
+            "hours": 67,
+            "mae": 12.96787981624555,
+            "rmse": 23.444733386321346,
+            "forecast_minus_actual_bias": -6.11052602982929,
+            "observed_le_p10": 0.08955223880597014,
+            "observed_le_p50": 0.3880597014925373,
+            "observed_le_p90": 0.9253731343283582,
+            "coverage_p10_p90": 0.835820895522388,
+            "mean_interval_width": 39.58270491414995,
+            "pinball10": 2.4131564767431244,
+            "pinball50": 6.483939908122775,
+            "pinball90": 2.1491389035233754
+          }
+        },
+        "regional_25": {
+          "hours": 8735,
+          "mae": 11.124900030054249,
+          "rmse": 23.412431830485254,
+          "forecast_minus_actual_bias": -0.9914770380772445,
+          "observed_le_p10": 0.1204350314825415,
+          "observed_le_p50": 0.4912421293646251,
+          "observed_le_p90": 0.8667429879793932,
+          "coverage_p10_p90": 0.7463079564968518,
+          "mean_interval_width": 30.4051165482431,
+          "pinball10": 2.6190628945428753,
+          "pinball50": 5.5624500150271246,
+          "pinball90": 3.2897494900207156,
+          "mae_gain_vs_nyx": 0.025488932703775773,
+          "exploratory_day_cluster_gain_ci95": [
+            -0.008458710394214357,
+            0.0594365758017659
+          ],
+          "top1_mae": 99.7996434765073,
+          "top1_mae_gain_vs_nyx": 2.9357318624287116,
+          "active_hours": 13,
+          "improved_active_hours": 11,
+          "worsened_active_hours": 2,
+          "active_no_underforecast_hours": 2,
+          "active_outside_error50_hours": 3,
+          "positive_error50_hours": 106,
+          "active_within_error50_hours": 10,
+          "mae_gain_excluding_preidentified_days": 0.005453471193549873,
+          "signed_total_absolute_error_gain": 222.64582716748137,
+          "active_scores": {
+            "hours": 13,
+            "mae": 210.00203182863623,
+            "rmse": 275.7947142537111,
+            "forecast_minus_actual_bias": -161.82167863916663,
+            "observed_le_p10": 0.15384615384615385,
+            "observed_le_p50": 0.23076923076923078,
+            "observed_le_p90": 0.23076923076923078,
+            "coverage_p10_p90": 0.07692307692307693,
+            "mean_interval_width": 36.6536705638449,
+            "pinball10": 39.17207427844788,
+            "pinball50": 105.00101591431812,
+            "pinball90": 156.43599134099605
+          },
+          "nyx_on_same_active_scores": {
+            "hours": 13,
+            "mae": 227.12863391844243,
+            "rmse": 290.4422649960577,
+            "forecast_minus_actual_bias": -186.9023883549576,
+            "observed_le_p10": 0.15384615384615385,
+            "observed_le_p50": 0.15384615384615385,
+            "observed_le_p90": 0.38461538461538464,
+            "coverage_p10_p90": 0.23076923076923078,
+            "mean_interval_width": 196.29050973745493,
+            "pinball10": 26.33338668860239,
+            "pinball50": 113.56431695922122,
+            "pinball90": 121.21491222272633
+          }
+        },
+        "forest_direct": {
+          "hours": 8735,
+          "mae": 11.109091246106429,
+          "rmse": 23.425168083210988,
+          "forecast_minus_actual_bias": -0.9594543572186198,
+          "observed_le_p10": 0.12169433314253005,
+          "observed_le_p50": 0.4918145392100744,
+          "observed_le_p90": 0.8676588437321122,
+          "coverage_p10_p90": 0.7459645105895821,
+          "mean_interval_width": 30.50749817798955,
+          "pinball10": 2.5998070532990116,
+          "pinball50": 5.554545623053214,
+          "pinball90": 3.2486788541995932,
+          "mae_gain_vs_nyx": 0.04129771665159539,
+          "exploratory_day_cluster_gain_ci95": [
+            -0.003962513986362957,
+            0.08655794728955374
+          ],
+          "top1_mae": 98.3746025324529,
+          "top1_mae_gain_vs_nyx": 4.360772806483115,
+          "active_hours": 161,
+          "improved_active_hours": 95,
+          "worsened_active_hours": 66,
+          "active_no_underforecast_hours": 64,
+          "active_outside_error50_hours": 142,
+          "positive_error50_hours": 106,
+          "active_within_error50_hours": 19,
+          "mae_gain_excluding_preidentified_days": 0.025010733430132114,
+          "signed_total_absolute_error_gain": 360.7355549516857,
+          "active_scores": {
+            "hours": 161,
+            "mae": 33.836031042141265,
+            "rmse": 92.3454678214069,
+            "forecast_minus_actual_bias": -25.016269887494733,
+            "observed_le_p10": 0.13664596273291926,
+            "observed_le_p50": 0.43478260869565216,
+            "observed_le_p90": 0.8695652173913043,
+            "coverage_p10_p90": 0.7329192546583851,
+            "mean_interval_width": 45.13745059634726,
+            "pinball10": 4.998622975251302,
+            "pinball50": 16.918015521070632,
+            "pinball90": 17.867725547084724
+          },
+          "nyx_on_same_active_scores": {
+            "hours": 161,
+            "mae": 36.07662455115795,
+            "rmse": 95.73411742851873,
+            "forecast_minus_actual_bias": -28.77879997200013,
+            "observed_le_p10": 0.06832298136645963,
+            "observed_le_p50": 0.39751552795031053,
+            "observed_le_p90": 0.8322981366459627,
+            "coverage_p10_p90": 0.7639751552795031,
+            "mean_interval_width": 52.47270136294158,
+            "pinball10": 5.0066778485255705,
+            "pinball50": 18.038312275578974,
+            "pinball90": 17.252060797767932
+          }
+        },
+        "forest_governed": {
+          "hours": 8735,
+          "mae": 11.126659164607073,
+          "rmse": 23.55309493266323,
+          "forecast_minus_actual_bias": -1.0024934844052187,
+          "observed_le_p10": 0.12066399542072123,
+          "observed_le_p50": 0.4911276473955352,
+          "observed_le_p90": 0.8673153978248426,
+          "coverage_p10_p90": 0.7466514024041213,
+          "mean_interval_width": 30.675975253200317,
+          "pinball10": 2.6002706123130865,
+          "pinball50": 5.5633295823035365,
+          "pinball90": 3.210303987728894,
+          "mae_gain_vs_nyx": 0.02372979815095321,
+          "exploratory_day_cluster_gain_ci95": [
+            -0.008754208636054334,
+            0.05621380493796076
+          ],
+          "top1_mae": 100.41130039670794,
+          "top1_mae_gain_vs_nyx": 2.324074942228055,
+          "active_hours": 28,
+          "improved_active_hours": 23,
+          "worsened_active_hours": 5,
+          "active_no_underforecast_hours": 5,
+          "active_outside_error50_hours": 20,
+          "positive_error50_hours": 106,
+          "active_within_error50_hours": 8,
+          "mae_gain_excluding_preidentified_days": 0.008466430364361774,
+          "signed_total_absolute_error_gain": 207.2797868485763,
+          "active_scores": {
+            "hours": 28,
+            "mae": 48.895511047159495,
+            "rmse": 81.21355733585322,
+            "forecast_minus_actual_bias": -43.361992502665764,
+            "observed_le_p10": 0.07142857142857142,
+            "observed_le_p50": 0.17857142857142858,
+            "observed_le_p90": 0.7142857142857143,
+            "coverage_p10_p90": 0.6428571428571429,
+            "mean_interval_width": 80.30178954657643,
+            "pinball10": 7.586188952677451,
+            "pinball50": 24.447755523579747,
+            "pinball90": 12.41098283020119
+          },
+          "nyx_on_same_active_scores": {
+            "hours": 28,
+            "mae": 56.29836057746579,
+            "rmse": 91.57229780193146,
+            "forecast_minus_actual_bias": -51.569869918038215,
+            "observed_le_p10": 0.0,
+            "observed_le_p50": 0.17857142857142858,
+            "observed_le_p90": 0.6071428571428571,
+            "coverage_p10_p90": 0.6071428571428571,
+            "mean_interval_width": 69.92065102713448,
+            "pinball10": 7.487890617292105,
+            "pinball50": 28.149180288732897,
+            "pinball90": 20.842498329542487
+          }
+        },
+        "empirical_direct": {
+          "hours": 8735,
+          "mae": 11.111474970570619,
+          "rmse": 23.44923020464664,
+          "forecast_minus_actual_bias": -0.9836723850710462,
+          "observed_le_p10": 0.12077847738981111,
+          "observed_le_p50": 0.4912421293646251,
+          "observed_le_p90": 0.8668574699484831,
+          "coverage_p10_p90": 0.746078992558672,
+          "mean_interval_width": 30.460489710954587,
+          "pinball10": 2.5961786676007748,
+          "pinball50": 5.555737485285309,
+          "pinball90": 3.270207882311107,
+          "mae_gain_vs_nyx": 0.03891399218740354,
+          "exploratory_day_cluster_gain_ci95": [
+            -0.0015046474785826366,
+            0.0793326318533897
+          ],
+          "top1_mae": 98.89197731872933,
+          "top1_mae_gain_vs_nyx": 3.8433980202066564,
+          "active_hours": 93,
+          "improved_active_hours": 67,
+          "worsened_active_hours": 26,
+          "active_no_underforecast_hours": 26,
+          "active_outside_error50_hours": 74,
+          "positive_error50_hours": 106,
+          "active_within_error50_hours": 19,
+          "mae_gain_excluding_preidentified_days": 0.02356559004358185,
+          "signed_total_absolute_error_gain": 339.9137217569699,
+          "active_scores": {
+            "hours": 93,
+            "mae": 52.836228920664034,
+            "rmse": 121.62919192398583,
+            "forecast_minus_actual_bias": -45.31379774834991,
+            "observed_le_p10": 0.10752688172043011,
+            "observed_le_p50": 0.2903225806451613,
+            "observed_le_p90": 0.7741935483870968,
+            "coverage_p10_p90": 0.6666666666666666,
+            "mean_interval_width": 51.141456324151484,
+            "pinball10": 7.184410285129687,
+            "pinball50": 26.418114460332017,
+            "pinball90": 31.48710817277257
+          },
+          "nyx_on_same_active_scores": {
+            "hours": 93,
+            "mae": 56.49121517611531,
+            "rmse": 125.66251491974461,
+            "forecast_minus_actual_bias": -49.5527533431287,
+            "observed_le_p10": 0.07526881720430108,
+            "observed_le_p50": 0.27956989247311825,
+            "observed_le_p90": 0.7849462365591398,
+            "coverage_p10_p90": 0.7096774193548387,
+            "mean_interval_width": 68.25537388299101,
+            "pinball10": 7.539149894498022,
+            "pinball50": 28.245607588057656,
+            "pinball90": 28.39917177283633
+          }
+        },
+        "empirical_governed": {
+          "hours": 8735,
+          "mae": 11.124436911430713,
+          "rmse": 23.523729850789923,
+          "forecast_minus_actual_bias": -1.00075029378715,
+          "observed_le_p10": 0.12066399542072123,
+          "observed_le_p50": 0.4911276473955352,
+          "observed_le_p90": 0.8674298797939325,
+          "coverage_p10_p90": 0.7467658843732112,
+          "mean_interval_width": 30.639564562732467,
+          "pinball10": 2.5991248479464977,
+          "pinball50": 5.562218455715357,
+          "pinball90": 3.2314435657540383,
+          "mae_gain_vs_nyx": 0.025952051327312764,
+          "exploratory_day_cluster_gain_ci95": [
+            -0.007212601526371855,
+            0.05911670418099738
+          ],
+          "top1_mae": 100.22140859209972,
+          "top1_mae_gain_vs_nyx": 2.5139667468362656,
+          "active_hours": 28,
+          "improved_active_hours": 23,
+          "worsened_active_hours": 5,
+          "active_no_underforecast_hours": 5,
+          "active_outside_error50_hours": 20,
+          "positive_error50_hours": 106,
+          "active_within_error50_hours": 8,
+          "mae_gain_excluding_preidentified_days": 0.011275890522297232,
+          "signed_total_absolute_error_gain": 226.691168344077,
+          "active_scores": {
+            "hours": 28,
+            "mae": 48.20224742232019,
+            "rmse": 78.51355198373004,
+            "forecast_minus_actual_bias": -42.818179286636166,
+            "observed_le_p10": 0.07142857142857142,
+            "observed_le_p50": 0.17857142857142858,
+            "observed_le_p90": 0.75,
+            "coverage_p10_p90": 0.6785714285714286,
+            "mean_interval_width": 68.94295450240917,
+            "pinball10": 7.228751390457569,
+            "pinball50": 24.101123711160096,
+            "pinball90": 19.005776189116915
+          },
+          "nyx_on_same_active_scores": {
+            "hours": 28,
+            "mae": 56.29836057746579,
+            "rmse": 91.57229780193146,
+            "forecast_minus_actual_bias": -51.569869918038215,
+            "observed_le_p10": 0.0,
+            "observed_le_p50": 0.17857142857142858,
+            "observed_le_p90": 0.6071428571428571,
+            "coverage_p10_p90": 0.6071428571428571,
+            "mean_interval_width": 69.92065102713448,
+            "pinball10": 7.487890617292105,
+            "pinball50": 28.149180288732897,
+            "pinball90": 20.842498329542487
+          }
+        }
+      }
+    },
+    "DE": {
+      "hours": 8735,
+      "baseline": {
+        "hours": 8735,
+        "mae": 11.078193815844099,
+        "rmse": 21.984015667766926,
+        "forecast_minus_actual_bias": -0.7136168393765638,
+        "observed_le_p10": 0.12684602175157414,
+        "observed_le_p50": 0.49639381797366916,
+        "observed_le_p90": 0.8697195191757299,
+        "coverage_p10_p90": 0.7428734974241556,
+        "mean_interval_width": 30.903273491512795,
+        "pinball10": 2.704479403224342,
+        "pinball50": 5.539096907922049,
+        "pinball90": 3.156418073033812
+      },
+      "storm_mae": 11.457842093302805,
+      "top1_threshold": 256.61249999999967,
+      "top1_hours": 88,
+      "top1_baseline_mae": 112.4325889566716,
+      "top1_storm_mae": 76.03236786363637,
+      "models": {
+        "old_fundamental_governed": {
+          "hours": 8735,
+          "mae": 11.078193815844099,
+          "rmse": 21.984015667766926,
+          "forecast_minus_actual_bias": -0.7136168393765638,
+          "observed_le_p10": 0.12684602175157414,
+          "observed_le_p50": 0.49639381797366916,
+          "observed_le_p90": 0.8697195191757299,
+          "coverage_p10_p90": 0.7428734974241556,
+          "mean_interval_width": 30.903273491512795,
+          "pinball10": 2.704479403224342,
+          "pinball50": 5.539096907922049,
+          "pinball90": 3.156418073033812,
+          "mae_gain_vs_nyx": 0.0,
+          "exploratory_day_cluster_gain_ci95": [
+            0.0,
+            0.0
+          ],
+          "top1_mae": 112.4325889566716,
+          "top1_mae_gain_vs_nyx": 0.0,
+          "active_hours": 0,
+          "improved_active_hours": 0,
+          "worsened_active_hours": 0,
+          "active_no_underforecast_hours": 0,
+          "active_outside_error50_hours": 0,
+          "positive_error50_hours": 101,
+          "active_within_error50_hours": 0,
+          "mae_gain_excluding_preidentified_days": 0.0,
+          "signed_total_absolute_error_gain": 0.0,
+          "active_scores": {
+            "hours": 0
+          },
+          "nyx_on_same_active_scores": {
+            "hours": 0
+          }
+        },
+        "old_fundamental_25": {
+          "hours": 8735,
+          "mae": 11.077646865069312,
+          "rmse": 21.979437540912308,
+          "forecast_minus_actual_bias": -0.7041434338427027,
+          "observed_le_p10": 0.12787635947338294,
+          "observed_le_p50": 0.49673726388093875,
+          "observed_le_p90": 0.8681167716084717,
+          "coverage_p10_p90": 0.7402404121350887,
+          "mean_interval_width": 30.632689202021794,
+          "pinball10": 2.705018458681365,
+          "pinball50": 5.538823432534656,
+          "pinball90": 3.1843439543682974,
+          "mae_gain_vs_nyx": 0.0005469507747873191,
+          "exploratory_day_cluster_gain_ci95": [
+            -0.0029284703291601387,
+            0.004022371878734777
+          ],
+          "top1_mae": 112.33540742130681,
+          "top1_mae_gain_vs_nyx": 0.09718153536477848,
+          "active_hours": 99,
+          "improved_active_hours": 47,
+          "worsened_active_hours": 52,
+          "active_no_underforecast_hours": 51,
+          "active_outside_error50_hours": 93,
+          "positive_error50_hours": 101,
+          "active_within_error50_hours": 6,
+          "mae_gain_excluding_preidentified_days": 0.0005530287090829069,
+          "signed_total_absolute_error_gain": 4.777615017767232,
+          "active_scores": {
+            "hours": 99,
+            "mae": 18.066358347123685,
+            "rmse": 26.976571555658722,
+            "forecast_minus_actual_bias": -6.5254296404362115,
+            "observed_le_p10": 0.18181818181818182,
+            "observed_le_p50": 0.5454545454545454,
+            "observed_le_p90": 0.7171717171717171,
+            "coverage_p10_p90": 0.5353535353535354,
+            "mean_interval_width": 28.496055173657226,
+            "pinball10": 2.9876304569889314,
+            "pinball50": 9.033179173561843,
+            "pinball90": 8.105239205849033
+          },
+          "nyx_on_same_active_scores": {
+            "hours": 99,
+            "mae": 18.114617084676887,
+            "rmse": 27.303735203133655,
+            "forecast_minus_actual_bias": -7.361290219610714,
+            "observed_le_p10": 0.09090909090909091,
+            "observed_le_p50": 0.5151515151515151,
+            "observed_le_p90": 0.8585858585858586,
+            "coverage_p10_p90": 0.7676767676767676,
+            "mean_interval_width": 52.370335665616125,
+            "pinball10": 2.9400683416647517,
+            "pinball50": 9.057308542338443,
+            "pinball90": 5.641273817397228
+          }
+        },
+        "regional_25": {
+          "hours": 8735,
+          "mae": 11.053620313275724,
+          "rmse": 21.66711105206987,
+          "forecast_minus_actual_bias": -0.6654006138956177,
+          "observed_le_p10": 0.1273039496279336,
+          "observed_le_p50": 0.496508299942759,
+          "observed_le_p90": 0.8697195191757299,
+          "coverage_p10_p90": 0.7424155695477962,
+          "mean_interval_width": 30.651834959724603,
+          "pinball10": 2.7165746827316624,
+          "pinball50": 5.526810156637862,
+          "pinball90": 3.178400525291552,
+          "mae_gain_vs_nyx": 0.024573502568374667,
+          "exploratory_day_cluster_gain_ci95": [
+            -0.010126082333217653,
+            0.059273087469966984
+          ],
+          "top1_mae": 109.32316857749619,
+          "top1_mae_gain_vs_nyx": 3.109420379175408,
+          "active_hours": 17,
+          "improved_active_hours": 13,
+          "worsened_active_hours": 4,
+          "active_no_underforecast_hours": 4,
+          "active_outside_error50_hours": 6,
+          "positive_error50_hours": 101,
+          "active_within_error50_hours": 11,
+          "mae_gain_excluding_preidentified_days": 0.004118142174135324,
+          "signed_total_absolute_error_gain": 214.64954493475273,
+          "active_scores": {
+            "hours": 17,
+            "mae": 155.06511203804047,
+            "rmse": 188.62989288212611,
+            "forecast_minus_actual_bias": -121.67678140442085,
+            "observed_le_p10": 0.23529411764705882,
+            "observed_le_p50": 0.29411764705882354,
+            "observed_le_p90": 0.35294117647058826,
+            "coverage_p10_p90": 0.11764705882352941,
+            "mean_interval_width": 32.01340930325371,
+            "pinball10": 26.55393555734517,
+            "pinball50": 77.53255601902023,
+            "pinball90": 116.47661789752601
+          },
+          "nyx_on_same_active_scores": {
+            "hours": 17,
+            "mae": 167.6915558577318,
+            "rmse": 206.61336478208565,
+            "forecast_minus_actual_bias": -146.45141255595402,
+            "observed_le_p10": 0.0,
+            "observed_le_p50": 0.23529411764705882,
+            "observed_le_p90": 0.35294117647058826,
+            "coverage_p10_p90": 0.35294117647058826,
+            "mean_interval_width": 161.2084431367762,
+            "pinball10": 20.339096351671923,
+            "pinball50": 83.8457779288659,
+            "pinball90": 105.1815166933284
+          }
+        },
+        "forest_direct": {
+          "hours": 8735,
+          "mae": 11.034256377224631,
+          "rmse": 21.457147018591836,
+          "forecast_minus_actual_bias": -0.5599061913509613,
+          "observed_le_p10": 0.12844876931883228,
+          "observed_le_p50": 0.4971951917572982,
+          "observed_le_p90": 0.870406410990269,
+          "coverage_p10_p90": 0.7419576416714367,
+          "mean_interval_width": 30.701884698868437,
+          "pinball10": 2.771906368316557,
+          "pinball50": 5.517128188612316,
+          "pinball90": 3.079462916869797,
+          "mae_gain_vs_nyx": 0.04393743861946754,
+          "exploratory_day_cluster_gain_ci95": [
+            -0.03681906948083184,
+            0.12469394671976693
+          ],
+          "top1_mae": 106.30869523708456,
+          "top1_mae_gain_vs_nyx": 6.1238937195870555,
+          "active_hours": 181,
+          "improved_active_hours": 102,
+          "worsened_active_hours": 79,
+          "active_no_underforecast_hours": 73,
+          "active_outside_error50_hours": 154,
+          "positive_error50_hours": 101,
+          "active_within_error50_hours": 27,
+          "mae_gain_excluding_preidentified_days": 0.01731943603346041,
+          "signed_total_absolute_error_gain": 383.79352634104896,
+          "active_scores": {
+            "hours": 181,
+            "mae": 41.26916268605044,
+            "rmse": 77.39493485930045,
+            "forecast_minus_actual_bias": -18.289726211749496,
+            "observed_le_p10": 0.18232044198895028,
+            "observed_le_p50": 0.4419889502762431,
+            "observed_le_p90": 0.7845303867403315,
+            "coverage_p10_p90": 0.6022099447513812,
+            "mean_interval_width": 60.318843271222995,
+            "pinball10": 9.580403991544436,
+            "pinball50": 20.63458134302522,
+            "pinball90": 17.698548305723683
+          },
+          "nyx_on_same_active_scores": {
+            "hours": 181,
+            "mae": 43.38956890892916,
+            "rmse": 84.22905045801065,
+            "forecast_minus_actual_bias": -25.707751131659084,
+            "observed_le_p10": 0.10497237569060773,
+            "observed_le_p50": 0.40331491712707185,
+            "observed_le_p90": 0.7513812154696132,
+            "coverage_p10_p90": 0.6464088397790055,
+            "mean_interval_width": 70.037799645524,
+            "pinball10": 6.326401007674275,
+            "pinball50": 21.69478445446458,
+            "pinball90": 21.412378632202547
+          }
+        },
+        "forest_governed": {
+          "hours": 8735,
+          "mae": 11.0611690989985,
+          "rmse": 21.843655075129412,
+          "forecast_minus_actual_bias": -0.6945740839904024,
+          "observed_le_p10": 0.12684602175157414,
+          "observed_le_p50": 0.496508299942759,
+          "observed_le_p90": 0.8700629650829994,
+          "coverage_p10_p90": 0.7432169433314253,
+          "mean_interval_width": 30.936777948099227,
+          "pinball10": 2.7038597141560157,
+          "pinball50": 5.53058454949925,
+          "pinball90": 3.1344755771146677,
+          "mae_gain_vs_nyx": 0.01702471684559962,
+          "exploratory_day_cluster_gain_ci95": [
+            -0.007480914081656999,
+            0.04153034777285624
+          ],
+          "top1_mae": 110.79697444880209,
+          "top1_mae_gain_vs_nyx": 1.6356145078694921,
+          "active_hours": 24,
+          "improved_active_hours": 18,
+          "worsened_active_hours": 6,
+          "active_no_underforecast_hours": 6,
+          "active_outside_error50_hours": 19,
+          "positive_error50_hours": 101,
+          "active_within_error50_hours": 5,
+          "mae_gain_excluding_preidentified_days": 0.005562189378779517,
+          "signed_total_absolute_error_gain": 148.7109016463127,
+          "active_scores": {
+            "hours": 24,
+            "mae": 46.18309391586147,
+            "rmse": 90.1522860919686,
+            "forecast_minus_actual_bias": -43.61642319308036,
+            "observed_le_p10": 0.0,
+            "observed_le_p50": 0.2916666666666667,
+            "observed_le_p90": 0.7916666666666666,
+            "coverage_p10_p90": 0.7916666666666666,
+            "mean_interval_width": 69.36484614303832,
+            "pinball10": 6.943922710771642,
+            "pinball50": 23.091546957930735,
+            "pinball90": 25.486878788212397
+          },
+          "nyx_on_same_active_scores": {
+            "hours": 24,
+            "mae": 52.37938148445784,
+            "rmse": 101.81546592359051,
+            "forecast_minus_actual_bias": -50.54719270550194,
+            "observed_le_p10": 0.0,
+            "observed_le_p50": 0.25,
+            "observed_le_p90": 0.6666666666666666,
+            "coverage_p10_p90": 0.6666666666666666,
+            "mean_interval_width": 57.17061996459961,
+            "pinball10": 7.169463711264712,
+            "pinball50": 26.18969074222892,
+            "pinball90": 33.473033032117584
+          }
+        },
+        "empirical_direct": {
+          "hours": 8735,
+          "mae": 11.031801029258945,
+          "rmse": 21.484080025797397,
+          "forecast_minus_actual_bias": -0.6075536087352325,
+          "observed_le_p10": 0.1276473955352032,
+          "observed_le_p50": 0.4968517458500286,
+          "observed_le_p90": 0.8707498568975386,
+          "coverage_p10_p90": 0.7431024613623355,
+          "mean_interval_width": 30.843010884436097,
+          "pinball10": 2.7570636730063764,
+          "pinball50": 5.515900514629473,
+          "pinball90": 3.083086218787748,
+          "mae_gain_vs_nyx": 0.04639278658515339,
+          "exploratory_day_cluster_gain_ci95": [
+            -0.02444132372106228,
+            0.11722689689136906
+          ],
+          "top1_mae": 106.8294685217419,
+          "top1_mae_gain_vs_nyx": 5.6031204349297115,
+          "active_hours": 121,
+          "improved_active_hours": 69,
+          "worsened_active_hours": 52,
+          "active_no_underforecast_hours": 49,
+          "active_outside_error50_hours": 99,
+          "positive_error50_hours": 101,
+          "active_within_error50_hours": 22,
+          "mae_gain_excluding_preidentified_days": 0.021469533926280548,
+          "signed_total_absolute_error_gain": 405.2409908213149,
+          "active_scores": {
+            "hours": 121,
+            "mae": 50.35778193262242,
+            "rmse": 92.33241335283732,
+            "forecast_minus_actual_bias": -25.67967532879048,
+            "observed_le_p10": 0.14049586776859505,
+            "observed_le_p50": 0.4380165289256198,
+            "observed_le_p90": 0.8264462809917356,
+            "coverage_p10_p90": 0.6859504132231405,
+            "mean_interval_width": 77.66094606903316,
+            "pinball10": 11.45238805446876,
+            "pinball50": 25.17889096631121,
+            "pinball90": 22.90404481451478
+          },
+          "nyx_on_same_active_scores": {
+            "hours": 121,
+            "mae": 53.70688103031923,
+            "rmse": 100.4691759324548,
+            "forecast_minus_actual_bias": -33.33638871434442,
+            "observed_le_p10": 0.08264462809917356,
+            "observed_le_p50": 0.4049586776859504,
+            "observed_le_p90": 0.7520661157024794,
+            "coverage_p10_p90": 0.6694214876033058,
+            "mean_interval_width": 82.01130865428074,
+            "pinball10": 7.656325273096257,
+            "pinball50": 26.853440515159615,
+            "pinball90": 28.19787743302197
+          }
+        },
+        "empirical_governed": {
+          "hours": 8735,
+          "mae": 11.078546758595966,
+          "rmse": 21.90308051553095,
+          "forecast_minus_actual_bias": -0.6820454032985247,
+          "observed_le_p10": 0.1273039496279336,
+          "observed_le_p50": 0.496508299942759,
+          "observed_le_p90": 0.8701774470520893,
+          "coverage_p10_p90": 0.7428734974241556,
+          "mean_interval_width": 30.667676232586967,
+          "pinball10": 2.755298180495576,
+          "pinball50": 5.539273379297983,
+          "pinball90": 3.119797021629126,
+          "mae_gain_vs_nyx": -0.0003529427518675853,
+          "exploratory_day_cluster_gain_ci95": [
+            -0.030631973169078088,
+            0.02992608766534292
+          ],
+          "top1_mae": 112.27669395796892,
+          "top1_mae_gain_vs_nyx": 0.1558949987026895,
+          "active_hours": 25,
+          "improved_active_hours": 13,
+          "worsened_active_hours": 12,
+          "active_no_underforecast_hours": 11,
+          "active_outside_error50_hours": 22,
+          "positive_error50_hours": 101,
+          "active_within_error50_hours": 3,
+          "mae_gain_excluding_preidentified_days": -0.01188365989274026,
+          "signed_total_absolute_error_gain": -3.0829549375633576,
+          "active_scores": {
+            "hours": 25,
+            "mae": 74.29185419740648,
+            "rmse": 114.76290318924879,
+            "forecast_minus_actual_bias": 3.3586382084141064,
+            "observed_le_p10": 0.24,
+            "observed_le_p50": 0.48,
+            "observed_le_p90": 0.84,
+            "coverage_p10_p90": 0.6,
+            "mean_interval_width": 92.88368369811204,
+            "pinball10": 28.64184926637099,
+            "pinball50": 37.14592709870324,
+            "pinball90": 23.268307324024068
+          },
+          "nyx_on_same_active_scores": {
+            "hours": 25,
+            "mae": 74.16853599990397,
+            "rmse": 120.0483062225991,
+            "forecast_minus_actual_bias": -7.672421557252744,
+            "observed_le_p10": 0.08,
+            "observed_le_p50": 0.44,
+            "observed_le_p90": 0.68,
+            "coverage_p10_p90": 0.6,
+            "mean_interval_width": 175.20136596679689,
+            "pinball10": 10.885768487801862,
+            "pinball50": 37.08426799995198,
+            "pinball90": 36.06370268482125
+          }
+        }
+      }
+    },
+    "FR": {
+      "hours": 8735,
+      "baseline": {
+        "hours": 8735,
+        "mae": 12.078890523243217,
+        "rmse": 19.076228789889925,
+        "forecast_minus_actual_bias": -0.1401148680186628,
+        "observed_le_p10": 0.1298225529479107,
+        "observed_le_p50": 0.4785346307956497,
+        "observed_le_p90": 0.8619347452776188,
+        "coverage_p10_p90": 0.732112192329708,
+        "mean_interval_width": 33.268181723871436,
+        "pinball10": 3.1644958995514556,
+        "pinball50": 6.0394452616216086,
+        "pinball90": 2.858087972235499
+      },
+      "storm_mae": 11.858560400457927,
+      "top1_threshold": 208.03135,
+      "top1_hours": 88,
+      "top1_baseline_mae": 25.09035593321612,
+      "top1_storm_mae": 21.90706628409091,
+      "models": {
+        "old_fundamental_governed": {
+          "hours": 8735,
+          "mae": 12.078890523243217,
+          "rmse": 19.076228789889925,
+          "forecast_minus_actual_bias": -0.1401148680186628,
+          "observed_le_p10": 0.1298225529479107,
+          "observed_le_p50": 0.4785346307956497,
+          "observed_le_p90": 0.8619347452776188,
+          "coverage_p10_p90": 0.732112192329708,
+          "mean_interval_width": 33.268181723871436,
+          "pinball10": 3.1644958995514556,
+          "pinball50": 6.0394452616216086,
+          "pinball90": 2.858087972235499,
+          "mae_gain_vs_nyx": 0.0,
+          "exploratory_day_cluster_gain_ci95": [
+            0.0,
+            0.0
+          ],
+          "top1_mae": 25.09035593321612,
+          "top1_mae_gain_vs_nyx": 0.0,
+          "active_hours": 0,
+          "improved_active_hours": 0,
+          "worsened_active_hours": 0,
+          "active_no_underforecast_hours": 0,
+          "active_outside_error50_hours": 0,
+          "positive_error50_hours": 63,
+          "active_within_error50_hours": 0,
+          "mae_gain_excluding_preidentified_days": 0.0,
+          "signed_total_absolute_error_gain": 0.0,
+          "active_scores": {
+            "hours": 0
+          },
+          "nyx_on_same_active_scores": {
+            "hours": 0
+          }
+        },
+        "old_fundamental_25": {
+          "hours": 8735,
+          "mae": 12.079397075670492,
+          "rmse": 19.07831543699288,
+          "forecast_minus_actual_bias": -0.12900298927260756,
+          "observed_le_p10": 0.12959358900973098,
+          "observed_le_p50": 0.47910704064109905,
+          "observed_le_p90": 0.8623926731539783,
+          "coverage_p10_p90": 0.7327990841442473,
+          "mean_interval_width": 33.27520778302311,
+          "pinball10": 3.1683467239528396,
+          "pinball50": 6.039698537835246,
+          "pinball90": 2.8609858647316178,
+          "mae_gain_vs_nyx": -0.000506552427274835,
+          "exploratory_day_cluster_gain_ci95": [
+            -0.00482142914006929,
+            0.00380832428551962
+          ],
+          "top1_mae": 25.037419787362488,
+          "top1_mae_gain_vs_nyx": 0.052936145853634736,
+          "active_hours": 111,
+          "improved_active_hours": 52,
+          "worsened_active_hours": 59,
+          "active_no_underforecast_hours": 57,
+          "active_outside_error50_hours": 111,
+          "positive_error50_hours": 63,
+          "active_within_error50_hours": 0,
+          "mae_gain_excluding_preidentified_days": -0.0005121814390838853,
+          "signed_total_absolute_error_gain": -4.4247354522456845,
+          "active_scores": {
+            "hours": 111,
+            "mae": 12.370590884689559,
+            "rmse": 17.488522353897235,
+            "forecast_minus_actual_bias": 2.6310281211251754,
+            "observed_le_p10": 0.1891891891891892,
+            "observed_le_p50": 0.5585585585585585,
+            "observed_le_p90": 0.8918918918918919,
+            "coverage_p10_p90": 0.7027027027027027,
+            "mean_interval_width": 30.14339298732844,
+            "pinball10": 3.9690503867610065,
+            "pinball50": 6.1852954423447795,
+            "pinball90": 2.8353108389988146
+          },
+          "nyx_on_same_active_scores": {
+            "hours": 111,
+            "mae": 12.330728403137796,
+            "rmse": 17.30847221032681,
+            "forecast_minus_actual_bias": 1.7565933387216432,
+            "observed_le_p10": 0.2072072072072072,
+            "observed_le_p50": 0.5135135135135135,
+            "observed_le_p90": 0.8558558558558559,
+            "coverage_p10_p90": 0.6486486486486487,
+            "mean_interval_width": 29.590486440572654,
+            "pinball10": 3.6660147908503236,
+            "pinball50": 6.165364201568898,
+            "pinball90": 2.6072649745519842
+          }
+        },
+        "regional_25": {
+          "hours": 8735,
+          "mae": 12.073210369805132,
+          "rmse": 19.040323777962655,
+          "forecast_minus_actual_bias": -0.11575756215260223,
+          "observed_le_p10": 0.13005151688609043,
+          "observed_le_p50": 0.4789925586720092,
+          "observed_le_p90": 0.8619347452776188,
+          "coverage_p10_p90": 0.7318832283915283,
+          "mean_interval_width": 33.249682317584096,
+          "pinball10": 3.162102893798071,
+          "pinball50": 6.036605184902566,
+          "pinball90": 2.857271041356527,
+          "mae_gain_vs_nyx": 0.005680153438085377,
+          "exploratory_day_cluster_gain_ci95": [
+            -0.011344854411788261,
+            0.022705161287959016
+          ],
+          "top1_mae": 24.71718905723087,
+          "top1_mae_gain_vs_nyx": 0.3731668759852592,
+          "active_hours": 8,
+          "improved_active_hours": 5,
+          "worsened_active_hours": 3,
+          "active_no_underforecast_hours": 0,
+          "active_outside_error50_hours": 5,
+          "positive_error50_hours": 63,
+          "active_within_error50_hours": 3,
+          "mae_gain_excluding_preidentified_days": 0.0019420598674583815,
+          "signed_total_absolute_error_gain": 49.61614028167577,
+          "active_scores": {
+            "hours": 8,
+            "mae": 42.59168496142712,
+            "rmse": 56.144496743456216,
+            "forecast_minus_actual_bias": -22.198569154131693,
+            "observed_le_p10": 0.25,
+            "observed_le_p50": 0.5,
+            "observed_le_p90": 0.625,
+            "coverage_p10_p90": 0.375,
+            "mean_interval_width": 43.178976278198405,
+            "pinball10": 5.087744847508995,
+            "pinball50": 21.29584248071356,
+            "pinball90": 23.15281563984141
+          },
+          "nyx_on_same_active_scores": {
+            "hours": 8,
+            "mae": 48.79370249663659,
+            "rmse": 68.16536981857294,
+            "forecast_minus_actual_bias": -48.79370249663659,
+            "observed_le_p10": 0.0,
+            "observed_le_p50": 0.0,
+            "observed_le_p90": 0.625,
+            "coverage_p10_p90": 0.625,
+            "mean_interval_width": 63.37801551818848,
+            "pinball10": 7.700608004485437,
+            "pinball50": 24.396851248318296,
+            "pinball90": 24.044802043318874
+          }
+        },
+        "forest_direct": {
+          "hours": 8735,
+          "mae": 12.10816821938819,
+          "rmse": 19.093947057705066,
+          "forecast_minus_actual_bias": -0.05988931401275474,
+          "observed_le_p10": 0.13119633657698912,
+          "observed_le_p50": 0.48151116199198624,
+          "observed_le_p90": 0.8633085289066972,
+          "coverage_p10_p90": 0.732112192329708,
+          "mean_interval_width": 33.35080777737818,
+          "pinball10": 3.1726575314267818,
+          "pinball50": 6.054084109694095,
+          "pinball90": 2.8643555290610268,
+          "mae_gain_vs_nyx": -0.029277696144972293,
+          "exploratory_day_cluster_gain_ci95": [
+            -0.05916104890881141,
+            0.0006056566188668254
+          ],
+          "top1_mae": 24.48595894792202,
+          "top1_mae_gain_vs_nyx": 0.604396985294106,
+          "active_hours": 206,
+          "improved_active_hours": 111,
+          "worsened_active_hours": 95,
+          "active_no_underforecast_hours": 77,
+          "active_outside_error50_hours": 202,
+          "positive_error50_hours": 63,
+          "active_within_error50_hours": 4,
+          "mae_gain_excluding_preidentified_days": -0.03223205671210933,
+          "signed_total_absolute_error_gain": -255.740675826333,
+          "active_scores": {
+            "hours": 206,
+            "mae": 14.809540690886728,
+            "rmse": 21.80728992274817,
+            "forecast_minus_actual_bias": -1.7427355870468353,
+            "observed_le_p10": 0.1650485436893204,
+            "observed_le_p50": 0.5,
+            "observed_le_p90": 0.8252427184466019,
+            "coverage_p10_p90": 0.6601941747572816,
+            "mean_interval_width": 34.86981765282415,
+            "pinball10": 3.381668187221615,
+            "pinball50": 7.404770345443364,
+            "pinball90": 4.326781016669788
+          },
+          "nyx_on_same_active_scores": {
+            "hours": 206,
+            "mae": 13.568081099496764,
+            "rmse": 21.139546008775135,
+            "forecast_minus_actual_bias": -5.144532743559489,
+            "observed_le_p10": 0.10679611650485436,
+            "observed_le_p50": 0.3737864077669903,
+            "observed_le_p90": 0.7669902912621359,
+            "coverage_p10_p90": 0.6601941747572816,
+            "mean_interval_width": 31.366232325729815,
+            "pinball10": 3.035591223964468,
+            "pinball50": 6.784040549748382,
+            "pinball90": 4.061018352247531
+          }
+        },
+        "forest_governed": {
+          "hours": 8735,
+          "mae": 12.078890523243217,
+          "rmse": 19.076228789889925,
+          "forecast_minus_actual_bias": -0.1401148680186628,
+          "observed_le_p10": 0.1298225529479107,
+          "observed_le_p50": 0.4785346307956497,
+          "observed_le_p90": 0.8619347452776188,
+          "coverage_p10_p90": 0.732112192329708,
+          "mean_interval_width": 33.268181723871436,
+          "pinball10": 3.1644958995514556,
+          "pinball50": 6.0394452616216086,
+          "pinball90": 2.858087972235499,
+          "mae_gain_vs_nyx": 0.0,
+          "exploratory_day_cluster_gain_ci95": [
+            0.0,
+            0.0
+          ],
+          "top1_mae": 25.09035593321612,
+          "top1_mae_gain_vs_nyx": 0.0,
+          "active_hours": 0,
+          "improved_active_hours": 0,
+          "worsened_active_hours": 0,
+          "active_no_underforecast_hours": 0,
+          "active_outside_error50_hours": 0,
+          "positive_error50_hours": 63,
+          "active_within_error50_hours": 0,
+          "mae_gain_excluding_preidentified_days": 0.0,
+          "signed_total_absolute_error_gain": 0.0,
+          "active_scores": {
+            "hours": 0
+          },
+          "nyx_on_same_active_scores": {
+            "hours": 0
+          }
+        },
+        "empirical_direct": {
+          "hours": 8735,
+          "mae": 12.072939013094716,
+          "rmse": 19.069741661680375,
+          "forecast_minus_actual_bias": -0.12257759642492155,
+          "observed_le_p10": 0.12902117916428163,
+          "observed_le_p50": 0.4789925586720092,
+          "observed_le_p90": 0.8631940469376074,
+          "coverage_p10_p90": 0.7341728677733257,
+          "mean_interval_width": 33.378373532806705,
+          "pinball10": 3.165676060424006,
+          "pinball50": 6.036469506547358,
+          "pinball90": 2.8586551486265694,
+          "mae_gain_vs_nyx": 0.005951510148500721,
+          "exploratory_day_cluster_gain_ci95": [
+            -0.0008304834064541871,
+            0.01273350370345563
+          ],
+          "top1_mae": 24.521138757741706,
+          "top1_mae_gain_vs_nyx": 0.569217175474419,
+          "active_hours": 245,
+          "improved_active_hours": 141,
+          "worsened_active_hours": 104,
+          "active_no_underforecast_hours": 103,
+          "active_outside_error50_hours": 241,
+          "positive_error50_hours": 63,
+          "active_within_error50_hours": 4,
+          "mae_gain_excluding_preidentified_days": 0.0032298618699805447,
+          "signed_total_absolute_error_gain": 51.9864411471538,
+          "active_scores": {
+            "hours": 245,
+            "mae": 12.685867742750563,
+            "rmse": 19.799842635633023,
+            "forecast_minus_actual_bias": -2.6642437593265518,
+            "observed_le_p10": 0.10204081632653061,
+            "observed_le_p50": 0.43673469387755104,
+            "observed_le_p90": 0.8489795918367347,
+            "coverage_p10_p90": 0.746938775510204,
+            "mean_interval_width": 34.082476072349664,
+            "pinball10": 3.0538975811642572,
+            "pinball50": 6.342933871375282,
+            "pinball90": 3.731693163430956
+          },
+          "nyx_on_same_active_scores": {
+            "hours": 245,
+            "mae": 12.898057298453228,
+            "rmse": 20.021398465772897,
+            "forecast_minus_actual_bias": -3.289501177168713,
+            "observed_le_p10": 0.1306122448979592,
+            "observed_le_p50": 0.4204081632653061,
+            "observed_le_p90": 0.8040816326530612,
+            "coverage_p10_p90": 0.673469387755102,
+            "mean_interval_width": 30.15380076194296,
+            "pinball10": 3.0118212333204535,
+            "pinball50": 6.449028649226614,
+            "pinball90": 3.7114715888350442
+          }
+        },
+        "empirical_governed": {
+          "hours": 8735,
+          "mae": 12.078890523243217,
+          "rmse": 19.076228789889925,
+          "forecast_minus_actual_bias": -0.1401148680186628,
+          "observed_le_p10": 0.1298225529479107,
+          "observed_le_p50": 0.4785346307956497,
+          "observed_le_p90": 0.8619347452776188,
+          "coverage_p10_p90": 0.732112192329708,
+          "mean_interval_width": 33.268181723871436,
+          "pinball10": 3.1644958995514556,
+          "pinball50": 6.0394452616216086,
+          "pinball90": 2.858087972235499,
+          "mae_gain_vs_nyx": 0.0,
+          "exploratory_day_cluster_gain_ci95": [
+            0.0,
+            0.0
+          ],
+          "top1_mae": 25.09035593321612,
+          "top1_mae_gain_vs_nyx": 0.0,
+          "active_hours": 0,
+          "improved_active_hours": 0,
+          "worsened_active_hours": 0,
+          "active_no_underforecast_hours": 0,
+          "active_outside_error50_hours": 0,
+          "positive_error50_hours": 63,
+          "active_within_error50_hours": 0,
+          "mae_gain_excluding_preidentified_days": 0.0,
+          "signed_total_absolute_error_gain": 0.0,
+          "active_scores": {
+            "hours": 0
+          },
+          "nyx_on_same_active_scores": {
+            "hours": 0
+          }
+        }
+      }
+    },
+    "NL": {
+      "hours": 8735,
+      "baseline": {
+        "hours": 8735,
+        "mae": 11.162527931950619,
+        "rmse": 22.504889680053278,
+        "forecast_minus_actual_bias": -0.7935662007712577,
+        "observed_le_p10": 0.11677160847166572,
+        "observed_le_p50": 0.49307384087006295,
+        "observed_le_p90": 0.8764739553520321,
+        "coverage_p10_p90": 0.7597023468803663,
+        "mean_interval_width": 31.650840743555637,
+        "pinball10": 2.707537021841322,
+        "pinball50": 5.581263965975309,
+        "pinball90": 3.1173658293298807
+      },
+      "storm_mae": 11.007282450143103,
+      "top1_threshold": 242.95344999999998,
+      "top1_hours": 88,
+      "top1_baseline_mae": 106.98707008613924,
+      "top1_storm_mae": 74.70212411363636,
+      "models": {
+        "old_fundamental_governed": {
+          "hours": 8735,
+          "mae": 11.163213517223173,
+          "rmse": 22.506196012594028,
+          "forecast_minus_actual_bias": -0.7921146120537353,
+          "observed_le_p10": 0.1164281625643961,
+          "observed_le_p50": 0.49307384087006295,
+          "observed_le_p90": 0.8792215226101889,
+          "coverage_p10_p90": 0.7627933600457928,
+          "mean_interval_width": 31.57546952403962,
+          "pinball10": 2.746897262409351,
+          "pinball50": 5.581606758611587,
+          "pinball90": 3.1158387519547293,
+          "mae_gain_vs_nyx": -0.0006855852725565807,
+          "exploratory_day_cluster_gain_ci95": [
+            -0.00226406578218511,
+            0.0008928952370719488
+          ],
+          "top1_mae": 107.01877330695243,
+          "top1_mae_gain_vs_nyx": -0.031703220813197805,
+          "active_hours": 9,
+          "improved_active_hours": 4,
+          "worsened_active_hours": 5,
+          "active_no_underforecast_hours": 5,
+          "active_outside_error50_hours": 9,
+          "positive_error50_hours": 104,
+          "active_within_error50_hours": 0,
+          "mae_gain_excluding_preidentified_days": -0.0006932037684664582,
+          "signed_total_absolute_error_gain": -5.988587355781732,
+          "active_scores": {
+            "hours": 9,
+            "mae": 22.817909679264446,
+            "rmse": 30.456004908166975,
+            "forecast_minus_actual_bias": 18.392609272397646,
+            "observed_le_p10": 0.4444444444444444,
+            "observed_le_p50": 0.5555555555555556,
+            "observed_le_p90": 1.0,
+            "coverage_p10_p90": 0.5555555555555556,
+            "mean_interval_width": 33.41125341443913,
+            "pinball10": 11.7748464767406,
+            "pinball50": 11.408954839632223,
+            "pinball90": 3.627931641356422
+          },
+          "nyx_on_same_active_scores": {
+            "hours": 9,
+            "mae": 22.152511084177586,
+            "rmse": 29.504238781072605,
+            "forecast_minus_actual_bias": 16.983761778224473,
+            "observed_le_p10": 0.3333333333333333,
+            "observed_le_p50": 0.5555555555555556,
+            "observed_le_p90": 1.0,
+            "coverage_p10_p90": 0.6666666666666666,
+            "mean_interval_width": 85.21745300292972,
+            "pinball10": 7.634816707267291,
+            "pinball50": 11.076255542088793,
+            "pinball90": 7.690790186068976
+          }
+        },
+        "old_fundamental_25": {
+          "hours": 8735,
+          "mae": 11.161168854566236,
+          "rmse": 22.499876100338035,
+          "forecast_minus_actual_bias": -0.7848175155456717,
+          "observed_le_p10": 0.11768746422438466,
+          "observed_le_p50": 0.49353176874642246,
+          "observed_le_p90": 0.873955352032055,
+          "coverage_p10_p90": 0.7562678878076703,
+          "mean_interval_width": 31.141903176808388,
+          "pinball10": 2.7109028499423475,
+          "pinball50": 5.580584427283118,
+          "pinball90": 3.230838408355746,
+          "mae_gain_vs_nyx": 0.0013590773843806248,
+          "exploratory_day_cluster_gain_ci95": [
+            -0.0011868775237161796,
+            0.003905032292477429
+          ],
+          "top1_mae": 106.88627434614473,
+          "top1_mae_gain_vs_nyx": 0.10079573999451535,
+          "active_hours": 134,
+          "improved_active_hours": 80,
+          "worsened_active_hours": 54,
+          "active_no_underforecast_hours": 51,
+          "active_outside_error50_hours": 118,
+          "positive_error50_hours": 104,
+          "active_within_error50_hours": 16,
+          "mae_gain_excluding_preidentified_days": 0.0013303232316478736,
+          "signed_total_absolute_error_gain": 11.871540952564757,
+          "active_scores": {
+            "hours": 134,
+            "mae": 39.10586378407061,
+            "rmse": 88.35036404133544,
+            "forecast_minus_actual_bias": -26.77825748986071,
+            "observed_le_p10": 0.19402985074626866,
+            "observed_le_p50": 0.41044776119402987,
+            "observed_le_p90": 0.6417910447761194,
+            "coverage_p10_p90": 0.44776119402985076,
+            "mean_interval_width": 29.69119737654403,
+            "pinball10": 6.500503980268366,
+            "pinball50": 19.552931892035303,
+            "pinball90": 24.802224599537944
+          },
+          "nyx_on_same_active_scores": {
+            "hours": 134,
+            "mae": 39.194457373268854,
+            "rmse": 88.43356374175693,
+            "forecast_minus_actual_bias": -27.34855424691663,
+            "observed_le_p10": 0.13432835820895522,
+            "observed_le_p50": 0.3805970149253731,
+            "observed_le_p90": 0.8059701492537313,
+            "coverage_p10_p90": 0.6716417910447762,
+            "mean_interval_width": 62.867090253687614,
+            "pinball10": 6.281097200697801,
+            "pinball50": 19.597228686634427,
+            "pinball90": 17.405336705575742
+          }
+        },
+        "regional_25": {
+          "hours": 8735,
+          "mae": 11.139288929904412,
+          "rmse": 22.28174704202743,
+          "forecast_minus_actual_bias": -0.7512769370423513,
+          "observed_le_p10": 0.11722953634802519,
+          "observed_le_p50": 0.4931883228391528,
+          "observed_le_p90": 0.8764739553520321,
+          "coverage_p10_p90": 0.7592444190040069,
+          "mean_interval_width": 31.380089845604573,
+          "pinball10": 2.719888868039187,
+          "pinball50": 5.569644464952206,
+          "pinball90": 3.149935103640617,
+          "mae_gain_vs_nyx": 0.023239002046204126,
+          "exploratory_day_cluster_gain_ci95": [
+            -0.010146143061053194,
+            0.056624147153461445
+          ],
+          "top1_mae": 103.9104354828237,
+          "top1_mae_gain_vs_nyx": 3.0766346033155427,
+          "active_hours": 15,
+          "improved_active_hours": 11,
+          "worsened_active_hours": 4,
+          "active_no_underforecast_hours": 3,
+          "active_outside_error50_hours": 7,
+          "positive_error50_hours": 104,
+          "active_within_error50_hours": 8,
+          "mae_gain_excluding_preidentified_days": 0.0025443553463299342,
+          "signed_total_absolute_error_gain": 202.99268287359303,
+          "active_scores": {
+            "hours": 15,
+            "mae": 142.14016046792452,
+            "rmse": 203.86381152081282,
+            "forecast_minus_actual_bias": -104.80816840174421,
+            "observed_le_p10": 0.26666666666666666,
+            "observed_le_p50": 0.26666666666666666,
+            "observed_le_p90": 0.4666666666666667,
+            "coverage_p10_p90": 0.2,
+            "mean_interval_width": 34.10354516770633,
+            "pinball10": 26.808243252432288,
+            "pinball50": 71.07008023396226,
+            "pinball90": 103.23272047800856
+          },
+          "nyx_on_same_active_scores": {
+            "hours": 15,
+            "mae": 155.6730059928307,
+            "rmse": 217.66989072515602,
+            "forecast_minus_actual_bias": -129.43461631321077,
+            "observed_le_p10": 0.0,
+            "observed_le_p50": 0.2,
+            "observed_le_p90": 0.4666666666666667,
+            "coverage_p10_p90": 0.4666666666666667,
+            "mean_interval_width": 191.77081807454428,
+            "pinball10": 19.615351483209096,
+            "pinball50": 77.83650299641535,
+            "pinball90": 84.2665464043898
+          }
+        },
+        "forest_direct": {
+          "hours": 8735,
+          "mae": 11.134280640846725,
+          "rmse": 22.112513414839086,
+          "forecast_minus_actual_bias": -0.6284184933762436,
+          "observed_le_p10": 0.11894676588437321,
+          "observed_le_p50": 0.4949055523755009,
+          "observed_le_p90": 0.8772753291356611,
+          "coverage_p10_p90": 0.758328563251288,
+          "mean_interval_width": 31.19761629441822,
+          "pinball10": 2.8089940968509604,
+          "pinball50": 5.567140320423363,
+          "pinball90": 3.067730398811315,
+          "mae_gain_vs_nyx": 0.02824729110389002,
+          "exploratory_day_cluster_gain_ci95": [
+            -0.034916150371459606,
+            0.09141073257923964
+          ],
+          "top1_mae": 101.68101990595117,
+          "top1_mae_gain_vs_nyx": 5.306050180188075,
+          "active_hours": 231,
+          "improved_active_hours": 132,
+          "worsened_active_hours": 99,
+          "active_no_underforecast_hours": 86,
+          "active_outside_error50_hours": 205,
+          "positive_error50_hours": 104,
+          "active_within_error50_hours": 26,
+          "mae_gain_excluding_preidentified_days": 0.01433734643812404,
+          "signed_total_absolute_error_gain": 246.74008779247933,
+          "active_scores": {
+            "hours": 231,
+            "mae": 37.17734436145647,
+            "rmse": 79.30853630248457,
+            "forecast_minus_actual_bias": -13.813928532105379,
+            "observed_le_p10": 0.21212121212121213,
+            "observed_le_p50": 0.44155844155844154,
+            "observed_le_p90": 0.8398268398268398,
+            "coverage_p10_p90": 0.6277056277056277,
+            "mean_interval_width": 51.567956215936576,
+            "pinball10": 9.844944749633044,
+            "pinball50": 18.588672180728235,
+            "pinball90": 15.45390228637762
+          },
+          "nyx_on_same_active_scores": {
+            "hours": 231,
+            "mae": 38.24548326964902,
+            "rmse": 83.37771804650095,
+            "forecast_minus_actual_bias": -20.058799632085684,
+            "observed_le_p10": 0.12987012987012986,
+            "observed_le_p50": 0.3722943722943723,
+            "observed_le_p90": 0.8095238095238095,
+            "coverage_p10_p90": 0.6796536796536796,
+            "mean_interval_width": 68.70611882725835,
+            "pinball10": 6.008461848294565,
+            "pinball50": 19.12274163482451,
+            "pinball90": 17.330809150358867
+          }
+        },
+        "forest_governed": {
+          "hours": 8735,
+          "mae": 11.149028140943424,
+          "rmse": 22.430709697142696,
+          "forecast_minus_actual_bias": -0.7518730489381383,
+          "observed_le_p10": 0.11711505437893532,
+          "observed_le_p50": 0.4936462507155123,
+          "observed_le_p90": 0.8768174012593016,
+          "coverage_p10_p90": 0.7597023468803663,
+          "mean_interval_width": 31.668379683558115,
+          "pinball10": 2.71573608447987,
+          "pinball50": 5.574514070471712,
+          "pinball90": 3.0914526994025437,
+          "mae_gain_vs_nyx": 0.013499791007193895,
+          "exploratory_day_cluster_gain_ci95": [
+            -0.01544444819215177,
+            0.04244403020653956
+          ],
+          "top1_mae": 105.7543884333426,
+          "top1_mae_gain_vs_nyx": 1.2326816527966487,
+          "active_hours": 49,
+          "improved_active_hours": 30,
+          "worsened_active_hours": 19,
+          "active_no_underforecast_hours": 15,
+          "active_outside_error50_hours": 45,
+          "positive_error50_hours": 104,
+          "active_within_error50_hours": 4,
+          "mae_gain_excluding_preidentified_days": 0.0033059749277554447,
+          "signed_total_absolute_error_gain": 117.92067444783868,
+          "active_scores": {
+            "hours": 49,
+            "mae": 23.681519464666522,
+            "rmse": 38.93333652994617,
+            "forecast_minus_actual_bias": -3.0944771035617915,
+            "observed_le_p10": 0.14285714285714285,
+            "observed_le_p50": 0.40816326530612246,
+            "observed_le_p90": 0.9183673469387755,
+            "coverage_p10_p90": 0.7755102040816326,
+            "mean_interval_width": 67.54103532921616,
+            "pinball10": 6.189228925197327,
+            "pinball50": 11.840759732333261,
+            "pinball90": 6.948549181353168
+          },
+          "nyx_on_same_active_scores": {
+            "hours": 49,
+            "mae": 26.088063841153026,
+            "rmse": 45.93495791874896,
+            "forecast_minus_actual_bias": -10.526919578302577,
+            "observed_le_p10": 0.08163265306122448,
+            "observed_le_p50": 0.30612244897959184,
+            "observed_le_p90": 0.8571428571428571,
+            "coverage_p10_p90": 0.7755102040816326,
+            "mean_interval_width": 64.41445082061145,
+            "pinball10": 4.727620514019457,
+            "pinball50": 13.044031920576513,
+            "pinball90": 11.567961220440662
+          }
+        },
+        "empirical_direct": {
+          "hours": 8735,
+          "mae": 11.118641475594139,
+          "rmse": 22.136432101066138,
+          "forecast_minus_actual_bias": -0.7083508051969039,
+          "observed_le_p10": 0.11745850028620493,
+          "observed_le_p50": 0.4936462507155123,
+          "observed_le_p90": 0.8770463651974814,
+          "coverage_p10_p90": 0.7595878649112765,
+          "mean_interval_width": 31.246572107955537,
+          "pinball10": 2.7784249413559645,
+          "pinball50": 5.559320737797069,
+          "pinball90": 3.0835663494355496,
+          "mae_gain_vs_nyx": 0.04388645635647707,
+          "exploratory_day_cluster_gain_ci95": [
+            -0.006135682645301815,
+            0.09390859535825595
+          ],
+          "top1_mae": 102.38283743255649,
+          "top1_mae_gain_vs_nyx": 4.604232653582762,
+          "active_hours": 104,
+          "improved_active_hours": 68,
+          "worsened_active_hours": 36,
+          "active_no_underforecast_hours": 32,
+          "active_outside_error50_hours": 83,
+          "positive_error50_hours": 104,
+          "active_within_error50_hours": 21,
+          "mae_gain_excluding_preidentified_days": 0.031854612659456855,
+          "signed_total_absolute_error_gain": 383.34819627382717,
+          "active_scores": {
+            "hours": 104,
+            "mae": 62.0343195395601,
+            "rmse": 115.79379783481227,
+            "forecast_minus_actual_bias": -31.12752640196779,
+            "observed_le_p10": 0.17307692307692307,
+            "observed_le_p50": 0.3557692307692308,
+            "observed_le_p90": 0.8076923076923077,
+            "coverage_p10_p90": 0.6346153846153846,
+            "mean_interval_width": 70.37865856479048,
+            "pinball10": 15.673545567922641,
+            "pinball50": 31.01715976978005,
+            "pinball90": 29.613919455867332
+          },
+          "nyx_on_same_active_scores": {
+            "hours": 104,
+            "mae": 65.7203598883469,
+            "rmse": 121.61296748325,
+            "forecast_minus_actual_bias": -38.284800251409926,
+            "observed_le_p10": 0.11538461538461539,
+            "observed_le_p50": 0.3076923076923077,
+            "observed_le_p90": 0.7596153846153846,
+            "coverage_p10_p90": 0.6442307692307693,
+            "mean_interval_width": 104.3333367567796,
+            "pinball10": 9.719641943303394,
+            "pinball50": 32.86017994417345,
+            "pinball90": 32.45275077199214
+          }
+        },
+        "empirical_governed": {
+          "hours": 8735,
+          "mae": 11.124182853877477,
+          "rmse": 22.21182984639316,
+          "forecast_minus_actual_bias": -0.7162472174306711,
+          "observed_le_p10": 0.11734401831711505,
+          "observed_le_p50": 0.4936462507155123,
+          "observed_le_p90": 0.8769318832283916,
+          "coverage_p10_p90": 0.7595878649112765,
+          "mean_interval_width": 31.249706447720886,
+          "pinball10": 2.7811356142404353,
+          "pinball50": 5.562091426938738,
+          "pinball90": 3.0734896688422273,
+          "mae_gain_vs_nyx": 0.03834507807313987,
+          "exploratory_day_cluster_gain_ci95": [
+            -0.011275682704923247,
+            0.08796583885120299
+          ],
+          "top1_mae": 102.94577368435316,
+          "top1_mae_gain_vs_nyx": 4.0412964017860995,
+          "active_hours": 69,
+          "improved_active_hours": 40,
+          "worsened_active_hours": 29,
+          "active_no_underforecast_hours": 25,
+          "active_outside_error50_hours": 59,
+          "positive_error50_hours": 104,
+          "active_within_error50_hours": 10,
+          "mae_gain_excluding_preidentified_days": 0.028762792000473287,
+          "signed_total_absolute_error_gain": 334.94425696887674,
+          "active_scores": {
+            "hours": 69,
+            "mae": 44.66332606544633,
+            "rmse": 81.63240541067546,
+            "forecast_minus_actual_bias": -1.4550897883082008,
+            "observed_le_p10": 0.21739130434782608,
+            "observed_le_p50": 0.43478260869565216,
+            "observed_le_p90": 0.8695652173913043,
+            "coverage_p10_p90": 0.6521739130434783,
+            "mean_interval_width": 68.85304646250312,
+            "pinball10": 17.6559976263096,
+            "pinball50": 22.331663032723164,
+            "pinball90": 13.31993252029104
+          },
+          "nyx_on_same_active_scores": {
+            "hours": 69,
+            "mae": 49.51759065919816,
+            "rmse": 91.22952055834119,
+            "forecast_minus_actual_bias": -11.243224853236088,
+            "observed_le_p10": 0.14492753623188406,
+            "observed_le_p50": 0.36231884057971014,
+            "observed_le_p90": 0.8115942028985508,
+            "coverage_p10_p90": 0.6666666666666666,
+            "mean_interval_width": 119.63432289897531,
+            "pinball10": 8.338842487088538,
+            "pinball50": 24.75879532959908,
+            "pinball90": 18.87440008347438
+          }
+        }
+      }
+    }
+  },
+  "preidentified_cases": [
+    {
+      "zone": "BE",
+      "day": "2026-06-24",
+      "hour": 19,
+      "actual": 552.8975,
+      "nyx": 233.51584513409463,
+      "storm": 490.743938,
+      "old_signed_median": -1.3087097054048908,
+      "p": 0.03381357850680553,
+      "physical_gate": false,
+      "models": {
+        "old_fundamental_governed": {
+          "point": 233.51584513409463,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed"
+        },
+        "old_fundamental_25": {
+          "point": 233.51584513409463,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed"
+        },
+        "regional_25": {
+          "point": 253.1644169352976,
+          "uplift": 19.648571801202966,
+          "reason": "experimental_fixed_25_percent_zonal_probability_gate"
+        },
+        "forest_direct": {
+          "point": 233.51584513409463,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed",
+          "raw_mixture_error50": 0.9724922496509265,
+          "q10": 195.53000529034463,
+          "q90": 306.09267313702435
+        },
+        "forest_governed": {
+          "point": 233.51584513409463,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed",
+          "raw_mixture_error50": 0.9724922496509265,
+          "q10": 195.53000529034463,
+          "q90": 306.09267313702435
+        },
+        "empirical_direct": {
+          "point": 233.51584513409463,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed",
+          "raw_mixture_error50": 0.3249444330706126,
+          "q10": 195.53000529034463,
+          "q90": 306.09267313702435
+        },
+        "empirical_governed": {
+          "point": 233.51584513409463,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed",
+          "raw_mixture_error50": 0.3249444330706126,
+          "q10": 195.53000529034463,
+          "q90": 306.09267313702435
+        }
+      }
+    },
+    {
+      "zone": "DE",
+      "day": "2026-06-24",
+      "hour": 19,
+      "actual": 455.1375,
+      "nyx": 257.9689811898498,
+      "storm": 447.306821,
+      "old_signed_median": -0.6721126836901775,
+      "p": 0.12801578201109948,
+      "physical_gate": true,
+      "models": {
+        "old_fundamental_governed": {
+          "point": 257.9689811898498,
+          "uplift": 0.0,
+          "reason": "signed_median_not_positive"
+        },
+        "old_fundamental_25": {
+          "point": 257.9689811898498,
+          "uplift": 0.0,
+          "reason": "signed_median_not_positive"
+        },
+        "regional_25": {
+          "point": 278.6421604087395,
+          "uplift": 20.673179218889757,
+          "reason": "experimental_fixed_25_percent_zonal_probability_gate"
+        },
+        "forest_direct": {
+          "point": 260.2981643867218,
+          "uplift": 2.329183196872009,
+          "reason": "direct_coherent_p50_after_physical_and_risk_gates",
+          "raw_mixture_error50": 2.329183196872009,
+          "q10": 245.8006842296796,
+          "q90": 322.39709520188023
+        },
+        "forest_governed": {
+          "point": 257.9689811898498,
+          "uplift": 0.0,
+          "reason": "no_candidate_passes_guards",
+          "raw_mixture_error50": 2.329183196872009,
+          "q10": 222.4322685433654,
+          "q90": 318.0106376839904
+        },
+        "empirical_direct": {
+          "point": 259.2137212415179,
+          "uplift": 1.2447400516681029,
+          "reason": "direct_coherent_p50_after_physical_and_risk_gates",
+          "raw_mixture_error50": 1.2447400516681029,
+          "q10": 244.61262464936948,
+          "q90": 314.4230273834635
+        },
+        "empirical_governed": {
+          "point": 257.9689811898498,
+          "uplift": 0.0,
+          "reason": "no_candidate_passes_guards",
+          "raw_mixture_error50": 1.2447400516681029,
+          "q10": 222.4322685433654,
+          "q90": 318.0106376839904
+        }
+      }
+    },
+    {
+      "zone": "FR",
+      "day": "2026-06-24",
+      "hour": 19,
+      "actual": 313.355,
+      "nyx": 187.1444571447893,
+      "storm": 249.908335,
+      "old_signed_median": -0.866975251481568,
+      "p": 0.03666518323065625,
+      "physical_gate": true,
+      "models": {
+        "old_fundamental_governed": {
+          "point": 187.1444571447893,
+          "uplift": 0.0,
+          "reason": "signed_median_not_positive"
+        },
+        "old_fundamental_25": {
+          "point": 187.1444571447893,
+          "uplift": 0.0,
+          "reason": "signed_median_not_positive"
+        },
+        "regional_25": {
+          "point": 206.1450509784337,
+          "uplift": 19.000593833644402,
+          "reason": "experimental_fixed_25_percent_zonal_probability_gate"
+        },
+        "forest_direct": {
+          "point": 188.14901957565462,
+          "uplift": 1.004562430865306,
+          "reason": "direct_coherent_p50_after_physical_and_risk_gates",
+          "raw_mixture_error50": 1.004562430865306,
+          "q10": 174.10063766293854,
+          "q90": 207.4174234985538
+        },
+        "forest_governed": {
+          "point": 187.1444571447893,
+          "uplift": 0.0,
+          "reason": "no_candidate_passes_guards",
+          "raw_mixture_error50": 1.004562430865306,
+          "q10": 158.70140294557055,
+          "q90": 225.7076437902971
+        },
+        "empirical_direct": {
+          "point": 187.93764538314372,
+          "uplift": 0.7931882383544078,
+          "reason": "direct_coherent_p50_after_physical_and_risk_gates",
+          "raw_mixture_error50": 0.7931882383544078,
+          "q10": 170.05802618651808,
+          "q90": 208.11198556024448
+        },
+        "empirical_governed": {
+          "point": 187.1444571447893,
+          "uplift": 0.0,
+          "reason": "no_candidate_passes_guards",
+          "raw_mixture_error50": 0.7931882383544078,
+          "q10": 158.70140294557055,
+          "q90": 225.7076437902971
+        }
+      }
+    },
+    {
+      "zone": "NL",
+      "day": "2026-06-24",
+      "hour": 19,
+      "actual": 506.1425,
+      "nyx": 246.54175706575762,
+      "storm": 466.303194,
+      "old_signed_median": -0.1943545846551333,
+      "p": 0.18436709538227,
+      "physical_gate": true,
+      "models": {
+        "old_fundamental_governed": {
+          "point": 246.54175706575762,
+          "uplift": 0.0,
+          "reason": "signed_median_not_positive"
+        },
+        "old_fundamental_25": {
+          "point": 246.54175706575762,
+          "uplift": 0.0,
+          "reason": "signed_median_not_positive"
+        },
+        "regional_25": {
+          "point": 266.36239198550663,
+          "uplift": 19.820634919749022,
+          "reason": "experimental_fixed_25_percent_zonal_probability_gate"
+        },
+        "forest_direct": {
+          "point": 249.90093848889427,
+          "uplift": 3.3591814231366612,
+          "reason": "direct_coherent_p50_after_physical_and_risk_gates",
+          "raw_mixture_error50": 3.3591814231366612,
+          "q10": 234.79236546947467,
+          "q90": 331.7481874445574
+        },
+        "forest_governed": {
+          "point": 246.54175706575762,
+          "uplift": 0.0,
+          "reason": "no_candidate_passes_guards",
+          "raw_mixture_error50": 3.3591814231366612,
+          "q10": 209.18607469271075,
+          "q90": 315.2353605813826
+        },
+        "empirical_direct": {
+          "point": 248.82199651113513,
+          "uplift": 2.2802394453774895,
+          "reason": "direct_coherent_p50_after_physical_and_risk_gates",
+          "raw_mixture_error50": 2.2802394453774895,
+          "q10": 233.69176378836366,
+          "q90": 307.66326519573806
+        },
+        "empirical_governed": {
+          "point": 246.54175706575762,
+          "uplift": 0.0,
+          "reason": "no_candidate_passes_guards",
+          "raw_mixture_error50": 2.2802394453774895,
+          "q10": 209.18607469271075,
+          "q90": 315.2353605813826
+        }
+      }
+    },
+    {
+      "zone": "BE",
+      "day": "2026-06-25",
+      "hour": 19,
+      "actual": 204.18,
+      "nyx": 418.5106201171875,
+      "storm": 174.979032,
+      "old_signed_median": -1.495317706449529,
+      "p": 0.010005809719456131,
+      "physical_gate": false,
+      "models": {
+        "old_fundamental_governed": {
+          "point": 418.5106201171875,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed"
+        },
+        "old_fundamental_25": {
+          "point": 418.5106201171875,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed"
+        },
+        "regional_25": {
+          "point": 418.5106201171875,
+          "uplift": 0.0,
+          "reason": "probability_below_gate"
+        },
+        "forest_direct": {
+          "point": 418.5106201171875,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed",
+          "raw_mixture_error50": 0.6985349865639421,
+          "q10": 264.2375946044922,
+          "q90": 697.5317993164062
+        },
+        "forest_governed": {
+          "point": 418.5106201171875,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed",
+          "raw_mixture_error50": 0.6985349865639421,
+          "q10": 264.2375946044922,
+          "q90": 697.5317993164062
+        },
+        "empirical_direct": {
+          "point": 418.5106201171875,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed",
+          "raw_mixture_error50": 0.0363232563276199,
+          "q10": 264.2375946044922,
+          "q90": 697.5317993164062
+        },
+        "empirical_governed": {
+          "point": 418.5106201171875,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed",
+          "raw_mixture_error50": 0.0363232563276199,
+          "q10": 264.2375946044922,
+          "q90": 697.5317993164062
+        }
+      }
+    },
+    {
+      "zone": "DE",
+      "day": "2026-06-25",
+      "hour": 19,
+      "actual": 203.315,
+      "nyx": 379.8953857421875,
+      "storm": 170.554254,
+      "old_signed_median": -1.7159166299332802,
+      "p": 0.044102438483896174,
+      "physical_gate": false,
+      "models": {
+        "old_fundamental_governed": {
+          "point": 379.8953857421875,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed"
+        },
+        "old_fundamental_25": {
+          "point": 379.8953857421875,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed"
+        },
+        "regional_25": {
+          "point": 379.8953857421875,
+          "uplift": 0.0,
+          "reason": "probability_below_gate"
+        },
+        "forest_direct": {
+          "point": 379.8953857421875,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed",
+          "raw_mixture_error50": 1.1002621056308044,
+          "q10": 272.8212890625,
+          "q90": 528.8424072265625
+        },
+        "forest_governed": {
+          "point": 379.8953857421875,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed",
+          "raw_mixture_error50": 1.1002621056308044,
+          "q10": 272.8212890625,
+          "q90": 528.8424072265625
+        },
+        "empirical_direct": {
+          "point": 379.8953857421875,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed",
+          "raw_mixture_error50": 0.08708048825359072,
+          "q10": 272.8212890625,
+          "q90": 528.8424072265625
+        },
+        "empirical_governed": {
+          "point": 379.8953857421875,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed",
+          "raw_mixture_error50": 0.08708048825359072,
+          "q10": 272.8212890625,
+          "q90": 528.8424072265625
+        }
+      }
+    },
+    {
+      "zone": "FR",
+      "day": "2026-06-25",
+      "hour": 19,
+      "actual": 195.005,
+      "nyx": 238.0901040664277,
+      "storm": 151.227613,
+      "old_signed_median": -1.3257995074345246,
+      "p": 0.018298131739179508,
+      "physical_gate": false,
+      "models": {
+        "old_fundamental_governed": {
+          "point": 238.0901040664277,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed"
+        },
+        "old_fundamental_25": {
+          "point": 238.0901040664277,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed"
+        },
+        "regional_25": {
+          "point": 238.0901040664277,
+          "uplift": 0.0,
+          "reason": "probability_below_gate"
+        },
+        "forest_direct": {
+          "point": 238.0901040664277,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed",
+          "raw_mixture_error50": 0.7863270929749184,
+          "q10": 195.22464080959176,
+          "q90": 295.46963592677923
+        },
+        "forest_governed": {
+          "point": 238.0901040664277,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed",
+          "raw_mixture_error50": 0.7863270929749184,
+          "q10": 195.22464080959176,
+          "q90": 295.46963592677923
+        },
+        "empirical_direct": {
+          "point": 238.0901040664277,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed",
+          "raw_mixture_error50": 0.5567571333718038,
+          "q10": 195.22464080959176,
+          "q90": 295.46963592677923
+        },
+        "empirical_governed": {
+          "point": 238.0901040664277,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed",
+          "raw_mixture_error50": 0.5567571333718038,
+          "q10": 195.22464080959176,
+          "q90": 295.46963592677923
+        }
+      }
+    },
+    {
+      "zone": "NL",
+      "day": "2026-06-25",
+      "hour": 19,
+      "actual": 204.5225,
+      "nyx": 405.67317582597843,
+      "storm": 174.685477,
+      "old_signed_median": -2.417148219183016,
+      "p": 0.06415008382516124,
+      "physical_gate": false,
+      "models": {
+        "old_fundamental_governed": {
+          "point": 405.67317582597843,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed"
+        },
+        "old_fundamental_25": {
+          "point": 405.67317582597843,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed"
+        },
+        "regional_25": {
+          "point": 405.67317582597843,
+          "uplift": 0.0,
+          "reason": "probability_below_gate"
+        },
+        "forest_direct": {
+          "point": 405.67317582597843,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed",
+          "raw_mixture_error50": 1.3656029912142884,
+          "q10": 269.1054878376972,
+          "q90": 627.1711006306659
+        },
+        "forest_governed": {
+          "point": 405.67317582597843,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed",
+          "raw_mixture_error50": 1.3656029912142884,
+          "q10": 269.1054878376972,
+          "q90": 627.1711006306659
+        },
+        "empirical_direct": {
+          "point": 405.67317582597843,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed",
+          "raw_mixture_error50": 0.4704425917821169,
+          "q10": 269.1054878376972,
+          "q90": 627.1711006306659
+        },
+        "empirical_governed": {
+          "point": 405.67317582597843,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed",
+          "raw_mixture_error50": 0.4704425917821169,
+          "q10": 269.1054878376972,
+          "q90": 627.1711006306659
+        }
+      }
+    },
+    {
+      "zone": "BE",
+      "day": "2026-06-26",
+      "hour": 19,
+      "actual": 243.75,
+      "nyx": 217.30486450683432,
+      "storm": 202.995569,
+      "old_signed_median": -2.322531027056026,
+      "p": 0.021738336545385085,
+      "physical_gate": false,
+      "models": {
+        "old_fundamental_governed": {
+          "point": 217.30486450683432,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed"
+        },
+        "old_fundamental_25": {
+          "point": 217.30486450683432,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed"
+        },
+        "regional_25": {
+          "point": 217.30486450683432,
+          "uplift": 0.0,
+          "reason": "probability_below_gate"
+        },
+        "forest_direct": {
+          "point": 217.30486450683432,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed",
+          "raw_mixture_error50": 0.821157272226543,
+          "q10": 173.54023132812338,
+          "q90": 340.7919860888656
+        },
+        "forest_governed": {
+          "point": 217.30486450683432,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed",
+          "raw_mixture_error50": 0.821157272226543,
+          "q10": 173.54023132812338,
+          "q90": 340.7919860888656
+        },
+        "empirical_direct": {
+          "point": 217.30486450683432,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed",
+          "raw_mixture_error50": 0.19498387320024335,
+          "q10": 173.54023132812338,
+          "q90": 340.7919860888656
+        },
+        "empirical_governed": {
+          "point": 217.30486450683432,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed",
+          "raw_mixture_error50": 0.19498387320024335,
+          "q10": 173.54023132812338,
+          "q90": 340.7919860888656
+        }
+      }
+    },
+    {
+      "zone": "DE",
+      "day": "2026-06-26",
+      "hour": 19,
+      "actual": 243.545,
+      "nyx": 221.53278441391575,
+      "storm": 184.149342,
+      "old_signed_median": -2.229951651228557,
+      "p": 0.03546855439205841,
+      "physical_gate": false,
+      "models": {
+        "old_fundamental_governed": {
+          "point": 221.53278441391575,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed"
+        },
+        "old_fundamental_25": {
+          "point": 221.53278441391575,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed"
+        },
+        "regional_25": {
+          "point": 221.53278441391575,
+          "uplift": 0.0,
+          "reason": "probability_below_gate"
+        },
+        "forest_direct": {
+          "point": 221.53278441391575,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed",
+          "raw_mixture_error50": 0.9926330711694789,
+          "q10": 183.26728148422825,
+          "q90": 312.96064085922825
+        },
+        "forest_governed": {
+          "point": 221.53278441391575,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed",
+          "raw_mixture_error50": 0.9926330711694789,
+          "q10": 183.26728148422825,
+          "q90": 312.96064085922825
+        },
+        "empirical_direct": {
+          "point": 221.53278441391575,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed",
+          "raw_mixture_error50": -0.03369378300817516,
+          "q10": 183.26728148422825,
+          "q90": 312.96064085922825
+        },
+        "empirical_governed": {
+          "point": 221.53278441391575,
+          "uplift": 0.0,
+          "reason": "physical_stress_gate_closed",
+          "raw_mixture_error50": -0.03369378300817516,
+          "q10": 183.26728148422825,
+          "q90": 312.96064085922825
+        }
+      }
+    },
+    {
+      "zone": "FR",
+      "day": "2026-06-26",
+      "hour": 19,
+      "actual": 216.18,
+      "nyx": 180.77257081778265,
+      "storm": 148.77,
+      "old_signed_median": -1.9164594691503116,
+      "p": 0.034805044446463373,
+      "physical_gate": true,
+      "models": {
+        "old_fundamental_governed": {
+          "point": 180.77257081778265,
+          "uplift": 0.0,
+          "reason": "signed_median_not_positive"
+        },
+        "old_fundamental_25": {
+          "point": 180.77257081778265,
+          "uplift": 0.0,
+          "reason": "signed_median_not_positive"
+        },
+        "regional_25": {
+          "point": 180.77257081778265,
+          "uplift": 0.0,
+          "reason": "probability_below_gate"
+        },
+        "forest_direct": {
+          "point": 181.7619586191406,
+          "uplift": 0.9893878013579352,
+          "reason": "direct_coherent_p50_after_physical_and_risk_gates",
+          "raw_mixture_error50": 0.9893878013579352,
+          "q10": 167.71844540615683,
+          "q90": 200.68592604155236
+        },
+        "forest_governed": {
+          "point": 180.77257081778265,
+          "uplift": 0.0,
+          "reason": "no_candidate_passes_guards",
+          "raw_mixture_error50": 0.9893878013579352,
+          "q10": 143.7909881761811,
+          "q90": 230.20860597403265
+        },
+        "empirical_direct": {
+          "point": 181.53915146190886,
+          "uplift": 0.7665806441262206,
+          "reason": "direct_coherent_p50_after_physical_and_risk_gates",
+          "raw_mixture_error50": 0.7665806441262206,
+          "q10": 163.61253761957647,
+          "q90": 201.50716936528076
+        },
+        "empirical_governed": {
+          "point": 180.77257081778265,
+          "uplift": 0.0,
+          "reason": "no_candidate_passes_guards",
+          "raw_mixture_error50": 0.7665806441262206,
+          "q10": 143.7909881761811,
+          "q90": 230.20860597403265
+        }
+      }
+    },
+    {
+      "zone": "NL",
+      "day": "2026-06-26",
+      "hour": 19,
+      "actual": 244.9375,
+      "nyx": 221.44840194713044,
+      "storm": 190.728186,
+      "old_signed_median": -0.8124877677668738,
+      "p": 0.1356182744062599,
+      "physical_gate": true,
+      "models": {
+        "old_fundamental_governed": {
+          "point": 221.44840194713044,
+          "uplift": 0.0,
+          "reason": "signed_median_not_positive"
+        },
+        "old_fundamental_25": {
+          "point": 221.44840194713044,
+          "uplift": 0.0,
+          "reason": "signed_median_not_positive"
+        },
+        "regional_25": {
+          "point": 221.44840194713044,
+          "uplift": 0.0,
+          "reason": "probability_below_gate"
+        },
+        "forest_direct": {
+          "point": 223.88551787779943,
+          "uplift": 2.437115930669009,
+          "reason": "direct_coherent_p50_after_physical_and_risk_gates",
+          "raw_mixture_error50": 2.437115930669009,
+          "q10": 209.33214355439372,
+          "q90": 286.84102836309313
+        },
+        "forest_governed": {
+          "point": 221.44840194713044,
+          "uplift": 0.0,
+          "reason": "no_candidate_passes_guards",
+          "raw_mixture_error50": 2.437115930669009,
+          "q10": 181.9283976746695,
+          "q90": 330.68402816783356
+        },
+        "empirical_direct": {
+          "point": 222.9252126435068,
+          "uplift": 1.4768106963763614,
+          "reason": "direct_coherent_p50_after_physical_and_risk_gates",
+          "raw_mixture_error50": 1.4768106963763614,
+          "q10": 208.1033717226444,
+          "q90": 279.3012009853253
+        },
+        "empirical_governed": {
+          "point": 222.9252126435068,
+          "uplift": 1.4768106963763614,
+          "reason": "tail_expert_selected",
+          "raw_mixture_error50": 1.4768106963763614,
+          "q10": 208.1033717226444,
+          "q90": 279.3012009853253
+        }
+      }
+    },
+    {
+      "zone": "BE",
+      "day": "2026-09-14",
+      "hour": 19,
+      "actual": 441.735,
+      "nyx": 286.7767300182848,
+      "storm": 370.577353,
+      "old_signed_median": -8.40397545768549,
+      "p": 0.5378766397458875,
+      "physical_gate": true,
+      "models": {
+        "old_fundamental_governed": {
+          "point": 286.7767300182848,
+          "uplift": 0.0,
+          "reason": "signed_median_not_positive"
+        },
+        "old_fundamental_25": {
+          "point": 286.7767300182848,
+          "uplift": 0.0,
+          "reason": "signed_median_not_positive"
+        },
+        "regional_25": {
+          "point": 325.8447396296497,
+          "uplift": 39.06800961136491,
+          "reason": "experimental_fixed_25_percent_zonal_probability_gate"
+        },
+        "forest_direct": {
+          "point": 339.1589695319275,
+          "uplift": 52.3822395136427,
+          "reason": "direct_coherent_p50_after_physical_and_risk_gates",
+          "raw_mixture_error50": 52.3822395136427,
+          "q10": 277.70843544904267,
+          "q90": 421.6816343596803
+        },
+        "forest_governed": {
+          "point": 339.1589695319275,
+          "uplift": 52.3822395136427,
+          "reason": "tail_expert_selected",
+          "raw_mixture_error50": 52.3822395136427,
+          "q10": 277.70843544904267,
+          "q90": 421.6816343596803
+        },
+        "empirical_direct": {
+          "point": 338.4361803283155,
+          "uplift": 51.6594503100307,
+          "reason": "direct_coherent_p50_after_physical_and_risk_gates",
+          "raw_mixture_error50": 51.6594503100307,
+          "q10": 279.194928933823,
+          "q90": 434.4545335434649
+        },
+        "empirical_governed": {
+          "point": 338.4361803283155,
+          "uplift": 51.6594503100307,
+          "reason": "tail_expert_selected",
+          "raw_mixture_error50": 51.6594503100307,
+          "q10": 279.194928933823,
+          "q90": 434.4545335434649
+        }
+      }
+    },
+    {
+      "zone": "DE",
+      "day": "2026-09-14",
+      "hour": 19,
+      "actual": 697.3075,
+      "nyx": 324.58956398890217,
+      "storm": 421.702206,
+      "old_signed_median": -10.463816703555166,
+      "p": 0.6774684797233752,
+      "physical_gate": true,
+      "models": {
+        "old_fundamental_governed": {
+          "point": 324.58956398890217,
+          "uplift": 0.0,
+          "reason": "signed_median_not_positive"
+        },
+        "old_fundamental_25": {
+          "point": 324.58956398890217,
+          "uplift": 0.0,
+          "reason": "signed_median_not_positive"
+        },
+        "regional_25": {
+          "point": 361.3380780580838,
+          "uplift": 36.74851406918162,
+          "reason": "experimental_fixed_25_percent_zonal_probability_gate"
+        },
+        "forest_direct": {
+          "point": 389.0176780009326,
+          "uplift": 64.42811401203042,
+          "reason": "direct_coherent_p50_after_physical_and_risk_gates",
+          "raw_mixture_error50": 64.42811401203042,
+          "q10": 283.93231247716756,
+          "q90": 465.56029737385893
+        },
+        "forest_governed": {
+          "point": 356.80362099491737,
+          "uplift": 32.21405700601521,
+          "reason": "tail_expert_selected",
+          "raw_mixture_error50": 64.42811401203042,
+          "q10": 293.10651928772234,
+          "q90": 415.92728663841183
+        },
+        "empirical_direct": {
+          "point": 391.9180682322914,
+          "uplift": 67.32850424338923,
+          "reason": "direct_coherent_p50_after_physical_and_risk_gates",
+          "raw_mixture_error50": 67.32850424338923,
+          "q10": 320.033740468822,
+          "q90": 495.3743872560064
+        },
+        "empirical_governed": {
+          "point": 358.2538161105968,
+          "uplift": 33.66425212169462,
+          "reason": "tail_expert_selected",
+          "raw_mixture_error50": 67.32850424338923,
+          "q10": 311.15723328354954,
+          "q90": 430.83433157948554
+        }
+      }
+    },
+    {
+      "zone": "FR",
+      "day": "2026-09-14",
+      "hour": 19,
+      "actual": 298.005,
+      "nyx": 284.4118734097112,
+      "storm": 296.467315,
+      "old_signed_median": -7.927823133165293,
+      "p": 0.3149572129516327,
+      "physical_gate": true,
+      "models": {
+        "old_fundamental_governed": {
+          "point": 284.4118734097112,
+          "uplift": 0.0,
+          "reason": "signed_median_not_positive"
+        },
+        "old_fundamental_25": {
+          "point": 284.4118734097112,
+          "uplift": 0.0,
+          "reason": "signed_median_not_positive"
+        },
+        "regional_25": {
+          "point": 322.4017397498625,
+          "uplift": 37.98986634015131,
+          "reason": "experimental_fixed_25_percent_zonal_probability_gate"
+        },
+        "forest_direct": {
+          "point": 291.2764456449996,
+          "uplift": 6.864572235288463,
+          "reason": "direct_coherent_p50_after_physical_and_risk_gates",
+          "raw_mixture_error50": 6.864572235288463,
+          "q10": 270.7442818855734,
+          "q90": 383.28670169628043
+        },
+        "forest_governed": {
+          "point": 284.4118734097112,
+          "uplift": 0.0,
+          "reason": "no_candidate_passes_guards",
+          "raw_mixture_error50": 6.864572235288463,
+          "q10": 267.30930382963305,
+          "q90": 308.6046529507268
+        },
+        "empirical_direct": {
+          "point": 292.2601825694479,
+          "uplift": 7.848309159736772,
+          "reason": "direct_coherent_p50_after_physical_and_risk_gates",
+          "raw_mixture_error50": 7.848309159736772,
+          "q10": 270.76467643125665,
+          "q90": 352.54281970638704
+        },
+        "empirical_governed": {
+          "point": 284.4118734097112,
+          "uplift": 0.0,
+          "reason": "no_candidate_passes_guards",
+          "raw_mixture_error50": 7.848309159736772,
+          "q10": 267.30930382963305,
+          "q90": 308.6046529507268
+        }
+      }
+    },
+    {
+      "zone": "NL",
+      "day": "2026-09-14",
+      "hour": 19,
+      "actual": 400.0,
+      "nyx": 307.1798958567812,
+      "storm": 412.320498,
+      "old_signed_median": -10.693989675219427,
+      "p": 0.45509307368102253,
+      "physical_gate": true,
+      "models": {
+        "old_fundamental_governed": {
+          "point": 307.1798958567812,
+          "uplift": 0.0,
+          "reason": "signed_median_not_positive"
+        },
+        "old_fundamental_25": {
+          "point": 307.1798958567812,
+          "uplift": 0.0,
+          "reason": "signed_median_not_positive"
+        },
+        "regional_25": {
+          "point": 348.76250831848847,
+          "uplift": 41.58261246170733,
+          "reason": "experimental_fixed_25_percent_zonal_probability_gate"
+        },
+        "forest_direct": {
+          "point": 326.31541123240237,
+          "uplift": 19.135515375621196,
+          "reason": "direct_coherent_p50_after_physical_and_risk_gates",
+          "raw_mixture_error50": 19.135515375621196,
+          "q10": 296.18094308055583,
+          "q90": 416.857511707148
+        },
+        "forest_governed": {
+          "point": 326.31541123240237,
+          "uplift": 19.135515375621196,
+          "reason": "tail_expert_selected",
+          "raw_mixture_error50": 19.135515375621196,
+          "q10": 296.18094308055583,
+          "q90": 416.857511707148
+        },
+        "empirical_direct": {
+          "point": 324.25088194512864,
+          "uplift": 17.07098608834749,
+          "reason": "direct_coherent_p50_after_physical_and_risk_gates",
+          "raw_mixture_error50": 17.07098608834749,
+          "q10": 298.30657477146195,
+          "q90": 422.3824977372609
+        },
+        "empirical_governed": {
+          "point": 324.25088194512864,
+          "uplift": 17.07098608834749,
+          "reason": "tail_expert_selected",
+          "raw_mixture_error50": 17.07098608834749,
+          "q10": 298.30657477146195,
+          "q90": 422.3824977372609
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,92 @@
+[
+  {
+    "series": "power.fr.generation.solar.hourly.gw.fcst",
+    "kind": "formula",
+    "source": "energyscan",
+    "metadata_http_status": 200,
+    "metadata": {
+      "tzaware": false,
+      "index_type": "datetime64[ns]",
+      "value_type": "float64",
+      "index_dtype": "<M8[ns]",
+      "value_dtype": "<f8"
+    },
+    "formula_http_status": 200,
+    "formula": "(/ (add (* 0.3 (naive (series \"power.nrjscan.fr.prod.total.solar.mw.ecmwf_avg.pointconnect.6h.cache\") \"CET\")) (* 0.7 (series \"50262\"))) 1000)"
+  },
+  {
+    "series": "power.de.generation.solar.hourly.gw.fcst",
+    "kind": "formula",
+    "source": "energyscan",
+    "metadata_http_status": 200,
+    "metadata": {
+      "tzaware": false,
+      "index_type": "datetime64[ns]",
+      "value_type": "float64",
+      "index_dtype": "<M8[ns]",
+      "value_dtype": "<f8"
+    },
+    "formula_http_status": 200,
+    "formula": "(/ (add (* 0.3 (naive (series \"power.nrjscan.de.prod.total.solar.mw.ecmwf_avg.pointconnect.6h.cache\") \"CET\")) (* 0.7 (series \"28214\"))) 1000)"
+  },
+  {
+    "series": "power.nl.generation.solar.hourly.gw.fcst",
+    "kind": "formula",
+    "source": "energyscan",
+    "metadata_http_status": 200,
+    "metadata": {
+      "tzaware": false,
+      "index_type": "datetime64[ns]",
+      "value_type": "float64",
+      "index_dtype": "<M8[ns]",
+      "value_dtype": "<f8"
+    },
+    "formula_http_status": 200,
+    "formula": "(/ (add (* 0.3 (naive (series \"power.nrjscan.nl.prod.total.solar.mw.ecmwf_avg.pointconnect.6h.cache\") \"CET\")) (* 0.7 (series \"50265\"))) 1000)"
+  },
+  {
+    "series": "power.fr.load.hourly.gw.fcst",
+    "kind": "formula",
+    "source": "energyscan",
+    "metadata_http_status": 200,
+    "metadata": {
+      "tzaware": false,
+      "index_type": "datetime64[ns]",
+      "value_type": "float64",
+      "index_dtype": "<M8[ns]",
+      "value_dtype": "<f8"
+    },
+    "formula_http_status": 200,
+    "formula": "(/ (series \"power.fr.load.fcst.mw\") 1000)"
+  },
+  {
+    "series": "power.de.load.hourly.gw.fcst",
+    "kind": "formula",
+    "source": "energyscan",
+    "metadata_http_status": 200,
+    "metadata": {
+      "tzaware": false,
+      "index_type": "datetime64[ns]",
+      "value_type": "float64",
+      "index_dtype": "<M8[ns]",
+      "value_dtype": "<f8"
+    },
+    "formula_http_status": 200,
+    "formula": "(/ (resample (series \"17769\") \"H\" #:method \"mean\") 1000)"
+  },
+  {
+    "series": "power.nl.load.hourly.gw.fcst",
+    "kind": "formula",
+    "source": "energyscan",
+    "metadata_http_status": 200,
+    "metadata": {
+      "tzaware": false,
+      "index_type": "datetime64[ns]",
+      "value_type": "float64",
+      "index_dtype": "<M8[ns]",
+      "value_dtype": "<f8"
+    },
+    "formula_http_status": 200,
+    "formula": "(/ (naive (series \"power.nrjscan.load.nl.mw.h.fcst.ecens.avg\") \"CET\") 1000)"
+  }
+]

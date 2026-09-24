@@ -1,0 +1,339 @@
+{
+  "preview_only": true,
+  "not_final_suite_report": true,
+  "report": "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\scarcity_variants_preview\\PREVIEW_HGB_TWO_FIXED_NOT_FINAL.html",
+  "report_bytes": 32035512,
+  "payload_bytes": 26912447,
+  "shared_payload_rows": 35136,
+  "variants": [
+    "hgb_v1",
+    "xgb_unweighted_fixed",
+    "xgb_weighted_fixed"
+  ],
+  "windows": {
+    "BE": {
+      "requested_start_day": "2025-09-15",
+      "end_day": "2026-09-14",
+      "represented_start_day": "2025-09-15",
+      "represented_days": 365,
+      "requested_days": 365,
+      "expected_hours": 8760,
+      "represented_hours": 8760,
+      "common_paired_hours": 8735,
+      "complete_365_physical_support": true,
+      "complete_365_common_support": false
+    },
+    "DE": {
+      "requested_start_day": "2025-09-15",
+      "end_day": "2026-09-14",
+      "represented_start_day": "2025-09-15",
+      "represented_days": 365,
+      "requested_days": 365,
+      "expected_hours": 8760,
+      "represented_hours": 8760,
+      "common_paired_hours": 8735,
+      "complete_365_physical_support": true,
+      "complete_365_common_support": false
+    },
+    "FR": {
+      "requested_start_day": "2025-09-15",
+      "end_day": "2026-09-14",
+      "represented_start_day": "2025-09-15",
+      "represented_days": 365,
+      "requested_days": 365,
+      "expected_hours": 8760,
+      "represented_hours": 8760,
+      "common_paired_hours": 8735,
+      "complete_365_physical_support": true,
+      "complete_365_common_support": false
+    },
+    "NL": {
+      "requested_start_day": "2025-09-15",
+      "end_day": "2026-09-14",
+      "represented_start_day": "2025-09-15",
+      "represented_days": 365,
+      "requested_days": 365,
+      "expected_hours": 8760,
+      "represented_hours": 8760,
+      "common_paired_hours": 8735,
+      "complete_365_physical_support": true,
+      "complete_365_common_support": false
+    }
+  },
+  "local_shap": {
+    "xgb_unweighted_fixed": {
+      "status": "complete",
+      "global_features": 242,
+      "verified_local_cases": 8,
+      "maximum_grouped_reconstruction_error": 8.89543752435884e-07
+    },
+    "xgb_weighted_fixed": {
+      "status": "complete",
+      "global_features": 242,
+      "verified_local_cases": 8,
+      "maximum_grouped_reconstruction_error": 1.213844344816195e-06
+    }
+  },
+  "mean_prices_2026_09_14": [
+    {
+      "zone": "BE",
+      "local_day": "2026-09-14",
+      "model": "nuclear_kalman",
+      "represented_hours": 24,
+      "paired_hours": 24,
+      "mean_forecast_eur_mwh": 216.25951973664291,
+      "mean_observed_eur_mwh": 232.26822916666666,
+      "mae_eur_mwh": 20.55119866273996,
+      "bias_eur_mwh": -16.00870943002377,
+      "gain_vs_hgb_mae_eur_mwh": null
+    },
+    {
+      "zone": "BE",
+      "local_day": "2026-09-14",
+      "model": "storm",
+      "represented_hours": 24,
+      "paired_hours": 24,
+      "mean_forecast_eur_mwh": 211.825469375,
+      "mean_observed_eur_mwh": 232.26822916666666,
+      "mae_eur_mwh": 20.977372125,
+      "bias_eur_mwh": -20.442759791666663,
+      "gain_vs_hgb_mae_eur_mwh": null
+    },
+    {
+      "zone": "BE",
+      "local_day": "2026-09-14",
+      "model": "hgb_v1",
+      "represented_hours": 24,
+      "paired_hours": 24,
+      "mean_forecast_eur_mwh": 216.25951973664291,
+      "mean_observed_eur_mwh": 232.26822916666666,
+      "mae_eur_mwh": 20.55119866273996,
+      "bias_eur_mwh": -16.00870943002377,
+      "gain_vs_hgb_mae_eur_mwh": 0.0
+    },
+    {
+      "zone": "BE",
+      "local_day": "2026-09-14",
+      "model": "xgb_unweighted_fixed",
+      "represented_hours": 24,
+      "paired_hours": 24,
+      "mean_forecast_eur_mwh": 216.25951973664291,
+      "mean_observed_eur_mwh": 232.26822916666666,
+      "mae_eur_mwh": 20.55119866273996,
+      "bias_eur_mwh": -16.00870943002377,
+      "gain_vs_hgb_mae_eur_mwh": 0.0
+    },
+    {
+      "zone": "BE",
+      "local_day": "2026-09-14",
+      "model": "xgb_weighted_fixed",
+      "represented_hours": 24,
+      "paired_hours": 24,
+      "mean_forecast_eur_mwh": 220.51469201731075,
+      "mean_observed_eur_mwh": 232.26822916666666,
+      "mae_eur_mwh": 16.296026382072096,
+      "bias_eur_mwh": -11.753537149355902,
+      "gain_vs_hgb_mae_eur_mwh": 4.255172280667864
+    },
+    {
+      "zone": "DE",
+      "local_day": "2026-09-14",
+      "model": "nuclear_kalman",
+      "represented_hours": 24,
+      "paired_hours": 24,
+      "mean_forecast_eur_mwh": 222.7209041163823,
+      "mean_observed_eur_mwh": 256.54531249999997,
+      "mae_eur_mwh": 38.5177345549991,
+      "bias_eur_mwh": -33.82440838361772,
+      "gain_vs_hgb_mae_eur_mwh": null
+    },
+    {
+      "zone": "DE",
+      "local_day": "2026-09-14",
+      "model": "storm",
+      "represented_hours": 24,
+      "paired_hours": 24,
+      "mean_forecast_eur_mwh": 215.31777045833334,
+      "mean_observed_eur_mwh": 256.54531249999997,
+      "mae_eur_mwh": 41.57474604166667,
+      "bias_eur_mwh": -41.22754204166667,
+      "gain_vs_hgb_mae_eur_mwh": null
+    },
+    {
+      "zone": "DE",
+      "local_day": "2026-09-14",
+      "model": "hgb_v1",
+      "represented_hours": 24,
+      "paired_hours": 24,
+      "mean_forecast_eur_mwh": 222.7209041163823,
+      "mean_observed_eur_mwh": 256.54531249999997,
+      "mae_eur_mwh": 38.5177345549991,
+      "bias_eur_mwh": -33.82440838361772,
+      "gain_vs_hgb_mae_eur_mwh": 0.0
+    },
+    {
+      "zone": "DE",
+      "local_day": "2026-09-14",
+      "model": "xgb_unweighted_fixed",
+      "represented_hours": 24,
+      "paired_hours": 24,
+      "mean_forecast_eur_mwh": 222.7209041163823,
+      "mean_observed_eur_mwh": 256.54531249999997,
+      "mae_eur_mwh": 38.5177345549991,
+      "bias_eur_mwh": -33.82440838361772,
+      "gain_vs_hgb_mae_eur_mwh": 0.0
+    },
+    {
+      "zone": "DE",
+      "local_day": "2026-09-14",
+      "model": "xgb_weighted_fixed",
+      "represented_hours": 24,
+      "paired_hours": 24,
+      "mean_forecast_eur_mwh": 222.7209041163823,
+      "mean_observed_eur_mwh": 256.54531249999997,
+      "mae_eur_mwh": 38.5177345549991,
+      "bias_eur_mwh": -33.82440838361772,
+      "gain_vs_hgb_mae_eur_mwh": 0.0
+    },
+    {
+      "zone": "FR",
+      "local_day": "2026-09-14",
+      "model": "nuclear_kalman",
+      "represented_hours": 24,
+      "paired_hours": 24,
+      "mean_forecast_eur_mwh": 201.84517966171322,
+      "mean_observed_eur_mwh": 216.33,
+      "mae_eur_mwh": 20.2747423848059,
+      "bias_eur_mwh": -14.484820338286776,
+      "gain_vs_hgb_mae_eur_mwh": null
+    },
+    {
+      "zone": "FR",
+      "local_day": "2026-09-14",
+      "model": "storm",
+      "represented_hours": 24,
+      "paired_hours": 24,
+      "mean_forecast_eur_mwh": 206.87922612500003,
+      "mean_observed_eur_mwh": 216.33,
+      "mae_eur_mwh": 11.23034954166667,
+      "bias_eur_mwh": -9.450773874999998,
+      "gain_vs_hgb_mae_eur_mwh": null
+    },
+    {
+      "zone": "FR",
+      "local_day": "2026-09-14",
+      "model": "hgb_v1",
+      "represented_hours": 24,
+      "paired_hours": 24,
+      "mean_forecast_eur_mwh": 201.84517966171322,
+      "mean_observed_eur_mwh": 216.33,
+      "mae_eur_mwh": 20.2747423848059,
+      "bias_eur_mwh": -14.484820338286776,
+      "gain_vs_hgb_mae_eur_mwh": 0.0
+    },
+    {
+      "zone": "FR",
+      "local_day": "2026-09-14",
+      "model": "xgb_unweighted_fixed",
+      "represented_hours": 24,
+      "paired_hours": 24,
+      "mean_forecast_eur_mwh": 201.84517966171322,
+      "mean_observed_eur_mwh": 216.33,
+      "mae_eur_mwh": 20.2747423848059,
+      "bias_eur_mwh": -14.484820338286776,
+      "gain_vs_hgb_mae_eur_mwh": 0.0
+    },
+    {
+      "zone": "FR",
+      "local_day": "2026-09-14",
+      "model": "xgb_weighted_fixed",
+      "represented_hours": 24,
+      "paired_hours": 24,
+      "mean_forecast_eur_mwh": 201.84517966171322,
+      "mean_observed_eur_mwh": 216.33,
+      "mae_eur_mwh": 20.2747423848059,
+      "bias_eur_mwh": -14.484820338286776,
+      "gain_vs_hgb_mae_eur_mwh": 0.0
+    },
+    {
+      "zone": "NL",
+      "local_day": "2026-09-14",
+      "model": "nuclear_kalman",
+      "represented_hours": 24,
+      "paired_hours": 24,
+      "mean_forecast_eur_mwh": 216.07467440019784,
+      "mean_observed_eur_mwh": 229.40364583333334,
+      "mae_eur_mwh": 15.194279393578517,
+      "bias_eur_mwh": -13.328971433135507,
+      "gain_vs_hgb_mae_eur_mwh": null
+    },
+    {
+      "zone": "NL",
+      "local_day": "2026-09-14",
+      "model": "storm",
+      "represented_hours": 24,
+      "paired_hours": 24,
+      "mean_forecast_eur_mwh": 214.67821137500002,
+      "mean_observed_eur_mwh": 229.40364583333334,
+      "mae_eur_mwh": 16.250668208333337,
+      "bias_eur_mwh": -14.725434458333337,
+      "gain_vs_hgb_mae_eur_mwh": null
+    },
+    {
+      "zone": "NL",
+      "local_day": "2026-09-14",
+      "model": "hgb_v1",
+      "represented_hours": 24,
+      "paired_hours": 24,
+      "mean_forecast_eur_mwh": 216.07467440019784,
+      "mean_observed_eur_mwh": 229.40364583333334,
+      "mae_eur_mwh": 15.194279393578517,
+      "bias_eur_mwh": -13.328971433135507,
+      "gain_vs_hgb_mae_eur_mwh": 0.0
+    },
+    {
+      "zone": "NL",
+      "local_day": "2026-09-14",
+      "model": "xgb_unweighted_fixed",
+      "represented_hours": 24,
+      "paired_hours": 24,
+      "mean_forecast_eur_mwh": 216.07467440019784,
+      "mean_observed_eur_mwh": 229.40364583333334,
+      "mae_eur_mwh": 15.194279393578517,
+      "bias_eur_mwh": -13.328971433135507,
+      "gain_vs_hgb_mae_eur_mwh": 0.0
+    },
+    {
+      "zone": "NL",
+      "local_day": "2026-09-14",
+      "model": "xgb_weighted_fixed",
+      "represented_hours": 24,
+      "paired_hours": 24,
+      "mean_forecast_eur_mwh": 216.07467440019784,
+      "mean_observed_eur_mwh": 229.40364583333334,
+      "mae_eur_mwh": 15.194279393578517,
+      "bias_eur_mwh": -13.328971433135507,
+      "gain_vs_hgb_mae_eur_mwh": 0.0
+    }
+  ],
+  "javascript": {
+    "javascript_controls": "passed",
+    "initial_observed_day": "2026-09-15",
+    "live_day": "2026-09-15",
+    "countries_tested": [
+      "FR",
+      "DE"
+    ],
+    "variants_tested": [
+      "hgb_v1",
+      "xgb_unweighted_fixed",
+      "xgb_weighted_fixed"
+    ],
+    "waterfall_identity": "verified",
+    "night_light": "passed",
+    "daily_mean_columns": "present",
+    "calendar_june_26": "present",
+    "plot_calls": 44
+  },
+  "sealed_modules_and_source_artifacts_unchanged": true
+}

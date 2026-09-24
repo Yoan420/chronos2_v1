@@ -1,0 +1,11 @@
+{
+  "manuscript_title": "NYX for hourly day ahead electricity price forecasting across four European markets",
+  "date": "2026-09-16",
+  "pages": 18,
+  "tables": 10,
+  "figures": 5,
+  "docx_sha256": "bed24fde19cc03051fe1e6f669bc6853fbe1ae536c0df4706bc39d4263b24586",
+  "pdf_sha256": "8ff98789465974513d318fec9c7bfb31f1fbc8c6556ad85390873962d033644f",
+  "format": "Single-column research manuscript with editable Word equations and vector figure assets",
+  "scope": "Retrospective empirical study of retained NYX forecasts, not a prospective deployment validation"
+}

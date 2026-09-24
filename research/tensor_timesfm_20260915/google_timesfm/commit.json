@@ -1,0 +1,61 @@
+{
+  "sha": "8cb0628371af142e16b8c232cc9fbf667ffb12f9",
+  "node_id": "C_kwDOL1Au99oAKDhjYjA2MjgzNzFhZjE0MmUxNmI4YzIzMmNjOWZiZjY2N2ZmYjEyZjk",
+  "commit": {
+    "author": {
+      "name": "Rajat Sen",
+      "email": "senrajat@google.com",
+      "date": "2026-09-09T22:05:56Z"
+    },
+    "committer": {
+      "name": "Rajat Sen",
+      "email": "senrajat@google.com",
+      "date": "2026-09-09T22:05:56Z"
+    },
+    "message": "chore: bump version to 3.0.2",
+    "tree": {
+      "sha": "9f4c3dbcff0fd540c87c699a42e404eef41cd4d5",
+      "url": "https://api.github.com/repos/google-research/timesfm/git/trees/9f4c3dbcff0fd540c87c699a42e404eef41cd4d5"
+    },
+    "url": "https://api.github.com/repos/google-research/timesfm/git/commits/8cb0628371af142e16b8c232cc9fbf667ffb12f9",
+    "comment_count": 0,
+    "verification": {
+      "verified": false,
+      "reason": "unsigned",
+      "signature": null,
+      "payload": null,
+      "verified_at": null
+    }
+  },
+  "url": "https://api.github.com/repos/google-research/timesfm/commits/8cb0628371af142e16b8c232cc9fbf667ffb12f9",
+  "html_url": "https://github.com/google-research/timesfm/commit/8cb0628371af142e16b8c232cc9fbf667ffb12f9",
+  "comments_url": "https://api.github.com/repos/google-research/timesfm/commits/8cb0628371af142e16b8c232cc9fbf667ffb12f9/comments",
+  "author": null,
+  "committer": null,
+  "parents": [
+    {
+      "sha": "1494fae00e5ab4fe15815ff749e6422ab4f8f7b9",
+      "url": "https://api.github.com/repos/google-research/timesfm/commits/1494fae00e5ab4fe15815ff749e6422ab4f8f7b9",
+      "html_url": "https://github.com/google-research/timesfm/commit/1494fae00e5ab4fe15815ff749e6422ab4f8f7b9"
+    }
+  ],
+  "stats": {
+    "total": 2,
+    "additions": 1,
+    "deletions": 1
+  },
+  "files": [
+    {
+      "sha": "189b6774d578fb6ff8bacb59972f5fdedf8750cb",
+      "filename": "pyproject.toml",
+      "status": "modified",
+      "additions": 1,
+      "deletions": 1,
+      "changes": 2,
+      "blob_url": "https://github.com/google-research/timesfm/blob/8cb0628371af142e16b8c232cc9fbf667ffb12f9/pyproject.toml",
+      "raw_url": "https://github.com/google-research/timesfm/raw/8cb0628371af142e16b8c232cc9fbf667ffb12f9/pyproject.toml",
+      "contents_url": "https://api.github.com/repos/google-research/timesfm/contents/pyproject.toml?ref=8cb0628371af142e16b8c232cc9fbf667ffb12f9",
+      "patch": "@@ -1,6 +1,6 @@\n [project]\n name = \"timesfm\"\n-version = \"3.0.1\"\n+version = \"3.0.2\"\n description = \"A time series foundation model.\"\n authors = [\n     {name = \"Rajat Sen\", email = \"senrajat@google.com\"},"
+    }
+  ]
+}

@@ -1,0 +1,122 @@
+[
+  {
+    "series": "power.nrjscan.be.price.spot.qh.epex.obs.eurmwh",
+    "kind": "formula",
+    "source": "energyscan",
+    "metadata_http_status": 200,
+    "metadata": {
+      "tzaware": false,
+      "index_type": "datetime64[ns]",
+      "value_type": "float64",
+      "index_dtype": "<M8[ns]",
+      "value_dtype": "<f8"
+    },
+    "formula_http_status": 200,
+    "formula": "(naive (series \"power.price.be.euromwh.qh.obs.epex\") \"CET\")"
+  },
+  {
+    "series": "power.nrjscan.de_lu.price.spot.qh.epex.obs.eurmwh",
+    "kind": "formula",
+    "source": "energyscan",
+    "metadata_http_status": 200,
+    "metadata": {
+      "tzaware": false,
+      "index_type": "datetime64[ns]",
+      "value_type": "float64",
+      "index_dtype": "<M8[ns]",
+      "value_dtype": "<f8"
+    },
+    "formula_http_status": 200,
+    "formula": "(naive (series \"power.price.de.euromwh.qh.obs.epex\") \"CET\")"
+  },
+  {
+    "series": "power.nrjscan.fr.price.spot.qh.epex.obs.eurmwh",
+    "kind": "formula",
+    "source": "energyscan",
+    "metadata_http_status": 200,
+    "metadata": {
+      "tzaware": false,
+      "index_type": "datetime64[ns]",
+      "value_type": "float64",
+      "index_dtype": "<M8[ns]",
+      "value_dtype": "<f8"
+    },
+    "formula_http_status": 200,
+    "formula": "(naive (series \"power.price.fr.euromwh.qh.obs.epex\") \"CET\")"
+  },
+  {
+    "series": "power.nrjscan.nl.price.spot.qh.epex.obs.eurmwh",
+    "kind": "formula",
+    "source": "energyscan",
+    "metadata_http_status": 200,
+    "metadata": {
+      "tzaware": false,
+      "index_type": "datetime64[ns]",
+      "value_type": "float64",
+      "index_dtype": "<M8[ns]",
+      "value_dtype": "<f8"
+    },
+    "formula_http_status": 200,
+    "formula": "(naive (series \"power.price.nl.euromwh.qh.obs.epex\") \"CET\")"
+  },
+  {
+    "series": "power.price.be.euromwh.qh.obs.epex",
+    "kind": "formula",
+    "source": "power",
+    "metadata_http_status": 200,
+    "metadata": {
+      "tzaware": true,
+      "index_type": "datetime64[ns, UTC]",
+      "value_type": "float64",
+      "index_dtype": "|M8[ns]",
+      "value_dtype": "<f8"
+    },
+    "formula_http_status": 200,
+    "formula": "(series \"60451\")"
+  },
+  {
+    "series": "power.price.de.euromwh.qh.obs.epex",
+    "kind": "formula",
+    "source": "power",
+    "metadata_http_status": 200,
+    "metadata": {
+      "tzaware": true,
+      "index_type": "datetime64[ns, UTC]",
+      "value_type": "float64",
+      "index_dtype": "|M8[ns]",
+      "value_dtype": "<f8"
+    },
+    "formula_http_status": 200,
+    "formula": "(series \"60452\")"
+  },
+  {
+    "series": "power.price.fr.euromwh.qh.obs.epex",
+    "kind": "formula",
+    "source": "power",
+    "metadata_http_status": 200,
+    "metadata": {
+      "tzaware": true,
+      "index_type": "datetime64[ns, UTC]",
+      "value_type": "float64",
+      "index_dtype": "|M8[ns]",
+      "value_dtype": "<f8"
+    },
+    "formula_http_status": 200,
+    "formula": "(priority (pointconnect \"165188855\") (series \"60454\"))"
+  },
+  {
+    "series": "power.price.nl.euromwh.qh.obs.epex",
+    "kind": "formula",
+    "source": "power",
+    "metadata_http_status": 200,
+    "metadata": {
+      "tzaware": true,
+      "index_type": "datetime64[ns, UTC]",
+      "value_type": "float64",
+      "index_dtype": "|M8[ns]",
+      "value_dtype": "<f8"
+    },
+    "formula_http_status": 200,
+    "formula": "(priority (pointconnect \"165546978\") (series \"60453\"))"
+  }
+]

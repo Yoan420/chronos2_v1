@@ -1,0 +1,52 @@
+{
+  "command": [
+    "C:\\Users\\BQ6757\\venvs\\pricefm311\\Scripts\\python.exe",
+    "-u",
+    "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-security-tests-final\\test_persisted_logs_redact_syn0\\explicit test fixture ; $literal.py",
+    "secrets",
+    "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-security-tests-final\\test_persisted_logs_redact_syn0\\console-state\\executions\\89aa7404f36c4bc4a39d0a7b6e0236ab\\results",
+    "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-security-tests-final\\test_persisted_logs_redact_syn0\\never-released"
+  ],
+  "cwd": "C:\\Users\\BQ6757\\chronos2_v1",
+  "output_dir": "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-security-tests-final\\test_persisted_logs_redact_syn0\\console-state\\executions\\89aa7404f36c4bc4a39d0a7b6e0236ab\\results",
+  "config": {
+    "fixture": true,
+    "mode": "secrets",
+    "resource": null
+  },
+  "type": "fixture",
+  "model": "explicit-test-fixture",
+  "resource_keys": [],
+  "warnings": [
+    "Explicit test fixture; contains no real scientific results."
+  ],
+  "id": "89aa7404f36c4bc4a39d0a7b6e0236ab",
+  "run_dir": "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-security-tests-final\\test_persisted_logs_redact_syn0\\console-state\\executions\\89aa7404f36c4bc4a39d0a7b6e0236ab",
+  "created_at": "2026-09-11T08:17:59.589436+00:00",
+  "request": {
+    "type": "fixture",
+    "name": "Explicit process test",
+    "mode": "secrets"
+  },
+  "name": "Explicit process test",
+  "description": "",
+  "python_executable": "C:\\Users\\BQ6757\\venvs\\pricefm311\\Scripts\\python.exe",
+  "source": "managed",
+  "source_key": "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-security-tests-final\\test_persisted_logs_redact_syn0\\console-state\\executions\\89aa7404f36c4bc4a39d0a7b6e0236ab",
+  "status": "queued",
+  "started_at": null,
+  "finished_at": null,
+  "duration_seconds": null,
+  "return_code": null,
+  "cancel_requested": false,
+  "tags": [],
+  "note": "",
+  "activity": "En attente d’une place ou d’une ressource",
+  "git": {
+    "commit": "900d8fc36a5f7d44e91f895786e49e4ed7614086",
+    "dirty_tracked_files": true
+  },
+  "log_paths": [
+    "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-security-tests-final\\test_persisted_logs_redact_syn0\\console-state\\executions\\89aa7404f36c4bc4a39d0a7b6e0236ab\\console.log"
+  ]
+}

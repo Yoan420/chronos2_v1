@@ -1,0 +1,98 @@
+[
+  {
+    "series": "23259",
+    "day": "2025-10-15",
+    "cutoff_utc": "2025-10-14T06:00:00+00:00",
+    "raw_count": 121,
+    "raw_timezone": "UTC",
+    "raw_min": "2025-10-14 19:00:00+00:00",
+    "raw_max": "2025-10-16 01:00:00+00:00",
+    "raw_minutes": [
+      0,
+      15,
+      30,
+      45
+    ],
+    "raw_step_seconds": {
+      "900.0": 120
+    },
+    "nan_count": 0,
+    "duplicate_count": 0,
+    "delivery_count": 96,
+    "delivery_distinct_values": 45,
+    "complete_quarters_expected": 96,
+    "within_hour_nonconstant_count": 11
+  },
+  {
+    "series": "23259",
+    "day": "2026-01-15",
+    "cutoff_utc": "2026-01-14T07:00:00+00:00",
+    "raw_count": 121,
+    "raw_timezone": "UTC",
+    "raw_min": "2026-01-14 20:00:00+00:00",
+    "raw_max": "2026-01-16 02:00:00+00:00",
+    "raw_minutes": [
+      0,
+      15,
+      30,
+      45
+    ],
+    "raw_step_seconds": {
+      "900.0": 120
+    },
+    "nan_count": 0,
+    "duplicate_count": 0,
+    "delivery_count": 96,
+    "delivery_distinct_values": 36,
+    "complete_quarters_expected": 96,
+    "within_hour_nonconstant_count": 10
+  },
+  {
+    "series": "23259",
+    "day": "2026-04-15",
+    "cutoff_utc": "2026-04-14T06:00:00+00:00",
+    "raw_count": 121,
+    "raw_timezone": "UTC",
+    "raw_min": "2026-04-14 19:00:00+00:00",
+    "raw_max": "2026-04-16 01:00:00+00:00",
+    "raw_minutes": [
+      0,
+      15,
+      30,
+      45
+    ],
+    "raw_step_seconds": {
+      "900.0": 120
+    },
+    "nan_count": 0,
+    "duplicate_count": 0,
+    "delivery_count": 96,
+    "delivery_distinct_values": 57,
+    "complete_quarters_expected": 96,
+    "within_hour_nonconstant_count": 15
+  },
+  {
+    "series": "23259",
+    "day": "2026-07-15",
+    "cutoff_utc": "2026-07-14T06:00:00+00:00",
+    "raw_count": 121,
+    "raw_timezone": "UTC",
+    "raw_min": "2026-07-14 19:00:00+00:00",
+    "raw_max": "2026-07-16 01:00:00+00:00",
+    "raw_minutes": [
+      0,
+      15,
+      30,
+      45
+    ],
+    "raw_step_seconds": {
+      "900.0": 120
+    },
+    "nan_count": 0,
+    "duplicate_count": 0,
+    "delivery_count": 96,
+    "delivery_distinct_values": 66,
+    "complete_quarters_expected": 96,
+    "within_hour_nonconstant_count": 17
+  }
+]

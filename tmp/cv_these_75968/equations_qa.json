@@ -1,0 +1,338 @@
+[
+  {
+    "latex": "d_{\\mathrm{model}}",
+    "label": ""
+  },
+  {
+    "latex": "x_i = E[v_i] + p_i",
+    "label": ""
+  },
+  {
+    "latex": "x_i = u_i W_E + b_E + p_i",
+    "label": ""
+  },
+  {
+    "latex": "x_i = E[v_i] + p_i \\qquad \\text{ou} \\qquad x_i = u_i W_E + b_E + p_i ",
+    "label": "1"
+  },
+  {
+    "latex": "W_{E}",
+    "label": ""
+  },
+  {
+    "latex": "d_{\\mathrm{model}}",
+    "label": ""
+  },
+  {
+    "latex": "d_{\\mathrm{model}}",
+    "label": ""
+  },
+  {
+    "latex": "Q = XW_Q,",
+    "label": ""
+  },
+  {
+    "latex": "K = XW_K,",
+    "label": ""
+  },
+  {
+    "latex": "V = XW_V",
+    "label": ""
+  },
+  {
+    "latex": "Q = XW_Q, \\qquad K = XW_K, \\qquad V = XW_V ",
+    "label": "2"
+  },
+  {
+    "latex": "d_{k}",
+    "label": ""
+  },
+  {
+    "latex": "d_{v}",
+    "label": ""
+  },
+  {
+    "latex": "d_{k}",
+    "label": ""
+  },
+  {
+    "latex": "\\operatorname{Attention}(Q,K,V) = \\operatorname{softmax}\\!\\left(\\frac{QK^{\\mathsf T}}{\\sqrt{d_k}}\\right)V ",
+    "label": "3"
+  },
+  {
+    "latex": "d_{v}",
+    "label": ""
+  },
+  {
+    "latex": "s_{ij}=\\frac{q_i k_j^{\\mathsf T}}{\\sqrt{d_k}},",
+    "label": ""
+  },
+  {
+    "latex": "a_{ij}=\\frac{\\exp(s_{ij})}{\\sum_{\\ell=1}^{n}\\exp(s_{i\\ell})},",
+    "label": ""
+  },
+  {
+    "latex": "y_i=\\sum_{j=1}^{n}a_{ij}v_j",
+    "label": ""
+  },
+  {
+    "latex": "s_{ij}=\\frac{q_i k_j^{\\mathsf T}}{\\sqrt{d_k}}, \\qquad a_{ij}=\\frac{\\exp(s_{ij})}{\\sum_{\\ell=1}^{n}\\exp(s_{i\\ell})}, \\qquad y_i=\\sum_{j=1}^{n}a_{ij}v_j ",
+    "label": "4"
+  },
+  {
+    "latex": "d_{k}",
+    "label": ""
+  },
+  {
+    "latex": "d_{k}",
+    "label": ""
+  },
+  {
+    "latex": "d_{\\mathrm{model}}",
+    "label": ""
+  },
+  {
+    "latex": "\\operatorname{MHA}(X)=\\operatorname{Concat}(Y_1,\\ldots,Y_h)W_O ",
+    "label": "5a"
+  },
+  {
+    "latex": "Y_r=\\operatorname{Attention}\\!\\left(XW_Q^{(r)},XW_K^{(r)},XW_V^{(r)}\\right) ",
+    "label": "5b"
+  },
+  {
+    "latex": "W_{O}",
+    "label": ""
+  },
+  {
+    "latex": "d_{v}",
+    "label": ""
+  },
+  {
+    "latex": "d_{\\mathrm{model}}",
+    "label": ""
+  },
+  {
+    "latex": "d_{k}",
+    "label": ""
+  },
+  {
+    "latex": "d_{v}",
+    "label": ""
+  },
+  {
+    "latex": "d_{\\mathrm{model}}",
+    "label": ""
+  },
+  {
+    "latex": "d_{\\mathrm{model}}",
+    "label": ""
+  },
+  {
+    "latex": "\\operatorname{PE}(p,2r)=\\sin\\!\\left(\\frac{p}{10000^{2r/d_{\\mathrm{model}}}}\\right) ",
+    "label": "6a"
+  },
+  {
+    "latex": "\\operatorname{PE}(p,2r+1)=\\cos\\!\\left(\\frac{p}{10000^{2r/d_{\\mathrm{model}}}}\\right) ",
+    "label": "6b"
+  },
+  {
+    "latex": "d_{\\mathrm{model}}",
+    "label": ""
+  },
+  {
+    "latex": "d_{\\mathrm{model}}",
+    "label": ""
+  },
+  {
+    "latex": "M_{ij}=\\begin{cases}0,&j\\leq i,\\\\-\\infty,&j>i.\\end{cases} ",
+    "label": "7a"
+  },
+  {
+    "latex": "Y=\\operatorname{softmax}\\!\\left(\\frac{QK^{\\mathsf T}}{\\sqrt{d_k}}+M\\right)V ",
+    "label": "7b"
+  },
+  {
+    "latex": "\\operatorname{FFN}(x)=\\operatorname{ReLU}(xW_1+b_1)W_2+b_2 ",
+    "label": "8"
+  },
+  {
+    "latex": "d_{\\mathrm{model}}",
+    "label": ""
+  },
+  {
+    "latex": "d_{\\mathrm{ff}}",
+    "label": ""
+  },
+  {
+    "latex": "d_{\\mathrm{ff}}",
+    "label": ""
+  },
+  {
+    "latex": "d_{\\mathrm{model}}",
+    "label": ""
+  },
+  {
+    "latex": "\\operatorname{LN}(z)=\\gamma\\odot\\frac{z-\\mu(z)}{\\sqrt{\\sigma^2(z)+\\varepsilon}}+\\beta ",
+    "label": "9a"
+  },
+  {
+    "latex": "\\mu(z)=\\frac{1}{d_{\\mathrm{model}}}\\sum_{j=1}^{d_{\\mathrm{model}}}z_j,",
+    "label": ""
+  },
+  {
+    "latex": "\\sigma^2(z)=\\frac{1}{d_{\\mathrm{model}}}\\sum_{j=1}^{d_{\\mathrm{model}}}\\bigl(z_j-\\mu(z)\\bigr)^2",
+    "label": ""
+  },
+  {
+    "latex": "\\mu(z)=\\frac{1}{d_{\\mathrm{model}}}\\sum_{j=1}^{d_{\\mathrm{model}}}z_j, \\qquad \\sigma^2(z)=\\frac{1}{d_{\\mathrm{model}}}\\sum_{j=1}^{d_{\\mathrm{model}}}\\bigl(z_j-\\mu(z)\\bigr)^2 ",
+    "label": "9b"
+  },
+  {
+    "latex": "Z=\\operatorname{LN}\\!\\left(X+\\operatorname{MHA}(X)\\right),",
+    "label": ""
+  },
+  {
+    "latex": "X^{\\prime}=\\operatorname{LN}\\!\\left(Z+\\operatorname{FFN}(Z)\\right)",
+    "label": ""
+  },
+  {
+    "latex": "Z=\\operatorname{LN}\\!\\left(X+\\operatorname{MHA}(X)\\right), \\qquad X^{\\prime}=\\operatorname{LN}\\!\\left(Z+\\operatorname{FFN}(Z)\\right) ",
+    "label": "10"
+  },
+  {
+    "latex": "\\widehat{y}_{t+1:t+H}=f_\\theta\\!\\left(y_{t-L+1:t},x_{t-L+1:t},z_{t+1:t+H},s\\right) ",
+    "label": "11"
+  },
+  {
+    "latex": "N=\\left\\lfloor\\frac{L-P}{S}\\right\\rfloor+2 ",
+    "label": "12a"
+  },
+  {
+    "latex": "E_c=P_cW_p+E_{\\mathrm{pos}} ",
+    "label": "12b"
+  },
+  {
+    "latex": "P_{c}",
+    "label": ""
+  },
+  {
+    "latex": "W_{p}",
+    "label": ""
+  },
+  {
+    "latex": "E_{c}",
+    "label": ""
+  },
+  {
+    "latex": "E_{\\mathrm{pos}}",
+    "label": ""
+  },
+  {
+    "latex": "P_{c}",
+    "label": ""
+  },
+  {
+    "latex": "W_{p}",
+    "label": ""
+  },
+  {
+    "latex": "E_{\\mathrm{pos}}",
+    "label": ""
+  },
+  {
+    "latex": "e_c^{(0)}=E(U_{:,c}) ",
+    "label": "13a"
+  },
+  {
+    "latex": "Z^{(\\ell+1)}=B_\\ell\\!\\left(Z^{(\\ell)}\\right),",
+    "label": ""
+  },
+  {
+    "latex": "\\ell=0,\\ldots,K-1",
+    "label": ""
+  },
+  {
+    "latex": "Z^{(\\ell+1)}=B_\\ell\\!\\left(Z^{(\\ell)}\\right), \\qquad \\ell=0,\\ldots,K-1 ",
+    "label": "13b"
+  },
+  {
+    "latex": "\\widehat{Y}_{:,c}=G\\!\\left(Z_{c,:}^{(K)}\\right) ",
+    "label": "13c"
+  },
+  {
+    "latex": "B_\\ell",
+    "label": ""
+  },
+  {
+    "latex": "\\mu_c",
+    "label": ""
+  },
+  {
+    "latex": "s_{c}",
+    "label": ""
+  },
+  {
+    "latex": "\\widetilde{y}_{r,c}=\\frac{y_{r,c}-\\mu_c}{s_c} ",
+    "label": "14a"
+  },
+  {
+    "latex": "\\widehat{y}_{t+h,c}=s_c\\widehat{\\widetilde{y}}_{t+h,c}+\\mu_c ",
+    "label": "14b"
+  },
+  {
+    "latex": "s_{c}",
+    "label": ""
+  },
+  {
+    "latex": "\\operatorname{MAE}=\\frac{1}{N}\\sum_{i=1}^{N}|y_i-\\widehat{y}_i|,",
+    "label": ""
+  },
+  {
+    "latex": "\\operatorname{RMSE}=\\sqrt{\\frac{1}{N}\\sum_{i=1}^{N}(y_i-\\widehat{y}_i)^2}",
+    "label": ""
+  },
+  {
+    "latex": "\\operatorname{MAE}=\\frac{1}{N}\\sum_{i=1}^{N}|y_i-\\widehat{y}_i|, \\qquad \\operatorname{RMSE}=\\sqrt{\\frac{1}{N}\\sum_{i=1}^{N}(y_i-\\widehat{y}_i)^2} ",
+    "label": "15"
+  },
+  {
+    "latex": "\\operatorname{MASE}=\\frac{\\displaystyle\\frac{1}{H}\\sum_{h=1}^{H}|y_{T+h}-\\widehat{y}_{T+h}|}{\\displaystyle\\frac{1}{T-m}\\sum_{t=m+1}^{T}|y_t-y_{t-m}|} ",
+    "label": "16"
+  },
+  {
+    "latex": "\\rho_\\tau(y-q)=(y-q)\\bigl(\\tau-\\mathbf{1}_{\\{y<q\\}}\\bigr),",
+    "label": ""
+  },
+  {
+    "latex": "0<\\tau<1",
+    "label": ""
+  },
+  {
+    "latex": "\\rho_\\tau(y-q)=(y-q)\\bigl(\\tau-\\mathbf{1}_{\\{y<q\\}}\\bigr), \\qquad 0<\\tau<1 ",
+    "label": "17"
+  },
+  {
+    "latex": "\\operatorname{CRPS}(F,y)=\\int_{-\\infty}^{+\\infty}\\left[F(z)-\\mathbf{1}_{\\{y\\leq z\\}}\\right]^2\\,\\mathrm{d}z ",
+    "label": "18"
+  },
+  {
+    "latex": "\\mathcal{L}_{\\mathrm{CE}}(\\theta)=-\\sum_{k=1}^{K}\\log p_\\theta\\!\\left(z_k\\mid c,z_{1:k-1}\\right) ",
+    "label": "19"
+  },
+  {
+    "latex": "\\mathcal{L}_{\\mathrm{FM}}(\\theta)=\\mathbb{E}_{\\tau,\\varepsilon,y,h}\\!\\left[\\left\\|v_\\theta(x_\\tau,\\tau,h)-(y-\\varepsilon)\\right\\|_2^2\\right] ",
+    "label": "20"
+  },
+  {
+    "latex": "x_\\tau",
+    "label": ""
+  },
+  {
+    "latex": "v_\\theta",
+    "label": ""
+  },
+  {
+    "latex": "x_\\tau",
+    "label": ""
+  }
+]

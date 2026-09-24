@@ -1,0 +1,2364 @@
+{
+  "schema": "openai.presentation.layout/v4",
+  "unit": "px",
+  "slide": {
+    "aid": "sl/6lsnupw7",
+    "id": "6lsnupw7",
+    "slide": 14,
+    "layoutId": "/ppt/slideLayouts/slideLayout6.xml",
+    "layoutName": "Title Only",
+    "masterLayoutId": "/ppt/slideMasters/slideMaster1.xml",
+    "frame": {
+      "left": 0,
+      "top": 0,
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "theme": {
+    "colorSchemeName": "Codex Colors",
+    "colors": {
+      "accent1": "#6DCBF4",
+      "accent2": "#3D8DFF",
+      "accent3": "#47E2C2",
+      "accent4": "#85DF7B",
+      "accent5": "#F7CB59",
+      "accent6": "#F67576",
+      "dk1": "#000000",
+      "lt1": "#FFFFFF",
+      "dk2": "#00264F",
+      "lt2": "#D0EDFA",
+      "hlink": "#000000",
+      "folHlink": "#0097A7"
+    },
+    "fontScheme": {
+      "name": "Helvetica Neue",
+      "majorFont": {
+        "latinTypeface": "Helvetica Neue"
+      },
+      "minorFont": {
+        "latinTypeface": "Helvetica Neue"
+      }
+    },
+    "typefaces": [
+      "Helvetica Neue",
+      "Helvetica Neue Medium"
+    ]
+  },
+  "inheritedLayers": [
+    {
+      "scope": "layout",
+      "id": "/ppt/slideLayouts/slideLayout6.xml",
+      "name": "Title Only",
+      "parentLayoutId": "/ppt/slideMasters/slideMaster1.xml",
+      "elements": [
+        {
+          "order": 1,
+          "kind": "shape",
+          "scope": "layout",
+          "aid": "template/layout//ppt/slideLayouts/slideLayout6.xml/8",
+          "id": "8",
+          "name": "Footer Placeholder 4",
+          "bbox": [
+            41.33,
+            659.31,
+            374.67,
+            25.33
+          ],
+          "geometry": "rect",
+          "resolvedTextStyle": {
+            "anchor": 3,
+            "vertical": 1,
+            "verticalAlignment": "bottom",
+            "insets": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          }
+        },
+        {
+          "order": 2,
+          "kind": "shape",
+          "scope": "layout",
+          "aid": "template/layout//ppt/slideLayouts/slideLayout6.xml/9",
+          "id": "9",
+          "name": "Slide Number Placeholder 5",
+          "bbox": [
+            1184.18,
+            659.24,
+            54.48,
+            25.33
+          ],
+          "geometry": "rect",
+          "text": "‹#›",
+          "textPreview": "‹#›",
+          "resolvedTextStyle": {
+            "anchor": 3,
+            "vertical": 1,
+            "verticalAlignment": "bottom",
+            "insets": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "‹#›",
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "‹#›"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "order": 3,
+          "kind": "shape",
+          "scope": "layout",
+          "aid": "template/layout//ppt/slideLayouts/slideLayout6.xml/2",
+          "id": "2",
+          "name": "Title Placeholder 1",
+          "bbox": [
+            41.33,
+            36.12,
+            1197.33,
+            109.97
+          ],
+          "geometry": "rect",
+          "text": "Click to edit Master title style",
+          "textPreview": "Click to edit Master title style",
+          "resolvedTextStyle": {
+            "anchor": 1,
+            "vertical": 1,
+            "verticalAlignment": "top",
+            "autoFit": "shrinkText",
+            "insets": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "Click to edit Master title style",
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Click to edit Master title style"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "scope": "master",
+      "id": "/ppt/slideMasters/slideMaster1.xml",
+      "type": "master",
+      "elements": [
+        {
+          "order": 1,
+          "kind": "shape",
+          "scope": "master",
+          "aid": "template/master//ppt/slideMasters/slideMaster1.xml/2",
+          "id": "2",
+          "name": "Title Placeholder 1",
+          "bbox": [
+            41.33,
+            36.12,
+            1197.33,
+            109.97
+          ],
+          "geometry": "rect",
+          "text": "Click to edit Master title style",
+          "textPreview": "Click to edit Master title style",
+          "resolvedTextStyle": {
+            "anchor": 1,
+            "vertical": 1,
+            "verticalAlignment": "top",
+            "autoFit": "shrinkText",
+            "insets": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "Click to edit Master title style",
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Click to edit Master title style"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "order": 2,
+          "kind": "shape",
+          "scope": "master",
+          "aid": "template/master//ppt/slideMasters/slideMaster1.xml/3",
+          "id": "3",
+          "name": "Text Placeholder 2",
+          "bbox": [
+            41.33,
+            213.33,
+            1197.33,
+            416
+          ],
+          "geometry": "rect",
+          "text": "Click to edit Master text styles\nSecond level\nThird level\nFourth level\nFifth level",
+          "textPreview": "Click to edit Master text styles | Second level | Third level | Fourth level | Fifth level",
+          "resolvedTextStyle": {
+            "vertical": 1,
+            "autoFit": "shrinkText",
+            "insets": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "Click to edit Master text styles",
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Click to edit Master text styles"
+                }
+              ]
+            },
+            {
+              "index": 2,
+              "text": "Second level",
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Second level"
+                }
+              ]
+            },
+            {
+              "index": 3,
+              "text": "Third level",
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Third level"
+                }
+              ]
+            },
+            {
+              "index": 4,
+              "text": "Fourth level",
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Fourth level"
+                }
+              ]
+            },
+            {
+              "index": 5,
+              "text": "Fifth level",
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Fifth level"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "order": 3,
+          "kind": "shape",
+          "scope": "master",
+          "aid": "template/master//ppt/slideMasters/slideMaster1.xml/5",
+          "id": "5",
+          "name": "Footer Placeholder 4",
+          "bbox": [
+            41.33,
+            659.31,
+            374.67,
+            25.33
+          ],
+          "geometry": "rect",
+          "resolvedTextStyle": {
+            "anchor": 3,
+            "vertical": 1,
+            "verticalAlignment": "bottom",
+            "insets": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          }
+        },
+        {
+          "order": 4,
+          "kind": "shape",
+          "scope": "master",
+          "aid": "template/master//ppt/slideMasters/slideMaster1.xml/6",
+          "id": "6",
+          "name": "Slide Number Placeholder 5",
+          "bbox": [
+            1184.18,
+            659.24,
+            54.48,
+            25.33
+          ],
+          "geometry": "rect",
+          "text": "‹#›",
+          "textPreview": "‹#›",
+          "resolvedTextStyle": {
+            "anchor": 3,
+            "vertical": 1,
+            "verticalAlignment": "bottom",
+            "insets": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "‹#›",
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "‹#›"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "elements": [
+    {
+      "order": 1,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/wbydknq1",
+      "id": "3",
+      "name": "Footer Placeholder 2",
+      "bbox": [
+        41.33,
+        659.31,
+        374.67,
+        25.33
+      ],
+      "resolvedFontSize": 13.33,
+      "resolvedTextStyle": {
+        "anchor": 3,
+        "vertical": 1,
+        "fontSize": 13.33,
+        "typeface": "Helvetica Neue",
+        "color": "tx1",
+        "alignment": "left",
+        "verticalAlignment": "bottom",
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": ""
+          }
+        ]
+      }
+    },
+    {
+      "order": 2,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/1sjmtsvy",
+      "id": "532",
+      "name": "Google Shape;532;p58",
+      "bbox": [
+        1184.18,
+        659.24,
+        54.48,
+        25.33
+      ],
+      "text": "14",
+      "textPreview": "14",
+      "resolvedFontSize": 13.33,
+      "resolvedTextStyle": {
+        "anchor": 3,
+        "vertical": 1,
+        "fontSize": 13.33,
+        "typeface": "Helvetica Neue",
+        "color": "tx1",
+        "alignment": "right",
+        "verticalAlignment": "bottom",
+        "wrap": "square",
+        "autoFit": "none",
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "useParagraphSpacing": true
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "14"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "14",
+          "runs": [
+            {
+              "index": 1,
+              "text": "14"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ]
+    },
+    {
+      "order": 3,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/0ral0ned",
+      "id": "533",
+      "name": "Google Shape;533;p58",
+      "bbox": [
+        41.33,
+        36.12,
+        1197.33,
+        109.97
+      ],
+      "text": "Intro and data table",
+      "textPreview": "Intro and data table",
+      "resolvedFontSize": 38.67,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "vertical": 1,
+        "fontSize": 38.67,
+        "typeface": "Helvetica Neue",
+        "color": "tx1",
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "wrap": "square",
+        "autoFit": "none",
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "useParagraphSpacing": true
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Intro and data table"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Intro and data table",
+          "runs": [
+            {
+              "index": 1,
+              "text": "Intro and data table"
+            }
+          ],
+          "bulletCharacter": "",
+          "lineSpacingPercent": 90000
+        }
+      ]
+    },
+    {
+      "order": 4,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/kre1k3y9",
+      "id": "14",
+      "name": "Content Placeholder 15",
+      "bbox": [
+        42.09,
+        111.02,
+        1197.33,
+        106.27
+      ],
+      "geometry": "rect",
+      "text": "Topic\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque ultricies quam ut massa luctus cursus. Nullam pharetra mauris tortor. In hac habitasse platea dictumst. Proin mattis nibh risus. Nulla tempor ut massa elementum dapibus. ",
+      "textPreview": "Topic | Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque ultricies quam ut massa luctus cursus. Nullam pharetra maur...",
+      "resolvedFontSize": 21.33,
+      "resolvedTextStyle": {
+        "vertical": 1,
+        "fontSize": 21.33,
+        "typeface": "Helvetica Neue",
+        "color": "tx1",
+        "alignment": "left",
+        "autoFit": "none",
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 3,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Topic"
+          },
+          {
+            "index": 2,
+            "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque ultricies quam ut massa luctus cursus. Nullam pharetra mauris tortor"
+          },
+          {
+            "index": 3,
+            "text": ". In hac habitasse platea dictumst. Proin mattis nibh risus. Nulla tempor ut massa elementum dapibus."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Topic",
+          "lineSpacingPercent": 114000,
+          "runs": [
+            {
+              "index": 1,
+              "text": "Topic",
+              "fontSize": 24,
+              "typeface": "Helvetica Neue Medium",
+              "color": "#000000"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0,
+          "indent": 0
+        },
+        {
+          "index": 2,
+          "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque ultricies quam ut massa luctus cursus. Nullam pharetra mauris tortor. In hac habitasse platea dictumst. Proin mattis nibh risus. Nulla tempor ut massa elementum dapibus. ",
+          "lineSpacingPercent": 114000,
+          "runs": [
+            {
+              "index": 1,
+              "text": "Lorem ipsum dolor sit ",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 2,
+              "text": "amet",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 3,
+              "text": ", ",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 4,
+              "text": "consectetur",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 5,
+              "text": " ",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 6,
+              "text": "adipiscing",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 7,
+              "text": " ",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 8,
+              "text": "elit",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 9,
+              "text": ". ",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 10,
+              "text": "Pellentesque",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 11,
+              "text": " ",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 12,
+              "text": "ultricies",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 13,
+              "text": " ",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 14,
+              "text": "quam",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 15,
+              "text": " ",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 16,
+              "text": "ut",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 17,
+              "text": " ",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 18,
+              "text": "massa",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 19,
+              "text": " ",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 20,
+              "text": "luctus",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 21,
+              "text": " cursus. ",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 22,
+              "text": "Nullam",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 23,
+              "text": " pharetra ",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 24,
+              "text": "mauris",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 25,
+              "text": " ",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 26,
+              "text": "tortor",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 27,
+              "text": ". In hac ",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 28,
+              "text": "habitasse",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 29,
+              "text": " ",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 30,
+              "text": "platea",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 31,
+              "text": " ",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 32,
+              "text": "dictumst",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 33,
+              "text": ". Proin ",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 34,
+              "text": "mattis",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 35,
+              "text": " ",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 36,
+              "text": "nibh",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 37,
+              "text": " ",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 38,
+              "text": "risus",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 39,
+              "text": ". ",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 40,
+              "text": "Nulla",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 41,
+              "text": " ",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 42,
+              "text": "tempor",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 43,
+              "text": " ",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 44,
+              "text": "ut",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 45,
+              "text": " ",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 46,
+              "text": "massa",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 47,
+              "text": " ",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 48,
+              "text": "elementum",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 49,
+              "text": " ",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 50,
+              "text": "dapibus",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            },
+            {
+              "index": 51,
+              "text": ". ",
+              "typeface": "Helvetica Neue",
+              "color": "#000000"
+            }
+          ],
+          "bulletCharacter": "",
+          "marginLeft": 0,
+          "indent": 0
+        }
+      ]
+    },
+    {
+      "order": 5,
+      "kind": "table",
+      "scope": "slide",
+      "aid": "tb/25crytor",
+      "id": "534",
+      "name": "Google Shape;644;p93",
+      "bbox": [
+        41.33,
+        236.33,
+        1197.33,
+        412.87
+      ],
+      "text": "Column Label | Column Label | Column Label | Column Label | Column Label\nData Point | $00.000 / item | Yes | 1,000,000k / s | 0.00023862381\nData Point | $00.000 / item | No | 1,000,000k / s | 0.00023862381\nData Point | $00.000 / item | Yes | 1,000,000k / s | 0.00023862381\nData Point | $00.000 / item | No | 1,000,000k / s | 0.00023862381\nData Point | $00.000 / item | Yes | 1,000,000k / s | 0.00023862381\nData Point | $00.000 / item | No | 1,000,000k / s | 0.00023862381\nData Point | $00.000 / item | Yes | 1,000,000k / s | 0.00023862381\nData Point | $00.000 / item | Yes | 1,000,000k / s | 0.00023862381",
+      "textPreview": "Column Label | Column Label | Column Label | Column Label | Column Label | Data Point | $00.000 / item | Yes | 1,000,000k / s | 0.0002386...",
+      "rows": 9,
+      "cols": 5,
+      "cells": [
+        {
+          "index": 1,
+          "row": 1,
+          "column": 1,
+          "bbox": [
+            41.33,
+            236.33,
+            410.09,
+            45.88
+          ],
+          "text": "Column Label",
+          "textPreview": "Column Label",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "Column Label",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Column Label",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000",
+                  "bold": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "row": 1,
+          "column": 2,
+          "bbox": [
+            451.42,
+            236.33,
+            196.81,
+            45.88
+          ],
+          "text": "Column Label",
+          "textPreview": "Column Label",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "Column Label",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Column Label",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000",
+                  "bold": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "row": 1,
+          "column": 3,
+          "bbox": [
+            648.23,
+            236.33,
+            196.81,
+            45.88
+          ],
+          "text": "Column Label",
+          "textPreview": "Column Label",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "Column Label",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Column Label",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000",
+                  "bold": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 4,
+          "row": 1,
+          "column": 4,
+          "bbox": [
+            845.04,
+            236.33,
+            196.81,
+            45.88
+          ],
+          "text": "Column Label",
+          "textPreview": "Column Label",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "Column Label",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Column Label",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000",
+                  "bold": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 5,
+          "row": 1,
+          "column": 5,
+          "bbox": [
+            1041.85,
+            236.33,
+            196.81,
+            45.88
+          ],
+          "text": "Column Label",
+          "textPreview": "Column Label",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "Column Label",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Column Label",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000",
+                  "bold": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 6,
+          "row": 2,
+          "column": 1,
+          "bbox": [
+            41.33,
+            282.22,
+            410.09,
+            45.87
+          ],
+          "text": "Data Point",
+          "textPreview": "Data Point",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "Data Point",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Data Point",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 7,
+          "row": 2,
+          "column": 2,
+          "bbox": [
+            451.42,
+            282.22,
+            196.81,
+            45.87
+          ],
+          "text": "$00.000 / item",
+          "textPreview": "$00.000 / item",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "$00.000 / item",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "$00.000 / item",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 8,
+          "row": 2,
+          "column": 3,
+          "bbox": [
+            648.23,
+            282.22,
+            196.81,
+            45.87
+          ],
+          "text": "Yes",
+          "textPreview": "Yes",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "Yes",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Yes",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 9,
+          "row": 2,
+          "column": 4,
+          "bbox": [
+            845.04,
+            282.22,
+            196.81,
+            45.87
+          ],
+          "text": "1,000,000k / s",
+          "textPreview": "1,000,000k / s",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "1,000,000k / s",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "1,000,000k / s",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 10,
+          "row": 2,
+          "column": 5,
+          "bbox": [
+            1041.85,
+            282.22,
+            196.81,
+            45.87
+          ],
+          "text": "0.00023862381",
+          "textPreview": "0.00023862381",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "0.00023862381",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "0.00023862381",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 11,
+          "row": 3,
+          "column": 1,
+          "bbox": [
+            41.33,
+            328.09,
+            410.09,
+            45.87
+          ],
+          "text": "Data Point",
+          "textPreview": "Data Point",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "Data Point",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Data Point",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 12,
+          "row": 3,
+          "column": 2,
+          "bbox": [
+            451.42,
+            328.09,
+            196.81,
+            45.87
+          ],
+          "text": "$00.000 / item",
+          "textPreview": "$00.000 / item",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "$00.000 / item",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "$00.000 / item",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 13,
+          "row": 3,
+          "column": 3,
+          "bbox": [
+            648.23,
+            328.09,
+            196.81,
+            45.87
+          ],
+          "text": "No",
+          "textPreview": "No",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "No",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "No",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 14,
+          "row": 3,
+          "column": 4,
+          "bbox": [
+            845.04,
+            328.09,
+            196.81,
+            45.87
+          ],
+          "text": "1,000,000k / s",
+          "textPreview": "1,000,000k / s",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "1,000,000k / s",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "1,000,000k / s",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 15,
+          "row": 3,
+          "column": 5,
+          "bbox": [
+            1041.85,
+            328.09,
+            196.81,
+            45.87
+          ],
+          "text": "0.00023862381",
+          "textPreview": "0.00023862381",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "0.00023862381",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "0.00023862381",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 16,
+          "row": 4,
+          "column": 1,
+          "bbox": [
+            41.33,
+            373.96,
+            410.09,
+            45.87
+          ],
+          "text": "Data Point",
+          "textPreview": "Data Point",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "Data Point",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Data Point",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 17,
+          "row": 4,
+          "column": 2,
+          "bbox": [
+            451.42,
+            373.96,
+            196.81,
+            45.87
+          ],
+          "text": "$00.000 / item",
+          "textPreview": "$00.000 / item",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "$00.000 / item",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "$00.000 / item",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 18,
+          "row": 4,
+          "column": 3,
+          "bbox": [
+            648.23,
+            373.96,
+            196.81,
+            45.87
+          ],
+          "text": "Yes",
+          "textPreview": "Yes",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "Yes",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Yes",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 19,
+          "row": 4,
+          "column": 4,
+          "bbox": [
+            845.04,
+            373.96,
+            196.81,
+            45.87
+          ],
+          "text": "1,000,000k / s",
+          "textPreview": "1,000,000k / s",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "1,000,000k / s",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "1,000,000k / s",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 20,
+          "row": 4,
+          "column": 5,
+          "bbox": [
+            1041.85,
+            373.96,
+            196.81,
+            45.87
+          ],
+          "text": "0.00023862381",
+          "textPreview": "0.00023862381",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "0.00023862381",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "0.00023862381",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 21,
+          "row": 5,
+          "column": 1,
+          "bbox": [
+            41.33,
+            419.84,
+            410.09,
+            45.87
+          ],
+          "text": "Data Point",
+          "textPreview": "Data Point",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "Data Point",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Data Point",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 22,
+          "row": 5,
+          "column": 2,
+          "bbox": [
+            451.42,
+            419.84,
+            196.81,
+            45.87
+          ],
+          "text": "$00.000 / item",
+          "textPreview": "$00.000 / item",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "$00.000 / item",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "$00.000 / item",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 23,
+          "row": 5,
+          "column": 3,
+          "bbox": [
+            648.23,
+            419.84,
+            196.81,
+            45.87
+          ],
+          "text": "No",
+          "textPreview": "No",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "No",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "No",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 24,
+          "row": 5,
+          "column": 4,
+          "bbox": [
+            845.04,
+            419.84,
+            196.81,
+            45.87
+          ],
+          "text": "1,000,000k / s",
+          "textPreview": "1,000,000k / s",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "1,000,000k / s",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "1,000,000k / s",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 25,
+          "row": 5,
+          "column": 5,
+          "bbox": [
+            1041.85,
+            419.84,
+            196.81,
+            45.87
+          ],
+          "text": "0.00023862381",
+          "textPreview": "0.00023862381",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "0.00023862381",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "0.00023862381",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 26,
+          "row": 6,
+          "column": 1,
+          "bbox": [
+            41.33,
+            465.71,
+            410.09,
+            45.87
+          ],
+          "text": "Data Point",
+          "textPreview": "Data Point",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "Data Point",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Data Point",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 27,
+          "row": 6,
+          "column": 2,
+          "bbox": [
+            451.42,
+            465.71,
+            196.81,
+            45.87
+          ],
+          "text": "$00.000 / item",
+          "textPreview": "$00.000 / item",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "$00.000 / item",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "$00.000 / item",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 28,
+          "row": 6,
+          "column": 3,
+          "bbox": [
+            648.23,
+            465.71,
+            196.81,
+            45.87
+          ],
+          "text": "Yes",
+          "textPreview": "Yes",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "Yes",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Yes",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 29,
+          "row": 6,
+          "column": 4,
+          "bbox": [
+            845.04,
+            465.71,
+            196.81,
+            45.87
+          ],
+          "text": "1,000,000k / s",
+          "textPreview": "1,000,000k / s",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "1,000,000k / s",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "1,000,000k / s",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 30,
+          "row": 6,
+          "column": 5,
+          "bbox": [
+            1041.85,
+            465.71,
+            196.81,
+            45.87
+          ],
+          "text": "0.00023862381",
+          "textPreview": "0.00023862381",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "0.00023862381",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "0.00023862381",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 31,
+          "row": 7,
+          "column": 1,
+          "bbox": [
+            41.33,
+            511.58,
+            410.09,
+            45.87
+          ],
+          "text": "Data Point",
+          "textPreview": "Data Point",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "Data Point",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Data Point",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 32,
+          "row": 7,
+          "column": 2,
+          "bbox": [
+            451.42,
+            511.58,
+            196.81,
+            45.87
+          ],
+          "text": "$00.000 / item",
+          "textPreview": "$00.000 / item",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "$00.000 / item",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "$00.000 / item",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 33,
+          "row": 7,
+          "column": 3,
+          "bbox": [
+            648.23,
+            511.58,
+            196.81,
+            45.87
+          ],
+          "text": "No",
+          "textPreview": "No",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "No",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "No",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 34,
+          "row": 7,
+          "column": 4,
+          "bbox": [
+            845.04,
+            511.58,
+            196.81,
+            45.87
+          ],
+          "text": "1,000,000k / s",
+          "textPreview": "1,000,000k / s",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "1,000,000k / s",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "1,000,000k / s",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 35,
+          "row": 7,
+          "column": 5,
+          "bbox": [
+            1041.85,
+            511.58,
+            196.81,
+            45.87
+          ],
+          "text": "0.00023862381",
+          "textPreview": "0.00023862381",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "0.00023862381",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "0.00023862381",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 36,
+          "row": 8,
+          "column": 1,
+          "bbox": [
+            41.33,
+            557.46,
+            410.09,
+            45.87
+          ],
+          "text": "Data Point",
+          "textPreview": "Data Point",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "Data Point",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Data Point",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 37,
+          "row": 8,
+          "column": 2,
+          "bbox": [
+            451.42,
+            557.46,
+            196.81,
+            45.87
+          ],
+          "text": "$00.000 / item",
+          "textPreview": "$00.000 / item",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "$00.000 / item",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "$00.000 / item",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 38,
+          "row": 8,
+          "column": 3,
+          "bbox": [
+            648.23,
+            557.46,
+            196.81,
+            45.87
+          ],
+          "text": "Yes",
+          "textPreview": "Yes",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "Yes",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Yes",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 39,
+          "row": 8,
+          "column": 4,
+          "bbox": [
+            845.04,
+            557.46,
+            196.81,
+            45.87
+          ],
+          "text": "1,000,000k / s",
+          "textPreview": "1,000,000k / s",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "1,000,000k / s",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "1,000,000k / s",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 40,
+          "row": 8,
+          "column": 5,
+          "bbox": [
+            1041.85,
+            557.46,
+            196.81,
+            45.87
+          ],
+          "text": "0.00023862381",
+          "textPreview": "0.00023862381",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "0.00023862381",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "0.00023862381",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 41,
+          "row": 9,
+          "column": 1,
+          "bbox": [
+            41.33,
+            603.33,
+            410.09,
+            45.87
+          ],
+          "text": "Data Point",
+          "textPreview": "Data Point",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "Data Point",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Data Point",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 42,
+          "row": 9,
+          "column": 2,
+          "bbox": [
+            451.42,
+            603.33,
+            196.81,
+            45.87
+          ],
+          "text": "$00.000 / item",
+          "textPreview": "$00.000 / item",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "$00.000 / item",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "$00.000 / item",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 43,
+          "row": 9,
+          "column": 3,
+          "bbox": [
+            648.23,
+            603.33,
+            196.81,
+            45.87
+          ],
+          "text": "Yes",
+          "textPreview": "Yes",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "Yes",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "Yes",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 44,
+          "row": 9,
+          "column": 4,
+          "bbox": [
+            845.04,
+            603.33,
+            196.81,
+            45.87
+          ],
+          "text": "1,000,000k / s",
+          "textPreview": "1,000,000k / s",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "1,000,000k / s",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "1,000,000k / s",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "index": 45,
+          "row": 9,
+          "column": 5,
+          "bbox": [
+            1041.85,
+            603.33,
+            196.81,
+            45.87
+          ],
+          "text": "0.00023862381",
+          "textPreview": "0.00023862381",
+          "paragraphs": [
+            {
+              "index": 1,
+              "text": "0.00023862381",
+              "lineSpacingPercent": 110000,
+              "resolvedTextStyle": {
+                "alignment": "left"
+              },
+              "runs": [
+                {
+                  "index": 1,
+                  "text": "0.00023862381",
+                  "fontSize": 18.67,
+                  "typeface": "Helvetica Neue",
+                  "color": "#000000"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "composeRuns": []
+}

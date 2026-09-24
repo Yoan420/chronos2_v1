@@ -1,0 +1,15 @@
+{
+  "status": "validated",
+  "days": 365,
+  "rows": 35040,
+  "unique_physical_hours": 8760,
+  "first_quarter_utc": "2025-09-15 22:00:00+00:00",
+  "last_quarter_utc": "2026-09-15 21:45:00+00:00",
+  "data_sha256": "264ec36a410265a682f20b4c4e36a27d0b45f4497d254a9460693a8e70756ac0",
+  "manifest_sha256": "ba2867345ad6904ef7c3417e90887ab6435801604173690cc78865c4ce99a00e",
+  "source_alias": "be_solar_elia_fcst",
+  "varying_hours": 4851,
+  "provider_revision_timestamp_available": false,
+  "production_pit_evidence": false,
+  "safe_paths_checked": 736
+}

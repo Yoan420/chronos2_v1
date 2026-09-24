@@ -1,0 +1,75 @@
+{
+  "status": "passed",
+  "final_variant_report": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\variants\\snapshots\\20260914T135026Z_0efb0e05\\nyx_scarcity_variants.html",
+  "final_adjustment_report": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\variants\\adjustments\\snapshots\\20260914T135953Z_77df8eeb\\nyx_scarcity_adjustments.html",
+  "variant_javascript": {
+    "javascript_controls": "passed",
+    "all_countries": 4,
+    "variants_including_control": 5,
+    "verified_local_waterfalls": 32,
+    "night_light": "passed",
+    "calendar_june_26": "passed",
+    "price_mean_columns": "passed",
+    "evaluation_end": "2026-09-14",
+    "observed_live": "2026-09-15",
+    "plot_calls": 332
+  },
+  "shap": {
+    "xgb_unweighted_fixed": {
+      "verified_local_cases": 8,
+      "global_features": 242
+    },
+    "xgb_weighted_fixed": {
+      "verified_local_cases": 8,
+      "global_features": 242
+    },
+    "xgb_unweighted_dwt": {
+      "verified_local_cases": 8,
+      "global_features": 243
+    },
+    "xgb_weighted_dwt": {
+      "verified_local_cases": 8,
+      "global_features": 243
+    }
+  },
+  "adjustment_javascript": {
+    "control_combinations": 60,
+    "all_countries": true,
+    "all_fixed_variants": true,
+    "all_fractions": true,
+    "night_light": true,
+    "observed_live_excluded_from_metrics": true,
+    "hourly_graph_prices_verified": true,
+    "hourly_table_24_rows": true,
+    "mean_observed_caption": true,
+    "unpaired_hours_caption": true
+  },
+  "same_paired_hours_per_country": 8735,
+  "daily_mean_rows_evaluation_end": 28,
+  "annual_and_fixed_proposal_arithmetic": "verified",
+  "governed_price_and_weight_arithmetic": "verified",
+  "all_protected_files_unchanged": true,
+  "checked_file_sha256": {
+    "nyx_scarcity\\adjustment_analysis.py": "583e0fa4c8b2d3c4366fabf2ab0a8ceb8d3491cbc7ad1aa1427b720099c1557c",
+    "nyx_scarcity\\adjustment_reporting.py": "324cb6bb05eccb39c93f6e207c55582808ebb3a5259e3fa3af125c294b1b352c",
+    "nyx_scarcity\\data.py": "93356d784909609c811c729d58dd8b276210afd004efb0469f42ce1f177d2274",
+    "nyx_scarcity\\fuel_refresh.py": "a1bcb287878049c4cb9674e3f6769541b95369599474348c38b3d1adbc554adb",
+    "nyx_scarcity\\policy.py": "001fdce80eaffd259d5881950071d2c004d872b3329fe25e1a05007c5e5d44e1",
+    "nyx_scarcity\\refresh.py": "7d7d8357dcbfa6137e06f779ff824430440618cfb345255e4067f74d5d0af185",
+    "nyx_scarcity\\reporting.py": "34b3af1c6e6f3783bae27636eee3e743d86034312c73d300b1fb8af790c2f728",
+    "nyx_scarcity\\runner.py": "eb95f65d3df2c76e2fd8db4e0302628e38e5dc93e26c6e8f77a279d510db0965",
+    "nyx_scarcity\\variants_runner.py": "256134532c3d3269bcc7fa9552c7884f9a296e00144233d019df37dba43b0109",
+    "nyx_scarcity\\variant_explain.py": "01e23c146b8699f7f57add71eef0fc9be07c06ea7f7c2a24964cbb8b51db3f35",
+    "nyx_scarcity\\variant_policy.py": "0c373c0c19f546dd5ee82e954f159466bdb8093c6f6d951af3f97c9935f1ecfb",
+    "nyx_scarcity\\variant_reporting.py": "7c59d7237d88a8996144b8900e2925745a99aa8289a394db0a02c75bde67e505",
+    "nyx_scarcity\\variant_runtime.py": "37cfcc2259e1b8d5f73954807169370a3be7456e8f85e8e1104f95ed939b81c9",
+    "nyx_scarcity\\__init__.py": "ae9dc44adef9c7e7a855bf9c3dd3dfa9c4e4d60eb2aab67136c3051b63a56ae1",
+    "runs\\experiments\\nyx_scarcity_v1\\variants\\snapshots\\20260914T135026Z_0efb0e05\\nyx_scarcity_variants.html": "3ee6064187c0716f6a3c94c83fb6c9fd51f905856e987030a92da07949ce4ba1",
+    "runs\\experiments\\nyx_scarcity_v1\\variants\\snapshots\\20260914T135026Z_0efb0e05\\comparison.json": "68c444b047395589ff4ae4db7ed6fd703df3772c3a5d3cf252d47d8a2d408086",
+    "runs\\experiments\\nyx_scarcity_v1\\variants\\snapshots\\20260914T135026Z_0efb0e05\\comparison_manifest.json": "b592264b8e575f8f2bd9c1cb90919d1b2e951a6bc6a948a2b68d18e800179da3",
+    "runs\\experiments\\nyx_scarcity_v1\\variants\\adjustments\\snapshots\\20260914T135953Z_77df8eeb\\nyx_scarcity_adjustments.html": "18d318c0816f0b72f8c40bdbb2ab47473674ebe71ac06c3e80effe21ab412adb",
+    "runs\\experiments\\nyx_scarcity_v1\\variants\\adjustments\\snapshots\\20260914T135953Z_77df8eeb\\adjustments.parquet": "9f39e2e79b89e076dc496f58eadb336e6e73ae00f39086c43561b66dfb2fb031",
+    "runs\\experiments\\nyx_scarcity_v1\\variants\\adjustments\\snapshots\\20260914T135953Z_77df8eeb\\metrics.json": "633f263b40f0dfe7e1bfc0d2ec8091ec2f67bb412eeae1330ca8b3aed2e608a4",
+    "runs\\experiments\\nyx_scarcity_v1\\variants\\adjustments\\snapshots\\20260914T135953Z_77df8eeb\\manifest.json": "726a690da5a0a1301a322ef3f0e573e87e7241a555f0987c649e75fc056ecb55"
+  }
+}

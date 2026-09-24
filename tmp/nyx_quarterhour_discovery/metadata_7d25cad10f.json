@@ -1,0 +1,62 @@
+[
+  {
+    "series": "60451",
+    "kind": "primary",
+    "source": "power",
+    "metadata_http_status": 200,
+    "metadata": {
+      "tzaware": true,
+      "index_type": "datetime64[ns, UTC]",
+      "value_type": "float64",
+      "index_dtype": "|M8[ns]",
+      "value_dtype": "<f8"
+    },
+    "formula_http_status": 200,
+    "formula": null
+  },
+  {
+    "series": "60452",
+    "kind": "primary",
+    "source": "power",
+    "metadata_http_status": 200,
+    "metadata": {
+      "tzaware": true,
+      "index_type": "datetime64[ns, UTC]",
+      "value_type": "float64",
+      "index_dtype": "|M8[ns]",
+      "value_dtype": "<f8"
+    },
+    "formula_http_status": 200,
+    "formula": null
+  },
+  {
+    "series": "60454",
+    "kind": "primary",
+    "source": "power",
+    "metadata_http_status": 200,
+    "metadata": {
+      "tzaware": true,
+      "index_type": "datetime64[ns, UTC]",
+      "value_type": "float64",
+      "index_dtype": "|M8[ns]",
+      "value_dtype": "<f8"
+    },
+    "formula_http_status": 200,
+    "formula": null
+  },
+  {
+    "series": "60453",
+    "kind": "primary",
+    "source": "power",
+    "metadata_http_status": 200,
+    "metadata": {
+      "tzaware": true,
+      "index_type": "datetime64[ns, UTC]",
+      "value_type": "float64",
+      "index_dtype": "|M8[ns]",
+      "value_dtype": "<f8"
+    },
+    "formula_http_status": 200,
+    "formula": null
+  }
+]

@@ -1,0 +1,3 @@
+[Nuclear] ECHEC : Saturn ProxyError: HTTPConnectionPool(host='127.0.0.1', port=9): Unable to connect to proxy
+[Nuclear Kalman] ECHEC sources : returncode=2
+Journal et statut du batch : runs/logs/nuclear_kalman/explicit_fixture

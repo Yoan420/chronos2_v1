@@ -1,0 +1,54 @@
+{
+  "command": [
+    "C:\\Users\\BQ6757\\venvs\\pricefm311\\Scripts\\python.exe",
+    "-u",
+    "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-combined-final-validation\\test_resource_conflict_blocks_0\\explicit test fixture ; $literal.py",
+    "success",
+    "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-combined-final-validation\\test_resource_conflict_blocks_0\\console-state\\executions\\93b3af50cadb448283505d81c5b40c8d\\results",
+    "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-combined-final-validation\\test_resource_conflict_blocks_0\\never-released"
+  ],
+  "cwd": "C:\\Users\\BQ6757\\chronos2_v1",
+  "output_dir": "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-combined-final-validation\\test_resource_conflict_blocks_0\\console-state\\executions\\93b3af50cadb448283505d81c5b40c8d\\results",
+  "config": {
+    "fixture": true,
+    "mode": "success",
+    "resource": "shared-cache"
+  },
+  "type": "fixture",
+  "model": "explicit-test-fixture",
+  "resource_keys": [
+    "shared-cache"
+  ],
+  "warnings": [
+    "Explicit test fixture; contains no real scientific results."
+  ],
+  "id": "93b3af50cadb448283505d81c5b40c8d",
+  "run_dir": "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-combined-final-validation\\test_resource_conflict_blocks_0\\console-state\\executions\\93b3af50cadb448283505d81c5b40c8d",
+  "created_at": "2026-09-11T08:59:09.454278+00:00",
+  "request": {
+    "type": "fixture",
+    "name": "Explicit process test",
+    "resource": "shared-cache"
+  },
+  "name": "Explicit process test",
+  "description": "",
+  "python_executable": "C:\\Users\\BQ6757\\venvs\\pricefm311\\Scripts\\python.exe",
+  "source": "managed",
+  "source_key": "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-combined-final-validation\\test_resource_conflict_blocks_0\\console-state\\executions\\93b3af50cadb448283505d81c5b40c8d",
+  "status": "queued",
+  "started_at": null,
+  "finished_at": null,
+  "duration_seconds": null,
+  "return_code": null,
+  "cancel_requested": false,
+  "tags": [],
+  "note": "",
+  "activity": "En attente d’une place ou d’une ressource",
+  "git": {
+    "commit": "900d8fc36a5f7d44e91f895786e49e4ed7614086",
+    "dirty_tracked_files": true
+  },
+  "log_paths": [
+    "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-combined-final-validation\\test_resource_conflict_blocks_0\\console-state\\executions\\93b3af50cadb448283505d81c5b40c8d\\console.log"
+  ]
+}

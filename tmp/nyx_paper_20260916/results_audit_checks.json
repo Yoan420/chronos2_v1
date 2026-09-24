@@ -1,0 +1,343 @@
+{
+  "input_matrix_sha256": "0548b72b6fadcb700d1b863db93fd95d0076670fb5e11bf4ad1c1fe1413a1188",
+  "matrix_hash_matches_summary": true,
+  "selection_hash_matches_summary": true,
+  "tmp_research_metrics_byte_equal": {
+    "correction_saturation.csv": true,
+    "descriptive_metrics.csv": true,
+    "experiments.py": true,
+    "experiment_summary.json": true,
+    "extraction_manifest.json": true,
+    "extract_metrics.py": true,
+    "label_revision_sensitivity.json": true,
+    "locked_test_group_metrics.csv": true,
+    "locked_test_metrics.csv": true,
+    "locked_test_paired_bootstrap.csv": true,
+    "locked_test_predictions.csv.gz": true,
+    "MEASURED_FINDINGS.md": false,
+    "nyx_interval_calibration.csv": true,
+    "rolling_fit_audit.json": true,
+    "validation_selection_locked.json": true,
+    "verified_hourly_pairs.csv.gz": true
+  },
+  "rows": 35040,
+  "duplicate_zone_timestamp": 0,
+  "zones": [
+    "BE",
+    "DE",
+    "FR",
+    "NL"
+  ],
+  "n_timestamps": 8760,
+  "utc_first": "2025-09-15 22:00:00+00:00",
+  "utc_last": "2026-09-15 21:00:00+00:00",
+  "storm_missing": [
+    {
+      "zone": "BE",
+      "timestamp": "2025-10-26 00:00:00+00:00",
+      "day": "2025-10-26",
+      "hour": 2
+    },
+    {
+      "zone": "DE",
+      "timestamp": "2025-10-26 00:00:00+00:00",
+      "day": "2025-10-26",
+      "hour": 2
+    },
+    {
+      "zone": "FR",
+      "timestamp": "2025-10-26 00:00:00+00:00",
+      "day": "2025-10-26",
+      "hour": 2
+    },
+    {
+      "zone": "NL",
+      "timestamp": "2025-10-26 00:00:00+00:00",
+      "day": "2025-10-26",
+      "hour": 2
+    }
+  ],
+  "splits": {
+    "test": {
+      "first": "2026-06-18",
+      "last": "2026-09-15",
+      "days": 90,
+      "n": 8640
+    },
+    "train": {
+      "first": "2025-09-16",
+      "last": "2026-03-14",
+      "days": 180,
+      "n": 17284
+    },
+    "validation": {
+      "first": "2026-03-15",
+      "last": "2026-06-17",
+      "days": 95,
+      "n": 9116
+    }
+  },
+  "quantile_crossings": 0,
+  "run_checks": [
+    {
+      "zone": "BE",
+      "bundle_manifest_hash_ok": true,
+      "backtest_hash_ok": true,
+      "source_audit_hash_ok": true,
+      "snapshot_observed_hash_ok": true,
+      "snapshot_storm_hash_ok": true,
+      "timestamp_matches": true,
+      "matrix_vs_bundle_max_abs": {
+        "nyx": 5.684341886080802e-14,
+        "chronos": 9.912109362630872e-06,
+        "residual": 5.684341886080802e-14,
+        "frozen_actual": 2.929687502728484e-05,
+        "nyx_p10": 5.684341886080802e-14,
+        "nyx_p90": 5.684341886080802e-14
+      },
+      "replay_causality_violations": 0,
+      "target_actuals_assimilated_before_forecast": 0,
+      "training_windows_count": 365,
+      "training_windows_labels_strictly_before_target": true,
+      "window_target_assimilations": 0,
+      "history_caches": {
+        "future_hits": 0,
+        "future_misses": 0,
+        "history_hits": 736,
+        "history_misses": 0,
+        "invalid_entries": 0,
+        "write_errors": 0,
+        "writes": 0
+      },
+      "warmup_scope": "fixed_epoch_diagnostic_warmup_not_full_nested_validation",
+      "width_change_vs_chronos_max": 3.0517578125e-05,
+      "selected_filter_counts": {
+        "identity": 31,
+        "linear_market": 317,
+        "linear_scale": 17
+      }
+    },
+    {
+      "zone": "DE",
+      "bundle_manifest_hash_ok": true,
+      "backtest_hash_ok": true,
+      "source_audit_hash_ok": true,
+      "snapshot_observed_hash_ok": true,
+      "snapshot_storm_hash_ok": true,
+      "timestamp_matches": true,
+      "matrix_vs_bundle_max_abs": {
+        "nyx": 5.684341886080802e-14,
+        "chronos": 1.3085937496271072e-05,
+        "residual": 5.684341886080802e-14,
+        "frozen_actual": 2.929687502728484e-05,
+        "nyx_p10": 5.684341886080802e-14,
+        "nyx_p90": 5.684341886080802e-14
+      },
+      "replay_causality_violations": 0,
+      "target_actuals_assimilated_before_forecast": 0,
+      "training_windows_count": 365,
+      "training_windows_labels_strictly_before_target": true,
+      "window_target_assimilations": 0,
+      "history_caches": {
+        "future_hits": 0,
+        "future_misses": 1,
+        "history_hits": 650,
+        "history_misses": 86,
+        "invalid_entries": 0,
+        "write_errors": 0,
+        "writes": 87
+      },
+      "warmup_scope": "fixed_epoch_diagnostic_warmup_not_full_nested_validation",
+      "width_change_vs_chronos_max": 1.525878911934342e-05,
+      "selected_filter_counts": {
+        "identity": 37,
+        "linear_bias": 4,
+        "linear_market": 324
+      }
+    },
+    {
+      "zone": "FR",
+      "bundle_manifest_hash_ok": true,
+      "backtest_hash_ok": true,
+      "source_audit_hash_ok": true,
+      "snapshot_observed_hash_ok": true,
+      "snapshot_storm_hash_ok": true,
+      "timestamp_matches": true,
+      "matrix_vs_bundle_max_abs": {
+        "nyx": 5.684341886080802e-14,
+        "chronos": 1.303710939737357e-05,
+        "residual": 5.684341886080802e-14,
+        "frozen_actual": 1.3427734359083843e-05,
+        "nyx_p10": 5.684341886080802e-14,
+        "nyx_p90": 5.684341886080802e-14
+      },
+      "replay_causality_violations": 0,
+      "target_actuals_assimilated_before_forecast": 0,
+      "training_windows_count": 365,
+      "training_windows_labels_strictly_before_target": true,
+      "window_target_assimilations": 0,
+      "history_caches": {
+        "future_hits": 0,
+        "future_misses": 1,
+        "history_hits": 651,
+        "history_misses": 86,
+        "invalid_entries": 0,
+        "write_errors": 0,
+        "writes": 87
+      },
+      "warmup_scope": "fixed_epoch_diagnostic_warmup_not_full_nested_validation",
+      "width_change_vs_chronos_max": 3.814697279835855e-06,
+      "selected_filter_counts": {
+        "identity": 14,
+        "linear_market": 351
+      }
+    },
+    {
+      "zone": "NL",
+      "bundle_manifest_hash_ok": true,
+      "backtest_hash_ok": true,
+      "source_audit_hash_ok": true,
+      "snapshot_observed_hash_ok": true,
+      "snapshot_storm_hash_ok": true,
+      "timestamp_matches": true,
+      "matrix_vs_bundle_max_abs": {
+        "nyx": 5.684341886080802e-14,
+        "chronos": 1.396484373117346e-05,
+        "residual": 5.684341886080802e-14,
+        "frozen_actual": 2.4414062522737368e-05,
+        "nyx_p10": 5.684341886080802e-14,
+        "nyx_p90": 2.2737367544323206e-13
+      },
+      "replay_causality_violations": 0,
+      "target_actuals_assimilated_before_forecast": 0,
+      "training_windows_count": 365,
+      "training_windows_labels_strictly_before_target": true,
+      "window_target_assimilations": 0,
+      "history_caches": {
+        "future_hits": 0,
+        "future_misses": 1,
+        "history_hits": 651,
+        "history_misses": 86,
+        "invalid_entries": 0,
+        "write_errors": 0,
+        "writes": 87
+      },
+      "warmup_scope": "fixed_epoch_diagnostic_warmup_not_full_nested_validation",
+      "width_change_vs_chronos_max": 3.0517578125e-05,
+      "selected_filter_counts": {
+        "identity": 56,
+        "linear_bias": 12,
+        "linear_harmonic": 17,
+        "linear_market": 256,
+        "linear_scale": 22,
+        "ukf_scale": 2
+      }
+    }
+  ],
+  "residual_metrics_max_abs_difference": 7.105427357601002e-15,
+  "residual_bootstrap_max_abs_difference": 1.7676832220203664e-14,
+  "residual_refit_audit": {
+    "count": 151,
+    "all_fit_last_day_le_permitted": true,
+    "stages": {
+      "validation": 112,
+      "test": 39
+    }
+  },
+  "material_label_revisions": [
+    {
+      "zone": "BE",
+      "count": 1,
+      "max_abs": 9.305000000000007,
+      "mean_abs": 0.001062214611873192,
+      "records": [
+        {
+          "timestamp": "2026-06-16 21:00:00+00:00",
+          "day": "2026-06-16",
+          "observed": 134.16,
+          "frozen_actual": 143.465
+        }
+      ],
+      "annual_mae_latest_minus_frozen": 0.0010622146118741682,
+      "test_mae_latest_minus_frozen": 0.0
+    },
+    {
+      "zone": "DE",
+      "count": 1,
+      "max_abs": 9.057499999999976,
+      "mean_abs": 0.0010339611872157014,
+      "records": [
+        {
+          "timestamp": "2026-06-16 21:00:00+00:00",
+          "day": "2026-06-16",
+          "observed": 134.05,
+          "frozen_actual": 143.1075
+        }
+      ],
+      "annual_mae_latest_minus_frozen": 0.0010339611872165477,
+      "test_mae_latest_minus_frozen": 0.0
+    },
+    {
+      "zone": "FR",
+      "count": 1,
+      "max_abs": 6.9550000000000125,
+      "mean_abs": 0.0007939497716902205,
+      "records": [
+        {
+          "timestamp": "2026-06-16 21:00:00+00:00",
+          "day": "2026-06-16",
+          "observed": 132.54,
+          "frozen_actual": 139.495
+        }
+      ],
+      "annual_mae_latest_minus_frozen": -0.0006432856990592484,
+      "test_mae_latest_minus_frozen": 0.0
+    },
+    {
+      "zone": "NL",
+      "count": 1,
+      "max_abs": 9.29000000000002,
+      "mean_abs": 0.0010605022831060276,
+      "records": [
+        {
+          "timestamp": "2026-06-16 21:00:00+00:00",
+          "day": "2026-06-16",
+          "observed": 134.23,
+          "frozen_actual": 143.52
+        }
+      ],
+      "annual_mae_latest_minus_frozen": -0.00029178887645819884,
+      "test_mae_latest_minus_frozen": 0.0
+    }
+  ],
+  "weekly_naive": {
+    "definition": "frozen_actual from D-7 at same civil hour, repeated source hour averaged, missing source excluded",
+    "missing_total": 676,
+    "missing_after_warmup": [
+      {
+        "zone": "BE",
+        "timestamp": "2026-04-05 00:00:00+00:00",
+        "day": "2026-04-05",
+        "hour": 2
+      },
+      {
+        "zone": "DE",
+        "timestamp": "2026-04-05 00:00:00+00:00",
+        "day": "2026-04-05",
+        "hour": 2
+      },
+      {
+        "zone": "FR",
+        "timestamp": "2026-04-05 00:00:00+00:00",
+        "day": "2026-04-05",
+        "hour": 2
+      },
+      {
+        "zone": "NL",
+        "timestamp": "2026-04-05 00:00:00+00:00",
+        "day": "2026-04-05",
+        "hour": 2
+      }
+    ]
+  }
+}

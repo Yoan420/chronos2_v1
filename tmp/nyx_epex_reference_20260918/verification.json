@@ -1,0 +1,79 @@
+{
+  "run_id": "ddf5bda0ea464f51a7c3f006de72dde2",
+  "status": "succeeded",
+  "return_code": 0,
+  "finished_at": "2026-09-18T12:55:45.650655+00:00",
+  "unchanged_frozen_files": 36,
+  "verified_published_files": 12,
+  "zones": [
+    {
+      "zone": "BE",
+      "coverage": {
+        "storm": 24,
+        "observed": 24,
+        "model": 24
+      },
+      "series": "power.price.be.euromwh.h.obs.epex",
+      "extracted_at_utc": "2026-09-18 12:51:55.897010+00:00",
+      "daily_mean_prices": {
+        "observed": 48.11041666666667,
+        "storm": 61.564255833333334,
+        "model": 76.60169655673076,
+        "models_mean": 69.08297619503205,
+        "models_std": 7.518720361698712
+      }
+    },
+    {
+      "zone": "DE",
+      "coverage": {
+        "storm": 24,
+        "observed": 24,
+        "model": 24
+      },
+      "series": "power.price.de.euromwh.h.obs.epex",
+      "extracted_at_utc": "2026-09-18 12:52:52.767303+00:00",
+      "daily_mean_prices": {
+        "observed": 42.6653125,
+        "storm": 58.28666608333336,
+        "model": 70.05981480431059,
+        "models_mean": 64.17324044382198,
+        "models_std": 5.886574360488616
+      }
+    },
+    {
+      "zone": "FR",
+      "coverage": {
+        "storm": 24,
+        "observed": 24,
+        "model": 24
+      },
+      "series": "power.price.fr.euromwh.h.obs.epex",
+      "extracted_at_utc": "2026-09-18 12:53:46.620655+00:00",
+      "daily_mean_prices": {
+        "observed": 50.96104166666667,
+        "storm": 64.064173,
+        "model": 72.55416781121751,
+        "models_mean": 68.30917040560875,
+        "models_std": 4.244997405608757
+      }
+    },
+    {
+      "zone": "NL",
+      "coverage": {
+        "storm": 24,
+        "observed": 24,
+        "model": 24
+      },
+      "series": "power.price.nl.euromwh.h.obs.epex",
+      "extracted_at_utc": "2026-09-18 12:54:40.317645+00:00",
+      "daily_mean_prices": {
+        "observed": 46.737604166666664,
+        "storm": 60.00966320833334,
+        "model": 74.98864370002221,
+        "models_mean": 67.49915345417777,
+        "models_std": 7.489490245844433
+      }
+    }
+  ],
+  "report": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\reports\\model_storm\\CWE_Model_Storm_2026-09-19.html"
+}

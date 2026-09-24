@@ -1,0 +1,193 @@
+{
+  "preview_only": true,
+  "report": "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\scarcity_variants_preview\\PREVIEW_ADJUSTMENTS_HGB_TWO_FIXED_NOT_FINAL.html",
+  "report_bytes": 32571014,
+  "payload_bytes": 27702713,
+  "javascript": {
+    "control_combinations": 36,
+    "all_countries": true,
+    "all_fixed_variants": true,
+    "all_fractions": true,
+    "night_light": true,
+    "observed_live_excluded_from_metrics": true,
+    "hourly_graph_prices_verified": true,
+    "hourly_table_24_rows": true,
+    "mean_observed_caption": true,
+    "unpaired_hours_caption": true
+  },
+  "overall_annual": {
+    "nyx": {
+      "hours": 34940,
+      "country_days": 1456,
+      "mean_forecast_eur_mwh": 92.02661402742574,
+      "mean_observed_eur_mwh": 92.6956394533486,
+      "mae_eur_mwh": 11.367500308448989,
+      "rmse_eur_mwh": 21.875529284056935,
+      "bias_eur_mwh": -0.6690254259228464,
+      "daily_mean_mae_eur_mwh": 7.723431505665549
+    },
+    "storm": {
+      "hours": 34940,
+      "country_days": 1456,
+      "mean_forecast_eur_mwh": 90.60314453692044,
+      "mean_observed_eur_mwh": 92.6956394533486,
+      "mae_eur_mwh": 11.317589063480252,
+      "rmse_eur_mwh": 20.78762710103393,
+      "bias_eur_mwh": -2.092494916428163,
+      "daily_mean_mae_eur_mwh": 7.163412746089396
+    },
+    "variants": {
+      "hgb_v1": {
+        "governed": {
+          "hours": 34940,
+          "country_days": 1456,
+          "mean_forecast_eur_mwh": 92.0273535491164,
+          "mean_observed_eur_mwh": 92.6956394533486,
+          "mae_eur_mwh": 11.368239830139625,
+          "rmse_eur_mwh": 21.879623770121654,
+          "bias_eur_mwh": -0.6682859042322099,
+          "daily_mean_mae_eur_mwh": 7.724170942703977,
+          "gain_vs_nyx_mae_eur_mwh": -0.0007395216906367352,
+          "gain_vs_storm_mae_eur_mwh": -0.0506507666593734
+        },
+        "proposal25": {
+          "hours": 34940,
+          "country_days": 1456,
+          "mean_forecast_eur_mwh": 92.04605575747702,
+          "mean_observed_eur_mwh": 92.6956394533486,
+          "mae_eur_mwh": 11.365612152339288,
+          "rmse_eur_mwh": 21.809755054335383,
+          "bias_eur_mwh": -0.6495836958715728,
+          "daily_mean_mae_eur_mwh": 7.711789434522364,
+          "gain_vs_nyx_mae_eur_mwh": 0.0018881561097003896,
+          "gain_vs_storm_mae_eur_mwh": -0.04802308885903628
+        },
+        "proposal50": {
+          "hours": 34940,
+          "country_days": 1456,
+          "mean_forecast_eur_mwh": 92.06549748752829,
+          "mean_observed_eur_mwh": 92.6956394533486,
+          "mae_eur_mwh": 11.366918528456438,
+          "rmse_eur_mwh": 21.76333005989542,
+          "bias_eur_mwh": -0.6301419658202991,
+          "daily_mean_mae_eur_mwh": 7.702190289236538,
+          "gain_vs_nyx_mae_eur_mwh": 0.0005817799925509348,
+          "gain_vs_storm_mae_eur_mwh": -0.04932946497618573
+        },
+        "proposal100": {
+          "hours": 34940,
+          "country_days": 1456,
+          "mean_forecast_eur_mwh": 92.10438094763084,
+          "mean_observed_eur_mwh": 92.6956394533486,
+          "mae_eur_mwh": 11.37629373923672,
+          "rmse_eur_mwh": 21.728972177894654,
+          "bias_eur_mwh": -0.5912585057177518,
+          "daily_mean_mae_eur_mwh": 7.6919607952548645,
+          "gain_vs_nyx_mae_eur_mwh": -0.008793430787731538,
+          "gain_vs_storm_mae_eur_mwh": -0.058704675756468205
+        }
+      },
+      "xgb_unweighted_fixed": {
+        "governed": {
+          "hours": 34940,
+          "country_days": 1456,
+          "mean_forecast_eur_mwh": 92.02801609312485,
+          "mean_observed_eur_mwh": 92.6956394533486,
+          "mae_eur_mwh": 11.368902374148092,
+          "rmse_eur_mwh": 21.880145096938044,
+          "bias_eur_mwh": -0.6676233602237421,
+          "daily_mean_mae_eur_mwh": 7.722029600459314,
+          "gain_vs_nyx_mae_eur_mwh": -0.0014020656991036162,
+          "gain_vs_storm_mae_eur_mwh": -0.051313310667840284
+        },
+        "proposal25": {
+          "hours": 34940,
+          "country_days": 1456,
+          "mean_forecast_eur_mwh": 92.06466141555663,
+          "mean_observed_eur_mwh": 92.6956394533486,
+          "mae_eur_mwh": 11.347754910759878,
+          "rmse_eur_mwh": 21.659962178951254,
+          "bias_eur_mwh": -0.6309780377919539,
+          "daily_mean_mae_eur_mwh": 7.696944810834049,
+          "gain_vs_nyx_mae_eur_mwh": 0.019745397689110433,
+          "gain_vs_storm_mae_eur_mwh": -0.030165847279626234
+        },
+        "proposal50": {
+          "hours": 34940,
+          "country_days": 1456,
+          "mean_forecast_eur_mwh": 92.10270880368753,
+          "mean_observed_eur_mwh": 92.6956394533486,
+          "mae_eur_mwh": 11.337563599557939,
+          "rmse_eur_mwh": 21.489777659762392,
+          "bias_eur_mwh": -0.5929306496610616,
+          "daily_mean_mae_eur_mwh": 7.670458116002547,
+          "gain_vs_nyx_mae_eur_mwh": 0.029936708891050046,
+          "gain_vs_storm_mae_eur_mwh": -0.019974536077686622
+        },
+        "proposal100": {
+          "hours": 34940,
+          "country_days": 1456,
+          "mean_forecast_eur_mwh": 92.17880357994932,
+          "mean_observed_eur_mwh": 92.6956394533486,
+          "mae_eur_mwh": 11.333792422862512,
+          "rmse_eur_mwh": 21.289619884353097,
+          "bias_eur_mwh": -0.5168358733992766,
+          "daily_mean_mae_eur_mwh": 7.637637620353426,
+          "gain_vs_nyx_mae_eur_mwh": 0.03370788558647675,
+          "gain_vs_storm_mae_eur_mwh": -0.01620335938225992
+        }
+      },
+      "xgb_weighted_fixed": {
+        "governed": {
+          "hours": 34940,
+          "country_days": 1456,
+          "mean_forecast_eur_mwh": 92.0383583911763,
+          "mean_observed_eur_mwh": 92.6956394533486,
+          "mae_eur_mwh": 11.368967577641213,
+          "rmse_eur_mwh": 21.88635386079566,
+          "bias_eur_mwh": -0.657281062172287,
+          "daily_mean_mae_eur_mwh": 7.724898606901132,
+          "gain_vs_nyx_mae_eur_mwh": -0.0014672691922239522,
+          "gain_vs_storm_mae_eur_mwh": -0.05137851416096062
+        },
+        "proposal25": {
+          "hours": 34940,
+          "country_days": 1456,
+          "mean_forecast_eur_mwh": 92.07320618931938,
+          "mean_observed_eur_mwh": 92.6956394533486,
+          "mae_eur_mwh": 11.349945744867519,
+          "rmse_eur_mwh": 21.67468518998528,
+          "bias_eur_mwh": -0.6224332640292205,
+          "daily_mean_mae_eur_mwh": 7.692585803903666,
+          "gain_vs_nyx_mae_eur_mwh": 0.017554563581470006,
+          "gain_vs_storm_mae_eur_mwh": -0.03235668138726666
+        },
+        "proposal50": {
+          "hours": 34940,
+          "country_days": 1456,
+          "mean_forecast_eur_mwh": 92.119798351213,
+          "mean_observed_eur_mwh": 92.6956394533486,
+          "mae_eur_mwh": 11.348469350032591,
+          "rmse_eur_mwh": 21.524506957556365,
+          "bias_eur_mwh": -0.5758411021355946,
+          "daily_mean_mae_eur_mwh": 7.66780480541854,
+          "gain_vs_nyx_mae_eur_mwh": 0.01903095841639768,
+          "gain_vs_storm_mae_eur_mwh": -0.030880286552338987
+        },
+        "proposal100": {
+          "hours": 34940,
+          "country_days": 1456,
+          "mean_forecast_eur_mwh": 92.21298267500026,
+          "mean_observed_eur_mwh": 92.6956394533486,
+          "mae_eur_mwh": 11.365516637632703,
+          "rmse_eur_mwh": 21.380058893476306,
+          "bias_eur_mwh": -0.48265677834834264,
+          "daily_mean_mae_eur_mwh": 7.644911757139822,
+          "gain_vs_nyx_mae_eur_mwh": 0.0019836708162852545,
+          "gain_vs_storm_mae_eur_mwh": -0.04792757415245141
+        }
+      }
+    }
+  },
+  "source_and_sealed_modules_unchanged": true
+}

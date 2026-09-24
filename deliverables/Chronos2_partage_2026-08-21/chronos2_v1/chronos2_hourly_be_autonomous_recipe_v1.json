@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "status": "sealed_before_final_opening",
+  "recipe_mode": "autonomous_only",
+  "prediction_mode": "autonomous_only",
+  "mkonline_enabled": false,
+  "zone": "BE",
+  "timezone": "Europe/Brussels",
+  "source_autonomous_run": "runs/chronos2_hourly_be_residual_extended_v1",
+  "source_autonomous_model": "residual_corrected",
+  "source_autonomous_checksum_manifest_sha256": "d0428e1f155d874768726690f895d043b9135ae835041de2350d1eb8e69d8cce",
+  "source_autonomous_recipe": "runs/chronos2_hourly_be_residual_extended_v1/extended_residual_recipe.json",
+  "source_autonomous_recipe_sha256": "3747732c1b841646f1f02c6d5d75eae59969a84ae9f19a303a1d7a9e1f9e2b97",
+  "final_target_used_for_weight_or_hyperparameters": false,
+  "weights": {
+    "autonomous": 1.0,
+    "mkonline_primary": 0.0
+  },
+  "autonomous_only_reason": "MKOnline BE was rejected by the frozen B1 gate: the candidate lost 0.051061 EUR/MWh overall and failed both-half positivity; B2 was never opened.",
+  "autonomous_validation": {
+    "approved": true,
+    "final_loaded": false,
+    "reason": "MKOnline BE failed the frozen B1 threshold; autonomous-only was selected without loading B2 or using final targets.",
+    "b1_gate_artifact": "runs/tmp/mkonline_be_b1_gate.json",
+    "b1_gate_artifact_sha256": "1313416cbd5d9b7b7d1280191fab61b90fd5090724cb871f026beb05447ab67d",
+    "b1_passes": false,
+    "b1_overall_gain_eur_mwh": -0.05106119881932791,
+    "b2_opened": false
+  },
+  "sealed_final_protocol": {
+    "start_local_day": "2025-08-12",
+    "end_local_day": "2026-08-11",
+    "selection_used_final_targets": false
+  }
+}

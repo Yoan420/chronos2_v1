@@ -1,0 +1,51 @@
+{
+  "command": [
+    "C:\\Users\\BQ6757\\venvs\\pricefm311\\Scripts\\python.exe",
+    "-u",
+    "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-combined-final-validation\\test_cancel_queued_run_never_c0\\explicit test fixture ; $literal.py",
+    "success",
+    "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-combined-final-validation\\test_cancel_queued_run_never_c0\\console-state\\executions\\ba17b9d8e4944222b97fd768af666cc6\\results",
+    "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-combined-final-validation\\test_cancel_queued_run_never_c0\\never-released"
+  ],
+  "cwd": "C:\\Users\\BQ6757\\chronos2_v1",
+  "output_dir": "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-combined-final-validation\\test_cancel_queued_run_never_c0\\console-state\\executions\\ba17b9d8e4944222b97fd768af666cc6\\results",
+  "config": {
+    "fixture": true,
+    "mode": "success",
+    "resource": null
+  },
+  "type": "fixture",
+  "model": "explicit-test-fixture",
+  "resource_keys": [],
+  "warnings": [
+    "Explicit test fixture; contains no real scientific results."
+  ],
+  "id": "ba17b9d8e4944222b97fd768af666cc6",
+  "run_dir": "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-combined-final-validation\\test_cancel_queued_run_never_c0\\console-state\\executions\\ba17b9d8e4944222b97fd768af666cc6",
+  "created_at": "2026-09-11T08:59:23.755353+00:00",
+  "request": {
+    "type": "fixture",
+    "name": "Explicit process test"
+  },
+  "name": "Explicit process test",
+  "description": "",
+  "python_executable": "C:\\Users\\BQ6757\\venvs\\pricefm311\\Scripts\\python.exe",
+  "source": "managed",
+  "source_key": "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-combined-final-validation\\test_cancel_queued_run_never_c0\\console-state\\executions\\ba17b9d8e4944222b97fd768af666cc6",
+  "status": "queued",
+  "started_at": null,
+  "finished_at": null,
+  "duration_seconds": null,
+  "return_code": null,
+  "cancel_requested": false,
+  "tags": [],
+  "note": "",
+  "activity": "En attente d’une place ou d’une ressource",
+  "git": {
+    "commit": "900d8fc36a5f7d44e91f895786e49e4ed7614086",
+    "dirty_tracked_files": true
+  },
+  "log_paths": [
+    "C:\\Users\\BQ6757\\chronos2_v1\\tmp\\console-combined-final-validation\\test_cancel_queued_run_never_c0\\console-state\\executions\\ba17b9d8e4944222b97fd768af666cc6\\console.log"
+  ]
+}

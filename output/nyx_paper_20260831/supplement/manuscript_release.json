@@ -1,0 +1,17 @@
+{
+  "title": "NYX for hourly day ahead electricity price forecasting across four European markets",
+  "evaluation_start": "2025-09-16",
+  "evaluation_cutoff": "2026-08-31",
+  "delivery_days": 350,
+  "test_days": 75,
+  "pages": 22,
+  "tables": 10,
+  "figures": 5,
+  "numbered_equations": 29,
+  "native_math_objects": 115,
+  "docx_sha256": "a7805ea91ecac28d48ec29075ad03e136f4c3aa0ab179f9572eb4c88f1a5a496",
+  "pdf_sha256": "49f40cd516132a5fae7c92095df270cdb5027af9c390cc2e05e242a8b7d3ce4a",
+  "scope": "Retrospective rescoring of archived forecasts; no new training or reselection. The observation cutoff is not a historical-availability certification.",
+  "source_vintage_dates": "Preserved in audit/cutoff_manifest.json; later source materialization is explicitly distinguished from the evaluation cutoff.",
+  "implementation_limitation": "Archived nonlinear candidate has a sigma-point orientation discrepancy; disclosed in Appendix B. Forecasts have not been repaired."
+}

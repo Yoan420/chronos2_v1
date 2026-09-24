@@ -1,0 +1,3997 @@
+{
+  "reports": {
+    "FR": {
+      "zone": "FR",
+      "evaluation_start_day": "2025-09-15",
+      "evaluation_end_day": "2026-09-14",
+      "evaluation_days": 365,
+      "evaluation_hours": 8760,
+      "paired_hours": 8735,
+      "live_day": "2026-09-15",
+      "live_observed_hours": 24,
+      "live_excluded_from_statistics": true,
+      "displayed_feature_count": 12,
+      "model_feature_column_count": 240,
+      "quantiles": "saved P10/P50/P90; intermediate deciles linearly interpolated only for legacy CRPS display",
+      "storm": {
+        "status": "verified_frozen_projection",
+        "source_kind": "projection du snapshot comparatif figé",
+        "original_archive": {
+          "archive": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-15\\fr\\civil_pit_v2\\report_only\\sources\\20260914T120307590887Z_1df796b6",
+          "artifact_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-15\\fr\\civil_pit_v2\\report_only\\sources\\20260914T120307590887Z_1df796b6\\inputs\\storm_dashboard_official_statistics.parquet",
+          "artifact_sha256": "11cae037be613f9eeb677d80caeb9fa0da00ebc6d3c12a0f8545d0b960e937a9",
+          "audit_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nuclear_forecast_v1\\2026-09-15\\fr\\civil_pit_v2\\report_only\\sources\\20260914T120307590887Z_1df796b6\\statistics_history_audit.json",
+          "audit_sha256": "25a336b8da90596093853f6c6883558a5c37bf319381575470f63b8da8ed78bb"
+        },
+        "original_source_materialization": {
+          "role": "evaluation_only_dashboard_comparator",
+          "contract": "explicit materialized Storm dashboard comparator",
+          "series": "power.price.fr.euromwh.h.fcst.3mv.storm.da.cache",
+          "column": "storm_dashboard_official__q50",
+          "source": {
+            "kind": "saturn_storm_day_ahead_cache_with_native_gap_fallback",
+            "requested_series": "power.price.fr.euromwh.h.fcst.3mv.storm.da.cache",
+            "series": "power.price.fr.euromwh.h.fcst.3mv.storm.da.cache",
+            "primary_series": "power.price.fr.euromwh.h.fcst.3mv.storm.da.cache",
+            "fallback_series": "power.price.fr.euromwh.h.fcst.3mv.storm",
+            "fallback_primary_series": "41377_native",
+            "zone": "FR",
+            "naive_timezone": "Europe/Paris",
+            "extracted_at_utc": "2026-09-14 12:03:07.590887+00:00",
+            "requested_from_utc": "2025-09-14 22:00:00+00:00",
+            "requested_to_utc": "2026-09-15 21:00:00+00:00",
+            "selection": "frozen GEMS day-ahead cache; native curve only where cache is missing, with cache precedence",
+            "cache_available_hours": 8279,
+            "cache_missing_hours": 505,
+            "fallback_available_hours": 8783,
+            "fallback_used_hours": 504,
+            "fallback_used_local_days": [
+              "2025-10-27",
+              "2025-11-02",
+              "2025-11-03",
+              "2025-11-17",
+              "2025-12-22",
+              "2026-01-02",
+              "2026-01-04",
+              "2026-01-12",
+              "2026-01-18",
+              "2026-01-19",
+              "2026-02-15",
+              "2026-02-16",
+              "2026-03-08",
+              "2026-03-09",
+              "2026-04-26",
+              "2026-06-01",
+              "2026-06-20",
+              "2026-07-13",
+              "2026-07-27",
+              "2026-08-02",
+              "2026-09-14"
+            ],
+            "nocache": true,
+            "cache_live_recomputation": false,
+            "fallback_live_recomputation": true,
+            "used_for_prediction": false,
+            "series_kind": "frozen_day_ahead_cache",
+            "fallback_policy": "native_only_where_day_ahead_cache_is_missing",
+            "cache_precedence": true
+          },
+          "period": {
+            "start_utc": "2025-09-14 22:00:00+00:00",
+            "end_utc": "2026-09-15 21:00:00+00:00",
+            "start_local_day": "2025-09-15",
+            "end_local_day": "2026-09-15",
+            "timezone": "Europe/Paris"
+          },
+          "expected_hours": 8784,
+          "source_rows": 8784,
+          "source_extra_hours_outside_period": 0,
+          "available_hours": 8783,
+          "missing_hours": 1,
+          "coverage": 0.9998861566484517,
+          "minimum_coverage": 0.0,
+          "maximum_missing_hours": 1,
+          "missing_timestamps": [
+            {
+              "utc": "2025-10-26 00:00:00+00:00",
+              "local": "2025-10-26 02:00:00+02:00",
+              "fold": 0
+            }
+          ],
+          "missing_timestamps_truncated": false,
+          "dst": {
+            "expected_local_day_hour_histogram": {
+              "23": 1,
+              "24": 364,
+              "25": 1
+            },
+            "available_local_day_hour_histogram": {
+              "23": 1,
+              "24": 365
+            },
+            "transition_days": [
+              {
+                "local_day": "2025-10-26",
+                "expected_hours": 25,
+                "available_hours": 24,
+                "missing_hours": 1
+              },
+              {
+                "local_day": "2026-03-29",
+                "expected_hours": 23,
+                "available_hours": 23,
+                "missing_hours": 0
+              }
+            ],
+            "interpolation": false,
+            "strict_08_fallback": false,
+            "native_allowed_missing_hours": 1,
+            "native_allowed_missing_utc": [
+              "2025-10-26 00:00:00+00:00"
+            ],
+            "native_actual_missing_matches_allowed": true
+          },
+          "actual_available_hours": 8784,
+          "actual_missing_hours": 0,
+          "allowed_missing_actual_hours": 0,
+          "actual_missing_contract_satisfied": true,
+          "metrics": {
+            "n": 8783,
+            "mae": 11.842403117385858,
+            "rmse": 18.481282133939676,
+            "bias": -1.9194832080154847
+          },
+          "used_for_prediction": false,
+          "used_for_live_forecast": false,
+          "candidate_frozen_before_comparator_attachment": true,
+          "delivery_placeholder": {
+            "delivery_day_local": "2026-09-15",
+            "timezone": "Europe/Paris",
+            "allowed_missing_utc": [],
+            "allowed_missing_hours": 0,
+            "status": "complete",
+            "used_for_prediction": false
+          },
+          "normalized_artifact_path": "inputs/storm_dashboard_official_statistics.parquet",
+          "normalized_artifact_sha256": "11cae037be613f9eeb677d80caeb9fa0da00ebc6d3c12a0f8545d0b960e937a9"
+        },
+        "published_report_source": {
+          "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\exports\\2026-09-15\\fr\\nuclear_kalman\\forecast_fr_2026-09-15_nuclear_kalman.html",
+          "sha256": "f6e6107ff4e4d8befab3db75137e631313d8e68d077eb9544f87261bae1cd131",
+          "modified_at_utc": "2026-09-14T12:03:27.188567162+00:00",
+          "zone": "FR",
+          "model": "nuclear_kalman",
+          "label": "Chronos-2 + nucl. + correcteur + Kalman P50",
+          "time_axis_audits": [
+            {
+              "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\exports\\2026-09-15\\fr\\nuclear_kalman\\nuclear_report_audit.json",
+              "sha256": "de801ea5917b09977c5b4efa37c9fc418ae2539447bd809708c25b19e0a4fd4a"
+            }
+          ],
+          "allowed_missing_pair_utc": [
+            "2025-10-26T00:00:00+00:00"
+          ],
+          "csv_source": {
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\exports\\2026-09-15\\fr\\nuclear_kalman\\forecast_fr_2026-09-15_nuclear_kalman.csv",
+            "sha256": "7612c25ac41b35c77d91d7aa0003dba54462c8715bc9e2b2b1a136f73c899eff",
+            "modified_at_utc": "2026-09-14T09:39:29.960139990+00:00"
+          },
+          "quantile_source": "published_P10_P90_traces_not_reconstructed",
+          "invalid_quantile_rows_discarded": 0,
+          "forecast_pit_certified": false,
+          "benchmark_pit_certified": false,
+          "provenance": "published_report_replay_and_latest_dashboard_not_certified_execution_vintages",
+          "last_complete_observed_day": "2026-09-15"
+        },
+        "compared_finite_hours": 8759,
+        "missing_frozen_hours": 25,
+        "archive_values_excluded_by_frozen_panel_mask": 24,
+        "panel_missing_values_filled": false,
+        "used_for_prediction": false,
+        "forecast_pit_certified": false,
+        "benchmark_pit_certified": false,
+        "verification_tolerance_eur_mwh": 1e-08
+      },
+      "diagnostic_only": true,
+      "production_modified": false,
+      "activation_performed": false,
+      "forecast_pit_certified": false,
+      "benchmark_pit_certified": false,
+      "point_metrics_common_support": true,
+      "price_attribution_available": false
+    }
+  },
+  "source_audit": {
+    "source_data_audit": {
+      "schema_version": 1,
+      "baseline": {
+        "schema_version": 1,
+        "delivery_day": "2026-09-15",
+        "selection": "latest_common_export_date",
+        "latest_export_by_model": {
+          "FR/nuclear_kalman": "2026-09-15",
+          "DE/nuclear_kalman": "2026-09-15",
+          "BE/nuclear_kalman": "2026-09-15",
+          "NL/nuclear_kalman": "2026-09-15"
+        },
+        "evaluation_start_day": "2025-09-15",
+        "evaluation_end_day": "2026-09-14",
+        "evaluation_days": 365,
+        "physical_hours_per_model": 8760,
+        "timezone": "Europe/Paris",
+        "forecast_cutoff": "D-1 08:00 civil (assumed, not per-row issue evidence)",
+        "forecast_pit_certified": false,
+        "benchmark_pit_certified": false,
+        "diagnostic_only": true,
+        "production_modified": false,
+        "sources": [
+          {
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\exports\\2026-09-15\\fr\\nuclear_kalman\\forecast_fr_2026-09-15_nuclear_kalman.html",
+            "sha256": "f6e6107ff4e4d8befab3db75137e631313d8e68d077eb9544f87261bae1cd131",
+            "modified_at_utc": "2026-09-14T12:03:27.188567162+00:00",
+            "zone": "FR",
+            "model": "nuclear_kalman",
+            "label": "Chronos-2 + nucl. + correcteur + Kalman P50",
+            "time_axis_audits": [
+              {
+                "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\exports\\2026-09-15\\fr\\nuclear_kalman\\nuclear_report_audit.json",
+                "sha256": "de801ea5917b09977c5b4efa37c9fc418ae2539447bd809708c25b19e0a4fd4a"
+              }
+            ],
+            "allowed_missing_pair_utc": [
+              "2025-10-26T00:00:00+00:00"
+            ],
+            "csv_source": {
+              "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\exports\\2026-09-15\\fr\\nuclear_kalman\\forecast_fr_2026-09-15_nuclear_kalman.csv",
+              "sha256": "7612c25ac41b35c77d91d7aa0003dba54462c8715bc9e2b2b1a136f73c899eff",
+              "modified_at_utc": "2026-09-14T09:39:29.960139990+00:00"
+            },
+            "quantile_source": "published_P10_P90_traces_not_reconstructed",
+            "invalid_quantile_rows_discarded": 0,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "provenance": "published_report_replay_and_latest_dashboard_not_certified_execution_vintages",
+            "last_complete_observed_day": "2026-09-15"
+          },
+          {
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\exports\\2026-09-15\\de\\nuclear_kalman\\forecast_de_2026-09-15_nuclear_kalman.html",
+            "sha256": "ad84143e4f05fd8d5d6d0e4a747a80ea9fbe85ae4a3db5dd87565d39422039ed",
+            "modified_at_utc": "2026-09-14T12:02:54.792122602+00:00",
+            "zone": "DE",
+            "model": "nuclear_kalman",
+            "label": "Chronos-2 + nucl. + correcteur + Kalman P50",
+            "time_axis_audits": [
+              {
+                "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\exports\\2026-09-15\\de\\nuclear_kalman\\nuclear_report_audit.json",
+                "sha256": "b036b79c71ed061ef646db14e23af41a2bb710646e9df1dd41ef0b8b105bf6b6"
+              }
+            ],
+            "allowed_missing_pair_utc": [
+              "2025-10-26T00:00:00+00:00"
+            ],
+            "csv_source": {
+              "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\exports\\2026-09-15\\de\\nuclear_kalman\\forecast_de_2026-09-15_nuclear_kalman.csv",
+              "sha256": "932c013d46d1eaf4dec118748cf8cc36875c375f84fe288027e3298add78b5cb",
+              "modified_at_utc": "2026-09-14T08:39:01.557795286+00:00"
+            },
+            "quantile_source": "published_P10_P90_traces_not_reconstructed",
+            "invalid_quantile_rows_discarded": 0,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "provenance": "published_report_replay_and_latest_dashboard_not_certified_execution_vintages",
+            "last_complete_observed_day": "2026-09-15"
+          },
+          {
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\exports\\2026-09-15\\be\\nuclear_kalman\\forecast_be_2026-09-15_nuclear_kalman.html",
+            "sha256": "8177031a943ff1522beef089bedf6b3cbfdbcec9d3230a97f142e12eefb3ab01",
+            "modified_at_utc": "2026-09-14T12:02:22.912246227+00:00",
+            "zone": "BE",
+            "model": "nuclear_kalman",
+            "label": "Chronos-2 + nucl. + correcteur + Kalman P50",
+            "time_axis_audits": [
+              {
+                "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\exports\\2026-09-15\\be\\nuclear_kalman\\nuclear_report_audit.json",
+                "sha256": "bcc3d3e47e1e040041e5c27392e29dc310555bc6edc8d1584989752c9e1d3ed4"
+              }
+            ],
+            "allowed_missing_pair_utc": [
+              "2025-10-26T00:00:00+00:00"
+            ],
+            "csv_source": {
+              "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\exports\\2026-09-15\\be\\nuclear_kalman\\forecast_be_2026-09-15_nuclear_kalman.csv",
+              "sha256": "f4e797e625ff8e5e76e6caaa9434d407182551b405076a2e8875acea967d2d99",
+              "modified_at_utc": "2026-09-14T07:41:57.305474758+00:00"
+            },
+            "quantile_source": "published_P10_P90_traces_not_reconstructed",
+            "invalid_quantile_rows_discarded": 0,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "provenance": "published_report_replay_and_latest_dashboard_not_certified_execution_vintages",
+            "last_complete_observed_day": "2026-09-15"
+          },
+          {
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\exports\\2026-09-15\\nl\\nuclear_kalman\\forecast_nl_2026-09-15_nuclear_kalman.html",
+            "sha256": "9b55b26bfc99f483946e3bae67b6b58dc09bf0119e8113a701477fa8c2907d28",
+            "modified_at_utc": "2026-09-14T12:04:14.697928429+00:00",
+            "zone": "NL",
+            "model": "nuclear_kalman",
+            "label": "Chronos-2 + nucl. + correcteur + Kalman P50",
+            "time_axis_audits": [
+              {
+                "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\exports\\2026-09-15\\nl\\nuclear_kalman\\nuclear_report_audit.json",
+                "sha256": "645eb9db90cef19a305e92f8ecb0089b08b56c13b5e0570fbbb91b691460aac6"
+              }
+            ],
+            "allowed_missing_pair_utc": [
+              "2025-10-26T00:00:00+00:00"
+            ],
+            "csv_source": {
+              "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\exports\\2026-09-15\\nl\\nuclear_kalman\\forecast_nl_2026-09-15_nuclear_kalman.csv",
+              "sha256": "f9c652fd35f7ea8b102ebab272a8586e2d8134e970d0ab9596a07408cc22fd08",
+              "modified_at_utc": "2026-09-14T10:32:43.659332752+00:00"
+            },
+            "quantile_source": "published_P10_P90_traces_not_reconstructed",
+            "invalid_quantile_rows_discarded": 0,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "provenance": "published_report_replay_and_latest_dashboard_not_certified_execution_vintages",
+            "last_complete_observed_day": "2026-09-15"
+          }
+        ],
+        "shared_observations": {
+          "FR": {
+            "label_policy": "latest_selected_report_publication_then_older_missing_fallback",
+            "priority_reports": [
+              "C:\\Users\\BQ6757\\chronos2_v1\\runs\\exports\\2026-09-15\\fr\\nuclear_kalman\\forecast_fr_2026-09-15_nuclear_kalman.html"
+            ],
+            "settlement_shared_across_models": true,
+            "storm_is_forecast_not_execution_price": true,
+            "actual_revision_differences_by_model": {
+              "nuclear_kalman": 0
+            },
+            "storm_revision_differences_by_model": {
+              "nuclear_kalman": 0
+            }
+          },
+          "DE": {
+            "label_policy": "latest_selected_report_publication_then_older_missing_fallback",
+            "priority_reports": [
+              "C:\\Users\\BQ6757\\chronos2_v1\\runs\\exports\\2026-09-15\\de\\nuclear_kalman\\forecast_de_2026-09-15_nuclear_kalman.html"
+            ],
+            "settlement_shared_across_models": true,
+            "storm_is_forecast_not_execution_price": true,
+            "actual_revision_differences_by_model": {
+              "nuclear_kalman": 0
+            },
+            "storm_revision_differences_by_model": {
+              "nuclear_kalman": 0
+            }
+          },
+          "BE": {
+            "label_policy": "latest_selected_report_publication_then_older_missing_fallback",
+            "priority_reports": [
+              "C:\\Users\\BQ6757\\chronos2_v1\\runs\\exports\\2026-09-15\\be\\nuclear_kalman\\forecast_be_2026-09-15_nuclear_kalman.html"
+            ],
+            "settlement_shared_across_models": true,
+            "storm_is_forecast_not_execution_price": true,
+            "actual_revision_differences_by_model": {
+              "nuclear_kalman": 0
+            },
+            "storm_revision_differences_by_model": {
+              "nuclear_kalman": 0
+            }
+          },
+          "NL": {
+            "label_policy": "latest_selected_report_publication_then_older_missing_fallback",
+            "priority_reports": [
+              "C:\\Users\\BQ6757\\chronos2_v1\\runs\\exports\\2026-09-15\\nl\\nuclear_kalman\\forecast_nl_2026-09-15_nuclear_kalman.html"
+            ],
+            "settlement_shared_across_models": true,
+            "storm_is_forecast_not_execution_price": true,
+            "actual_revision_differences_by_model": {
+              "nuclear_kalman": 0
+            },
+            "storm_revision_differences_by_model": {
+              "nuclear_kalman": 0
+            }
+          }
+        },
+        "missing_evaluation_forecasts": 0,
+        "live_rows": [
+          {
+            "timestamp_utc": "2026-09-14T22:00:00.000Z",
+            "actual": 209.265,
+            "benchmark_forecast": 212.68279,
+            "forecast": 216.7726805989,
+            "q10": 208.371771175,
+            "q90": 228.1208861653,
+            "zone": "FR",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-14T23:00:00.000Z",
+            "actual": 198.015,
+            "benchmark_forecast": 201.334101,
+            "forecast": 203.4783453239,
+            "q10": 193.9050726188,
+            "q90": 214.7460455192,
+            "zone": "FR",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T00:00:00.000Z",
+            "actual": 188.6325,
+            "benchmark_forecast": 192.085463,
+            "forecast": 195.8484494878,
+            "q10": 184.0905454351,
+            "q90": 205.6983030034,
+            "zone": "FR",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T01:00:00.000Z",
+            "actual": 185.655,
+            "benchmark_forecast": 187.673292,
+            "forecast": 188.4590107925,
+            "q10": 176.6154133804,
+            "q90": 199.7197224625,
+            "zone": "FR",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T02:00:00.000Z",
+            "actual": 183.55,
+            "benchmark_forecast": 187.232224,
+            "forecast": 189.2941501955,
+            "q10": 177.3923099856,
+            "q90": 202.754767261,
+            "zone": "FR",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T03:00:00.000Z",
+            "actual": 197.1,
+            "benchmark_forecast": 200.038101,
+            "forecast": 205.6060334256,
+            "q10": 193.8957062771,
+            "q90": 217.8029328396,
+            "zone": "FR",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T04:00:00.000Z",
+            "actual": 233.6425,
+            "benchmark_forecast": 224.823805,
+            "forecast": 234.5154637092,
+            "q10": 221.163046717,
+            "q90": 248.4157627815,
+            "zone": "FR",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T05:00:00.000Z",
+            "actual": 240.46,
+            "benchmark_forecast": 233.130103,
+            "forecast": 250.4153436095,
+            "q10": 237.5619347961,
+            "q90": 267.2409356506,
+            "zone": "FR",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T06:00:00.000Z",
+            "actual": 233.1125,
+            "benchmark_forecast": 228.015487,
+            "forecast": 241.3096683415,
+            "q10": 225.510657111,
+            "q90": 257.0096500309,
+            "zone": "FR",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T07:00:00.000Z",
+            "actual": 197.2025,
+            "benchmark_forecast": 188.854343,
+            "forecast": 204.2600887037,
+            "q10": 188.1749446607,
+            "q90": 221.1487910963,
+            "zone": "FR",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T08:00:00.000Z",
+            "actual": 145.96,
+            "benchmark_forecast": 146.513476,
+            "forecast": 161.9679992019,
+            "q10": 144.4793669998,
+            "q90": 180.1246459305,
+            "zone": "FR",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T09:00:00.000Z",
+            "actual": 100.0025,
+            "benchmark_forecast": 122.040669,
+            "forecast": 118.7967581758,
+            "q10": 95.1093115815,
+            "q90": 140.5105109224,
+            "zone": "FR",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T10:00:00.000Z",
+            "actual": 56.0,
+            "benchmark_forecast": 65.124877,
+            "forecast": 80.7919617088,
+            "q10": 52.25263218,
+            "q90": 109.2656174095,
+            "zone": "FR",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T11:00:00.000Z",
+            "actual": 38.39,
+            "benchmark_forecast": 18.946609,
+            "forecast": 62.0688041631,
+            "q10": 33.4194892827,
+            "q90": 89.8089088384,
+            "zone": "FR",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T12:00:00.000Z",
+            "actual": 49.7725,
+            "benchmark_forecast": 63.922275,
+            "forecast": 76.3382270875,
+            "q10": 48.0335853639,
+            "q90": 104.1629722657,
+            "zone": "FR",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T13:00:00.000Z",
+            "actual": 55.2675,
+            "benchmark_forecast": 112.876844,
+            "forecast": 101.1538504514,
+            "q10": 72.7873038206,
+            "q90": 126.5991324339,
+            "zone": "FR",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T14:00:00.000Z",
+            "actual": 84.2825,
+            "benchmark_forecast": 138.141035,
+            "forecast": 127.7876107103,
+            "q10": 95.3202568895,
+            "q90": 167.7488381272,
+            "zone": "FR",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T15:00:00.000Z",
+            "actual": 165.68,
+            "benchmark_forecast": 170.112816,
+            "forecast": 193.9055421805,
+            "q10": 167.7513673758,
+            "q90": 222.7890718436,
+            "zone": "FR",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T16:00:00.000Z",
+            "actual": 220.96,
+            "benchmark_forecast": 218.19192,
+            "forecast": 243.3299231546,
+            "q10": 219.1859564798,
+            "q90": 272.1637091654,
+            "zone": "FR",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T17:00:00.000Z",
+            "actual": 258.255,
+            "benchmark_forecast": 272.088,
+            "forecast": 268.9420169282,
+            "q10": 245.9255984712,
+            "q90": 302.4669192719,
+            "zone": "FR",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T18:00:00.000Z",
+            "actual": 246.805,
+            "benchmark_forecast": 250.05,
+            "forecast": 268.2591552955,
+            "q10": 245.4748687965,
+            "q90": 299.4935608131,
+            "zone": "FR",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T19:00:00.000Z",
+            "actual": 222.3225,
+            "benchmark_forecast": 229.105183,
+            "forecast": 242.2663411609,
+            "q10": 224.3418569079,
+            "q90": 266.4674825183,
+            "zone": "FR",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T20:00:00.000Z",
+            "actual": 201.1875,
+            "benchmark_forecast": 212.67,
+            "forecast": 216.353839126,
+            "q10": 201.0102264551,
+            "q90": 233.5248291162,
+            "zone": "FR",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T21:00:00.000Z",
+            "actual": 183.5775,
+            "benchmark_forecast": 198.065239,
+            "forecast": 197.3216159539,
+            "q10": 181.8680331902,
+            "q90": 214.279867907,
+            "zone": "FR",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-14T22:00:00.000Z",
+            "actual": 208.8875,
+            "benchmark_forecast": 212.46932,
+            "forecast": 214.7202659897,
+            "q10": 200.458089476,
+            "q90": 230.4753013901,
+            "zone": "DE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-14T23:00:00.000Z",
+            "actual": 198.015,
+            "benchmark_forecast": 199.589754,
+            "forecast": 198.3330066225,
+            "q10": 186.4065234682,
+            "q90": 213.6718585512,
+            "zone": "DE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T00:00:00.000Z",
+            "actual": 188.3525,
+            "benchmark_forecast": 190.214575,
+            "forecast": 187.7679200232,
+            "q10": 174.7467713415,
+            "q90": 203.7860474646,
+            "zone": "DE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T01:00:00.000Z",
+            "actual": 185.655,
+            "benchmark_forecast": 186.56,
+            "forecast": 183.371247876,
+            "q10": 170.2794357422,
+            "q90": 200.3167282227,
+            "zone": "DE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T02:00:00.000Z",
+            "actual": 183.55,
+            "benchmark_forecast": 186.56,
+            "forecast": 185.8278813566,
+            "q10": 171.620026132,
+            "q90": 201.1568608487,
+            "zone": "DE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T03:00:00.000Z",
+            "actual": 196.7575,
+            "benchmark_forecast": 199.208131,
+            "forecast": 204.0078069766,
+            "q10": 189.5860845644,
+            "q90": 222.3639471133,
+            "zone": "DE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T04:00:00.000Z",
+            "actual": 237.425,
+            "benchmark_forecast": 238.515191,
+            "forecast": 246.8606863723,
+            "q10": 228.6719961868,
+            "q90": 271.2949209915,
+            "zone": "DE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T05:00:00.000Z",
+            "actual": 262.0775,
+            "benchmark_forecast": 251.08,
+            "forecast": 270.4927012435,
+            "q10": 249.396021556,
+            "q90": 302.8842417708,
+            "zone": "DE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T06:00:00.000Z",
+            "actual": 233.1125,
+            "benchmark_forecast": 226.698681,
+            "forecast": 242.6125967621,
+            "q10": 221.0414297699,
+            "q90": 272.6656668304,
+            "zone": "DE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T07:00:00.000Z",
+            "actual": 196.395,
+            "benchmark_forecast": 181.407831,
+            "forecast": 188.669786954,
+            "q10": 170.6724267245,
+            "q90": 211.9546685458,
+            "zone": "DE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T08:00:00.000Z",
+            "actual": 145.96,
+            "benchmark_forecast": 143.630077,
+            "forecast": 141.0427743137,
+            "q10": 125.1745949924,
+            "q90": 160.1094247043,
+            "zone": "DE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T09:00:00.000Z",
+            "actual": 78.87,
+            "benchmark_forecast": 88.08369,
+            "forecast": 90.6576354262,
+            "q10": 66.5072448012,
+            "q90": 112.4558531997,
+            "zone": "DE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T10:00:00.000Z",
+            "actual": 44.4675,
+            "benchmark_forecast": 48.888634,
+            "forecast": 45.2058847691,
+            "q10": 15.5463007237,
+            "q90": 75.0910318638,
+            "zone": "DE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T11:00:00.000Z",
+            "actual": 29.5,
+            "benchmark_forecast": -0.05,
+            "forecast": 34.7509058308,
+            "q10": 7.2328470539,
+            "q90": 65.8534296345,
+            "zone": "DE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T12:00:00.000Z",
+            "actual": 46.2,
+            "benchmark_forecast": 52.277495,
+            "forecast": 58.974447103,
+            "q10": 31.6740549522,
+            "q90": 87.7512796836,
+            "zone": "DE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T13:00:00.000Z",
+            "actual": 103.6925,
+            "benchmark_forecast": 104.894767,
+            "forecast": 107.7899446252,
+            "q10": 81.1595811609,
+            "q90": 132.0876588586,
+            "zone": "DE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T14:00:00.000Z",
+            "actual": 156.0225,
+            "benchmark_forecast": 142.845115,
+            "forecast": 151.2126670764,
+            "q10": 126.3279090808,
+            "q90": 181.8373924182,
+            "zone": "DE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T15:00:00.000Z",
+            "actual": 213.465,
+            "benchmark_forecast": 208.210784,
+            "forecast": 220.1786884264,
+            "q10": 192.0312885241,
+            "q90": 263.865059276,
+            "zone": "DE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T16:00:00.000Z",
+            "actual": 251.51,
+            "benchmark_forecast": 232.283719,
+            "forecast": 289.2218510127,
+            "q10": 246.2580143428,
+            "q90": 360.296558044,
+            "zone": "DE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T17:00:00.000Z",
+            "actual": 303.365,
+            "benchmark_forecast": 302.795069,
+            "forecast": 363.541763646,
+            "q10": 308.5825961655,
+            "q90": 495.1185458726,
+            "zone": "DE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T18:00:00.000Z",
+            "actual": 253.9,
+            "benchmark_forecast": 250.05,
+            "forecast": 337.4706921121,
+            "q10": 284.4479259989,
+            "q90": 450.044849827,
+            "zone": "DE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T19:00:00.000Z",
+            "actual": 222.3225,
+            "benchmark_forecast": 229.105183,
+            "forecast": 263.1925092236,
+            "q10": 231.0666242139,
+            "q90": 311.1964765088,
+            "zone": "DE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T20:00:00.000Z",
+            "actual": 199.4625,
+            "benchmark_forecast": 212.223547,
+            "forecast": 218.4665916095,
+            "q10": 198.1424491534,
+            "q90": 245.9536521564,
+            "zone": "DE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T21:00:00.000Z",
+            "actual": 182.7125,
+            "benchmark_forecast": 195.826838,
+            "forecast": 195.6757626617,
+            "q10": 178.1166195953,
+            "q90": 215.1563229644,
+            "zone": "DE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-14T22:00:00.000Z",
+            "actual": 209.07,
+            "benchmark_forecast": 212.709884,
+            "forecast": 213.5276323729,
+            "q10": 201.6027513914,
+            "q90": 226.6800066404,
+            "zone": "BE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-14T23:00:00.000Z",
+            "actual": 198.015,
+            "benchmark_forecast": 201.681491,
+            "forecast": 198.9779715813,
+            "q10": 188.5900321281,
+            "q90": 212.2141166008,
+            "zone": "BE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T00:00:00.000Z",
+            "actual": 188.49,
+            "benchmark_forecast": 192.094365,
+            "forecast": 188.0676612307,
+            "q10": 176.6872748781,
+            "q90": 200.8087348391,
+            "zone": "BE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T01:00:00.000Z",
+            "actual": 185.655,
+            "benchmark_forecast": 187.412558,
+            "forecast": 179.5759009109,
+            "q10": 168.4028967605,
+            "q90": 194.115314363,
+            "zone": "BE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T02:00:00.000Z",
+            "actual": 183.55,
+            "benchmark_forecast": 186.471999,
+            "forecast": 180.0583252499,
+            "q10": 168.5937408993,
+            "q90": 192.6876434872,
+            "zone": "BE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T03:00:00.000Z",
+            "actual": 196.7125,
+            "benchmark_forecast": 199.102901,
+            "forecast": 196.776838283,
+            "q10": 185.3964671892,
+            "q90": 210.4630565447,
+            "zone": "BE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T04:00:00.000Z",
+            "actual": 234.6325,
+            "benchmark_forecast": 236.875832,
+            "forecast": 235.99737023,
+            "q10": 222.3246102202,
+            "q90": 252.795618521,
+            "zone": "BE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T05:00:00.000Z",
+            "actual": 249.835,
+            "benchmark_forecast": 246.032656,
+            "forecast": 255.2918011712,
+            "q10": 240.0464398431,
+            "q90": 277.7153241205,
+            "zone": "BE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T06:00:00.000Z",
+            "actual": 233.1125,
+            "benchmark_forecast": 228.380141,
+            "forecast": 234.977905091,
+            "q10": 217.5496824348,
+            "q90": 257.3371885383,
+            "zone": "BE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T07:00:00.000Z",
+            "actual": 196.9075,
+            "benchmark_forecast": 197.022067,
+            "forecast": 191.2812549685,
+            "q10": 174.743458948,
+            "q90": 213.2880298708,
+            "zone": "BE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T08:00:00.000Z",
+            "actual": 145.96,
+            "benchmark_forecast": 146.872394,
+            "forecast": 150.1367801071,
+            "q10": 133.7605441452,
+            "q90": 170.0370181442,
+            "zone": "BE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T09:00:00.000Z",
+            "actual": 122.8175,
+            "benchmark_forecast": 151.447539,
+            "forecast": 112.3896333492,
+            "q10": 89.5628663815,
+            "q90": 136.0452882565,
+            "zone": "BE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T10:00:00.000Z",
+            "actual": 63.9975,
+            "benchmark_forecast": 65.124877,
+            "forecast": 77.2034551179,
+            "q10": 50.2769109285,
+            "q90": 104.2732106721,
+            "zone": "BE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T11:00:00.000Z",
+            "actual": 38.39,
+            "benchmark_forecast": 16.152915,
+            "forecast": 71.5017311868,
+            "q10": 47.8767998514,
+            "q90": 98.6086037454,
+            "zone": "BE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T12:00:00.000Z",
+            "actual": 62.0,
+            "benchmark_forecast": 63.922275,
+            "forecast": 99.8770448054,
+            "q10": 76.2614594783,
+            "q90": 125.0369645442,
+            "zone": "BE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T13:00:00.000Z",
+            "actual": 101.3825,
+            "benchmark_forecast": 112.942814,
+            "forecast": 123.6156497885,
+            "q10": 100.454516976,
+            "q90": 146.946452706,
+            "zone": "BE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T14:00:00.000Z",
+            "actual": 153.0,
+            "benchmark_forecast": 142.595561,
+            "forecast": 151.9338153187,
+            "q10": 127.6095355335,
+            "q90": 181.8950732533,
+            "zone": "BE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T15:00:00.000Z",
+            "actual": 201.6725,
+            "benchmark_forecast": 200.798439,
+            "forecast": 211.4909053053,
+            "q10": 189.62504532,
+            "q90": 245.6370387282,
+            "zone": "BE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T16:00:00.000Z",
+            "actual": 237.795,
+            "benchmark_forecast": 229.156618,
+            "forecast": 262.195027159,
+            "q10": 231.4892776473,
+            "q90": 308.5001419051,
+            "zone": "BE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T17:00:00.000Z",
+            "actual": 274.7875,
+            "benchmark_forecast": 291.49752,
+            "forecast": 312.6596772883,
+            "q10": 277.069131634,
+            "q90": 393.6727998469,
+            "zone": "BE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T18:00:00.000Z",
+            "actual": 249.5175,
+            "benchmark_forecast": 252.646997,
+            "forecast": 295.4665803021,
+            "q10": 261.9418915814,
+            "q90": 362.3968476361,
+            "zone": "BE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T19:00:00.000Z",
+            "actual": 222.3225,
+            "benchmark_forecast": 232.000566,
+            "forecast": 244.8983683063,
+            "q10": 222.022452779,
+            "q90": 277.2692789508,
+            "zone": "BE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T20:00:00.000Z",
+            "actual": 200.505,
+            "benchmark_forecast": 215.503029,
+            "forecast": 216.2575597552,
+            "q10": 200.1501989153,
+            "q90": 238.1369695452,
+            "zone": "BE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T21:00:00.000Z",
+            "actual": 183.2425,
+            "benchmark_forecast": 198.988966,
+            "forecast": 197.6023453708,
+            "q10": 182.6494797702,
+            "q90": 215.1483658786,
+            "zone": "BE",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-14T22:00:00.000Z",
+            "actual": 208.9,
+            "benchmark_forecast": 212.74853,
+            "forecast": 206.8135876737,
+            "q10": 195.275516995,
+            "q90": 218.6497693143,
+            "zone": "NL",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-14T23:00:00.000Z",
+            "actual": 198.015,
+            "benchmark_forecast": 202.102627,
+            "forecast": 194.544038413,
+            "q10": 184.285432456,
+            "q90": 206.5737320166,
+            "zone": "NL",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T00:00:00.000Z",
+            "actual": 188.37,
+            "benchmark_forecast": 192.248408,
+            "forecast": 186.6134572706,
+            "q10": 174.8065114699,
+            "q90": 198.5607381544,
+            "zone": "NL",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T01:00:00.000Z",
+            "actual": 185.655,
+            "benchmark_forecast": 187.257784,
+            "forecast": 180.1391339969,
+            "q10": 168.5582624149,
+            "q90": 194.6749005984,
+            "zone": "NL",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T02:00:00.000Z",
+            "actual": 183.55,
+            "benchmark_forecast": 185.878226,
+            "forecast": 181.5088648317,
+            "q10": 169.0883936403,
+            "q90": 194.1472925661,
+            "zone": "NL",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T03:00:00.000Z",
+            "actual": 196.1425,
+            "benchmark_forecast": 198.385041,
+            "forecast": 197.2407965399,
+            "q10": 184.8627295233,
+            "q90": 211.019727204,
+            "zone": "NL",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T04:00:00.000Z",
+            "actual": 224.4225,
+            "benchmark_forecast": 238.612491,
+            "forecast": 235.3821350288,
+            "q10": 220.5353637886,
+            "q90": 252.3014160347,
+            "zone": "NL",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T05:00:00.000Z",
+            "actual": 244.3075,
+            "benchmark_forecast": 250.641518,
+            "forecast": 253.7803253655,
+            "q10": 237.5973572259,
+            "q90": 275.8654388909,
+            "zone": "NL",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T06:00:00.000Z",
+            "actual": 233.1125,
+            "benchmark_forecast": 228.761001,
+            "forecast": 233.8366376923,
+            "q10": 216.5464155243,
+            "q90": 255.1049329804,
+            "zone": "NL",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T07:00:00.000Z",
+            "actual": 196.71,
+            "benchmark_forecast": 185.92427,
+            "forecast": 186.6057831427,
+            "q10": 170.6020905157,
+            "q90": 205.8490234991,
+            "zone": "NL",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T08:00:00.000Z",
+            "actual": 145.96,
+            "benchmark_forecast": 144.368382,
+            "forecast": 145.4186253933,
+            "q10": 130.3416829495,
+            "q90": 161.9350285916,
+            "zone": "NL",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T09:00:00.000Z",
+            "actual": 92.995,
+            "benchmark_forecast": 103.450038,
+            "forecast": 104.5565880725,
+            "q10": 83.1586312243,
+            "q90": 123.4776238391,
+            "zone": "NL",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T10:00:00.000Z",
+            "actual": 52.75,
+            "benchmark_forecast": 43.902074,
+            "forecast": 66.601366799,
+            "q10": 39.7260997702,
+            "q90": 91.1525218893,
+            "zone": "NL",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T11:00:00.000Z",
+            "actual": 35.19,
+            "benchmark_forecast": -0.05,
+            "forecast": 57.1146149237,
+            "q10": 32.8870377142,
+            "q90": 83.4232391912,
+            "zone": "NL",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T12:00:00.000Z",
+            "actual": 53.5675,
+            "benchmark_forecast": 52.277495,
+            "forecast": 70.5652292023,
+            "q10": 46.2689721832,
+            "q90": 94.8138864288,
+            "zone": "NL",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T13:00:00.000Z",
+            "actual": 102.2325,
+            "benchmark_forecast": 104.894767,
+            "forecast": 114.9033604034,
+            "q10": 90.8696766265,
+            "q90": 135.1946277984,
+            "zone": "NL",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T14:00:00.000Z",
+            "actual": 152.7925,
+            "benchmark_forecast": 142.892577,
+            "forecast": 150.8354470771,
+            "q10": 127.7456643623,
+            "q90": 176.4000375313,
+            "zone": "NL",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T15:00:00.000Z",
+            "actual": 207.9525,
+            "benchmark_forecast": 206.611217,
+            "forecast": 211.5375196912,
+            "q10": 190.1214735486,
+            "q90": 240.6742994764,
+            "zone": "NL",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T16:00:00.000Z",
+            "actual": 226.9775,
+            "benchmark_forecast": 229.489593,
+            "forecast": 268.5527314703,
+            "q10": 239.2309541265,
+            "q90": 309.337399439,
+            "zone": "NL",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T17:00:00.000Z",
+            "actual": 266.4125,
+            "benchmark_forecast": 304.797004,
+            "forecast": 332.9548126814,
+            "q10": 299.0847565291,
+            "q90": 407.5348602889,
+            "zone": "NL",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T18:00:00.000Z",
+            "actual": 248.485,
+            "benchmark_forecast": 252.847964,
+            "forecast": 297.1748552829,
+            "q10": 266.1076250583,
+            "q90": 360.0434160739,
+            "zone": "NL",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T19:00:00.000Z",
+            "actual": 222.3225,
+            "benchmark_forecast": 232.721099,
+            "forecast": 244.9598502294,
+            "q10": 222.0615195409,
+            "q90": 275.0711173192,
+            "zone": "NL",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T20:00:00.000Z",
+            "actual": 200.0775,
+            "benchmark_forecast": 216.412322,
+            "forecast": 215.7926962236,
+            "q10": 199.5354482987,
+            "q90": 236.5843374589,
+            "zone": "NL",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          },
+          {
+            "timestamp_utc": "2026-09-15T21:00:00.000Z",
+            "actual": 183.035,
+            "benchmark_forecast": 198.937089,
+            "forecast": 195.4876701764,
+            "q10": 180.4096062115,
+            "q90": 212.3981316022,
+            "zone": "NL",
+            "model": "nuclear_kalman",
+            "duration_hours": 1.0,
+            "forecast_origin_utc": "2026-09-14T06:00:00.000Z",
+            "forecast_eligible": true,
+            "forecast_pit_certified": false,
+            "benchmark_pit_certified": false,
+            "sample": "live"
+          }
+        ]
+      },
+      "sources": {
+        "fr_residual_load": {
+          "path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\nuclear_forecast\\residual_load_market_features.parquet",
+          "sha256": "5ec89a2848719851d34fa111c7286866328819cb662c0ca1270aafa7128ab8a8",
+          "modified_at_utc": "2026-09-14T06:50:15.381809711+00:00",
+          "key": "fr_residual_load",
+          "status": "loaded",
+          "audit": {
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\nuclear_forecast\\residual_load_market_features.parquet.audit.json",
+            "sha256": "f17453385f25c06f46901ffc9f2dfb1ba15b12b75382f845727a80780c348763",
+            "modified_at_utc": "2026-09-14T06:50:15.400334358+00:00"
+          },
+          "series": "power.fr.residual.load.hourly.gw.fcst",
+          "unit": "GW",
+          "information_type": "day_ahead_forecast",
+          "finite_hours": 8784,
+          "missing_hours": 0,
+          "first_selected_utc": "2025-09-14 22:00:00+00:00",
+          "last_selected_utc": "2026-09-15 21:00:00+00:00",
+          "late_rows_excluded": 0,
+          "eligible_multivintage_hours": 0,
+          "selected_origin_digest": "11169b27aaba9aa823114e7f3644375b28692e8398bc7c432d4eae863a4d3030",
+          "selection": "latest snapshot then revision <= delivery D-1 08:00 civil",
+          "provider_revision_timestamp_available": false,
+          "revision_time_semantics": "maximum selected source revision per hour",
+          "approximation": null,
+          "fill_or_interpolation": "none_except_duplicate_missing_autumn_fold_if_source_is_civil_naive_and_the_strictly_audited_nl_spring_04_and_06_linear_repairs; exact physical-hour coverage required",
+          "production_pit_evidence": false
+        },
+        "fr_gas_available": {
+          "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T124822441838Z_9eafc66f\\fr_gas_available_gw.parquet",
+          "sha256": "061f6531e232247f4a39265c977c8ab44e9a006ade00207e2907cb413a098198",
+          "modified_at_utc": "2026-09-14T12:48:22.552682877+00:00",
+          "key": "fr_gas_available",
+          "status": "loaded",
+          "audit": {
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T124822441838Z_9eafc66f\\fr_gas_available_gw.parquet.audit.json",
+            "sha256": "f24fcfdde23f1ee14ec88659fd025ff124d91a9239a5b7fe905e1fb854df7544",
+            "modified_at_utc": "2026-09-14T12:48:33.071887493+00:00"
+          },
+          "series": "power.nrjscan.fr.3mv.availability.pmax.fuel.nat_gas.gw",
+          "unit": "GW",
+          "information_type": "capacity_forecast_proxy",
+          "finite_hours": 8784,
+          "missing_hours": 0,
+          "first_selected_utc": "2025-09-14 22:00:00+00:00",
+          "last_selected_utc": "2026-09-15 21:00:00+00:00",
+          "late_rows_excluded": 0,
+          "eligible_multivintage_hours": 0,
+          "selected_origin_digest": "11169b27aaba9aa823114e7f3644375b28692e8398bc7c432d4eae863a4d3030",
+          "selection": "latest snapshot then revision <= delivery D-1 08:00 civil",
+          "provider_revision_timestamp_available": false,
+          "revision_time_semantics": "query_asof_cutoff; provider insertion timestamp is not returned by Client.get(revision_date=...)",
+          "approximation": "Daily available Pmax broadcast to physical hours, not generation; national coverage unverified",
+          "fill_or_interpolation": "daily_value_broadcast_to_physical_hours",
+          "production_pit_evidence": false
+        },
+        "fr_wind_generation": {
+          "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T124822441838Z_9eafc66f\\fr_wind_generation_fcst.parquet",
+          "sha256": "4a6f16620ea150eaa53ad3e552f0df85bc76ebab8062a530d3964279dce01ef5",
+          "modified_at_utc": "2026-09-14T12:48:22.450349808+00:00",
+          "key": "fr_wind_generation",
+          "status": "loaded",
+          "audit": {
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T124822441838Z_9eafc66f\\fr_wind_generation_fcst.parquet.audit.json",
+            "sha256": "d443f4691cd382c5735645123ff560b45afa41d5ca470b026559ef7361713516",
+            "modified_at_utc": "2026-09-14T12:48:22.672366619+00:00"
+          },
+          "series": "power.fr.generation.wind.hourly.gw.fcst",
+          "unit": "GW",
+          "information_type": "day_ahead_forecast",
+          "finite_hours": 8784,
+          "missing_hours": 0,
+          "first_selected_utc": "2025-09-14 22:00:00+00:00",
+          "last_selected_utc": "2026-09-15 21:00:00+00:00",
+          "late_rows_excluded": 0,
+          "eligible_multivintage_hours": 0,
+          "selected_origin_digest": "11169b27aaba9aa823114e7f3644375b28692e8398bc7c432d4eae863a4d3030",
+          "selection": "latest snapshot then revision <= delivery D-1 08:00 civil",
+          "provider_revision_timestamp_available": false,
+          "revision_time_semantics": "query_asof_cutoff; provider insertion timestamp is not returned by Client.get(revision_date=...)",
+          "approximation": null,
+          "fill_or_interpolation": "none_except_duplicate_missing_autumn_fold_if_source_is_civil_naive",
+          "production_pit_evidence": false
+        },
+        "fr_solar_generation": {
+          "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T124822441838Z_9eafc66f\\fr_solar_generation_fcst.parquet",
+          "sha256": "6e0e8cd42b301202ca9f95a1cfed7c0ace702b9775fb25b6abf9fea5a47646c7",
+          "modified_at_utc": "2026-09-14T12:48:22.462361813+00:00",
+          "key": "fr_solar_generation",
+          "status": "loaded",
+          "audit": {
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T124822441838Z_9eafc66f\\fr_solar_generation_fcst.parquet.audit.json",
+            "sha256": "eefecee19bef5afaf4e0007fd7faddc3aec47d498c76ea7a15123fc598309725",
+            "modified_at_utc": "2026-09-14T12:48:22.673365593+00:00"
+          },
+          "series": "power.fr.generation.solar.hourly.gw.fcst",
+          "unit": "GW",
+          "information_type": "day_ahead_forecast",
+          "finite_hours": 8784,
+          "missing_hours": 0,
+          "first_selected_utc": "2025-09-14 22:00:00+00:00",
+          "last_selected_utc": "2026-09-15 21:00:00+00:00",
+          "late_rows_excluded": 0,
+          "eligible_multivintage_hours": 0,
+          "selected_origin_digest": "11169b27aaba9aa823114e7f3644375b28692e8398bc7c432d4eae863a4d3030",
+          "selection": "latest snapshot then revision <= delivery D-1 08:00 civil",
+          "provider_revision_timestamp_available": false,
+          "revision_time_semantics": "query_asof_cutoff; provider insertion timestamp is not returned by Client.get(revision_date=...)",
+          "approximation": null,
+          "fill_or_interpolation": "none_except_duplicate_missing_autumn_fold_if_source_is_civil_naive",
+          "production_pit_evidence": false
+        },
+        "fr_temperature": {
+          "path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\kalman_weather\\fr_temperature_fcst.parquet",
+          "sha256": "ec700ccc72e56701223580bcffa41dabb0f9878d5fc0cc5b44ff63d3f32f0685",
+          "modified_at_utc": "2026-09-03T13:18:20.488133907+00:00",
+          "key": "fr_temperature",
+          "status": "loaded",
+          "audit": {
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\kalman_weather\\fr_temperature_fcst.parquet.audit.json",
+            "sha256": "c75fda659c73787358cc780d7069ab5559be79527500c2953aa219abc305e471",
+            "modified_at_utc": "2026-09-03T13:18:20.504132032+00:00"
+          },
+          "series": "meteo.nrjscan.fr.t_2m.index.fcst.d",
+          "unit": "degC",
+          "information_type": "daily_forecast_temperature_index",
+          "finite_hours": 8520,
+          "missing_hours": 264,
+          "first_selected_utc": "2025-09-14 22:00:00+00:00",
+          "last_selected_utc": "2026-09-04 21:00:00+00:00",
+          "late_rows_excluded": 0,
+          "eligible_multivintage_hours": 0,
+          "selected_origin_digest": "a29016a368fee0101ed00d8567b796dc2d40f8c3d2cd44bcd14aad319ec7aa74",
+          "selection": "latest snapshot then revision <= delivery D-1 08:00 civil",
+          "provider_revision_timestamp_available": false,
+          "revision_time_semantics": "query_asof_cutoff; provider insertion timestamp is not returned by Client.get(revision_date=...)",
+          "approximation": null,
+          "fill_or_interpolation": "daily_value_broadcast_to_physical_hours",
+          "production_pit_evidence": false
+        },
+        "de_residual_load": {
+          "path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\nuclear_forecast\\residual_load_market_features.parquet",
+          "sha256": "5ec89a2848719851d34fa111c7286866328819cb662c0ca1270aafa7128ab8a8",
+          "modified_at_utc": "2026-09-14T06:50:15.381809711+00:00",
+          "key": "de_residual_load",
+          "status": "loaded",
+          "audit": {
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\nuclear_forecast\\residual_load_market_features.parquet.audit.json",
+            "sha256": "f17453385f25c06f46901ffc9f2dfb1ba15b12b75382f845727a80780c348763",
+            "modified_at_utc": "2026-09-14T06:50:15.400334358+00:00"
+          },
+          "series": "power.de.residual.load.hourly.gw.fcst",
+          "unit": "GW",
+          "information_type": "day_ahead_forecast",
+          "finite_hours": 8784,
+          "missing_hours": 0,
+          "first_selected_utc": "2025-09-14 22:00:00+00:00",
+          "last_selected_utc": "2026-09-15 21:00:00+00:00",
+          "late_rows_excluded": 0,
+          "eligible_multivintage_hours": 0,
+          "selected_origin_digest": "11169b27aaba9aa823114e7f3644375b28692e8398bc7c432d4eae863a4d3030",
+          "selection": "latest snapshot then revision <= delivery D-1 08:00 civil",
+          "provider_revision_timestamp_available": false,
+          "revision_time_semantics": "maximum selected source revision per hour",
+          "approximation": null,
+          "fill_or_interpolation": "none_except_duplicate_missing_autumn_fold_if_source_is_civil_naive_and_the_strictly_audited_nl_spring_04_and_06_linear_repairs; exact physical-hour coverage required",
+          "production_pit_evidence": false
+        },
+        "de_gas_available": {
+          "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T124822441838Z_9eafc66f\\de_gas_available_gw.parquet",
+          "sha256": "78f7bb7874a73442b7b5cbf21c439bbeb0900e305ae01d24b4cbfe626323cb7c",
+          "modified_at_utc": "2026-09-14T12:48:22.563678265+00:00",
+          "key": "de_gas_available",
+          "status": "loaded",
+          "audit": {
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T124822441838Z_9eafc66f\\de_gas_available_gw.parquet.audit.json",
+            "sha256": "0abf9271dd91f9cb7e8e31a96a4a572c774e92f3b24c2af8e4643aec51506a21",
+            "modified_at_utc": "2026-09-14T12:48:33.900281906+00:00"
+          },
+          "series": "power.nrjscan.de.3mv.availability.pmax.fuel.nat_gas.gw",
+          "unit": "GW",
+          "information_type": "capacity_forecast_proxy",
+          "finite_hours": 8784,
+          "missing_hours": 0,
+          "first_selected_utc": "2025-09-14 22:00:00+00:00",
+          "last_selected_utc": "2026-09-15 21:00:00+00:00",
+          "late_rows_excluded": 0,
+          "eligible_multivintage_hours": 0,
+          "selected_origin_digest": "11169b27aaba9aa823114e7f3644375b28692e8398bc7c432d4eae863a4d3030",
+          "selection": "latest snapshot then revision <= delivery D-1 08:00 civil",
+          "provider_revision_timestamp_available": false,
+          "revision_time_semantics": "query_asof_cutoff; provider insertion timestamp is not returned by Client.get(revision_date=...)",
+          "approximation": "Daily available Pmax broadcast to physical hours, not generation; national coverage unverified",
+          "fill_or_interpolation": "daily_value_broadcast_to_physical_hours",
+          "production_pit_evidence": false
+        },
+        "de_wind_generation": {
+          "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T124822441838Z_9eafc66f\\de_wind_generation_fcst.parquet",
+          "sha256": "67d795736cccc9e0723f3ae147381d5de2346f82ba90e3375eeecd3de9ba8c72",
+          "modified_at_utc": "2026-09-14T12:48:22.474361420+00:00",
+          "key": "de_wind_generation",
+          "status": "loaded",
+          "audit": {
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T124822441838Z_9eafc66f\\de_wind_generation_fcst.parquet.audit.json",
+            "sha256": "030e90ca4d11b5c565faa0f26313d8da210a2af4707f0c216ef4fdb94dc3e47b",
+            "modified_at_utc": "2026-09-14T12:48:25.002613306+00:00"
+          },
+          "series": "power.de.generation.wind.hourly.gw.fcst",
+          "unit": "GW",
+          "information_type": "day_ahead_forecast",
+          "finite_hours": 8784,
+          "missing_hours": 0,
+          "first_selected_utc": "2025-09-14 22:00:00+00:00",
+          "last_selected_utc": "2026-09-15 21:00:00+00:00",
+          "late_rows_excluded": 0,
+          "eligible_multivintage_hours": 0,
+          "selected_origin_digest": "11169b27aaba9aa823114e7f3644375b28692e8398bc7c432d4eae863a4d3030",
+          "selection": "latest snapshot then revision <= delivery D-1 08:00 civil",
+          "provider_revision_timestamp_available": false,
+          "revision_time_semantics": "query_asof_cutoff; provider insertion timestamp is not returned by Client.get(revision_date=...)",
+          "approximation": null,
+          "fill_or_interpolation": "none_except_duplicate_missing_autumn_fold_if_source_is_civil_naive",
+          "production_pit_evidence": false
+        },
+        "de_solar_generation": {
+          "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T124822441838Z_9eafc66f\\de_solar_generation_fcst.parquet",
+          "sha256": "5154268c2580c5e78cf1d2a0999849ec317fab34c8194497433c8c1d84834700",
+          "modified_at_utc": "2026-09-14T12:48:22.484877110+00:00",
+          "key": "de_solar_generation",
+          "status": "loaded",
+          "audit": {
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T124822441838Z_9eafc66f\\de_solar_generation_fcst.parquet.audit.json",
+            "sha256": "2094843aaaab5aa0cf3afd3a81ab1c009aa766c187441c022471481644c8ddb7",
+            "modified_at_utc": "2026-09-14T12:48:25.276374817+00:00"
+          },
+          "series": "power.de.generation.solar.hourly.gw.fcst",
+          "unit": "GW",
+          "information_type": "day_ahead_forecast",
+          "finite_hours": 8784,
+          "missing_hours": 0,
+          "first_selected_utc": "2025-09-14 22:00:00+00:00",
+          "last_selected_utc": "2026-09-15 21:00:00+00:00",
+          "late_rows_excluded": 0,
+          "eligible_multivintage_hours": 0,
+          "selected_origin_digest": "11169b27aaba9aa823114e7f3644375b28692e8398bc7c432d4eae863a4d3030",
+          "selection": "latest snapshot then revision <= delivery D-1 08:00 civil",
+          "provider_revision_timestamp_available": false,
+          "revision_time_semantics": "query_asof_cutoff; provider insertion timestamp is not returned by Client.get(revision_date=...)",
+          "approximation": null,
+          "fill_or_interpolation": "none_except_duplicate_missing_autumn_fold_if_source_is_civil_naive",
+          "production_pit_evidence": false
+        },
+        "de_temperature": {
+          "path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\kalman_weather\\de_temperature_fcst.parquet",
+          "sha256": "ce40398af229c66ae0c472fb8ebb3b9771b7fa2eef291f4ace0ff4c8536328b5",
+          "modified_at_utc": "2026-09-03T13:18:39.959662199+00:00",
+          "key": "de_temperature",
+          "status": "loaded",
+          "audit": {
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\kalman_weather\\de_temperature_fcst.parquet.audit.json",
+            "sha256": "3252d55495941222f4fa8a9cd3225e149a941e1941dbb32c3f1a24e93b0f94c8",
+            "modified_at_utc": "2026-09-03T13:18:39.976663828+00:00"
+          },
+          "series": "meteo.nrjscan.de.t_2m.index.fcst.d",
+          "unit": "degC",
+          "information_type": "daily_forecast_temperature_index",
+          "finite_hours": 8520,
+          "missing_hours": 264,
+          "first_selected_utc": "2025-09-14 22:00:00+00:00",
+          "last_selected_utc": "2026-09-04 21:00:00+00:00",
+          "late_rows_excluded": 0,
+          "eligible_multivintage_hours": 0,
+          "selected_origin_digest": "a29016a368fee0101ed00d8567b796dc2d40f8c3d2cd44bcd14aad319ec7aa74",
+          "selection": "latest snapshot then revision <= delivery D-1 08:00 civil",
+          "provider_revision_timestamp_available": false,
+          "revision_time_semantics": "query_asof_cutoff; provider insertion timestamp is not returned by Client.get(revision_date=...)",
+          "approximation": null,
+          "fill_or_interpolation": "daily_value_broadcast_to_physical_hours",
+          "production_pit_evidence": false
+        },
+        "be_residual_load": {
+          "path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\nuclear_forecast\\residual_load_market_features.parquet",
+          "sha256": "5ec89a2848719851d34fa111c7286866328819cb662c0ca1270aafa7128ab8a8",
+          "modified_at_utc": "2026-09-14T06:50:15.381809711+00:00",
+          "key": "be_residual_load",
+          "status": "loaded",
+          "audit": {
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\nuclear_forecast\\residual_load_market_features.parquet.audit.json",
+            "sha256": "f17453385f25c06f46901ffc9f2dfb1ba15b12b75382f845727a80780c348763",
+            "modified_at_utc": "2026-09-14T06:50:15.400334358+00:00"
+          },
+          "series": "power.be.residual.load.hourly.gw.fcst",
+          "unit": "GW",
+          "information_type": "day_ahead_forecast",
+          "finite_hours": 8784,
+          "missing_hours": 0,
+          "first_selected_utc": "2025-09-14 22:00:00+00:00",
+          "last_selected_utc": "2026-09-15 21:00:00+00:00",
+          "late_rows_excluded": 0,
+          "eligible_multivintage_hours": 0,
+          "selected_origin_digest": "11169b27aaba9aa823114e7f3644375b28692e8398bc7c432d4eae863a4d3030",
+          "selection": "latest snapshot then revision <= delivery D-1 08:00 civil",
+          "provider_revision_timestamp_available": false,
+          "revision_time_semantics": "maximum selected source revision per hour",
+          "approximation": null,
+          "fill_or_interpolation": "none_except_duplicate_missing_autumn_fold_if_source_is_civil_naive_and_the_strictly_audited_nl_spring_04_and_06_linear_repairs; exact physical-hour coverage required",
+          "production_pit_evidence": false
+        },
+        "be_gas_available": {
+          "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T124822441838Z_9eafc66f\\be_gas_available_gw.parquet",
+          "sha256": "83672276123968e87ac76f2295007f235d79c793b06634377348a863c9ef93e5",
+          "modified_at_utc": "2026-09-14T12:48:22.575675726+00:00",
+          "key": "be_gas_available",
+          "status": "loaded",
+          "audit": {
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T124822441838Z_9eafc66f\\be_gas_available_gw.parquet.audit.json",
+            "sha256": "1d3df30a74aa654fa714c1563b50c56825fbc58449cf03091ee9bf1090f84c49",
+            "modified_at_utc": "2026-09-14T12:48:35.573985100+00:00"
+          },
+          "series": "power.nrjscan.be.3mv.availability.pmax.fuel.nat_gas.gw",
+          "unit": "GW",
+          "information_type": "capacity_forecast_proxy",
+          "finite_hours": 8784,
+          "missing_hours": 0,
+          "first_selected_utc": "2025-09-14 22:00:00+00:00",
+          "last_selected_utc": "2026-09-15 21:00:00+00:00",
+          "late_rows_excluded": 0,
+          "eligible_multivintage_hours": 0,
+          "selected_origin_digest": "11169b27aaba9aa823114e7f3644375b28692e8398bc7c432d4eae863a4d3030",
+          "selection": "latest snapshot then revision <= delivery D-1 08:00 civil",
+          "provider_revision_timestamp_available": false,
+          "revision_time_semantics": "query_asof_cutoff; provider insertion timestamp is not returned by Client.get(revision_date=...)",
+          "approximation": "Daily available Pmax broadcast to physical hours, not generation; national coverage unverified",
+          "fill_or_interpolation": "daily_value_broadcast_to_physical_hours",
+          "production_pit_evidence": false
+        },
+        "be_wind_generation": {
+          "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T124822441838Z_9eafc66f\\be_wind_generation_fcst.parquet",
+          "sha256": "8b4cce02eae5bd7188b78af8ce6cc916c0167fedefcfaa90e93601f85ff0ce28",
+          "modified_at_utc": "2026-09-14T12:48:22.495125771+00:00",
+          "key": "be_wind_generation",
+          "status": "loaded",
+          "audit": {
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T124822441838Z_9eafc66f\\be_wind_generation_fcst.parquet.audit.json",
+            "sha256": "bd35d54d9549fe08395b8c216cc0659d8f416fda86da9de12390fcd8589fc798",
+            "modified_at_utc": "2026-09-14T12:48:27.477991104+00:00"
+          },
+          "series": "power.be.generation.wind.hourly.gw.fcst",
+          "unit": "GW",
+          "information_type": "day_ahead_forecast",
+          "finite_hours": 8784,
+          "missing_hours": 0,
+          "first_selected_utc": "2025-09-14 22:00:00+00:00",
+          "last_selected_utc": "2026-09-15 21:00:00+00:00",
+          "late_rows_excluded": 0,
+          "eligible_multivintage_hours": 0,
+          "selected_origin_digest": "11169b27aaba9aa823114e7f3644375b28692e8398bc7c432d4eae863a4d3030",
+          "selection": "latest snapshot then revision <= delivery D-1 08:00 civil",
+          "provider_revision_timestamp_available": false,
+          "revision_time_semantics": "query_asof_cutoff; provider insertion timestamp is not returned by Client.get(revision_date=...)",
+          "approximation": null,
+          "fill_or_interpolation": "none_except_duplicate_missing_autumn_fold_if_source_is_civil_naive",
+          "production_pit_evidence": false
+        },
+        "be_solar_generation": {
+          "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T124822441838Z_9eafc66f\\be_solar_generation_fcst.parquet",
+          "sha256": "32c66ae3d781cc216907d8fe4d475afb09e2e3539620a5956d98cbbe55811c78",
+          "modified_at_utc": "2026-09-14T12:48:22.507137060+00:00",
+          "key": "be_solar_generation",
+          "status": "loaded",
+          "audit": {
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T124822441838Z_9eafc66f\\be_solar_generation_fcst.parquet.audit.json",
+            "sha256": "fda5120e9bf4dbe41d0ca72cf1d7a72e5d58687ae823a2b8f613696b543f314e",
+            "modified_at_utc": "2026-09-14T12:48:28.099796772+00:00"
+          },
+          "series": "power.be.generation.solar.hourly.gw.fcst",
+          "unit": "GW",
+          "information_type": "day_ahead_forecast",
+          "finite_hours": 8784,
+          "missing_hours": 0,
+          "first_selected_utc": "2025-09-14 22:00:00+00:00",
+          "last_selected_utc": "2026-09-15 21:00:00+00:00",
+          "late_rows_excluded": 0,
+          "eligible_multivintage_hours": 0,
+          "selected_origin_digest": "11169b27aaba9aa823114e7f3644375b28692e8398bc7c432d4eae863a4d3030",
+          "selection": "latest snapshot then revision <= delivery D-1 08:00 civil",
+          "provider_revision_timestamp_available": false,
+          "revision_time_semantics": "query_asof_cutoff; provider insertion timestamp is not returned by Client.get(revision_date=...)",
+          "approximation": null,
+          "fill_or_interpolation": "none_except_duplicate_missing_autumn_fold_if_source_is_civil_naive",
+          "production_pit_evidence": false
+        },
+        "be_temperature": {
+          "path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\kalman_weather\\be_temperature_fcst.parquet",
+          "sha256": "f3a62f59cf471ce0af91587f02dbe1ab164c91c3edb3c2179b63f3dd6ab6c974",
+          "modified_at_utc": "2026-09-03T13:18:53.683316708+00:00",
+          "key": "be_temperature",
+          "status": "loaded",
+          "audit": {
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\kalman_weather\\be_temperature_fcst.parquet.audit.json",
+            "sha256": "7af02159b2c78c7658dd68dea95110f62bec8e19a367dcdf4c5727d8f21a7b99",
+            "modified_at_utc": "2026-09-03T13:18:53.698336601+00:00"
+          },
+          "series": "meteo.nrjscan.be.t_2m.index.fcst.d",
+          "unit": "degC",
+          "information_type": "daily_forecast_temperature_index",
+          "finite_hours": 8520,
+          "missing_hours": 264,
+          "first_selected_utc": "2025-09-14 22:00:00+00:00",
+          "last_selected_utc": "2026-09-04 21:00:00+00:00",
+          "late_rows_excluded": 0,
+          "eligible_multivintage_hours": 0,
+          "selected_origin_digest": "a29016a368fee0101ed00d8567b796dc2d40f8c3d2cd44bcd14aad319ec7aa74",
+          "selection": "latest snapshot then revision <= delivery D-1 08:00 civil",
+          "provider_revision_timestamp_available": false,
+          "revision_time_semantics": "query_asof_cutoff; provider insertion timestamp is not returned by Client.get(revision_date=...)",
+          "approximation": null,
+          "fill_or_interpolation": "daily_value_broadcast_to_physical_hours",
+          "production_pit_evidence": false
+        },
+        "nl_residual_load": {
+          "path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\nuclear_forecast\\residual_load_market_features.parquet",
+          "sha256": "5ec89a2848719851d34fa111c7286866328819cb662c0ca1270aafa7128ab8a8",
+          "modified_at_utc": "2026-09-14T06:50:15.381809711+00:00",
+          "key": "nl_residual_load",
+          "status": "loaded",
+          "audit": {
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\nuclear_forecast\\residual_load_market_features.parquet.audit.json",
+            "sha256": "f17453385f25c06f46901ffc9f2dfb1ba15b12b75382f845727a80780c348763",
+            "modified_at_utc": "2026-09-14T06:50:15.400334358+00:00"
+          },
+          "series": "power.nl.residual.load.hourly.gw.fcst",
+          "unit": "GW",
+          "information_type": "day_ahead_forecast",
+          "finite_hours": 8784,
+          "missing_hours": 0,
+          "first_selected_utc": "2025-09-14 22:00:00+00:00",
+          "last_selected_utc": "2026-09-15 21:00:00+00:00",
+          "late_rows_excluded": 0,
+          "eligible_multivintage_hours": 0,
+          "selected_origin_digest": "11169b27aaba9aa823114e7f3644375b28692e8398bc7c432d4eae863a4d3030",
+          "selection": "latest snapshot then revision <= delivery D-1 08:00 civil",
+          "provider_revision_timestamp_available": false,
+          "revision_time_semantics": "maximum selected source revision per hour",
+          "approximation": null,
+          "fill_or_interpolation": "none_except_duplicate_missing_autumn_fold_if_source_is_civil_naive_and_the_strictly_audited_nl_spring_04_and_06_linear_repairs; exact physical-hour coverage required",
+          "production_pit_evidence": false
+        },
+        "nl_gas_available": {
+          "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T124822441838Z_9eafc66f\\nl_gas_available_gw.parquet",
+          "sha256": "4645f8ca9e2c8031f823aa848ceaf56132dfc2a7f5f597796735cea00bb69034",
+          "modified_at_utc": "2026-09-14T12:48:22.587045193+00:00",
+          "key": "nl_gas_available",
+          "status": "loaded",
+          "audit": {
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T124822441838Z_9eafc66f\\nl_gas_available_gw.parquet.audit.json",
+            "sha256": "2f02e5881ff1635d3790e80de340cf7d42dff2fe7810279c25a7add570333744",
+            "modified_at_utc": "2026-09-14T12:48:36.361362696+00:00"
+          },
+          "series": "power.nrjscan.nl.3mv.availability.pmax.fuel.nat_gas.gw",
+          "unit": "GW",
+          "information_type": "capacity_forecast_proxy",
+          "finite_hours": 8784,
+          "missing_hours": 0,
+          "first_selected_utc": "2025-09-14 22:00:00+00:00",
+          "last_selected_utc": "2026-09-15 21:00:00+00:00",
+          "late_rows_excluded": 0,
+          "eligible_multivintage_hours": 0,
+          "selected_origin_digest": "11169b27aaba9aa823114e7f3644375b28692e8398bc7c432d4eae863a4d3030",
+          "selection": "latest snapshot then revision <= delivery D-1 08:00 civil",
+          "provider_revision_timestamp_available": false,
+          "revision_time_semantics": "query_asof_cutoff; provider insertion timestamp is not returned by Client.get(revision_date=...)",
+          "approximation": "Daily available Pmax broadcast to physical hours, not generation; national coverage unverified",
+          "fill_or_interpolation": "daily_value_broadcast_to_physical_hours",
+          "production_pit_evidence": false
+        },
+        "nl_wind_generation": {
+          "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T124822441838Z_9eafc66f\\nl_wind_generation_fcst.parquet",
+          "sha256": "9dde1c4dfbac5b8a21c03627d51d2d0719910440294b9ae9da72e028d91dc179",
+          "modified_at_utc": "2026-09-14T12:48:22.519139290+00:00",
+          "key": "nl_wind_generation",
+          "status": "loaded",
+          "audit": {
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T124822441838Z_9eafc66f\\nl_wind_generation_fcst.parquet.audit.json",
+            "sha256": "792aa20f4828cb97583b7e074f2790afcd6c86cb576e2ee20e8da14ad7fd0180",
+            "modified_at_utc": "2026-09-14T12:48:30.480489969+00:00"
+          },
+          "series": "power.nl.prod.total.wind.mw.ecmwf_avg.pointconnect.6h.cache",
+          "unit": "GW",
+          "information_type": "day_ahead_forecast",
+          "finite_hours": 8784,
+          "missing_hours": 0,
+          "first_selected_utc": "2025-09-14 22:00:00+00:00",
+          "last_selected_utc": "2026-09-15 21:00:00+00:00",
+          "late_rows_excluded": 0,
+          "eligible_multivintage_hours": 0,
+          "selected_origin_digest": "11169b27aaba9aa823114e7f3644375b28692e8398bc7c432d4eae863a4d3030",
+          "selection": "latest snapshot then revision <= delivery D-1 08:00 civil",
+          "provider_revision_timestamp_available": false,
+          "revision_time_semantics": "query_asof_cutoff; provider insertion timestamp is not returned by Client.get(revision_date=...)",
+          "approximation": null,
+          "fill_or_interpolation": "none_except_duplicate_missing_autumn_fold_if_source_is_civil_naive",
+          "production_pit_evidence": false
+        },
+        "nl_solar_generation": {
+          "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T124822441838Z_9eafc66f\\nl_solar_generation_fcst.parquet",
+          "sha256": "a15616e6c1bded8c78897fa1ddaaabb3b195715301878a88f5414052f6878757",
+          "modified_at_utc": "2026-09-14T12:48:22.535140752+00:00",
+          "key": "nl_solar_generation",
+          "status": "loaded",
+          "audit": {
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T124822441838Z_9eafc66f\\nl_solar_generation_fcst.parquet.audit.json",
+            "sha256": "bba72811db771b053214c63dc5b873d014fa46bfefd06747522d8e8d77c9d777",
+            "modified_at_utc": "2026-09-14T12:48:31.166803598+00:00"
+          },
+          "series": "power.nl.generation.solar.hourly.gw.fcst",
+          "unit": "GW",
+          "information_type": "day_ahead_forecast",
+          "finite_hours": 8784,
+          "missing_hours": 0,
+          "first_selected_utc": "2025-09-14 22:00:00+00:00",
+          "last_selected_utc": "2026-09-15 21:00:00+00:00",
+          "late_rows_excluded": 0,
+          "eligible_multivintage_hours": 0,
+          "selected_origin_digest": "11169b27aaba9aa823114e7f3644375b28692e8398bc7c432d4eae863a4d3030",
+          "selection": "latest snapshot then revision <= delivery D-1 08:00 civil",
+          "provider_revision_timestamp_available": false,
+          "revision_time_semantics": "query_asof_cutoff; provider insertion timestamp is not returned by Client.get(revision_date=...)",
+          "approximation": null,
+          "fill_or_interpolation": "none_except_verified_zero_duplicate_for_singleton_autumn_fold",
+          "production_pit_evidence": false
+        },
+        "nl_temperature": {
+          "path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\kalman_weather\\nl_temperature_fcst.parquet",
+          "sha256": "7ae4aee610d0390c57815f30462a306404348b06c5d2b113a0b743fcda7f1154",
+          "modified_at_utc": "2026-09-03T13:18:54.873992443+00:00",
+          "key": "nl_temperature",
+          "status": "loaded",
+          "audit": {
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\kalman_weather\\nl_temperature_fcst.parquet.audit.json",
+            "sha256": "7ad66a9672f26845d36d38c21f313df5e50695aa853c5c3cd3442b1cf07c8678",
+            "modified_at_utc": "2026-09-03T13:18:54.884993553+00:00"
+          },
+          "series": "meteo.nrjscan.nl.t_2m.index.fcst.d",
+          "unit": "degC",
+          "information_type": "daily_forecast_temperature_index",
+          "finite_hours": 8520,
+          "missing_hours": 264,
+          "first_selected_utc": "2025-09-14 22:00:00+00:00",
+          "last_selected_utc": "2026-09-04 21:00:00+00:00",
+          "late_rows_excluded": 0,
+          "eligible_multivintage_hours": 0,
+          "selected_origin_digest": "a29016a368fee0101ed00d8567b796dc2d40f8c3d2cd44bcd14aad319ec7aa74",
+          "selection": "latest snapshot then revision <= delivery D-1 08:00 civil",
+          "provider_revision_timestamp_available": false,
+          "revision_time_semantics": "query_asof_cutoff; provider insertion timestamp is not returned by Client.get(revision_date=...)",
+          "approximation": null,
+          "fill_or_interpolation": "daily_value_broadcast_to_physical_hours",
+          "production_pit_evidence": false
+        },
+        "fr_nuclear_generation": {
+          "path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\nuclear_forecast\\fr_nuclear_generation_fcst_gw.parquet",
+          "sha256": "ff511699266666faa836a4cbd1ad8efbb353d48ae911d791c107fdd9c590fdc1",
+          "modified_at_utc": "2026-09-14T06:48:47.661268950+00:00",
+          "key": "fr_nuclear_generation",
+          "status": "loaded",
+          "audit": {
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\data\\pit\\nuclear_forecast\\fr_nuclear_generation_fcst_gw.parquet.audit.json",
+            "sha256": "279dda61b3feedb8bfd8dee5da0e6e0d6e4d350d65d50d76f597278ef6ddd498",
+            "modified_at_utc": "2026-09-14T06:48:47.680599451+00:00"
+          },
+          "series": "power.fr.generation.nuclear.gw.fcst",
+          "unit": "GW",
+          "information_type": "day_ahead_forecast",
+          "finite_hours": 8784,
+          "missing_hours": 0,
+          "first_selected_utc": "2025-09-14 22:00:00+00:00",
+          "last_selected_utc": "2026-09-15 21:00:00+00:00",
+          "late_rows_excluded": 0,
+          "eligible_multivintage_hours": 0,
+          "selected_origin_digest": "11169b27aaba9aa823114e7f3644375b28692e8398bc7c432d4eae863a4d3030",
+          "selection": "latest snapshot then revision <= delivery D-1 08:00 civil",
+          "provider_revision_timestamp_available": false,
+          "revision_time_semantics": "query_asof_cutoff; provider insertion timestamp is not returned by Client.get(revision_date=...)",
+          "approximation": null,
+          "fill_or_interpolation": "none_except_duplicate_missing_autumn_fold_if_source_is_civil_naive",
+          "production_pit_evidence": false
+        },
+        "de_coal_available": {
+          "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T124822441838Z_9eafc66f\\de_coal_available_gw.parquet",
+          "sha256": "26fe4ff788b418c63df7ca77b06188accad30da547d1c19ae4bd13d4d34ed403",
+          "modified_at_utc": "2026-09-14T12:48:22.598564148+00:00",
+          "key": "de_coal_available",
+          "status": "loaded",
+          "audit": {
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T124822441838Z_9eafc66f\\de_coal_available_gw.parquet.audit.json",
+            "sha256": "123b418dfe8f5a0ca4fdce094b28e0addb35b614d24c03d8cdc5f2acee04c477",
+            "modified_at_utc": "2026-09-14T12:48:38.023720503+00:00"
+          },
+          "series": "power.nrjscan.de.3mv.availability.pmax.fuel.coal.gw",
+          "unit": "GW",
+          "information_type": "capacity_forecast_proxy",
+          "finite_hours": 8784,
+          "missing_hours": 0,
+          "first_selected_utc": "2025-09-14 22:00:00+00:00",
+          "last_selected_utc": "2026-09-15 21:00:00+00:00",
+          "late_rows_excluded": 0,
+          "eligible_multivintage_hours": 0,
+          "selected_origin_digest": "11169b27aaba9aa823114e7f3644375b28692e8398bc7c432d4eae863a4d3030",
+          "selection": "latest snapshot then revision <= delivery D-1 08:00 civil",
+          "provider_revision_timestamp_available": false,
+          "revision_time_semantics": "query_asof_cutoff; provider insertion timestamp is not returned by Client.get(revision_date=...)",
+          "approximation": "Daily available Pmax broadcast to physical hours, not generation; national coverage unverified",
+          "fill_or_interpolation": "daily_value_broadcast_to_physical_hours",
+          "production_pit_evidence": false
+        },
+        "de_lignite_available": {
+          "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T124822441838Z_9eafc66f\\de_lignite_available_gw.parquet",
+          "sha256": "81f2e3b6eb5873e9a052e9bf45ff45f05c62d10ba32fc219fc053d55d17bee45",
+          "modified_at_utc": "2026-09-14T12:48:22.609568119+00:00",
+          "key": "de_lignite_available",
+          "status": "loaded",
+          "audit": {
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T124822441838Z_9eafc66f\\de_lignite_available_gw.parquet.audit.json",
+            "sha256": "2860767fc60645861e61c99dd6070c0a115ad59bdb3df073986e9040a64cc131",
+            "modified_at_utc": "2026-09-14T12:48:38.884321690+00:00"
+          },
+          "series": "power.nrjscan.de.3mv.availability.pmax.fuel.lignite.gw",
+          "unit": "GW",
+          "information_type": "capacity_forecast_proxy",
+          "finite_hours": 8784,
+          "missing_hours": 0,
+          "first_selected_utc": "2025-09-14 22:00:00+00:00",
+          "last_selected_utc": "2026-09-15 21:00:00+00:00",
+          "late_rows_excluded": 0,
+          "eligible_multivintage_hours": 0,
+          "selected_origin_digest": "11169b27aaba9aa823114e7f3644375b28692e8398bc7c432d4eae863a4d3030",
+          "selection": "latest snapshot then revision <= delivery D-1 08:00 civil",
+          "provider_revision_timestamp_available": false,
+          "revision_time_semantics": "query_asof_cutoff; provider insertion timestamp is not returned by Client.get(revision_date=...)",
+          "approximation": "Daily available Pmax broadcast to physical hours, not generation; national coverage unverified",
+          "fill_or_interpolation": "daily_value_broadcast_to_physical_hours",
+          "production_pit_evidence": false
+        },
+        "nl_coal_available": {
+          "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T124822441838Z_9eafc66f\\nl_coal_available_gw.parquet",
+          "sha256": "a9c222481e6876909444c5eaa678da9912ab86475b3283b54b091a7da5286918",
+          "modified_at_utc": "2026-09-14T12:48:22.621824503+00:00",
+          "key": "nl_coal_available",
+          "status": "loaded",
+          "audit": {
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T124822441838Z_9eafc66f\\nl_coal_available_gw.parquet.audit.json",
+            "sha256": "c4e2afce24d8dd43cbcb145a452367811c260468ad9b197c6f6fbd00050c81e4",
+            "modified_at_utc": "2026-09-14T12:48:40.577111483+00:00"
+          },
+          "series": "power.nrjscan.nl.3mv.availability.pmax.fuel.coal.gw",
+          "unit": "GW",
+          "information_type": "capacity_forecast_proxy",
+          "finite_hours": 8784,
+          "missing_hours": 0,
+          "first_selected_utc": "2025-09-14 22:00:00+00:00",
+          "last_selected_utc": "2026-09-15 21:00:00+00:00",
+          "late_rows_excluded": 0,
+          "eligible_multivintage_hours": 0,
+          "selected_origin_digest": "11169b27aaba9aa823114e7f3644375b28692e8398bc7c432d4eae863a4d3030",
+          "selection": "latest snapshot then revision <= delivery D-1 08:00 civil",
+          "provider_revision_timestamp_available": false,
+          "revision_time_semantics": "query_asof_cutoff; provider insertion timestamp is not returned by Client.get(revision_date=...)",
+          "approximation": "Daily available Pmax broadcast to physical hours, not generation; national coverage unverified",
+          "fill_or_interpolation": "daily_value_broadcast_to_physical_hours",
+          "production_pit_evidence": false
+        },
+        "be_nuclear_available": {
+          "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T124822441838Z_9eafc66f\\be_nuclear_available_gw.parquet",
+          "sha256": "298a491365542f12794b51d7a9d9d7cbdd99983b813131fa16e77a3be7de0201",
+          "modified_at_utc": "2026-09-14T12:48:22.634823322+00:00",
+          "key": "be_nuclear_available",
+          "status": "loaded",
+          "audit": {
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T124822441838Z_9eafc66f\\be_nuclear_available_gw.parquet.audit.json",
+            "sha256": "544c3643fbd9d6983bfb023ddb248ff9eec278ec1bd00af66aec107628b00422",
+            "modified_at_utc": "2026-09-14T12:48:41.221956015+00:00"
+          },
+          "series": "power.nrjscan.be.3mv.availability.pmax.type.nuclear.gw",
+          "unit": "GW",
+          "information_type": "capacity_forecast_proxy",
+          "finite_hours": 8784,
+          "missing_hours": 0,
+          "first_selected_utc": "2025-09-14 22:00:00+00:00",
+          "last_selected_utc": "2026-09-15 21:00:00+00:00",
+          "late_rows_excluded": 0,
+          "eligible_multivintage_hours": 0,
+          "selected_origin_digest": "11169b27aaba9aa823114e7f3644375b28692e8398bc7c432d4eae863a4d3030",
+          "selection": "latest snapshot then revision <= delivery D-1 08:00 civil",
+          "provider_revision_timestamp_available": false,
+          "revision_time_semantics": "query_asof_cutoff; provider insertion timestamp is not returned by Client.get(revision_date=...)",
+          "approximation": "Daily available Pmax broadcast to physical hours, not generation; national coverage unverified",
+          "fill_or_interpolation": "daily_value_broadcast_to_physical_hours",
+          "production_pit_evidence": false
+        },
+        "nl_nuclear_available": {
+          "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T124822441838Z_9eafc66f\\nl_nuclear_available_gw.parquet",
+          "sha256": "2e8d594ae9c3abbbc97bcd6fbce775b77789d42f7ad64cbf5acb8b7e62cef6a0",
+          "modified_at_utc": "2026-09-14T12:48:22.647834301+00:00",
+          "key": "nl_nuclear_available",
+          "status": "loaded",
+          "audit": {
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T124822441838Z_9eafc66f\\nl_nuclear_available_gw.parquet.audit.json",
+            "sha256": "fd06c6c16756267cff770af64d91a2aad90a62e7902c7442b8169f38efac97a6",
+            "modified_at_utc": "2026-09-14T12:48:42.965709686+00:00"
+          },
+          "series": "power.nrjscan.nl.3mv.availability.pmax.type.nuclear.gw",
+          "unit": "GW",
+          "information_type": "capacity_forecast_proxy",
+          "finite_hours": 8784,
+          "missing_hours": 0,
+          "first_selected_utc": "2025-09-14 22:00:00+00:00",
+          "last_selected_utc": "2026-09-15 21:00:00+00:00",
+          "late_rows_excluded": 0,
+          "eligible_multivintage_hours": 0,
+          "selected_origin_digest": "11169b27aaba9aa823114e7f3644375b28692e8398bc7c432d4eae863a4d3030",
+          "selection": "latest snapshot then revision <= delivery D-1 08:00 civil",
+          "provider_revision_timestamp_available": false,
+          "revision_time_semantics": "query_asof_cutoff; provider insertion timestamp is not returned by Client.get(revision_date=...)",
+          "approximation": "Daily available Pmax broadcast to physical hours, not generation; national coverage unverified",
+          "fill_or_interpolation": "daily_value_broadcast_to_physical_hours",
+          "production_pit_evidence": false
+        },
+        "ttf": {
+          "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T124848569948Z_91655101\\fuel\\market_fuel_features.parquet",
+          "sha256": "bad2bc5852ed3f0dae03bf88d34580e818bf4d6086cdfd9047d6aa93b9527705",
+          "modified_at_utc": "2026-09-14T12:49:29.571012735+00:00",
+          "key": "ttf",
+          "status": "loaded",
+          "audit": {
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T124848569948Z_91655101\\fuel\\market_fuel_features.parquet.audit.json",
+            "sha256": "c47c033d739ef09aa2e907d006daebdaf1e9064b70a7e69e1bde7314b7d11940",
+            "modified_at_utc": "2026-09-14T12:49:29.593012571+00:00"
+          },
+          "series": "gas.ttf.price.everyday.month.1.ice.eurmwh",
+          "unit": "EUR/MWh_th",
+          "information_type": "market_observation_known_before_cutoff",
+          "finite_hours": 8784,
+          "missing_hours": 0,
+          "first_selected_utc": "2025-09-14 22:00:00+00:00",
+          "last_selected_utc": "2026-09-15 21:00:00+00:00",
+          "late_rows_excluded": 0,
+          "eligible_multivintage_hours": 0,
+          "selected_origin_digest": "11169b27aaba9aa823114e7f3644375b28692e8398bc7c432d4eae863a4d3030",
+          "selection": "latest snapshot then revision <= delivery D-1 08:00 civil",
+          "provider_revision_timestamp_available": false,
+          "revision_time_semantics": "query_asof_cutoff; provider insertion timestamp unavailable",
+          "approximation": null,
+          "fill_or_interpolation": "no interpolation; one independently selected last-known value per delivery day, then deterministic broadcast to physical hours",
+          "production_pit_evidence": false
+        },
+        "eua": {
+          "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T124848569948Z_91655101\\fuel\\market_fuel_features.parquet",
+          "sha256": "bad2bc5852ed3f0dae03bf88d34580e818bf4d6086cdfd9047d6aa93b9527705",
+          "modified_at_utc": "2026-09-14T12:49:29.571012735+00:00",
+          "key": "eua",
+          "status": "loaded",
+          "audit": {
+            "path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\source_refresh\\20260914T124848569948Z_91655101\\fuel\\market_fuel_features.parquet.audit.json",
+            "sha256": "c47c033d739ef09aa2e907d006daebdaf1e9064b70a7e69e1bde7314b7d11940",
+            "modified_at_utc": "2026-09-14T12:49:29.593012571+00:00"
+          },
+          "series": "carbon.eu.price.everyday.eua.ice.1st.dec",
+          "unit": "EUR/tCO2",
+          "information_type": "market_observation_known_before_cutoff",
+          "finite_hours": 8784,
+          "missing_hours": 0,
+          "first_selected_utc": "2025-09-14 22:00:00+00:00",
+          "last_selected_utc": "2026-09-15 21:00:00+00:00",
+          "late_rows_excluded": 0,
+          "eligible_multivintage_hours": 0,
+          "selected_origin_digest": "11169b27aaba9aa823114e7f3644375b28692e8398bc7c432d4eae863a4d3030",
+          "selection": "latest snapshot then revision <= delivery D-1 08:00 civil",
+          "provider_revision_timestamp_available": false,
+          "revision_time_semantics": "query_asof_cutoff; provider insertion timestamp unavailable",
+          "approximation": null,
+          "fill_or_interpolation": "no interpolation; one independently selected last-known value per delivery day, then deterministic broadcast to physical hours",
+          "production_pit_evidence": false
+        }
+      },
+      "delivery_day": "2026-09-15",
+      "evaluation_start_day": "2025-09-15",
+      "evaluation_end_day": "2026-09-14",
+      "evaluation_days": 365,
+      "zones": [
+        "FR",
+        "DE",
+        "BE",
+        "NL"
+      ],
+      "rows": 35136,
+      "feature_columns": [
+        "feature_fr_residual_load_gw",
+        "feature_fr_residual_load_gw_revision_delta",
+        "feature_fr_residual_load_gw_vintage_range_proxy",
+        "feature_fr_gas_available_gw",
+        "feature_fr_gas_available_gw_revision_delta",
+        "feature_fr_gas_available_gw_vintage_range_proxy",
+        "feature_fr_wind_generation_gw",
+        "feature_fr_wind_generation_gw_revision_delta",
+        "feature_fr_wind_generation_gw_vintage_range_proxy",
+        "feature_fr_solar_generation_gw",
+        "feature_fr_solar_generation_gw_revision_delta",
+        "feature_fr_solar_generation_gw_vintage_range_proxy",
+        "feature_fr_temperature_c",
+        "feature_fr_temperature_c_revision_delta",
+        "feature_fr_temperature_c_vintage_range_proxy",
+        "feature_de_residual_load_gw",
+        "feature_de_residual_load_gw_revision_delta",
+        "feature_de_residual_load_gw_vintage_range_proxy",
+        "feature_de_gas_available_gw",
+        "feature_de_gas_available_gw_revision_delta",
+        "feature_de_gas_available_gw_vintage_range_proxy",
+        "feature_de_wind_generation_gw",
+        "feature_de_wind_generation_gw_revision_delta",
+        "feature_de_wind_generation_gw_vintage_range_proxy",
+        "feature_de_solar_generation_gw",
+        "feature_de_solar_generation_gw_revision_delta",
+        "feature_de_solar_generation_gw_vintage_range_proxy",
+        "feature_de_temperature_c",
+        "feature_de_temperature_c_revision_delta",
+        "feature_de_temperature_c_vintage_range_proxy",
+        "feature_be_residual_load_gw",
+        "feature_be_residual_load_gw_revision_delta",
+        "feature_be_residual_load_gw_vintage_range_proxy",
+        "feature_be_gas_available_gw",
+        "feature_be_gas_available_gw_revision_delta",
+        "feature_be_gas_available_gw_vintage_range_proxy",
+        "feature_be_wind_generation_gw",
+        "feature_be_wind_generation_gw_revision_delta",
+        "feature_be_wind_generation_gw_vintage_range_proxy",
+        "feature_be_solar_generation_gw",
+        "feature_be_solar_generation_gw_revision_delta",
+        "feature_be_solar_generation_gw_vintage_range_proxy",
+        "feature_be_temperature_c",
+        "feature_be_temperature_c_revision_delta",
+        "feature_be_temperature_c_vintage_range_proxy",
+        "feature_nl_residual_load_gw",
+        "feature_nl_residual_load_gw_revision_delta",
+        "feature_nl_residual_load_gw_vintage_range_proxy",
+        "feature_nl_gas_available_gw",
+        "feature_nl_gas_available_gw_revision_delta",
+        "feature_nl_gas_available_gw_vintage_range_proxy",
+        "feature_nl_wind_generation_gw",
+        "feature_nl_wind_generation_gw_revision_delta",
+        "feature_nl_wind_generation_gw_vintage_range_proxy",
+        "feature_nl_solar_generation_gw",
+        "feature_nl_solar_generation_gw_revision_delta",
+        "feature_nl_solar_generation_gw_vintage_range_proxy",
+        "feature_nl_temperature_c",
+        "feature_nl_temperature_c_revision_delta",
+        "feature_nl_temperature_c_vintage_range_proxy",
+        "feature_fr_nuclear_generation_gw",
+        "feature_fr_nuclear_generation_gw_revision_delta",
+        "feature_fr_nuclear_generation_gw_vintage_range_proxy",
+        "feature_de_coal_available_gw",
+        "feature_de_coal_available_gw_revision_delta",
+        "feature_de_coal_available_gw_vintage_range_proxy",
+        "feature_de_lignite_available_gw",
+        "feature_de_lignite_available_gw_revision_delta",
+        "feature_de_lignite_available_gw_vintage_range_proxy",
+        "feature_nl_coal_available_gw",
+        "feature_nl_coal_available_gw_revision_delta",
+        "feature_nl_coal_available_gw_vintage_range_proxy",
+        "feature_be_nuclear_available_gw",
+        "feature_be_nuclear_available_gw_revision_delta",
+        "feature_be_nuclear_available_gw_vintage_range_proxy",
+        "feature_nl_nuclear_available_gw",
+        "feature_nl_nuclear_available_gw_revision_delta",
+        "feature_nl_nuclear_available_gw_vintage_range_proxy",
+        "feature_ttf",
+        "feature_ttf_revision_delta",
+        "feature_ttf_vintage_range_proxy",
+        "feature_eua",
+        "feature_eua_revision_delta",
+        "feature_eua_vintage_range_proxy",
+        "feature_regional_residual_load_gw",
+        "feature_regional_gas_available_gw",
+        "feature_regional_residual_spread_gw",
+        "feature_regional_residual_to_gas_ratio_proxy",
+        "feature_regional_simultaneous_gas_stress_proxy",
+        "feature_clean_gas_cost_ccgt_proxy_eur_mwh",
+        "feature_clean_gas_cost_ocgt_proxy_eur_mwh",
+        "feature_gas_merit_slope_proxy_eur_mwh",
+        "feature_hour_sin",
+        "feature_hour_cos",
+        "feature_weekday",
+        "feature_month",
+        "feature_local_residual_load_gw",
+        "feature_local_gas_available_gw",
+        "feature_local_residual_to_gas_ratio_proxy",
+        "feature_local_gas_zero_available",
+        "feature_local_gas_minus_residual_proxy_gw",
+        "feature_local_selected_supply_proxy_gw",
+        "feature_local_selected_supply_minus_residual_proxy_gw",
+        "feature_local_wind_generation_gw",
+        "feature_local_wind_ramp_1h_gw_per_hour",
+        "feature_local_wind_ramp_3h_gw_per_hour",
+        "feature_local_solar_generation_gw",
+        "feature_local_solar_ramp_1h_gw_per_hour",
+        "feature_local_solar_ramp_3h_gw_per_hour",
+        "feature_local_residual_ramp_1h_gw_per_hour",
+        "feature_local_residual_ramp_1h_to_gas_proxy",
+        "feature_local_residual_ramp_3h_gw_per_hour",
+        "feature_local_residual_ramp_3h_to_gas_proxy",
+        "feature_local_residual_vs_region_gw",
+        "feature_local_temperature_c",
+        "feature_baseline_forecast",
+        "feature_baseline_interval_width",
+        "feature_baseline_upper_distance",
+        "feature_cgc_minus_baseline_proxy_eur_mwh",
+        "feature_fr_residual_load_gw__missing",
+        "feature_fr_residual_load_gw_revision_delta__missing",
+        "feature_fr_residual_load_gw_vintage_range_proxy__missing",
+        "feature_fr_gas_available_gw__missing",
+        "feature_fr_gas_available_gw_revision_delta__missing",
+        "feature_fr_gas_available_gw_vintage_range_proxy__missing",
+        "feature_fr_wind_generation_gw__missing",
+        "feature_fr_wind_generation_gw_revision_delta__missing",
+        "feature_fr_wind_generation_gw_vintage_range_proxy__missing",
+        "feature_fr_solar_generation_gw__missing",
+        "feature_fr_solar_generation_gw_revision_delta__missing",
+        "feature_fr_solar_generation_gw_vintage_range_proxy__missing",
+        "feature_fr_temperature_c__missing",
+        "feature_fr_temperature_c_revision_delta__missing",
+        "feature_fr_temperature_c_vintage_range_proxy__missing",
+        "feature_de_residual_load_gw__missing",
+        "feature_de_residual_load_gw_revision_delta__missing",
+        "feature_de_residual_load_gw_vintage_range_proxy__missing",
+        "feature_de_gas_available_gw__missing",
+        "feature_de_gas_available_gw_revision_delta__missing",
+        "feature_de_gas_available_gw_vintage_range_proxy__missing",
+        "feature_de_wind_generation_gw__missing",
+        "feature_de_wind_generation_gw_revision_delta__missing",
+        "feature_de_wind_generation_gw_vintage_range_proxy__missing",
+        "feature_de_solar_generation_gw__missing",
+        "feature_de_solar_generation_gw_revision_delta__missing",
+        "feature_de_solar_generation_gw_vintage_range_proxy__missing",
+        "feature_de_temperature_c__missing",
+        "feature_de_temperature_c_revision_delta__missing",
+        "feature_de_temperature_c_vintage_range_proxy__missing",
+        "feature_be_residual_load_gw__missing",
+        "feature_be_residual_load_gw_revision_delta__missing",
+        "feature_be_residual_load_gw_vintage_range_proxy__missing",
+        "feature_be_gas_available_gw__missing",
+        "feature_be_gas_available_gw_revision_delta__missing",
+        "feature_be_gas_available_gw_vintage_range_proxy__missing",
+        "feature_be_wind_generation_gw__missing",
+        "feature_be_wind_generation_gw_revision_delta__missing",
+        "feature_be_wind_generation_gw_vintage_range_proxy__missing",
+        "feature_be_solar_generation_gw__missing",
+        "feature_be_solar_generation_gw_revision_delta__missing",
+        "feature_be_solar_generation_gw_vintage_range_proxy__missing",
+        "feature_be_temperature_c__missing",
+        "feature_be_temperature_c_revision_delta__missing",
+        "feature_be_temperature_c_vintage_range_proxy__missing",
+        "feature_nl_residual_load_gw__missing",
+        "feature_nl_residual_load_gw_revision_delta__missing",
+        "feature_nl_residual_load_gw_vintage_range_proxy__missing",
+        "feature_nl_gas_available_gw__missing",
+        "feature_nl_gas_available_gw_revision_delta__missing",
+        "feature_nl_gas_available_gw_vintage_range_proxy__missing",
+        "feature_nl_wind_generation_gw__missing",
+        "feature_nl_wind_generation_gw_revision_delta__missing",
+        "feature_nl_wind_generation_gw_vintage_range_proxy__missing",
+        "feature_nl_solar_generation_gw__missing",
+        "feature_nl_solar_generation_gw_revision_delta__missing",
+        "feature_nl_solar_generation_gw_vintage_range_proxy__missing",
+        "feature_nl_temperature_c__missing",
+        "feature_nl_temperature_c_revision_delta__missing",
+        "feature_nl_temperature_c_vintage_range_proxy__missing",
+        "feature_fr_nuclear_generation_gw__missing",
+        "feature_fr_nuclear_generation_gw_revision_delta__missing",
+        "feature_fr_nuclear_generation_gw_vintage_range_proxy__missing",
+        "feature_de_coal_available_gw__missing",
+        "feature_de_coal_available_gw_revision_delta__missing",
+        "feature_de_coal_available_gw_vintage_range_proxy__missing",
+        "feature_de_lignite_available_gw__missing",
+        "feature_de_lignite_available_gw_revision_delta__missing",
+        "feature_de_lignite_available_gw_vintage_range_proxy__missing",
+        "feature_nl_coal_available_gw__missing",
+        "feature_nl_coal_available_gw_revision_delta__missing",
+        "feature_nl_coal_available_gw_vintage_range_proxy__missing",
+        "feature_be_nuclear_available_gw__missing",
+        "feature_be_nuclear_available_gw_revision_delta__missing",
+        "feature_be_nuclear_available_gw_vintage_range_proxy__missing",
+        "feature_nl_nuclear_available_gw__missing",
+        "feature_nl_nuclear_available_gw_revision_delta__missing",
+        "feature_nl_nuclear_available_gw_vintage_range_proxy__missing",
+        "feature_ttf__missing",
+        "feature_ttf_revision_delta__missing",
+        "feature_ttf_vintage_range_proxy__missing",
+        "feature_eua__missing",
+        "feature_eua_revision_delta__missing",
+        "feature_eua_vintage_range_proxy__missing",
+        "feature_regional_residual_load_gw__missing",
+        "feature_regional_gas_available_gw__missing",
+        "feature_regional_residual_spread_gw__missing",
+        "feature_regional_residual_to_gas_ratio_proxy__missing",
+        "feature_regional_simultaneous_gas_stress_proxy__missing",
+        "feature_clean_gas_cost_ccgt_proxy_eur_mwh__missing",
+        "feature_clean_gas_cost_ocgt_proxy_eur_mwh__missing",
+        "feature_gas_merit_slope_proxy_eur_mwh__missing",
+        "feature_hour_sin__missing",
+        "feature_hour_cos__missing",
+        "feature_weekday__missing",
+        "feature_month__missing",
+        "feature_local_residual_load_gw__missing",
+        "feature_local_gas_available_gw__missing",
+        "feature_local_residual_to_gas_ratio_proxy__missing",
+        "feature_local_gas_zero_available__missing",
+        "feature_local_gas_minus_residual_proxy_gw__missing",
+        "feature_local_selected_supply_proxy_gw__missing",
+        "feature_local_selected_supply_minus_residual_proxy_gw__missing",
+        "feature_local_wind_generation_gw__missing",
+        "feature_local_wind_ramp_1h_gw_per_hour__missing",
+        "feature_local_wind_ramp_3h_gw_per_hour__missing",
+        "feature_local_solar_generation_gw__missing",
+        "feature_local_solar_ramp_1h_gw_per_hour__missing",
+        "feature_local_solar_ramp_3h_gw_per_hour__missing",
+        "feature_local_residual_ramp_1h_gw_per_hour__missing",
+        "feature_local_residual_ramp_1h_to_gas_proxy__missing",
+        "feature_local_residual_ramp_3h_gw_per_hour__missing",
+        "feature_local_residual_ramp_3h_to_gas_proxy__missing",
+        "feature_local_residual_vs_region_gw__missing",
+        "feature_local_temperature_c__missing",
+        "feature_baseline_forecast__missing",
+        "feature_baseline_interval_width__missing",
+        "feature_baseline_upper_distance__missing",
+        "feature_cgc_minus_baseline_proxy_eur_mwh__missing"
+      ],
+      "required_feature_columns": [
+        "feature_fr_residual_load_gw",
+        "feature_de_residual_load_gw",
+        "feature_be_residual_load_gw",
+        "feature_nl_residual_load_gw",
+        "feature_fr_nuclear_generation_gw",
+        "feature_local_gas_available_gw",
+        "feature_local_wind_generation_gw",
+        "feature_local_solar_generation_gw",
+        "feature_baseline_forecast"
+      ],
+      "feature_coverage": {
+        "feature_fr_residual_load_gw": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_fr_residual_load_gw_revision_delta": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_fr_residual_load_gw_vintage_range_proxy": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_fr_gas_available_gw": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_fr_gas_available_gw_revision_delta": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_fr_gas_available_gw_vintage_range_proxy": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_fr_wind_generation_gw": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_fr_wind_generation_gw_revision_delta": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_fr_wind_generation_gw_vintage_range_proxy": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_fr_solar_generation_gw": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_fr_solar_generation_gw_revision_delta": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_fr_solar_generation_gw_vintage_range_proxy": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_fr_temperature_c": {
+          "finite_rows": 34080,
+          "missing_rows": 1056
+        },
+        "feature_fr_temperature_c_revision_delta": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_fr_temperature_c_vintage_range_proxy": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_de_residual_load_gw": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_de_residual_load_gw_revision_delta": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_de_residual_load_gw_vintage_range_proxy": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_de_gas_available_gw": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_de_gas_available_gw_revision_delta": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_de_gas_available_gw_vintage_range_proxy": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_de_wind_generation_gw": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_de_wind_generation_gw_revision_delta": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_de_wind_generation_gw_vintage_range_proxy": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_de_solar_generation_gw": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_de_solar_generation_gw_revision_delta": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_de_solar_generation_gw_vintage_range_proxy": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_de_temperature_c": {
+          "finite_rows": 34080,
+          "missing_rows": 1056
+        },
+        "feature_de_temperature_c_revision_delta": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_de_temperature_c_vintage_range_proxy": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_be_residual_load_gw": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_be_residual_load_gw_revision_delta": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_be_residual_load_gw_vintage_range_proxy": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_be_gas_available_gw": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_be_gas_available_gw_revision_delta": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_be_gas_available_gw_vintage_range_proxy": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_be_wind_generation_gw": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_be_wind_generation_gw_revision_delta": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_be_wind_generation_gw_vintage_range_proxy": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_be_solar_generation_gw": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_be_solar_generation_gw_revision_delta": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_be_solar_generation_gw_vintage_range_proxy": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_be_temperature_c": {
+          "finite_rows": 34080,
+          "missing_rows": 1056
+        },
+        "feature_be_temperature_c_revision_delta": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_be_temperature_c_vintage_range_proxy": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_nl_residual_load_gw": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_nl_residual_load_gw_revision_delta": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_nl_residual_load_gw_vintage_range_proxy": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_nl_gas_available_gw": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_nl_gas_available_gw_revision_delta": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_nl_gas_available_gw_vintage_range_proxy": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_nl_wind_generation_gw": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_nl_wind_generation_gw_revision_delta": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_nl_wind_generation_gw_vintage_range_proxy": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_nl_solar_generation_gw": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_nl_solar_generation_gw_revision_delta": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_nl_solar_generation_gw_vintage_range_proxy": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_nl_temperature_c": {
+          "finite_rows": 34080,
+          "missing_rows": 1056
+        },
+        "feature_nl_temperature_c_revision_delta": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_nl_temperature_c_vintage_range_proxy": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_fr_nuclear_generation_gw": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_fr_nuclear_generation_gw_revision_delta": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_fr_nuclear_generation_gw_vintage_range_proxy": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_de_coal_available_gw": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_de_coal_available_gw_revision_delta": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_de_coal_available_gw_vintage_range_proxy": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_de_lignite_available_gw": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_de_lignite_available_gw_revision_delta": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_de_lignite_available_gw_vintage_range_proxy": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_nl_coal_available_gw": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_nl_coal_available_gw_revision_delta": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_nl_coal_available_gw_vintage_range_proxy": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_be_nuclear_available_gw": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_be_nuclear_available_gw_revision_delta": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_be_nuclear_available_gw_vintage_range_proxy": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_nl_nuclear_available_gw": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_nl_nuclear_available_gw_revision_delta": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_nl_nuclear_available_gw_vintage_range_proxy": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_ttf": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_ttf_revision_delta": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_ttf_vintage_range_proxy": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_eua": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_eua_revision_delta": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_eua_vintage_range_proxy": {
+          "finite_rows": 0,
+          "missing_rows": 35136
+        },
+        "feature_regional_residual_load_gw": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_regional_gas_available_gw": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_regional_residual_spread_gw": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_regional_residual_to_gas_ratio_proxy": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_regional_simultaneous_gas_stress_proxy": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_clean_gas_cost_ccgt_proxy_eur_mwh": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_clean_gas_cost_ocgt_proxy_eur_mwh": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_gas_merit_slope_proxy_eur_mwh": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_hour_sin": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_hour_cos": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_weekday": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_month": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_local_residual_load_gw": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_local_gas_available_gw": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_local_residual_to_gas_ratio_proxy": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_local_gas_zero_available": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_local_gas_minus_residual_proxy_gw": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_local_selected_supply_proxy_gw": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_local_selected_supply_minus_residual_proxy_gw": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_local_wind_generation_gw": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_local_wind_ramp_1h_gw_per_hour": {
+          "finite_rows": 33672,
+          "missing_rows": 1464
+        },
+        "feature_local_wind_ramp_3h_gw_per_hour": {
+          "finite_rows": 30744,
+          "missing_rows": 4392
+        },
+        "feature_local_solar_generation_gw": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_local_solar_ramp_1h_gw_per_hour": {
+          "finite_rows": 33672,
+          "missing_rows": 1464
+        },
+        "feature_local_solar_ramp_3h_gw_per_hour": {
+          "finite_rows": 30744,
+          "missing_rows": 4392
+        },
+        "feature_local_residual_ramp_1h_gw_per_hour": {
+          "finite_rows": 33672,
+          "missing_rows": 1464
+        },
+        "feature_local_residual_ramp_1h_to_gas_proxy": {
+          "finite_rows": 33672,
+          "missing_rows": 1464
+        },
+        "feature_local_residual_ramp_3h_gw_per_hour": {
+          "finite_rows": 30744,
+          "missing_rows": 4392
+        },
+        "feature_local_residual_ramp_3h_to_gas_proxy": {
+          "finite_rows": 30744,
+          "missing_rows": 4392
+        },
+        "feature_local_residual_vs_region_gw": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_local_temperature_c": {
+          "finite_rows": 34080,
+          "missing_rows": 1056
+        },
+        "feature_baseline_forecast": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_baseline_interval_width": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_baseline_upper_distance": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_cgc_minus_baseline_proxy_eur_mwh": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_fr_residual_load_gw__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_fr_residual_load_gw_revision_delta__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_fr_residual_load_gw_vintage_range_proxy__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_fr_gas_available_gw__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_fr_gas_available_gw_revision_delta__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_fr_gas_available_gw_vintage_range_proxy__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_fr_wind_generation_gw__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_fr_wind_generation_gw_revision_delta__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_fr_wind_generation_gw_vintage_range_proxy__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_fr_solar_generation_gw__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_fr_solar_generation_gw_revision_delta__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_fr_solar_generation_gw_vintage_range_proxy__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_fr_temperature_c__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_fr_temperature_c_revision_delta__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_fr_temperature_c_vintage_range_proxy__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_de_residual_load_gw__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_de_residual_load_gw_revision_delta__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_de_residual_load_gw_vintage_range_proxy__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_de_gas_available_gw__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_de_gas_available_gw_revision_delta__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_de_gas_available_gw_vintage_range_proxy__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_de_wind_generation_gw__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_de_wind_generation_gw_revision_delta__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_de_wind_generation_gw_vintage_range_proxy__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_de_solar_generation_gw__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_de_solar_generation_gw_revision_delta__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_de_solar_generation_gw_vintage_range_proxy__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_de_temperature_c__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_de_temperature_c_revision_delta__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_de_temperature_c_vintage_range_proxy__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_be_residual_load_gw__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_be_residual_load_gw_revision_delta__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_be_residual_load_gw_vintage_range_proxy__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_be_gas_available_gw__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_be_gas_available_gw_revision_delta__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_be_gas_available_gw_vintage_range_proxy__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_be_wind_generation_gw__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_be_wind_generation_gw_revision_delta__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_be_wind_generation_gw_vintage_range_proxy__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_be_solar_generation_gw__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_be_solar_generation_gw_revision_delta__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_be_solar_generation_gw_vintage_range_proxy__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_be_temperature_c__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_be_temperature_c_revision_delta__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_be_temperature_c_vintage_range_proxy__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_nl_residual_load_gw__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_nl_residual_load_gw_revision_delta__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_nl_residual_load_gw_vintage_range_proxy__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_nl_gas_available_gw__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_nl_gas_available_gw_revision_delta__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_nl_gas_available_gw_vintage_range_proxy__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_nl_wind_generation_gw__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_nl_wind_generation_gw_revision_delta__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_nl_wind_generation_gw_vintage_range_proxy__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_nl_solar_generation_gw__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_nl_solar_generation_gw_revision_delta__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_nl_solar_generation_gw_vintage_range_proxy__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_nl_temperature_c__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_nl_temperature_c_revision_delta__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_nl_temperature_c_vintage_range_proxy__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_fr_nuclear_generation_gw__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_fr_nuclear_generation_gw_revision_delta__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_fr_nuclear_generation_gw_vintage_range_proxy__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_de_coal_available_gw__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_de_coal_available_gw_revision_delta__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_de_coal_available_gw_vintage_range_proxy__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_de_lignite_available_gw__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_de_lignite_available_gw_revision_delta__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_de_lignite_available_gw_vintage_range_proxy__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_nl_coal_available_gw__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_nl_coal_available_gw_revision_delta__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_nl_coal_available_gw_vintage_range_proxy__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_be_nuclear_available_gw__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_be_nuclear_available_gw_revision_delta__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_be_nuclear_available_gw_vintage_range_proxy__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_nl_nuclear_available_gw__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_nl_nuclear_available_gw_revision_delta__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_nl_nuclear_available_gw_vintage_range_proxy__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_ttf__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_ttf_revision_delta__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_ttf_vintage_range_proxy__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_eua__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_eua_revision_delta__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_eua_vintage_range_proxy__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_regional_residual_load_gw__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_regional_gas_available_gw__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_regional_residual_spread_gw__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_regional_residual_to_gas_ratio_proxy__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_regional_simultaneous_gas_stress_proxy__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_clean_gas_cost_ccgt_proxy_eur_mwh__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_clean_gas_cost_ocgt_proxy_eur_mwh__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_gas_merit_slope_proxy_eur_mwh__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_hour_sin__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_hour_cos__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_weekday__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_month__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_local_residual_load_gw__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_local_gas_available_gw__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_local_residual_to_gas_ratio_proxy__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_local_gas_zero_available__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_local_gas_minus_residual_proxy_gw__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_local_selected_supply_proxy_gw__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_local_selected_supply_minus_residual_proxy_gw__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_local_wind_generation_gw__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_local_wind_ramp_1h_gw_per_hour__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_local_wind_ramp_3h_gw_per_hour__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_local_solar_generation_gw__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_local_solar_ramp_1h_gw_per_hour__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_local_solar_ramp_3h_gw_per_hour__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_local_residual_ramp_1h_gw_per_hour__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_local_residual_ramp_1h_to_gas_proxy__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_local_residual_ramp_3h_gw_per_hour__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_local_residual_ramp_3h_to_gas_proxy__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_local_residual_vs_region_gw__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_local_temperature_c__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_baseline_forecast__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_baseline_interval_width__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_baseline_upper_distance__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        },
+        "feature_cgc_minus_baseline_proxy_eur_mwh__missing": {
+          "finite_rows": 35136,
+          "missing_rows": 0
+        }
+      },
+      "eligibility": {
+        "FR": {
+          "eligible_rows": 8784,
+          "fallback_rows": 0,
+          "fallback_days": []
+        },
+        "DE": {
+          "eligible_rows": 8784,
+          "fallback_rows": 0,
+          "fallback_days": []
+        },
+        "BE": {
+          "eligible_rows": 8784,
+          "fallback_rows": 0,
+          "fallback_days": []
+        },
+        "NL": {
+          "eligible_rows": 8784,
+          "fallback_rows": 0,
+          "fallback_days": []
+        }
+      },
+      "forecast_cutoff": "D-1 08:00 Europe/Paris",
+      "training_history": "only the 365 reporting days; no invented prior baseline year",
+      "label_availability": "assumed D-1 18:00 Europe/Paris; not provider publication timestamp",
+      "capacity_semantics": "daily available-Pmax forecasts, not generation; unverified national fleet scope; gas fuel aggregate is not added to CCGT/GT components",
+      "margin_semantics": "gas-minus-residual proxy only; no full reserve margin, import capacity, reserve commitment or deliverable flexibility claim",
+      "selected_supply_proxy": "FR gas Pmax + nuclear generation forecast; DE gas + coal + lignite Pmax; BE gas + nuclear Pmax; NL gas + coal + nuclear Pmax. Incomplete, mixed capacity/generation approximation, never a full national balance.",
+      "renewable_accounting": "no subtraction from residual load; separate wind/solar only for levels and ramps",
+      "ramp_semantics": "within the same delivery-day vintage; residual ramp / available gas is not a measured GW/hour ramp capability",
+      "ratio_denominator_floor_gw": 0.1,
+      "zero_capacity_semantics": "A valid zero capacity remains zero and eligible; only ratio denominators use the stated floor, never imputed physical capacity.",
+      "uncertainty_semantics": "baseline P10-P90 plus past eligible vintage range; no genuine meteorological ensemble assumed",
+      "clean_gas_cost": {
+        "native_saturn_cgc_used": false,
+        "formula": "(TTF_M1 + EUA_first_Dec * gas_emission_factor) / efficiency",
+        "ccgt_efficiency": 0.58,
+        "ocgt_efficiency": 0.39,
+        "emissions_tco2_mwh_th": 0.202,
+        "variable_om_included": false,
+        "contract_mismatch": "M1 gas / first December EUA are cost proxies, not same-hour executable costs"
+      },
+      "jao": {
+        "status": "excluded_fail_closed",
+        "reason": "08:00 source/publication qualification incomplete; no RAM/PTDF reconstructed or imported"
+      },
+      "diagnostic_only": true,
+      "production_pit_evidence": false,
+      "forecast_pit_certified": false,
+      "benchmark_pit_certified": false,
+      "promotion_eligible": false,
+      "production_modified": false,
+      "fill_or_interpolation": "none; optional NaN plus missing flags; required gaps force baseline fallback"
+    },
+    "source_suite_path": "C:\\Users\\BQ6757\\chronos2_v1\\runs\\experiments\\nyx_scarcity_v1\\variants\\snapshots\\20260914T135026Z_0efb0e05"
+  }
+}

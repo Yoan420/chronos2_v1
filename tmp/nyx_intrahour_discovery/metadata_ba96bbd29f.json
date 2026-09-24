@@ -1,0 +1,137 @@
+[
+  {
+    "series": "power.stp.wind_production_total_da_fcst.be.mw.qh.fcst.elia",
+    "kind": "formula",
+    "source": "power",
+    "metadata_http_status": 200,
+    "metadata": {
+      "tzaware": true,
+      "index_type": "datetime64[ns, UTC]",
+      "value_type": "float64",
+      "index_dtype": "|M8[ns]",
+      "value_dtype": "<f8"
+    },
+    "formula_http_status": 200,
+    "formula": "(add (series \"power.stp.wind_production_onshore_da_fcst.be.mw.qh.fcst.elia\") (series \"power.stp.wind_production_offshore_da_fcst.be.mw.qh.fcst.elia\"))"
+  },
+  {
+    "series": "power.stp.wind_production_total_da_fcst.de.mw.qh.fcst.entsoe",
+    "kind": "formula",
+    "source": "power",
+    "metadata_http_status": 200,
+    "metadata": {
+      "tzaware": true,
+      "index_type": "datetime64[ns, UTC]",
+      "value_type": "float64",
+      "index_dtype": "|M8[ns]",
+      "value_dtype": "<f8"
+    },
+    "formula_http_status": 200,
+    "formula": "(add (series \"power.stp.wind_production_onshore_da_fcst.de.mw.qh.fcst.entsoe\") (series \"power.stp.wind_production_offshore_da_fcst.de.mw.qh.fcst.entsoe\"))"
+  },
+  {
+    "series": "power.stp.wind_production_total_da_fcst.nl.mw.qh.fcst.entsoe",
+    "kind": "formula",
+    "source": "power",
+    "metadata_http_status": 200,
+    "metadata": {
+      "tzaware": true,
+      "index_type": "datetime64[ns, UTC]",
+      "value_type": "float64",
+      "index_dtype": "|M8[ns]",
+      "value_dtype": "<f8"
+    },
+    "formula_http_status": 200,
+    "formula": "(add (series \"power.stp.wind_production_onshore_da_fcst.nl.mw.qh.fcst.entsoe\") (series \"power.stp.wind_production_offshore_da_fcst.nl.mw.qh.fcst.entsoe\"))"
+  },
+  {
+    "series": "power.stp.wind_production_onshore_da_fcst.fr.mw.qh.fcst.entsoe",
+    "kind": "formula",
+    "source": "power",
+    "metadata_http_status": 200,
+    "metadata": {
+      "tzaware": true,
+      "index_type": "datetime64[ns, UTC]",
+      "value_type": "float64",
+      "index_dtype": "|M8[ns]",
+      "value_dtype": "<f8"
+    },
+    "formula_http_status": 200,
+    "formula": "(resample (pointconnect \"114740602\") \"15min\" #:method \"ffill\")"
+  },
+  {
+    "series": "power.de.50hz.load.forecast.mw.15min",
+    "kind": "formula",
+    "source": "stp",
+    "metadata_http_status": 200,
+    "metadata": {
+      "tzaware": true,
+      "index_type": "datetime64[ns, UTC]",
+      "value_type": "float64",
+      "index_dtype": "|M8[ns]",
+      "value_dtype": "<f8"
+    },
+    "formula_http_status": 200,
+    "formula": "(pointconnect \"103114898\")"
+  },
+  {
+    "series": "power.de.amprion.load.forecast.mw.15min",
+    "kind": "formula",
+    "source": "stp",
+    "metadata_http_status": 200,
+    "metadata": {
+      "tzaware": true,
+      "index_type": "datetime64[ns, UTC]",
+      "value_type": "float64",
+      "index_dtype": "|M8[ns]",
+      "value_dtype": "<f8"
+    },
+    "formula_http_status": 200,
+    "formula": "(pointconnect \"101648707\")"
+  },
+  {
+    "series": "power.be.load.fcst.mw",
+    "kind": "formula",
+    "source": "energyscan",
+    "metadata_http_status": 200,
+    "metadata": {
+      "tzaware": false,
+      "index_type": "datetime64[ns]",
+      "value_type": "float64",
+      "index_dtype": "<M8[ns]",
+      "value_dtype": "<f8"
+    },
+    "formula_http_status": 200,
+    "formula": "(priority (series \"38100\") (series \"17765\"))"
+  },
+  {
+    "series": "23259",
+    "kind": "primary",
+    "source": "power",
+    "metadata_http_status": 200,
+    "metadata": {
+      "tzaware": true,
+      "index_type": "datetime64[ns, UTC]",
+      "value_type": "float64",
+      "index_dtype": "|M8[ns]",
+      "value_dtype": "<f8"
+    },
+    "formula_http_status": 200,
+    "formula": null
+  },
+  {
+    "series": "38100",
+    "kind": "primary",
+    "source": "power",
+    "metadata_http_status": 200,
+    "metadata": {
+      "tzaware": false,
+      "index_type": "datetime64[ns]",
+      "value_type": "float64",
+      "index_dtype": "<M8[ns]",
+      "value_dtype": "<f8"
+    },
+    "formula_http_status": 200,
+    "formula": null
+  }
+]

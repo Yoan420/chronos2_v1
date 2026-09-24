@@ -1,0 +1,452 @@
+{
+  "result": "PASS",
+  "validated_at_utc": "2026-09-16T12:38:32.843167+00:00",
+  "command": "python recompute_cutoff.py --workspace <authorized-local-NYX-workspace>",
+  "workspace_default": "NYX_WORKSPACE environment variable, otherwise current working directory",
+  "output_directory": "recomputed adjacent to the script",
+  "python": "3.11.9",
+  "dependencies": {
+    "numpy": "2.4.6",
+    "pandas": "2.3.3",
+    "pyarrow": "24.0.0",
+    "tzdata": "2026.2"
+  },
+  "input_metrics_relative_path": "research/tensor_timesfm_20260915/metrics",
+  "requires_authorized_local_archives": true,
+  "no_training_or_reselection": true,
+  "evaluation_cutoff": "2026-08-31",
+  "csv_files_compared": 22,
+  "csv_rows_compared": 2542,
+  "all_csv_numeric_and_non_numeric_values_exact": true,
+  "all_csv_bytes_identical": true,
+  "csv_checks": [
+    {
+      "file": "annual_paired_metrics.csv",
+      "rows": 16,
+      "columns": 6,
+      "numeric_columns": [
+        "n",
+        "mae",
+        "rmse",
+        "bias"
+      ],
+      "maximum_absolute_numeric_difference": 0.0,
+      "exact_dataframe_match": true,
+      "byte_identical": true,
+      "sha256": "045b6101c813e1030b7bb14009522c548751f52836e5d819edbad67849dbce60"
+    },
+    {
+      "file": "correction_saturation.csv",
+      "rows": 140,
+      "columns": 7,
+      "numeric_columns": [
+        "n",
+        "residual_cap40_fraction",
+        "kalman_cap20_fraction",
+        "kalman_raw_above20_fraction"
+      ],
+      "maximum_absolute_numeric_difference": 0.0,
+      "exact_dataframe_match": true,
+      "byte_identical": true,
+      "sha256": "4404414a322b743874d5347d531ea71723773acde4b2ed985d1a323908360c3c"
+    },
+    {
+      "file": "data_description.csv",
+      "rows": 4,
+      "columns": 8,
+      "numeric_columns": [
+        "n",
+        "mean",
+        "sd",
+        "min",
+        "median",
+        "max",
+        "negative_hours"
+      ],
+      "maximum_absolute_numeric_difference": 0.0,
+      "exact_dataframe_match": true,
+      "byte_identical": true,
+      "sha256": "201cd5e7432643f1e43aaa98c61921e1ab8f02ff8a7d3a32f74150c535bacddb"
+    },
+    {
+      "file": "descriptive_metrics.csv",
+      "rows": 560,
+      "columns": 8,
+      "numeric_columns": [
+        "n",
+        "mae",
+        "rmse",
+        "bias"
+      ],
+      "maximum_absolute_numeric_difference": 0.0,
+      "exact_dataframe_match": true,
+      "byte_identical": true,
+      "sha256": "137eab8ab38f513f403f7433c6f4917ede135a1e5d4de8dbb5af1bd02224aa7f"
+    },
+    {
+      "file": "extreme_regimes.csv",
+      "rows": 8,
+      "columns": 8,
+      "numeric_columns": [
+        "q99_initial",
+        "n",
+        "mae",
+        "rmse",
+        "bias",
+        "coverage80_pct"
+      ],
+      "maximum_absolute_numeric_difference": 0.0,
+      "exact_dataframe_match": true,
+      "byte_identical": true,
+      "sha256": "571852728e0f74278568371fb0254b84aadb025644f3ebe23e8ddba4349ddb76"
+    },
+    {
+      "file": "governance_selected_filter_counts.csv",
+      "rows": 20,
+      "columns": 5,
+      "numeric_columns": [
+        "days",
+        "physical_hours"
+      ],
+      "maximum_absolute_numeric_difference": 0.0,
+      "exact_dataframe_match": true,
+      "byte_identical": true,
+      "sha256": "5c03e09e59cc6a65bbe832b7c6bf4d7a53d5523b4ef606a119b8e155321285ea"
+    },
+    {
+      "file": "initial_train_residual_correlation.csv",
+      "rows": 4,
+      "columns": 5,
+      "numeric_columns": [
+        "BE",
+        "DE",
+        "FR",
+        "NL"
+      ],
+      "maximum_absolute_numeric_difference": 0.0,
+      "exact_dataframe_match": true,
+      "byte_identical": true,
+      "sha256": "d2aa0757cbf128738e683937c4f112f4d7e33409c6eb3a1b869470816f5ab540"
+    },
+    {
+      "file": "locked_test_group_metrics.csv",
+      "rows": 756,
+      "columns": 8,
+      "numeric_columns": [
+        "n",
+        "mae",
+        "rmse",
+        "bias"
+      ],
+      "maximum_absolute_numeric_difference": 0.0,
+      "exact_dataframe_match": true,
+      "byte_identical": true,
+      "sha256": "ef248af48766db313f9b3f9bc337c9a007e1caf117feb7afd6b9c0826952191c"
+    },
+    {
+      "file": "locked_test_metrics.csv",
+      "rows": 70,
+      "columns": 7,
+      "numeric_columns": [
+        "n",
+        "mae",
+        "rmse",
+        "bias"
+      ],
+      "maximum_absolute_numeric_difference": 0.0,
+      "exact_dataframe_match": true,
+      "byte_identical": true,
+      "sha256": "a4e7dbc26eb9fc94035e443ff4f250fb45697c7da062a5e667f92b40c970ffc1"
+    },
+    {
+      "file": "locked_test_paired_bootstrap.csv",
+      "rows": 70,
+      "columns": 14,
+      "numeric_columns": [
+        "n",
+        "days",
+        "block_days",
+        "reps",
+        "seed",
+        "mae_delta",
+        "mae_delta_ci_low",
+        "mae_delta_ci_high",
+        "rmse_delta",
+        "rmse_delta_ci_low",
+        "rmse_delta_ci_high"
+      ],
+      "maximum_absolute_numeric_difference": 0.0,
+      "exact_dataframe_match": true,
+      "byte_identical": true,
+      "sha256": "cdf47f989fcc6de81a00f9e39e6ab1fbe1e9465d28bf28094334af73d3e42c5f"
+    },
+    {
+      "file": "monthly_mae.csv",
+      "rows": 144,
+      "columns": 5,
+      "numeric_columns": [
+        "n",
+        "mae"
+      ],
+      "maximum_absolute_numeric_difference": 0.0,
+      "exact_dataframe_match": true,
+      "byte_identical": true,
+      "sha256": "60d6d7eeb6faf7369c8c1823b533a1ed7b05b975931d27e9dc23b390d0a3e137"
+    },
+    {
+      "file": "nyx_interval_calibration.csv",
+      "rows": 140,
+      "columns": 10,
+      "numeric_columns": [
+        "n",
+        "coverage80",
+        "below_p10",
+        "above_p90",
+        "width80",
+        "interval_score80",
+        "wis80_single_interval"
+      ],
+      "maximum_absolute_numeric_difference": 0.0,
+      "exact_dataframe_match": true,
+      "byte_identical": true,
+      "sha256": "da5cf68399dc379dfa0e1863a2c53aa5130af64dbd99999a8dcdef7a26935b7c"
+    },
+    {
+      "file": "retained_fit_audit.csv",
+      "rows": 145,
+      "columns": 10,
+      "numeric_columns": [
+        "fit_physical_hours",
+        "original_predicted_physical_hours",
+        "retained_predicted_physical_hours"
+      ],
+      "maximum_absolute_numeric_difference": 0.0,
+      "exact_dataframe_match": true,
+      "byte_identical": true,
+      "sha256": "07fde839d7d4c6f483016878344b230f336a6633daa8f868591f4c604080d97b"
+    },
+    {
+      "file": "source_fallback_counts.csv",
+      "rows": 4,
+      "columns": 14,
+      "numeric_columns": [
+        "snapshot_hours",
+        "storm_snapshot_fallback_hours",
+        "full350_storm_fallback_hours",
+        "test75_storm_fallback_hours",
+        "full350_storm_fallback_fraction_of_paired",
+        "test75_storm_fallback_fraction",
+        "full350_label_fallback_hours",
+        "test75_label_fallback_hours",
+        "retained_kalman_windows"
+      ],
+      "maximum_absolute_numeric_difference": 0.0,
+      "exact_dataframe_match": true,
+      "byte_identical": true,
+      "sha256": "2992c4657764235727482e69721ba376625619f567c3da9fdde6c7a7234651f6"
+    },
+    {
+      "file": "stage_paired_block_bootstrap.csv",
+      "rows": 40,
+      "columns": 14,
+      "numeric_columns": [
+        "n",
+        "days",
+        "block_days",
+        "reps",
+        "seed",
+        "mae_delta",
+        "mae_delta_ci_low",
+        "mae_delta_ci_high",
+        "rmse_delta",
+        "rmse_delta_ci_low",
+        "rmse_delta_ci_high"
+      ],
+      "maximum_absolute_numeric_difference": 0.0,
+      "exact_dataframe_match": true,
+      "byte_identical": true,
+      "sha256": "82134c5985ed145db5211ef44f6668affea9079235b27deb59bccc54d97e35e7"
+    },
+    {
+      "file": "storm_provenance_sensitivity.csv",
+      "rows": 80,
+      "columns": 9,
+      "numeric_columns": [
+        "days",
+        "n",
+        "mae",
+        "rmse",
+        "bias"
+      ],
+      "maximum_absolute_numeric_difference": 0.0,
+      "exact_dataframe_match": true,
+      "byte_identical": true,
+      "sha256": "47cc992b3fb9ec7e66a9b52b1eee17e1215975dd9309e70ae382a80c794479a2"
+    },
+    {
+      "file": "ukf_selected_days.csv",
+      "rows": 1,
+      "columns": 9,
+      "numeric_columns": [
+        "physical_hours",
+        "weight_min",
+        "weight_max",
+        "shift_min",
+        "shift_max",
+        "sum_absolute_shift"
+      ],
+      "maximum_absolute_numeric_difference": 0.0,
+      "exact_dataframe_match": true,
+      "byte_identical": true,
+      "sha256": "1e3d7469a33f046b235ed7eb68ff796f595754cbf9b3cc79fba2426effc5ccd5"
+    },
+    {
+      "file": "verified_interval_metrics.csv",
+      "rows": 5,
+      "columns": 8,
+      "numeric_columns": [
+        "n",
+        "coverage80",
+        "below_p10",
+        "above_p90",
+        "mean_width",
+        "interval_score80",
+        "wis_one80"
+      ],
+      "maximum_absolute_numeric_difference": 0.0,
+      "exact_dataframe_match": true,
+      "byte_identical": true,
+      "sha256": "ebc179882bee74b4ec389cefe572d781cb8ced2a3254f77f6039bf09add4a9a2"
+    },
+    {
+      "file": "verified_residual_test_metrics.csv",
+      "rows": 70,
+      "columns": 17,
+      "numeric_columns": [
+        "n",
+        "mae",
+        "rmse",
+        "bias",
+        "days",
+        "block_days",
+        "reps",
+        "seed",
+        "mae_delta",
+        "mae_delta_ci_low",
+        "mae_delta_ci_high",
+        "rmse_delta",
+        "rmse_delta_ci_low",
+        "rmse_delta_ci_high"
+      ],
+      "maximum_absolute_numeric_difference": 0.0,
+      "exact_dataframe_match": true,
+      "byte_identical": true,
+      "sha256": "47135b56ededd30b937bf422a840da8860aece698d873c1e2f387a3045162ca6"
+    },
+    {
+      "file": "verified_stage_metrics.csv",
+      "rows": 140,
+      "columns": 8,
+      "numeric_columns": [
+        "n",
+        "mae",
+        "rmse",
+        "bias"
+      ],
+      "maximum_absolute_numeric_difference": 0.0,
+      "exact_dataframe_match": true,
+      "byte_identical": true,
+      "sha256": "444f3a18ca6680b8d78647f59c0159b52fdb5003586e5bf83e204d2caaf70af2"
+    },
+    {
+      "file": "weekly_naive_matched_metrics.csv",
+      "rows": 90,
+      "columns": 11,
+      "numeric_columns": [
+        "days",
+        "n",
+        "mae",
+        "rmse",
+        "bias"
+      ],
+      "maximum_absolute_numeric_difference": 0.0,
+      "exact_dataframe_match": true,
+      "byte_identical": true,
+      "sha256": "4f38351913533c97197645504534f57fb657261e363bbe557a730326074788f0"
+    },
+    {
+      "file": "weekly_naive_paired_bootstrap.csv",
+      "rows": 35,
+      "columns": 14,
+      "numeric_columns": [
+        "n",
+        "days",
+        "block_days",
+        "reps",
+        "seed",
+        "mae_delta",
+        "mae_delta_ci_low",
+        "mae_delta_ci_high",
+        "rmse_delta",
+        "rmse_delta_ci_low",
+        "rmse_delta_ci_high"
+      ],
+      "maximum_absolute_numeric_difference": 0.0,
+      "exact_dataframe_match": true,
+      "byte_identical": true,
+      "sha256": "11e3758057b3709faade4c441809ce79e5c36729b78b49034a0d19c0da7824b9"
+    }
+  ],
+  "json_checks": [
+    {
+      "file": "cutoff_manifest.json",
+      "parsed_content_identical": true
+    },
+    {
+      "file": "initial_train_dependence.json",
+      "parsed_content_identical": true
+    },
+    {
+      "file": "label_revision_sensitivity.json",
+      "parsed_content_identical": true
+    },
+    {
+      "file": "extraction_manifest.json",
+      "parsed_content_identical": true
+    },
+    {
+      "file": "validation_selection_locked.json",
+      "parsed_content_identical": true
+    }
+  ],
+  "manuscript_tables": {
+    "count": 10,
+    "layout_seed_matches_new_final_tables": true,
+    "numerical_result_table_rows_equal_analysis": [
+      "data_description",
+      "annual_stages",
+      "annual_benchmark",
+      "extremes",
+      "intervals",
+      "residual_test",
+      "provenance_sensitivity"
+    ]
+  },
+  "raw_hourly_matrices_emitted": false,
+  "package_allowlist": [
+    "recompute_cutoff.py",
+    "table_layout_seed.json",
+    "validation.json",
+    "requirements.txt"
+  ],
+  "package_files_sha256": {
+    "recompute_cutoff.py": "5715de35a5e4b91201ebad000bfcb3d720d8feaa71a7320aca956165978d0fe3",
+    "table_layout_seed.json": "f71df5a73144a80ffba16334433eddf344529e59987791a1fe989521a020e61f",
+    "requirements.txt": "d18f09b9d4f97fbc5abb3a79a799f76af4ed893603ee4eaf9617ac9d62ccbbd1"
+  },
+  "limitations": [
+    "Recomputation requires authorized retained source metrics and referenced local runs; this does not constitute full public end-to-end replication.",
+    "The snapshots were assembled retrospectively after the evaluation cutoff. No claim of their availability on 31 August 2026 is made.",
+    "This validates rescoring and bootstrap calculations from saved forecasts, not retraining, prospective performance or software equivalence of the entire original pipeline."
+  ]
+}
