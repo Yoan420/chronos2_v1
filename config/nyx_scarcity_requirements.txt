@@ -1,0 +1,2 @@
+# Windows wheel, Python >=3.10. Installed only in the laboratory's private target.
+xgboost==3.2.0 --hash=sha256:0d169736fd836fc13646c7ab787167b3a8110351c2c6bc770c755ee1618f0442
