@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Guide technique d’entretien — NLP statistique</title>
+  <style>
+    @page { size: A4; margin: 1.8cm 1.75cm 1.8cm 1.75cm; }
+    body { font-family: Aptos, Calibri, Arial, sans-serif; color: #24343b; font-size: 9.7pt; line-height: 1.28; }
+    h1, h2, h3, h4 { font-family: Aptos Display, Calibri, Arial, sans-serif; color: #0b5967; page-break-after: avoid; }
+    h1 { font-size: 21pt; margin: 0 0 10pt; padding-bottom: 5pt; border-bottom: 2.5pt solid #d8892b; }
+    h2 { font-size: 15pt; margin: 16pt 0 6pt; }
+    h3 { font-size: 12pt; margin: 11pt 0 4pt; color: #2c7076; }
+    h4 { font-size: 10.5pt; margin: 8pt 0 3pt; color: #9c5a15; }
+    p { margin: 0 0 6pt; }
+    ul, ol { margin: 3pt 0 8pt 18pt; }
+    li { margin: 0 0 2.5pt; }
+    strong { color: #173f47; }
+    code { font-family: Consolas, 'Courier New', monospace; font-size: 8.7pt; background: #f0f3f3; padding: 0 2pt; }
+    .cover { padding-top: 4.5cm; page-break-after: always; }
+    .eyebrow { color: #cf7614; font-weight: bold; letter-spacing: 1.5pt; text-transform: uppercase; }
+    .cover-title { font-size: 31pt; line-height: 1.04; color: #0b5967; font-weight: bold; margin: 12pt 0 16pt; }
+    .cover-subtitle { font-size: 16pt; line-height: 1.25; color: #486269; width: 82%; }
+    .cover-rule { width: 5cm; border-top: 6pt solid #d8892b; margin: 25pt 0; }
+    .meta { color: #526a71; font-size: 10.5pt; }
+    .toc a { color: #1c6370; text-decoration: none; }
+    .toc li { margin-bottom: 4pt; }
+    .chapter { page-break-before: always; }
+    .lead { font-size: 11.5pt; line-height: 1.38; color: #3d5d65; }
+    .callout { background: #edf5f4; border-left: 5pt solid #2c7e84; padding: 8pt 10pt; margin: 8pt 0 10pt; }
+    .warning { background: #fff4e5; border-left-color: #d8892b; }
+    .answer { background: #f4f7f7; border-left: 4pt solid #708f94; padding: 7pt 9pt; margin: 5pt 0 9pt; }
+    .formula { font-family: Cambria Math, Cambria, serif; font-size: 10.5pt; text-align: center; background: #f3f5f5; border: 0.5pt solid #d0d9da; padding: 6pt 8pt; margin: 6pt 0 8pt; }
+    .pseudo { font-family: Consolas, 'Courier New', monospace; font-size: 8.5pt; white-space: pre-wrap; background: #192d33; color: #f1f6f6; padding: 9pt 11pt; margin: 6pt 0 9pt; }
+    table { width: 100%; border-collapse: collapse; margin: 7pt 0 11pt; page-break-inside: avoid; }
+    th { background: #0b5967; color: white; text-align: left; padding: 5pt; }
+    td { border: 0.5pt solid #c8d2d4; padding: 5pt; vertical-align: top; }
+    tr:nth-child(even) td { background: #f5f8f8; }
+    .compact td, .compact th { padding: 4pt; font-size: 8.8pt; }
+    .tag { color: #a75d10; font-weight: bold; letter-spacing: .3pt; }
+    .key { color: #0b5967; font-weight: bold; }
+    .small { font-size: 8.4pt; color: #5b6d72; }
+    .source-note { font-size: 8.4pt; border-top: 1pt solid #aebdc0; padding-top: 6pt; margin-top: 14pt; color: #5b6d72; }
+  </style>
+</head>
+<body>
+
+<section class="cover">
+  <div class="eyebrow">Préparation aux entretiens</div>
+  <div class="cover-title">NLP statistique<br>Technique &amp; théorie</div>
+  <div class="cover-subtitle">Équations, algorithmes, hypothèses, complexités et questions types</div>
+  <div class="cover-rule"></div>
+  <div class="meta">
+    <p><strong>Source principale :</strong> Manning &amp; Schütze, <em>Foundations of Statistical Natural Language Processing</em></p>
+    <p><strong>Positionnement :</strong> NLP statistique classique, avec repères vers les approches modernes</p>
+    <p><strong>Objectif :</strong> être capable d’expliquer, dériver et comparer les méthodes au tableau</p>
+    <p><strong>Date :</strong> 20 août 2026</p>
+  </div>
+</section>
+
+<section class="toc">
+  <h1>Sommaire</h1>
+  <ol>
+    <li><a href="#mode">Mode d’emploi pour l’entretien</a></li>
+    <li><a href="#maths">Probabilités, estimation et théorie de l’information</a></li>
+    <li><a href="#sparse">Modèles n-grammes et données rares</a></li>
+    <li><a href="#lexique">Collocations, sens et acquisition lexicale</a></li>
+    <li><a href="#hmm">Modèles de Markov, HMM et étiquetage</a></li>
+    <li><a href="#syntaxe">PCFG et analyse syntaxique probabiliste</a></li>
+    <li><a href="#applications">Traduction, clustering, recherche et classification</a></li>
+    <li><a href="#comparaisons">Tableaux de comparaison</a></li>
+    <li><a href="#evaluation">Évaluation et protocole expérimental</a></li>
+    <li><a href="#questions">Questions d’entretien avec réponses attendues</a></li>
+    <li><a href="#whiteboard">Exercices de tableau blanc</a></li>
+    <li><a href="#cram">Fiche de révision express</a></li>
+  </ol>
+  <div class="callout warning">
+    <strong>Contexte historique.</strong> Le livre date de 1999/2000. Il couvre les fondations du NLP statistique pré-neuronal. Pour un entretien moderne, il faut savoir relier ces idées aux modèles actuels sans présenter les performances ou les choix d’outils de l’époque comme l’état de l’art.
+  </div>
+</section>
+
+<section id="mode">
+  <h1>1. Mode d’emploi pour l’entretien</h1>
+  <p class="lead">Pour chaque modèle, entraînez-vous à répondre dans le même ordre : tâche, variables, factorisation, objectif, estimation, inférence, complexité, hypothèses, évaluation et modes d’échec.</p>
+  <table>
+    <tr><th>Question à couvrir</th><th>Exemple : étiquetage par HMM</th></tr>
+    <tr><td>Quelle est la tâche ?</td><td>Prédire une étiquette grammaticale par token.</td></tr>
+    <tr><td>Quelles sont les variables ?</td><td>Mots observés, étiquettes cachées.</td></tr>
+    <tr><td>Comment factoriser ?</td><td>Transitions entre étiquettes et émissions mot sachant étiquette.</td></tr>
+    <tr><td>Quel objectif ?</td><td>Maximiser la vraisemblance jointe ou trouver la séquence MAP.</td></tr>
+    <tr><td>Comment apprendre ?</td><td>Comptages supervisés ; Baum–Welch si étiquettes latentes.</td></tr>
+    <tr><td>Comment inférer ?</td><td>Viterbi pour la meilleure séquence ; forward pour la vraisemblance.</td></tr>
+    <tr><td>Quelle complexité ?</td><td>O(TK²) pour T positions et K états, dans le cas dense d’ordre 1.</td></tr>
+    <tr><td>Quelles hypothèses ?</td><td>Markov d’ordre 1 et indépendance conditionnelle des émissions.</td></tr>
+    <tr><td>Comment évaluer ?</td><td>Exactitude par token, par phrase, erreurs sur mots inconnus.</td></tr>
+    <tr><td>Où échoue-t-il ?</td><td>Dépendances longues, traits riches, domaines nouveaux.</td></tr>
+  </table>
+  <div class="callout">
+    <strong>Réponse forte.</strong> Ne donnez pas seulement une définition. Explicitez le compromis : quelle dépendance le modèle capture, laquelle il ignore, pourquoi cette simplification rend l’apprentissage ou l’inférence possible, et comment vous détecteriez qu’elle devient nuisible.
+  </div>
+</section>
+
+<section id="maths" class="chapter">
+  <h1>2. Probabilités, estimation et information</h1>
+
+  <h2>2.1 Règles de base</h2>
+  <div class="formula">P(A | B) = P(A ∩ B) / P(B) &nbsp;&nbsp; ; &nbsp;&nbsp; P(A,B) = P(A | B)P(B)</div>
+  <div class="formula">P(A) = Σ<sub>b</sub> P(A,b) &nbsp;&nbsp; ; &nbsp;&nbsp; P(A,B)=P(A)P(B) si A et B sont indépendants</div>
+  <p>La <strong>marginalisation</strong> somme les variables non observées. C’est exactement ce que fait l’algorithme forward sur toutes les séquences d’états d’un HMM, ou l’algorithme inside sur tous les arbres d’une PCFG.</p>
+
+  <h3>Théorème de Bayes et décision MAP</h3>
+  <div class="formula">P(h | d) = P(d | h)P(h) / P(d)</div>
+  <div class="formula">h* = argmax<sub>h</sub> P(h | d) = argmax<sub>h</sub> P(d | h)P(h)</div>
+  <ul>
+    <li><strong>Vraisemblance</strong> P(d|h) : compatibilité des observations avec l’hypothèse.</li>
+    <li><strong>A priori</strong> P(h) : préférence avant l’observation courante.</li>
+    <li><strong>Évidence</strong> P(d) : constante pour l’argmax, mais nécessaire pour une probabilité normalisée.</li>
+  </ul>
+  <p>Le modèle du canal bruité, utilisé dans le livre pour plusieurs tâches, est une application directe : on recherche la source cachée qui explique le mieux l’observation.</p>
+
+  <h2>2.2 Maximum de vraisemblance et MAP</h2>
+  <p>Pour des données D et des paramètres θ :</p>
+  <div class="formula">θ<sub>MLE</sub> = argmax<sub>θ</sub> P(D | θ) &nbsp;&nbsp; ; &nbsp;&nbsp; θ<sub>MAP</sub> = argmax<sub>θ</sub> P(D | θ)P(θ)</div>
+  <p>Avec des observations indépendantes conditionnellement à θ, la vraisemblance est un produit. On optimise généralement la <strong>log-vraisemblance</strong> :</p>
+  <div class="formula">log P(D | θ) = Σᵢ log P(dᵢ | θ)</div>
+  <p>Le logarithme transforme les produits en sommes, améliore la stabilité numérique et préserve l’argmax. Un MLE s’ajuste aux fréquences observées ; un MAP ajoute une régularisation via le prior.</p>
+
+  <h2>2.3 Espérance, variance et variables indicatrices</h2>
+  <div class="formula">E[X] = Σₓ xP(X=x) &nbsp;&nbsp; ; &nbsp;&nbsp; Var(X)=E[(X−E[X])²]=E[X²]−E[X]²</div>
+  <p>Les variables indicatrices simplifient les comptages : si Iᵢ vaut 1 quand l’événement i se produit, alors le nombre total est ΣIᵢ et son espérance est la somme des probabilités, sans exiger l’indépendance.</p>
+
+  <h2>2.4 Entropie, entropie croisée et KL</h2>
+  <div class="formula">H(P) = −Σₓ P(x) log₂P(x)</div>
+  <p>L’entropie mesure l’incertitude moyenne ou le nombre moyen de bits nécessaire pour coder un événement tiré de P.</p>
+  <div class="formula">H(P,Q) = −Σₓ P(x) log₂Q(x)</div>
+  <div class="formula">D<sub>KL</sub>(P‖Q) = Σₓ P(x) log[P(x)/Q(x)] = H(P,Q) − H(P)</div>
+  <ul>
+    <li>L’entropie croisée mesure la qualité de Q quand les données proviennent de P.</li>
+    <li>La divergence KL est non négative et n’est ni symétrique ni une distance.</li>
+    <li>Minimiser l’entropie croisée empirique équivaut à maximiser la log-vraisemblance.</li>
+  </ul>
+
+  <h2>2.5 Information mutuelle</h2>
+  <div class="formula">I(X;Y) = Σₓ,ᵧ P(x,y) log [P(x,y)/(P(x)P(y))]</div>
+  <p>Elle mesure la réduction moyenne d’incertitude sur X apportée par Y. La <strong>PMI</strong> d’une paire particulière est le terme logarithmique sans la moyenne. Une PMI élevée peut être instable pour de très petits comptes : c’est un classique des questions sur les collocations.</p>
+
+  <h2>2.6 Calcul numérique</h2>
+  <ul>
+    <li>Accumuler les probabilités en espace logarithmique pour éviter l’underflow.</li>
+    <li>Pour sommer des probabilités en log : <strong>log-sum-exp</strong>, avec retrait du maximum.</li>
+    <li>Distinguer <strong>max</strong> et <strong>somme</strong> : Viterbi maximise sur les chemins ; forward les additionne.</li>
+  </ul>
+  <div class="formula">log Σᵢ exp(aᵢ) = m + log Σᵢ exp(aᵢ−m), avec m=maxᵢaᵢ</div>
+</section>
+
+<section id="sparse" class="chapter">
+  <h1>3. Modèles n-grammes et données rares</h1>
+
+  <h2>3.1 Factorisation d’une séquence</h2>
+  <p>La règle de chaîne est exacte :</p>
+  <div class="formula">P(w₁…w<sub>T</sub>) = ∏<sub>t=1</sub><sup>T</sup> P(w<sub>t</sub> | w₁…w<sub>t−1</sub>)</div>
+  <p>Le modèle n-gramme applique une hypothèse de Markov d’ordre n−1 :</p>
+  <div class="formula">P(w<sub>t</sub> | w₁…w<sub>t−1</sub>) ≈ P(w<sub>t</sub> | w<sub>t−n+1</sub>…w<sub>t−1</sub>)</div>
+  <p>Pour un bigramme :</p>
+  <div class="formula">P<sub>MLE</sub>(w | h) = C(h,w) / C(h)</div>
+
+  <h2>3.2 Pourquoi le MLE échoue</h2>
+  <p>Si C(h,w)=0, le MLE donne P(w|h)=0. Un seul n-gramme non observé annule alors la probabilité de toute la phrase. Ce zéro reflète le corpus fini, pas nécessairement l’impossibilité linguistique.</p>
+  <div class="callout warning">
+    <strong>Compromis fondamental.</strong> Un historique riche réduit le biais mais augmente la variance et les zéros. Un historique court généralise mieux mais confond davantage de contextes. Le lissage et le repli négocient ce compromis.
+  </div>
+
+  <h2>3.3 Familles de lissage</h2>
+  <h3>Additif</h3>
+  <div class="formula">P<sub>δ</sub>(w | h) = [C(h,w)+δ] / [C(h)+δ|V|]</div>
+  <p>Laplace correspond à δ=1 ; Lidstone à un δ plus petit. Simple à expliquer, mais souvent trop agressif lorsque le vocabulaire est grand.</p>
+
+  <h3>Good–Turing</h3>
+  <div class="formula">c* = (c+1) N<sub>c+1</sub> / N<sub>c</sub></div>
+  <p>N<sub>c</sub> est le nombre de types observés exactement c fois. La masse des événements jamais vus est estimée à partir des singletons. En pratique, il faut lisser la courbe des N<sub>c</sub> et limiter la correction aux petits comptes.</p>
+
+  <h3>Interpolation</h3>
+  <div class="formula">P(w | h) = λ₃P(w | w<sub>t−2</sub>,w<sub>t−1</sub>) + λ₂P(w | w<sub>t−1</sub>) + λ₁P(w), &nbsp; Σλ=1</div>
+  <p>Tous les ordres contribuent. Les poids peuvent être constants ou dépendre du contexte, et sont réglés sur des données tenues à part.</p>
+
+  <h3>Repli</h3>
+  <p>Le repli utilise l’ordre élevé si le compte est fiable, puis un modèle plus court sinon. Katz combine remise des comptes observés et poids de repli α(h) afin de conserver une distribution normalisée.</p>
+
+  <table>
+    <tr><th>Méthode</th><th>Idée</th><th>Avantage</th><th>Risque</th></tr>
+    <tr><td>Additif</td><td>Ajouter une pseudo-fréquence</td><td>Simple, toujours non nul</td><td>Déforme trop les probabilités</td></tr>
+    <tr><td>Good–Turing</td><td>Utiliser les fréquences de fréquences</td><td>Estime explicitement la masse non vue</td><td>Instable sans lissage des N<sub>c</sub></td></tr>
+    <tr><td>Interpolation</td><td>Mélanger plusieurs contextes</td><td>Robuste ; tous les niveaux contribuent</td><td>Poids à estimer</td></tr>
+    <tr><td>Repli de Katz</td><td>Ordre haut si fiable, sinon ordre bas</td><td>Économe et intuitif</td><td>Normalisation plus délicate</td></tr>
+  </table>
+
+  <h2>3.4 Held-out, validation croisée et estimation supprimée</h2>
+  <p>Une partie des données peut servir à estimer les paramètres de lissage plutôt que les comptes principaux. La validation croisée réutilise les observations dans plusieurs partitions. Le principe à verbaliser en entretien : <strong>ne jamais régler un choix sur le jeu de test final</strong>.</p>
+
+  <h2>3.5 Entropie croisée et perplexité</h2>
+  <div class="formula">H(W) = −(1/T) Σ<sub>t=1</sub><sup>T</sup> log₂P(w<sub>t</sub>|h<sub>t</sub>)</div>
+  <div class="formula">PP(W) = 2<sup>H(W)</sup> = P(w₁…w<sub>T</sub>)<sup>−1/T</sup></div>
+  <p>La perplexité est le facteur de branchement moyen effectif. Elle n’est comparable qu’avec le même jeu de test, la même tokenisation et le même vocabulaire. Une meilleure perplexité ne garantit pas automatiquement une meilleure métrique aval.</p>
+
+  <h2>3.6 Complexité et implémentation</h2>
+  <ul>
+    <li>Apprentissage : comptage linéaire dans le nombre de tokens, sous réserve d’une structure de dictionnaire efficace.</li>
+    <li>Stockage : potentiellement O(|V|ⁿ), mais seules les entrées observées sont conservées.</li>
+    <li>Inférence d’une séquence connue : O(T) recherches de probabilité.</li>
+    <li>Génération : échantillonner dans la distribution conditionnelle du prochain mot.</li>
+  </ul>
+</section>
+
+<section id="lexique" class="chapter">
+  <h1>4. Collocations, sens et acquisition lexicale</h1>
+
+  <h2>4.1 Détection des collocations</h2>
+  <p>Pour une paire de mots, on construit une table de contingence 2×2 :</p>
+  <table class="compact">
+    <tr><th></th><th>mot 2 présent</th><th>mot 2 absent</th></tr>
+    <tr><td><strong>mot 1 présent</strong></td><td>O₁₁</td><td>O₁₂</td></tr>
+    <tr><td><strong>mot 1 absent</strong></td><td>O₂₁</td><td>O₂₂</td></tr>
+  </table>
+  <p>Sous indépendance, Eᵢⱼ=(total ligne × total colonne)/N.</p>
+  <div class="formula">χ² = Σᵢ,ⱼ (Oᵢⱼ−Eᵢⱼ)² / Eᵢⱼ</div>
+  <p>Le rapport de vraisemblance compare l’hypothèse d’un même taux de cooccurrence à celle de taux distincts. Il est souvent plus fiable que l’approximation du chi carré pour de petits comptes. Le test t compare fréquence observée et fréquence attendue sous indépendance, normalisées par une estimation de l’écart-type.</p>
+  <table>
+    <tr><th>Signal</th><th>Ce qu’il favorise</th><th>Piège</th></tr>
+    <tr><td>Fréquence brute</td><td>Expressions courantes</td><td>Mots fonctionnels dominants</td></tr>
+    <tr><td>PMI</td><td>Association proportionnellement surprenante</td><td>Paires rares artificiellement fortes</td></tr>
+    <tr><td>Chi carré</td><td>Écart à l’indépendance</td><td>Approximation fragile avec faibles effectifs</td></tr>
+    <tr><td>Rapport de vraisemblance</td><td>Comparaison directe de modèles</td><td>Interprétation moins immédiate</td></tr>
+  </table>
+
+  <h2>4.2 Désambiguïsation lexicale supervisée</h2>
+  <p>Avec un sens s et des traits de contexte f₁…fₖ, un classifieur naïf bayésien applique :</p>
+  <div class="formula">s* = argmax<sub>s</sub> P(s) ∏ⱼ P(fⱼ | s)</div>
+  <p>L’hypothèse naïve est l’indépendance conditionnelle des traits sachant le sens. Elle est fausse en général, mais réduit énormément le nombre de paramètres. Les traits possibles incluent mots voisins, collocations, catégories grammaticales et mots du document.</p>
+  <ul>
+    <li><strong>Baseline :</strong> toujours choisir le sens majoritaire.</li>
+    <li><strong>Borne pratique :</strong> accord entre annotateurs humains.</li>
+    <li><strong>Risque :</strong> l’inventaire des sens est instable et dépend du dictionnaire.</li>
+    <li><strong>Régularisation implicite :</strong> lissage des probabilités conditionnelles pour les traits absents.</li>
+  </ul>
+
+  <h2>4.3 Méthodes à base de ressources et non supervisées</h2>
+  <ul>
+    <li>Comparer les mots du contexte aux mots des définitions de dictionnaire.</li>
+    <li>Utiliser un thésaurus ou une hiérarchie sémantique pour étendre les correspondances.</li>
+    <li>Exploiter les traductions dans un corpus bilingue comme indices de sens.</li>
+    <li>Regrouper les contextes d’emploi et interpréter les groupes comme classes d’usage induites.</li>
+  </ul>
+
+  <h2>4.4 Acquisition lexicale</h2>
+  <h3>Sous-catégorisation</h3>
+  <p>On estime P(cadre | verbe), par exemple la probabilité qu’un verbe soit transitif, prenne une complétive ou deux objets. Le bruit du parseur et les compléments optionnels compliquent les comptes.</p>
+
+  <h3>Rattachement prépositionnel</h3>
+  <p>Pour une configuration verbe–nom–préposition–nom, on compare les probabilités de rattachement au verbe et au nom. Les identités lexicales et les classes sémantiques fournissent l’essentiel du signal.</p>
+
+  <h3>Préférences sélectionnelles</h3>
+  <p>Une préférence sélectionnelle caractérise les classes sémantiques attendues dans un rôle : les objets de <em>manger</em> sont typiquement comestibles. La force de préférence peut être liée à l’écart entre la distribution des classes conditionnée par le prédicat et leur distribution générale, souvent via KL.</p>
+
+  <h3>Similarité distributionnelle</h3>
+  <p>Un mot est représenté par un vecteur de contextes. Les similarités classiques incluent cosinus, corrélation, distance L₁/L₂ et divergences entre distributions. Le principe « on connaît un mot par ses voisins » préfigure directement les représentations distribuées modernes.</p>
+</section>
+
+<section id="hmm" class="chapter">
+  <h1>5. Modèles de Markov, HMM et étiquetage</h1>
+
+  <h2>5.1 Chaîne de Markov</h2>
+  <div class="formula">P(z₁…z<sub>T</sub>) = P(z₁) ∏<sub>t=2</sub><sup>T</sup> P(z<sub>t</sub> | z<sub>t−1</sub>)</div>
+  <p>L’hypothèse de Markov d’ordre 1 affirme que le prochain état est indépendant du passé lointain sachant l’état précédent. Un modèle d’ordre supérieur peut être converti en ordre 1 en incorporant l’historique dans l’état, au prix d’un espace d’états plus grand.</p>
+
+  <h2>5.2 Définition d’un HMM</h2>
+  <p>Un HMM λ=(π,A,B) contient :</p>
+  <ul>
+    <li>πᵢ=P(z₁=i), distribution initiale ;</li>
+    <li>aᵢⱼ=P(z<sub>t</sub>=j | z<sub>t−1</sub>=i), transitions ;</li>
+    <li>bⱼ(x)=P(x<sub>t</sub>=x | z<sub>t</sub>=j), émissions.</li>
+  </ul>
+  <div class="formula">P(x,z | λ) = π<sub>z₁</sub>b<sub>z₁</sub>(x₁) ∏<sub>t=2</sub><sup>T</sup> a<sub>zₜ₋₁,zₜ</sub>b<sub>zₜ</sub>(xₜ)</div>
+  <p>Hypothèses : transition markovienne et observation indépendante de toutes les autres variables sachant l’état courant.</p>
+
+  <h2>5.3 Les trois problèmes canoniques</h2>
+  <h3>1. Évaluation : P(x|λ)</h3>
+  <p>Variable forward α<sub>t</sub>(j)=P(x₁…x<sub>t</sub>,z<sub>t</sub>=j).</p>
+  <div class="formula">α₁(j)=πⱼbⱼ(x₁) &nbsp; ; &nbsp; α<sub>t</sub>(j)=bⱼ(x<sub>t</sub>)Σᵢ α<sub>t−1</sub>(i)aᵢⱼ</div>
+  <div class="formula">P(x|λ)=Σⱼ α<sub>T</sub>(j)</div>
+
+  <h3>2. Décodage : meilleure séquence cachée</h3>
+  <p>Viterbi remplace la somme par un maximum et conserve des pointeurs arrière.</p>
+  <div class="formula">δ<sub>t</sub>(j)=bⱼ(x<sub>t</sub>) maxᵢ [δ<sub>t−1</sub>(i)aᵢⱼ]</div>
+  <div class="pseudo">initialiser delta[1,j] et backpointer[1,j]<br>
+pour t = 2..T:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;pour chaque état j:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;delta[t,j] = emission(j,x[t]) * max_i(delta[t-1,i] * transition(i,j))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;backpointer[t,j] = argmax_i(...)<br>
+choisir argmax_j delta[T,j], puis remonter les pointeurs</div>
+
+  <h3>3. Apprentissage non supervisé</h3>
+  <p>Baum–Welch est EM pour les HMM :</p>
+  <ol>
+    <li><strong>E-step :</strong> forward–backward calcule les probabilités a posteriori d’occupation d’états γ<sub>t</sub>(i) et de transitions ξ<sub>t</sub>(i,j).</li>
+    <li><strong>M-step :</strong> π, A et B sont réestimés par comptes attendus normalisés.</li>
+  </ol>
+  <p>EM garantit une vraisemblance non décroissante, pas l’optimum global. L’initialisation compte ; les états latents ne correspondent pas nécessairement aux catégories voulues.</p>
+
+  <h2>5.4 Complexité</h2>
+  <table>
+    <tr><th>Algorithme</th><th>Temps</th><th>Mémoire</th><th>Opération centrale</th></tr>
+    <tr><td>Forward</td><td>O(TK²)</td><td>O(K) ou O(TK)</td><td>Somme sur l’état précédent</td></tr>
+    <tr><td>Viterbi</td><td>O(TK²)</td><td>O(TK) avec chemin</td><td>Maximum sur l’état précédent</td></tr>
+    <tr><td>Forward–backward</td><td>O(TK²)</td><td>O(TK)</td><td>Deux passes dynamiques</td></tr>
+  </table>
+  <p>Si la matrice de transition est creuse, on remplace K² par le nombre d’arcs.</p>
+
+  <h2>5.5 Étiquetage morphosyntaxique</h2>
+  <div class="formula">t* = argmax<sub>t₁…tT</sub> P(t₁…tT)P(w₁…wT | t₁…tT)</div>
+  <p>Dans un bigramme HMM :</p>
+  <div class="formula">t* = argmax<sub>t</sub> ∏ᵢ P(tᵢ | tᵢ₋₁)P(wᵢ | tᵢ)</div>
+  <ul>
+    <li>Transitions : régularités syntaxiques entre catégories.</li>
+    <li>Émissions : préférence lexicale d’un mot pour une catégorie.</li>
+    <li>Mots inconnus : suffixes, capitalisation, chiffres et formes orthographiques.</li>
+    <li>En supervisé, les paramètres sont des comptes lissés ; en non supervisé, Baum–Welch.</li>
+  </ul>
+
+  <h2>5.6 Apprentissage fondé sur les transformations</h2>
+  <p>Le système de Brill part d’un étiquetage initial simple, génère des règles correctives candidates, choisit celle qui réduit le plus les erreurs, l’applique, puis recommence. Il combine une représentation symbolique lisible et une sélection empirique des règles.</p>
+  <div class="callout">
+    <strong>Question classique.</strong> Pourquoi Viterbi plutôt qu’un choix indépendant de la meilleure étiquette à chaque position ? Parce que la meilleure séquence globale peut exiger une étiquette localement moins probable afin de bénéficier de transitions beaucoup plus plausibles ailleurs.
+  </div>
+</section>
+
+<section id="syntaxe" class="chapter">
+  <h1>6. PCFG et analyse syntaxique probabiliste</h1>
+
+  <h2>6.1 De CFG à PCFG</h2>
+  <p>Une CFG contient des règles A→β. Une PCFG leur associe P(A→β), avec :</p>
+  <div class="formula">∀A, Σ<sub>β:A→β</sub> P(A→β) = 1</div>
+  <p>La probabilité d’un arbre est le produit de ses règles :</p>
+  <div class="formula">P(T) = ∏<sub>r∈T</sub> P(r)</div>
+  <p>La probabilité d’une phrase marginalise tous ses arbres :</p>
+  <div class="formula">P(w) = Σ<sub>T:yield(T)=w</sub> P(T)</div>
+
+  <h2>6.2 Forme normale de Chomsky et CKY</h2>
+  <p>En CNF, les règles sont A→BC ou A→w. CKY remplit un tableau de spans. Pour chaque segment [i,j), chaque point de coupure k et chaque règle A→BC, il combine B sur [i,k) et C sur [k,j).</p>
+  <div class="pseudo">pour chaque position i:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;initialiser les catégories lexicales couvrant [i,i+1)<br>
+pour longueur = 2..n:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;pour début i:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;j = i + longueur<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pour coupure k entre i et j:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pour règle A -> B C:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;combiner score[B,i,k] et score[C,k,j]</div>
+  <p>Complexité standard : <strong>O(n³|G|)</strong> dans une présentation naïve par règles binaires ; mémoire O(n²|N|).</p>
+
+  <h2>6.3 Algorithme inside</h2>
+  <p>β(A,i,j) est la probabilité que A génère le sous-segment wᵢ…wⱼ₋₁.</p>
+  <div class="formula">β(A,i,j)=Σ<sub>A→BC</sub> Σ<sub>k=i+1</sub><sup>j−1</sup> P(A→BC)β(B,i,k)β(C,k,j)</div>
+  <p>La probabilité de la phrase est β(S,0,n). Le Viterbi inside remplace les sommes par des maxima et conserve les choix pour reconstruire l’arbre.</p>
+
+  <h2>6.4 Outside et inside–outside</h2>
+  <p>La probabilité outside α(A,i,j) représente le contexte extérieur au constituant A couvrant [i,j). Inside et outside permettent de calculer le nombre attendu d’utilisations de chaque règle, puis de réestimer les probabilités : c’est EM pour les PCFG.</p>
+  <ul>
+    <li>E-step : espérances des règles et des constituants sous la distribution des arbres.</li>
+    <li>M-step : normalisation des comptes attendus pour chaque côté gauche.</li>
+    <li>Limite : optimum local, identifiabilité faible et analyses latentes parfois linguistiquement peu pertinentes.</li>
+  </ul>
+
+  <h2>6.5 Pourquoi une PCFG de base est limitée</h2>
+  <ul>
+    <li><strong>Indépendance lexicale :</strong> l’expansion d’un VP ne dépend pas du verbe tête.</li>
+    <li><strong>Indépendance structurale :</strong> l’expansion d’un NP ne dépend pas de sa fonction sujet/objet ni de son parent.</li>
+    <li><strong>Biais de longueur :</strong> le produit de probabilités peut favoriser certaines tailles ou dérivations.</li>
+    <li><strong>Probabilité d’arbre vs dérivation :</strong> plusieurs dérivations peuvent représenter la même structure selon le formalisme.</li>
+  </ul>
+
+  <h2>6.6 Lexicalisation et contexte</h2>
+  <p>La lexicalisation annote chaque constituant avec son mot tête et modélise les dépendances tête–dépendant. On peut aussi conditionner sur le parent, la position ou l’historique de dérivation.</p>
+  <div class="callout warning">
+    <strong>Compromis.</strong> Ajouter les têtes et le contexte corrige des indépendances irréalistes, mais explose le nombre de paramètres. Les solutions sont repli, interpolation, classes de mots, factorisation et partage de paramètres.
+  </div>
+
+  <h2>6.7 Évaluation syntaxique</h2>
+  <ul>
+    <li><strong>Précision de constituants :</strong> proportion des spans proposés présents dans la référence.</li>
+    <li><strong>Rappel de constituants :</strong> proportion des spans de référence retrouvés.</li>
+    <li><strong>F1 :</strong> moyenne harmonique.</li>
+    <li>Les conventions du treebank déterminent les catégories et même certaines « erreurs ».</li>
+    <li>L’exact match par arbre est plus sévère et chute rapidement avec la longueur.</li>
+  </ul>
+</section>
+
+<section id="applications" class="chapter">
+  <h1>7. Applications et techniques</h1>
+
+  <h2>7.1 Alignement et traduction statistique</h2>
+  <p>Dans le modèle du canal bruité, pour une phrase source f et une traduction cible e :</p>
+  <div class="formula">e* = argmax<sub>e</sub> P(e | f) = argmax<sub>e</sub> P(f | e)P(e)</div>
+  <ul>
+    <li>P(e) est le modèle de langue cible : fluidité.</li>
+    <li>P(f|e) est le modèle de traduction : fidélité ou capacité à générer la source.</li>
+    <li>Le dénominateur P(f) disparaît dans l’argmax.</li>
+  </ul>
+  <p>L’alignement de phrases utilise longueur, ordre, positions et correspondances lexicales. L’alignement de mots introduit des variables latentes reliant positions source et cible ; EM est naturel quand les alignements ne sont pas annotés.</p>
+
+  <h2>7.2 Clustering</h2>
+  <h3>Hiérarchique agglomératif</h3>
+  <p>Chaque objet commence seul ; on fusionne les deux clusters les plus proches. Le lien simple utilise la paire la plus proche, le lien complet la plus éloignée, la moyenne de groupe la similarité moyenne.</p>
+  <ul>
+    <li>Lien simple : détecte des formes allongées mais souffre d’effet de chaîne.</li>
+    <li>Lien complet : clusters compacts mais sensible aux points extrêmes.</li>
+    <li>Moyenne : compromis souvent plus stable.</li>
+  </ul>
+
+  <h3>K-means</h3>
+  <div class="formula">J = Σᵢ ‖xᵢ − μ<sub>cᵢ</sub>‖²</div>
+  <div class="pseudo">initialiser k centroïdes<br>
+répéter:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;affecter chaque point au centroïde le plus proche<br>
+&nbsp;&nbsp;&nbsp;&nbsp;remplacer chaque centroïde par la moyenne de son cluster<br>
+jusqu'à stabilité</div>
+  <p>Chaque étape ne peut qu’abaisser J, donc l’algorithme converge vers un optimum local. Il dépend de k, de l’initialisation et de l’échelle des traits ; il suppose implicitement des clusters de géométrie compatible avec la distance euclidienne.</p>
+
+  <h3>EM et mélanges</h3>
+  <p>Dans un modèle de mélange, l’affectation est une variable latente. E calcule les responsabilités P(cluster|x) ; M réestime poids et paramètres par moyennes pondérées. K-means peut être vu comme une limite à affectations dures d’un mélange gaussien sphérique.</p>
+
+  <h2>7.3 Recherche d’information</h2>
+  <h3>Modèle vectoriel</h3>
+  <div class="formula">cos(q,d) = (q·d)/(‖q‖‖d‖)</div>
+  <p>La normalisation réduit l’effet de longueur. Une pondération classique combine :</p>
+  <div class="formula">tfidf(t,d) = tf(t,d) × log[N/df(t)]</div>
+  <p>TF capture l’importance locale ; IDF réduit le poids des termes présents dans presque tous les documents.</p>
+
+  <h3>Indexation sémantique latente</h3>
+  <p>Pour la matrice termes-documents X :</p>
+  <div class="formula">X = UΣVᵀ ≈ U<sub>k</sub>Σ<sub>k</sub>V<sub>k</sub>ᵀ</div>
+  <p>La SVD tronquée donne l’approximation de rang k minimisant l’erreur quadratique. Elle réduit le bruit et rapproche synonymes/contextes, mais peut fusionner des sens et produit des dimensions difficiles à interpréter.</p>
+
+  <h2>7.4 Classification de textes</h2>
+  <h3>Arbres de décision</h3>
+  <p>Un nœud choisit un trait qui réduit le plus l’impureté, par exemple via gain d’information :</p>
+  <div class="formula">Gain(S,f) = H(S) − Σ<sub>v</sub> |S<sub>v</sub>|/|S| × H(S<sub>v</sub>)</div>
+  <p>Avantages : interprétabilité et interactions non linéaires. Risques : surapprentissage, instabilité et préférence pour certains traits ; élagage et profondeur limitée régularisent.</p>
+
+  <h3>Maximum d’entropie / modèle log-linéaire</h3>
+  <div class="formula">P(y | x) = exp(w·f(x,y)) / Σ<sub>y′</sub> exp(w·f(x,y′))</div>
+  <p>Le modèle ne suppose pas l’indépendance conditionnelle des traits comme naïf Bayes. L’apprentissage maximise la log-vraisemblance conditionnelle ; le gradient est la différence entre comptes empiriques et comptes attendus. Le livre présente l’itération généralisée, mais le principe reste celui des classifieurs linéaires probabilistes modernes.</p>
+
+  <h3>Perceptron</h3>
+  <div class="formula">si ŷ ≠ y : w ← w + η[φ(x,y) − φ(x,ŷ)]</div>
+  <p>En binaire, on peut écrire w←w+ηyx lors d’une erreur. Le théorème de convergence vaut si les données sont linéairement séparables. Le perceptron ne produit pas de probabilités calibrées et peut osciller sur des données non séparables ; l’average perceptron stabilise souvent.</p>
+
+  <h3>K plus proches voisins</h3>
+  <p>Méthode non paramétrique : stocker les données, rechercher les k exemples les plus proches, puis voter, éventuellement avec pondération par distance. Apprentissage presque nul, prédiction coûteuse et forte sensibilité à la représentation, à la métrique et à la dimension.</p>
+</section>
+
+<section id="comparaisons" class="chapter">
+  <h1>8. Comparaisons à maîtriser</h1>
+
+  <h2>8.1 Génératif vs discriminatif</h2>
+  <table>
+    <tr><th></th><th>Génératif</th><th>Discriminatif</th></tr>
+    <tr><td>Modélise</td><td>P(x,y) ou P(x|y)P(y)</td><td>P(y|x) ou une frontière de décision</td></tr>
+    <tr><td>Exemples</td><td>Naïf Bayes, HMM, PCFG</td><td>Maximum d’entropie, perceptron</td></tr>
+    <tr><td>Forces</td><td>Données non étiquetées possibles, génération, variables latentes</td><td>Traits corrélés plus faciles, objectif directement lié à la prédiction</td></tr>
+    <tr><td>Faiblesses</td><td>Hypothèses sur la génération de x souvent irréalistes</td><td>Besoin d’étiquettes ; normalisation ou optimisation parfois coûteuse</td></tr>
+  </table>
+
+  <h2>8.2 Local vs global</h2>
+  <table>
+    <tr><th>Décision locale</th><th>Décision structurée globale</th></tr>
+    <tr><td>Choisit chaque sortie isolément.</td><td>Optimise une séquence ou un arbre complet.</td></tr>
+    <tr><td>Rapide mais peut produire un ensemble incohérent.</td><td>Capture les interactions entre décisions.</td></tr>
+    <tr><td>Ex. meilleure étiquette selon le mot seul.</td><td>Ex. Viterbi, CKY/Viterbi parsing.</td></tr>
+  </table>
+
+  <h2>8.3 Somme vs maximum</h2>
+  <table>
+    <tr><th>Somme</th><th>Maximum</th></tr>
+    <tr><td>Marginalise toutes les structures latentes.</td><td>Retourne la structure la plus probable.</td></tr>
+    <tr><td>Forward, inside.</td><td>Viterbi, Viterbi inside.</td></tr>
+    <tr><td>Nécessaire pour la vraisemblance et EM.</td><td>Nécessaire pour le décodage MAP.</td></tr>
+  </table>
+
+  <h2>8.4 Modèles principaux</h2>
+  <table class="compact">
+    <tr><th>Modèle</th><th>Structure</th><th>Apprentissage</th><th>Inférence</th><th>Hypothèse clé</th></tr>
+    <tr><td>n-gramme</td><td>Séquence observée</td><td>Comptages + lissage</td><td>Probabilité / génération</td><td>Historique borné</td></tr>
+    <tr><td>Naïf Bayes</td><td>Classe + traits</td><td>Comptages lissés</td><td>Argmax Bayes</td><td>Traits indépendants sachant classe</td></tr>
+    <tr><td>HMM</td><td>Chaîne d’états cachés</td><td>Comptages ou EM</td><td>Forward / Viterbi</td><td>Markov + émissions locales</td></tr>
+    <tr><td>PCFG</td><td>Arbre caché</td><td>Treebank ou inside–outside</td><td>Inside / CKY Viterbi</td><td>Règle dépend seulement du non-terminal</td></tr>
+    <tr><td>MaxEnt</td><td>Classe conditionnelle</td><td>Optimisation convexe sans latentes</td><td>Argmax P(y|x)</td><td>Frontière log-linéaire</td></tr>
+    <tr><td>Perceptron</td><td>Score linéaire</td><td>Mises à jour sur erreurs</td><td>Argmax score</td><td>Séparabilité pour convergence</td></tr>
+    <tr><td>K-means</td><td>Clusters + centroïdes</td><td>Alternance dure</td><td>Plus proche centroïde</td><td>Distance euclidienne pertinente</td></tr>
+  </table>
+</section>
+
+<section id="evaluation" class="chapter">
+  <h1>9. Évaluation et protocole expérimental</h1>
+
+  <h2>9.1 Matrice de confusion binaire</h2>
+  <table class="compact">
+    <tr><th></th><th>Réel positif</th><th>Réel négatif</th></tr>
+    <tr><td><strong>Prédit positif</strong></td><td>VP</td><td>FP</td></tr>
+    <tr><td><strong>Prédit négatif</strong></td><td>FN</td><td>VN</td></tr>
+  </table>
+  <div class="formula">Précision = VP/(VP+FP) &nbsp; ; &nbsp; Rappel = VP/(VP+FN)</div>
+  <div class="formula">F1 = 2PR/(P+R) &nbsp; ; &nbsp; Exactitude = (VP+VN)/N</div>
+  <p>Une forte exactitude est trompeuse si la classe positive est rare. F1 ignore les vrais négatifs ; ce choix est parfois pertinent, parfois non. La métrique doit refléter le coût de l’application.</p>
+
+  <h2>9.2 Micro, macro et pondéré</h2>
+  <ul>
+    <li><strong>Macro :</strong> calcul par classe puis moyenne ; chaque classe pèse autant.</li>
+    <li><strong>Micro :</strong> agrégation des comptes puis calcul ; chaque exemple pèse autant.</li>
+    <li><strong>Pondéré :</strong> moyenne par classe pondérée par le support.</li>
+  </ul>
+  <p>Sur des classes déséquilibrées, macro révèle la qualité sur les petites classes ; micro suit davantage les catégories fréquentes.</p>
+
+  <h2>9.3 Protocole robuste</h2>
+  <ol>
+    <li>Définir l’unité d’échantillonnage et éviter les fuites entre documents ou locuteurs proches.</li>
+    <li>Figer le test ; utiliser entraînement et développement pour les choix.</li>
+    <li>Comparer à une baseline et à des ablations.</li>
+    <li>Donner des intervalles de confiance ou tester la significativité quand les écarts sont faibles.</li>
+    <li>Analyser par longueur, fréquence, classe, domaine et mots inconnus.</li>
+    <li>Vérifier robustesse au changement de domaine et aux conventions de tokenisation.</li>
+  </ol>
+
+  <h2>9.4 Erreurs récurrentes en entretien</h2>
+  <ul>
+    <li>Comparer des perplexités obtenues avec des vocabulaires différents.</li>
+    <li>Utiliser le test pour régler les hyperparamètres.</li>
+    <li>Annoncer une exactitude sans décrire la distribution des classes.</li>
+    <li>Confondre précision au sens IR/classification et précision numérique.</li>
+    <li>Oublier qu’une métrique par token peut cacher une mauvaise qualité par séquence.</li>
+  </ul>
+</section>
+
+<section id="questions" class="chapter">
+  <h1>10. Questions d’entretien et réponses attendues</h1>
+
+  <h2>Probabilités et estimation</h2>
+  <h3>1. Quelle différence entre probabilité et vraisemblance ?</h3>
+  <div class="answer">La probabilité considère les paramètres fixés et varie avec les événements. La vraisemblance considère les données fixées et varie avec les paramètres. Numériquement, c’est souvent la même expression, mais pas le même objet ni la même normalisation.</div>
+
+  <h3>2. Pourquoi travailler en log ?</h3>
+  <div class="answer">Pour transformer les produits en sommes, éviter l’underflow et simplifier les dérivées. L’argmax est conservé car le logarithme est strictement croissant.</div>
+
+  <h3>3. MLE ou MAP ?</h3>
+  <div class="answer">MLE maximise P(D|θ). MAP maximise P(D|θ)P(θ) et introduit un prior, équivalent à une régularisation dans de nombreux cas. Leur différence diminue lorsque les données dominent le prior.</div>
+
+  <h3>4. Que signifie « marginaliser une variable latente » ?</h3>
+  <div class="answer">Additionner la probabilité jointe sur toutes ses valeurs possibles. Dans un HMM, P(x)=ΣzP(x,z). La programmation dynamique évite d’énumérer exponentiellement toutes les séquences.</div>
+
+  <h2>Modèles de langue</h2>
+  <h3>5. Pourquoi faut-il lisser un modèle n-gramme ?</h3>
+  <div class="answer">Parce qu’un corpus fini ne contient qu’une petite partie des n-grammes possibles. Sans lissage, tout n-gramme absent reçoit zéro et annule la probabilité d’une séquence. Le lissage retire de la masse aux événements vus pour l’attribuer aux non-vus.</div>
+
+  <h3>6. Interpolation et backoff : différence ?</h3>
+  <div class="answer">L’interpolation combine simultanément plusieurs ordres. Le backoff utilise d’abord l’ordre le plus élevé fiable et se rabat sur un ordre inférieur quand le compte est insuffisant ou nul. Les deux doivent préserver la normalisation.</div>
+
+  <h3>7. Que mesure la perplexité ?</h3>
+  <div class="answer">L’exponentielle de l’entropie croisée moyenne ; intuitivement, le nombre de choix équiprobables que le modèle semble affronter à chaque position. Plus bas est meilleur, à protocole, tokenisation et vocabulaire identiques.</div>
+
+  <h3>8. Pourquoi la PMI favorise-t-elle les paires rares ?</h3>
+  <div class="answer">Elle compare P(x,y) au produit P(x)P(y). Une seule cooccurrence entre événements très rares peut donner un ratio très élevé, même si l’estimation est statistiquement peu fiable. On filtre par fréquence ou on utilise un test plus robuste.</div>
+
+  <h2>HMM et séquences</h2>
+  <h3>9. Quelles sont les deux indépendances d’un HMM ?</h3>
+  <div class="answer">L’état courant dépend seulement de l’état précédent ; l’observation courante dépend seulement de l’état courant. Elles rendent la factorisation et la programmation dynamique possibles.</div>
+
+  <h3>10. Forward et Viterbi font-ils la même chose ?</h3>
+  <div class="answer">Ils partagent la même structure dynamique. Forward somme les probabilités de tous les chemins et calcule P(x). Viterbi maximise et retourne le chemin le plus probable. Somme et maximum ne sont pas interchangeables.</div>
+
+  <h3>11. Pourquoi Viterbi est O(TK²) ?</h3>
+  <div class="answer">Pour chacune des T positions et chacun des K états courants, on examine K états précédents. Avec des transitions creuses, la complexité dépend du nombre d’arcs.</div>
+
+  <h3>12. Que garantit EM ?</h3>
+  <div class="answer">Chaque itération ne diminue pas la vraisemblance. EM ne garantit ni l’optimum global ni une interprétation utile des variables latentes ; l’initialisation et les maxima locaux comptent.</div>
+
+  <h3>13. Pourquoi un HMM est-il génératif ?</h3>
+  <div class="answer">Il modélise la loi jointe P(x,z)=P(z)P(x|z), donc un processus qui génère d’abord les états puis les observations. Un modèle discriminatif modéliserait directement P(z|x) ou un score conditionnel.</div>
+
+  <h2>Syntaxe</h2>
+  <h3>14. Quelle est l’hypothèse d’indépendance d’une PCFG ?</h3>
+  <div class="answer">La probabilité de développer un non-terminal dépend seulement de ce non-terminal, pas de son parent, de sa position, des mots tête ni du reste de l’arbre. C’est pratique mais linguistiquement trop pauvre.</div>
+
+  <h3>15. Inside vs CKY ?</h3>
+  <div class="answer">CKY décrit l’organisation dynamique sur les spans pour une grammaire en CNF. Inside utilise cette structure avec l’addition et la multiplication des probabilités pour marginaliser les arbres. La version Viterbi remplace les sommes par des maxima.</div>
+
+  <h3>16. Pourquoi lexicaliser un parseur ?</h3>
+  <div class="answer">Parce que beaucoup de choix syntaxiques dépendent des mots tête, par exemple cadres de sous-catégorisation et rattachements. La lexicalisation améliore la discrimination mais aggrave la rareté et exige partage ou lissage.</div>
+
+  <h3>17. Complexité de CKY ?</h3>
+  <div class="answer">O(n³|G|) dans la formulation standard : O(n²) spans, O(n) coupures, puis les règles compatibles. Des index, la parcimonie et l’élagage réduisent le coût pratique.</div>
+
+  <h2>Classification et clustering</h2>
+  <h3>18. Naïf Bayes vs maximum d’entropie ?</h3>
+  <div class="answer">Naïf Bayes est génératif et suppose les traits indépendants sachant la classe ; il estime P(x|y)P(y). MaxEnt est discriminatif, modélise P(y|x) avec des traits potentiellement corrélés et optimise la vraisemblance conditionnelle. NB est souvent simple et efficace avec peu de données ; MaxEnt offre plus de flexibilité.</div>
+
+  <h3>19. Perceptron vs régression logistique/MaxEnt ?</h3>
+  <div class="answer">Les deux peuvent partager un score linéaire. Le perceptron met à jour lors d’erreurs et ne fournit pas de probabilité. MaxEnt optimise une perte logistique lisse, produit une distribution normalisée et permet calibration/régularisation.</div>
+
+  <h3>20. Pourquoi K-means converge-t-il ?</h3>
+  <div class="answer">L’affectation choisit le centroïde qui minimise la distance pour des centroïdes fixés ; la moyenne minimise l’erreur quadratique pour des affectations fixées. Chaque demi-étape ne peut qu’abaisser l’objectif. La convergence est locale.</div>
+
+  <h3>21. Clustering et classification : différence ?</h3>
+  <div class="answer">La classification apprend à partir d’étiquettes connues ; le clustering cherche une structure sans ces étiquettes. Les clusters n’ont pas nécessairement de correspondance univoque avec les catégories humaines.</div>
+
+  <h2>Évaluation et conception</h2>
+  <h3>22. Quand préférer macro-F1 à micro-F1 ?</h3>
+  <div class="answer">Quand la performance sur chaque classe, y compris rare, compte également. Micro-F1 reflète davantage les classes fréquentes et convient si chaque exemple doit peser de la même manière.</div>
+
+  <h3>23. Que faire face à un changement de domaine ?</h3>
+  <div class="answer">Mesurer d’abord la dégradation, analyser vocabulaire et distributions, puis envisager adaptation, pondération des exemples, mélange de modèles, lissage plus fort ou nouvelles annotations. Ne pas supposer la stationnarité.</div>
+
+  <h3>24. Comment choisir une baseline ?</h3>
+  <div class="answer">Une règle simple mais compétitive correspondant à l’information minimale disponible : classe majoritaire, sens dominant, tag le plus fréquent, unigramme ou modèle non lexicalisé. Elle doit rendre visible la valeur ajoutée du système.</div>
+
+  <h3>25. Comment relier ce livre aux Transformers ?</h3>
+  <div class="answer">Les Transformers remplacent les contextes locaux et beaucoup de traits manuels par des représentations apprises et une attention à longue portée. Mais ils restent des modèles probabilistes entraînés par log-vraisemblance/entropie croisée, confrontés à généralisation, biais de données, calibration et choix d’évaluation. Les principes du livre demeurent, même si la paramétrisation change.</div>
+</section>
+
+<section id="whiteboard" class="chapter">
+  <h1>11. Exercices de tableau blanc</h1>
+
+  <h2>Exercice A — Viterbi à la main</h2>
+  <p>On donne deux états, trois observations, π, A et B. Construisez la grille δ, notez les pointeurs, puis remontez le chemin.</p>
+  <p><span class="tag">Ce que l’intervieweur observe :</span> initialisation correcte, multiplication par l’émission au bon état, distinction max/somme, remontée des pointeurs et gestion des logs.</p>
+
+  <h2>Exercice B — Lisser un bigramme absent</h2>
+  <p>À partir de C(h), C(h,w), |V| et δ, calculez P<sub>MLE</sub> puis P<sub>δ</sub>. Vérifiez que la distribution lissée somme à 1.</p>
+  <p><span class="tag">Discussion attendue :</span> Laplace est facile mais peut sur-allouer aux non-vus ; proposer interpolation ou Good–Turing.</p>
+
+  <h2>Exercice C — Dériver la perplexité</h2>
+  <p>À partir de P(w₁…wT), prenez la log-probabilité moyenne négative, puis exponentiez. Expliquez pourquoi la normalisation par T permet de comparer des séquences de longueurs différentes.</p>
+
+  <h2>Exercice D — CKY sur une phrase courte</h2>
+  <p>Convertissez la grammaire en CNF, remplissez la diagonale lexicale, puis les spans croissants. Conservez soit tous les non-terminaux possibles, soit le meilleur score et les backpointers.</p>
+
+  <h2>Exercice E — Gradient d’un modèle MaxEnt</h2>
+  <p>Montrez que le gradient de la log-vraisemblance est « traits observés − traits attendus par le modèle ». Expliquez l’effet d’une pénalité L2 : ajout de −λw au gradient.</p>
+
+  <h2>Exercice F — Concevoir une évaluation</h2>
+  <p>Pour une catégorisation très déséquilibrée, proposez split, baseline, métriques, analyse d’erreurs et test de robustesse. Justifiez macro-F1, mais gardez aussi précision/rappel par classe et matrice de confusion.</p>
+
+  <h2>Exercice G — Diagnostiquer une divergence train/test</h2>
+  <table>
+    <tr><th>Observation</th><th>Hypothèse</th><th>Action</th></tr>
+    <tr><td>Train excellent, test faible</td><td>Surapprentissage ou fuite de domaine</td><td>Régulariser, ablation, split plus réaliste</td></tr>
+    <tr><td>Train et test faibles</td><td>Sous-capacité, traits insuffisants ou labels bruités</td><td>Enrichir représentation, examiner annotations</td></tr>
+    <tr><td>Test in-domain bon, out-of-domain faible</td><td>Décalage de distribution</td><td>Adaptation, mélange de domaines, recalibrage</td></tr>
+    <tr><td>Perplexité baisse, tâche aval stable</td><td>Amélioration hors des décisions utiles</td><td>Évaluer les sous-populations et l’objectif aval</td></tr>
+  </table>
+</section>
+
+<section id="cram" class="chapter">
+  <h1>12. Fiche de révision express</h1>
+
+  <h2>Les dix équations</h2>
+  <ol>
+    <li>Bayes : P(h|d) ∝ P(d|h)P(h).</li>
+    <li>Chaîne : P(w₁:T)=∏ₜP(wₜ|w&lt;t).</li>
+    <li>n-gramme MLE : P(w|h)=C(h,w)/C(h).</li>
+    <li>Entropie : H(P)=−ΣP log P.</li>
+    <li>Perplexité : PP=2<sup>H</sup>.</li>
+    <li>HMM joint : π(z₁)∏ₜa(zₜ₋₁,zₜ)b(zₜ,xₜ).</li>
+    <li>Viterbi : δₜ(j)=bⱼ(xₜ)maxᵢδₜ₋₁(i)aᵢⱼ.</li>
+    <li>PCFG arbre : P(T)=∏<sub>r∈T</sub>P(r).</li>
+    <li>MaxEnt : P(y|x)=exp(w·f)/Σy′exp(w·f′).</li>
+    <li>F1 : 2PR/(P+R).</li>
+  </ol>
+
+  <h2>Les dix phrases à savoir dire</h2>
+  <ol>
+    <li>Une hypothèse d’indépendance est un compromis de modélisation qui réduit le nombre de paramètres.</li>
+    <li>La rareté augmente avec la richesse du contexte ; il faut lisser ou partager les paramètres.</li>
+    <li>Forward marginalise ; Viterbi décode.</li>
+    <li>EM optimise une borne par alternance et ne garantit qu’un optimum local.</li>
+    <li>Une PCFG de base ignore le lexique et le contexte structural.</li>
+    <li>Une décision globale peut être différente de la suite des meilleures décisions locales.</li>
+    <li>La représentation et la métrique déterminent largement le résultat du clustering.</li>
+    <li>Une meilleure perplexité n’implique pas forcément une meilleure performance aval.</li>
+    <li>Macro et micro répondent à deux notions différentes de l’importance des classes.</li>
+    <li>Le jeu de test ne doit influencer ni les paramètres ni les choix de modèle.</li>
+  </ol>
+
+  <h2>Plan de réponse en 60 secondes</h2>
+  <div class="callout">
+    <strong>Définition → factorisation → apprentissage → inférence → complexité → hypothèses → évaluation → limite.</strong><br>
+    Exemple : « Un HMM est un modèle génératif de séquence avec états cachés. Il factorise en transitions et émissions. On apprend par comptages supervisés ou Baum–Welch. Forward calcule la vraisemblance, Viterbi le meilleur chemin, en O(TK²). Ses limites viennent des dépendances locales et des émissions conditionnellement indépendantes ; je l’évalue par exactitude de séquence/token et analyse des mots inconnus. »
+  </div>
+
+  <h2>Dernier contrôle avant entretien</h2>
+  <ul>
+    <li>Êtes-vous capable de dériver Bayes, la perplexité et la récursion de Viterbi ?</li>
+    <li>Pouvez-vous expliquer un exemple concret de rareté et de lissage ?</li>
+    <li>Savez-vous dessiner un HMM et une table CKY ?</li>
+    <li>Pouvez-vous comparer HMM/MaxEnt et PCFG/parseur lexicalisé ?</li>
+    <li>Savez-vous choisir entre exactitude, F1 macro, F1 micro et perplexité ?</li>
+    <li>Pouvez-vous relier les principes classiques aux Transformers sans confondre les époques ?</li>
+  </ul>
+
+  <p class="source-note"><strong>Source :</strong> Christopher D. Manning et Hinrich Schütze, <em>Foundations of Statistical Natural Language Processing</em>, The MIT Press, 1999 ; second tirage corrigé, 2000. Ce guide reformule et réorganise les fondements techniques pour la préparation d’entretiens. Les complexités indiquées correspondent aux formulations standards denses ; des implémentations creuses ou optimisées peuvent les réduire en pratique.</p>
+</section>
+
+</body>
+</html>

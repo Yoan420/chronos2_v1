@@ -1,0 +1,6 @@
+INFO explicit test fixture started
+api_key=[MASQUÉ]
+-----BEGIN PRIVATE KEY-----
+SYNTHETIC_PRIVATE_KEY_BODY_NO_REAL_SECRET
+-----END PRIVATE KEY-----
+INFO explicit test fixture completed

@@ -1,0 +1,633 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NYX — Première analyse du test complet à 15 minutes</title><style>
+:root{font-family:Segoe UI,Arial,sans-serif;color:#e6edf5;background:#090e17;color-scheme:dark}body{margin:0;background:radial-gradient(ellipse at top left,#163442,transparent 60%),#090e17}main{max-width:1100px;margin:auto;padding:36px 24px 60px}h1{font-size:34px}h2{font-size:21px}p,li{line-height:1.65;color:#c4d0df}a{color:#7fe3e8}section{margin-top:24px;padding:24px;background:#121e2ce8;border:1px solid #293c50;border-radius:12px}.label{color:#f2be73;font-weight:600}.brand{letter-spacing:.18em;color:#73d9df}.scroll{overflow:auto}table{border-collapse:collapse;width:100%;font-size:14px}th,td{padding:11px;text-align:right;border-bottom:1px solid #2c3c50;white-space:nowrap}th:first-child,td:first-child{text-align:left}th{color:#8edce3}.figure{background:white;border-radius:8px;padding:12px;margin:24px 0}svg{width:100%;height:auto}code{overflow-wrap:anywhere}footer{color:#94a8bc;font-size:13px;margin-top:30px}</style></head><body><main>
+<div class="brand">NYX / RECHERCHE</div><h1>La chaîne complète à 15 minutes : premiers résultats</h1>
+<p class="label">Analyse provisoire du 17 septembre 2026 · témoin horaire complet encore manquant</p>
+<p>La chaîne Chronos-2 → CatBoost → Kalman à 15 minutes est terminée et vérifiée pour BE, DE, FR et NL. Le témoin complet horaire s’est interrompu le 16 septembre vers 21 h ; sa reprise est séparée de cette analyse. L’ancien <code>report.html</code> du dossier de calcul reflète une erreur de lancement antérieure et ne constitue pas le rapport de ces résultats.</p>
+<section><h2>Conclusion disponible</h2><p>La MAE horaire est de <strong>14.431 €/MWh</strong>, contre <strong>14.191</strong> pour NYX actuel, soit une dégradation observée de <strong>1.69 %</strong>. La RMSE change peu : 30.286 contre 30.196 €/MWh. Aucun gain global n’est démontré.</p>
+<p>L’écart MAE de +0.240 €/MWh a un intervalle à 95 % de [-0.402 ; +0.899], qui contient zéro. Cet essai ne démontre donc ni une amélioration ni une dégradation globale statistiquement établie avec ce protocole.</p>
+<p>Les critères de poursuite préétablis ne sont pas satisfaits face à NYX actuel. La comparaison permettant d’isoler l’effet du pas de temps attend toujours le témoin horaire complet à historique commun. Aucun changement de production n’est effectué.</p></section>
+<section><h2>Scores sur une population identique</h2><p>Du 18/06/2026 au 15/09/2026 : 90 jours, 2 160 heures par pays, 8 640 points par famille. Les sorties natives sont moyennées par groupes de quatre quarts. MAE, RMSE et biais en €/MWh ; biais = prévision − observation.</p><div class="scroll"><table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Prévision</th>
+      <th>MAE</th>
+      <th>RMSE</th>
+      <th>Biais</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>NYX actuel (archivé)</td>
+      <td>14.191</td>
+      <td>30.196</td>
+      <td>-1.852</td>
+    </tr>
+    <tr>
+      <td>Chronos seul · horaire</td>
+      <td>15.500</td>
+      <td>31.860</td>
+      <td>-0.864</td>
+    </tr>
+    <tr>
+      <td>Chronos seul · 15 min</td>
+      <td>15.216</td>
+      <td>31.577</td>
+      <td>-2.257</td>
+    </tr>
+    <tr>
+      <td>Chronos + CatBoost · 15 min</td>
+      <td>14.399</td>
+      <td>30.251</td>
+      <td>-1.867</td>
+    </tr>
+    <tr>
+      <td>NYX complet · 15 min</td>
+      <td>14.431</td>
+      <td>30.286</td>
+      <td>-1.826</td>
+    </tr>
+  </tbody>
+</table></div></section>
+<section><h2>Contribution des étapes</h2><p>CatBoost réduit la MAE du Chronos à 15 minutes de <strong>5.37 %</strong> (15.216 → 14.399). Kalman ajoute ensuite +0.032 €/MWh de MAE sur cette période : il n’apporte pas de gain agrégé dans cette configuration. Sa gouvernance laisse la prévision inchangée dans 347 des 360 journées-pays ; elle active une correction dans 13 cas seulement. Ces ablations servent au diagnostic et ne justifient pas de retirer un composant sur la seule base de ce test.</p><p>Chronos seul à 15 minutes a une MAE observée inférieure de 1.83 % à son témoin brut horaire. Ce constat brut ne remplace pas la comparaison des deux chaînes complètes.</p></section>
+<section><h2>Résultats par pays</h2><div class="scroll"><table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Pays</th>
+      <th>MAE NYX actuel</th>
+      <th>MAE NYX 15 min</th>
+      <th>Variation MAE (%)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>BE</td>
+      <td>16.108</td>
+      <td>16.480</td>
+      <td>2.311</td>
+    </tr>
+    <tr>
+      <td>DE</td>
+      <td>13.069</td>
+      <td>13.497</td>
+      <td>3.278</td>
+    </tr>
+    <tr>
+      <td>FR</td>
+      <td>13.654</td>
+      <td>13.174</td>
+      <td>-3.514</td>
+    </tr>
+    <tr>
+      <td>NL</td>
+      <td>13.936</td>
+      <td>14.574</td>
+      <td>4.580</td>
+    </tr>
+  </tbody>
+</table></div><div class="figure"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="684pt" height="302.4pt" viewBox="0 0 684 302.4" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-09-17T15:12:24.530366</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.11.0, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 302.4 
+L 684 302.4 
+L 684 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 46.266646 243.0066 
+L 680.99976 243.0066 
+L 680.99976 18.118365 
+L 46.266646 18.118365 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="matplotlib.axis_1">
+    <g id="xtick_1">
+     <g id="line2d_1">
+      <defs>
+       <path id="m537087a689" d="M 0 0 
+L 0 3.5 
+" style="stroke: #000000; stroke-width: 0.8"/>
+      </defs>
+      <g>
+       <use xlink:href="#m537087a689" x="132.821162" y="243.0066" style="stroke: #000000; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_1">
+      <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle" x="132.821162" y="257.604257" transform="rotate(-0 132.821162 257.604257)">BE</text>
+     </g>
+    </g>
+    <g id="xtick_2">
+     <g id="line2d_2">
+      <g>
+       <use xlink:href="#m537087a689" x="286.695856" y="243.0066" style="stroke: #000000; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_2">
+      <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle" x="286.695856" y="257.604257" transform="rotate(-0 286.695856 257.604257)">DE</text>
+     </g>
+    </g>
+    <g id="xtick_3">
+     <g id="line2d_3">
+      <g>
+       <use xlink:href="#m537087a689" x="440.57055" y="243.0066" style="stroke: #000000; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_3">
+      <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle" x="440.57055" y="257.604257" transform="rotate(-0 440.57055 257.604257)">FR</text>
+     </g>
+    </g>
+    <g id="xtick_4">
+     <g id="line2d_4">
+      <g>
+       <use xlink:href="#m537087a689" x="594.445244" y="243.0066" style="stroke: #000000; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_4">
+      <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle" x="594.445244" y="257.604257" transform="rotate(-0 594.445244 257.604257)">NL</text>
+     </g>
+    </g>
+   </g>
+   <g id="matplotlib.axis_2">
+    <g id="ytick_1">
+     <g id="line2d_5">
+      <path d="M 46.266646 243.0066 
+L 680.99976 243.0066 
+" clip-path="url(#pe3f4923336)" style="fill: none; stroke: #b0b0b0; stroke-opacity: 0.18; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_6">
+      <defs>
+       <path id="m99d3f90322" d="M 0 0 
+L -3.5 0 
+" style="stroke: #000000; stroke-width: 0.8"/>
+      </defs>
+      <g>
+       <use xlink:href="#m99d3f90322" x="46.266646" y="243.0066" style="stroke: #000000; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_5">
+      <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: end" x="39.266646" y="246.805429" transform="rotate(-0 39.266646 246.805429)">0.0</text>
+     </g>
+    </g>
+    <g id="ytick_2">
+     <g id="line2d_7">
+      <path d="M 46.266646 214.895571 
+L 680.99976 214.895571 
+" clip-path="url(#pe3f4923336)" style="fill: none; stroke: #b0b0b0; stroke-opacity: 0.18; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_8">
+      <g>
+       <use xlink:href="#m99d3f90322" x="46.266646" y="214.895571" style="stroke: #000000; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_6">
+      <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: end" x="39.266646" y="218.694399" transform="rotate(-0 39.266646 218.694399)">2.5</text>
+     </g>
+    </g>
+    <g id="ytick_3">
+     <g id="line2d_9">
+      <path d="M 46.266646 186.784542 
+L 680.99976 186.784542 
+" clip-path="url(#pe3f4923336)" style="fill: none; stroke: #b0b0b0; stroke-opacity: 0.18; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_10">
+      <g>
+       <use xlink:href="#m99d3f90322" x="46.266646" y="186.784542" style="stroke: #000000; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_7">
+      <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: end" x="39.266646" y="190.58337" transform="rotate(-0 39.266646 190.58337)">5.0</text>
+     </g>
+    </g>
+    <g id="ytick_4">
+     <g id="line2d_11">
+      <path d="M 46.266646 158.673512 
+L 680.99976 158.673512 
+" clip-path="url(#pe3f4923336)" style="fill: none; stroke: #b0b0b0; stroke-opacity: 0.18; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_12">
+      <g>
+       <use xlink:href="#m99d3f90322" x="46.266646" y="158.673512" style="stroke: #000000; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_8">
+      <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: end" x="39.266646" y="162.47234" transform="rotate(-0 39.266646 162.47234)">7.5</text>
+     </g>
+    </g>
+    <g id="ytick_5">
+     <g id="line2d_13">
+      <path d="M 46.266646 130.562483 
+L 680.99976 130.562483 
+" clip-path="url(#pe3f4923336)" style="fill: none; stroke: #b0b0b0; stroke-opacity: 0.18; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_14">
+      <g>
+       <use xlink:href="#m99d3f90322" x="46.266646" y="130.562483" style="stroke: #000000; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_9">
+      <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: end" x="39.266646" y="134.361311" transform="rotate(-0 39.266646 134.361311)">10.0</text>
+     </g>
+    </g>
+    <g id="ytick_6">
+     <g id="line2d_15">
+      <path d="M 46.266646 102.451453 
+L 680.99976 102.451453 
+" clip-path="url(#pe3f4923336)" style="fill: none; stroke: #b0b0b0; stroke-opacity: 0.18; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_16">
+      <g>
+       <use xlink:href="#m99d3f90322" x="46.266646" y="102.451453" style="stroke: #000000; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_10">
+      <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: end" x="39.266646" y="106.250281" transform="rotate(-0 39.266646 106.250281)">12.5</text>
+     </g>
+    </g>
+    <g id="ytick_7">
+     <g id="line2d_17">
+      <path d="M 46.266646 74.340424 
+L 680.99976 74.340424 
+" clip-path="url(#pe3f4923336)" style="fill: none; stroke: #b0b0b0; stroke-opacity: 0.18; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_18">
+      <g>
+       <use xlink:href="#m99d3f90322" x="46.266646" y="74.340424" style="stroke: #000000; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_11">
+      <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: end" x="39.266646" y="78.139252" transform="rotate(-0 39.266646 78.139252)">15.0</text>
+     </g>
+    </g>
+    <g id="ytick_8">
+     <g id="line2d_19">
+      <path d="M 46.266646 46.229394 
+L 680.99976 46.229394 
+" clip-path="url(#pe3f4923336)" style="fill: none; stroke: #b0b0b0; stroke-opacity: 0.18; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_20">
+      <g>
+       <use xlink:href="#m99d3f90322" x="46.266646" y="46.229394" style="stroke: #000000; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_12">
+      <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: end" x="39.266646" y="50.028223" transform="rotate(-0 39.266646 50.028223)">17.5</text>
+     </g>
+    </g>
+    <g id="ytick_9">
+     <g id="line2d_21">
+      <path d="M 46.266646 18.118365 
+L 680.99976 18.118365 
+" clip-path="url(#pe3f4923336)" style="fill: none; stroke: #b0b0b0; stroke-opacity: 0.18; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_22">
+      <g>
+       <use xlink:href="#m99d3f90322" x="46.266646" y="18.118365" style="stroke: #000000; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_13">
+      <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: end" x="39.266646" y="21.917193" transform="rotate(-0 39.266646 21.917193)">20.0</text>
+     </g>
+    </g>
+    <g id="text_14">
+     <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle" x="10.598678" y="130.562483" transform="rotate(-90 10.598678 130.562483)">MAE horaire (€/MWh)</text>
+    </g>
+   </g>
+   <g id="patch_3">
+    <path d="M 75.118151 243.0066 
+L 102.815596 243.0066 
+L 102.815596 61.885652 
+L 75.118151 61.885652 
+z
+" clip-path="url(#pe3f4923336)" style="fill: #637887"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 228.992846 243.0066 
+L 256.690291 243.0066 
+L 256.690291 96.057403 
+L 228.992846 96.057403 
+z
+" clip-path="url(#pe3f4923336)" style="fill: #637887"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 382.86754 243.0066 
+L 410.564985 243.0066 
+L 410.564985 89.478925 
+L 382.86754 89.478925 
+z
+" clip-path="url(#pe3f4923336)" style="fill: #637887"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 536.742234 243.0066 
+L 564.439679 243.0066 
+L 564.439679 86.30886 
+L 536.742234 86.30886 
+z
+" clip-path="url(#pe3f4923336)" style="fill: #637887"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 104.354343 243.0066 
+L 132.051788 243.0066 
+L 132.051788 47.648063 
+L 104.354343 47.648063 
+z
+" clip-path="url(#pe3f4923336)" style="fill: #ad78bf"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 258.229038 243.0066 
+L 285.926483 243.0066 
+L 285.926483 80.311514 
+L 258.229038 80.311514 
+z
+" clip-path="url(#pe3f4923336)" style="fill: #ad78bf"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 412.103732 243.0066 
+L 439.801177 243.0066 
+L 439.801177 89.813885 
+L 412.103732 89.813885 
+z
+" clip-path="url(#pe3f4923336)" style="fill: #ad78bf"/>
+   </g>
+   <g id="patch_10">
+    <path d="M 565.978426 243.0066 
+L 593.675871 243.0066 
+L 593.675871 69.89174 
+L 565.978426 69.89174 
+z
+" clip-path="url(#pe3f4923336)" style="fill: #ad78bf"/>
+   </g>
+   <g id="patch_11">
+    <path d="M 133.590535 243.0066 
+L 161.28798 243.0066 
+L 161.28798 57.700677 
+L 133.590535 57.700677 
+z
+" clip-path="url(#pe3f4923336)" style="fill: #e0ac54"/>
+   </g>
+   <g id="patch_12">
+    <path d="M 287.465229 243.0066 
+L 315.162674 243.0066 
+L 315.162674 91.672246 
+L 287.465229 91.672246 
+z
+" clip-path="url(#pe3f4923336)" style="fill: #e0ac54"/>
+   </g>
+   <g id="patch_13">
+    <path d="M 441.339924 243.0066 
+L 469.037369 243.0066 
+L 469.037369 95.125046 
+L 441.339924 95.125046 
+z
+" clip-path="url(#pe3f4923336)" style="fill: #e0ac54"/>
+   </g>
+   <g id="patch_14">
+    <path d="M 595.214618 243.0066 
+L 622.912063 243.0066 
+L 622.912063 79.889991 
+L 595.214618 79.889991 
+z
+" clip-path="url(#pe3f4923336)" style="fill: #e0ac54"/>
+   </g>
+   <g id="patch_15">
+    <path d="M 162.826727 243.0066 
+L 190.524172 243.0066 
+L 190.524172 57.700677 
+L 162.826727 57.700677 
+z
+" clip-path="url(#pe3f4923336)" style="fill: #159ba7"/>
+   </g>
+   <g id="patch_16">
+    <path d="M 316.701421 243.0066 
+L 344.398866 243.0066 
+L 344.398866 91.239811 
+L 316.701421 91.239811 
+z
+" clip-path="url(#pe3f4923336)" style="fill: #159ba7"/>
+   </g>
+   <g id="patch_17">
+    <path d="M 470.576116 243.0066 
+L 498.273561 243.0066 
+L 498.273561 94.874653 
+L 470.576116 94.874653 
+z
+" clip-path="url(#pe3f4923336)" style="fill: #159ba7"/>
+   </g>
+   <g id="patch_18">
+    <path d="M 624.45081 243.0066 
+L 652.148255 243.0066 
+L 652.148255 79.131966 
+L 624.45081 79.131966 
+z
+" clip-path="url(#pe3f4923336)" style="fill: #159ba7"/>
+   </g>
+   <g id="patch_19">
+    <path d="M 46.266646 243.0066 
+L 46.266646 18.118365 
+" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="patch_20">
+    <path d="M 46.266646 243.0066 
+L 680.99976 243.0066 
+" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="text_15">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle" x="363.633203" y="12.118365" transform="rotate(-0 363.633203 12.118365)">90 jours communs · une valeur plus basse est meilleure</text>
+   </g>
+   <g id="legend_1">
+    <g id="patch_21">
+     <path d="M 198.518359 277.996097 
+L 218.518359 277.996097 
+L 218.518359 270.996097 
+L 198.518359 270.996097 
+z
+" style="fill: #637887"/>
+    </g>
+    <g id="text_16">
+     <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start" x="226.518359" y="277.996097" transform="rotate(-0 226.518359 277.996097)">NYX actuel (archivé)</text>
+    </g>
+    <g id="patch_22">
+     <path d="M 198.518359 292.996878 
+L 218.518359 292.996878 
+L 218.518359 285.996878 
+L 198.518359 285.996878 
+z
+" style="fill: #ad78bf"/>
+    </g>
+    <g id="text_17">
+     <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start" x="226.518359" y="292.996878" transform="rotate(-0 226.518359 292.996878)">Chronos seul · 15 min</text>
+    </g>
+    <g id="patch_23">
+     <path d="M 355.463672 277.996097 
+L 375.463672 277.996097 
+L 375.463672 270.996097 
+L 355.463672 270.996097 
+z
+" style="fill: #e0ac54"/>
+    </g>
+    <g id="text_18">
+     <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start" x="383.463672" y="277.996097" transform="rotate(-0 383.463672 277.996097)">Chronos + CatBoost · 15 min</text>
+    </g>
+    <g id="patch_24">
+     <path d="M 355.463672 292.996878 
+L 375.463672 292.996878 
+L 375.463672 285.996878 
+L 355.463672 285.996878 
+z
+" style="fill: #159ba7"/>
+    </g>
+    <g id="text_19">
+     <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start" x="383.463672" y="292.996878" transform="rotate(-0 383.463672 292.996878)">NYX complet · 15 min</text>
+    </g>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="pe3f4923336">
+   <rect x="46.266646" y="18.118365" width="634.733114" height="224.888235"/>
+  </clipPath>
+ </defs>
+</svg>
+</div><p>La France présente la seule baisse de MAE observée (3,51 %), avec une RMSE légèrement supérieure. Les trois autres pays se dégradent en MAE. Les intervalles par pays contiennent tous zéro ; le signal français reste à confirmer.</p><div class="scroll"><table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Périmètre</th>
+      <th>Écart MAE</th>
+      <th>IC 95 % bas</th>
+      <th>IC 95 % haut</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>all</td>
+      <td>0.240</td>
+      <td>-0.402</td>
+      <td>0.899</td>
+    </tr>
+    <tr>
+      <td>BE</td>
+      <td>0.372</td>
+      <td>-0.381</td>
+      <td>1.221</td>
+    </tr>
+    <tr>
+      <td>DE</td>
+      <td>0.428</td>
+      <td>-0.476</td>
+      <td>1.235</td>
+    </tr>
+    <tr>
+      <td>FR</td>
+      <td>-0.480</td>
+      <td>-1.290</td>
+      <td>0.372</td>
+    </tr>
+    <tr>
+      <td>NL</td>
+      <td>0.638</td>
+      <td>-0.300</td>
+      <td>1.626</td>
+    </tr>
+  </tbody>
+</table></div><p>Écart = NYX 15 min − NYX actuel. Un écart négatif favorise le 15 min. Bootstrap apparié commun aux pays, blocs de sept jours, 1 000 répétitions, graine 20260916.</p></section>
+<section><h2>Régimes de marché</h2><p>Les prix négatifs montrent une baisse observée de MAE dans les quatre pays : environ 27,1 % en BE, 15,8 % en DE, 10,8 % en FR et 17,7 % en NL. À l’inverse, sur les heures au-dessus du q95 historique en Allemagne, la MAE augmente de 5,74 %, dépassant le seuil de dégradation de 5 % prévu au protocole. Ces sous-groupes restent exploratoires, sans test multiple corrigé.</p><div class="scroll"><table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Pays</th>
+      <th>Régime</th>
+      <th>Heures</th>
+      <th>MAE NYX 15 min</th>
+      <th>MAE NYX actuel</th>
+      <th>Variation (%)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>BE</td>
+      <td>Prix négatifs</td>
+      <td>73</td>
+      <td>4.675</td>
+      <td>6.410</td>
+      <td>-27.070</td>
+    </tr>
+    <tr>
+      <td>BE</td>
+      <td>Au-dessus du q95 historique</td>
+      <td>992</td>
+      <td>20.135</td>
+      <td>19.563</td>
+      <td>2.922</td>
+    </tr>
+    <tr>
+      <td>DE</td>
+      <td>Prix négatifs</td>
+      <td>165</td>
+      <td>4.947</td>
+      <td>5.872</td>
+      <td>-15.752</td>
+    </tr>
+    <tr>
+      <td>DE</td>
+      <td>Au-dessus du q95 historique</td>
+      <td>548</td>
+      <td>22.227</td>
+      <td>21.021</td>
+      <td>5.738</td>
+    </tr>
+    <tr>
+      <td>FR</td>
+      <td>Prix négatifs</td>
+      <td>147</td>
+      <td>6.083</td>
+      <td>6.819</td>
+      <td>-10.796</td>
+    </tr>
+    <tr>
+      <td>FR</td>
+      <td>Au-dessus du q95 historique</td>
+      <td>1119</td>
+      <td>11.600</td>
+      <td>12.658</td>
+      <td>-8.355</td>
+    </tr>
+    <tr>
+      <td>NL</td>
+      <td>Prix négatifs</td>
+      <td>137</td>
+      <td>5.383</td>
+      <td>6.543</td>
+      <td>-17.725</td>
+    </tr>
+    <tr>
+      <td>NL</td>
+      <td>Au-dessus du q95 historique</td>
+      <td>744</td>
+      <td>20.218</td>
+      <td>19.269</td>
+      <td>4.923</td>
+    </tr>
+  </tbody>
+</table></div><p>Les seuils q95 sont fixés sur des observations antérieures au 14/03/2026, pas sur les 90 jours du test. Ils ne désignent donc pas les 5 % de prix les plus élevés de cette période. Chaque sous-groupe satisfait ici les minima prévus de 30 heures et cinq journées.</p></section>
+<section><h2>Limites et suite</h2><p>Les correcteurs disposent de 174 à 263 journées passées, au lieu de 365 complètes, à cause de la disponibilité de l’archive native. NYX actuel conserve un historique plus long. Les fondamentaux restent horaires et sont répétés sur les quatre quarts ; seule la cible et la chaîne de modélisation passent au quart d’heure. Les observations sont rétrospectives et cette période a déjà été examinée lors d’essais précédents.</p><p>Il faut achever le témoin horaire, comparer les chaînes à historique égal, puis confirmer les éventuels gains sur une nouvelle période avant toute promotion. Les quatre moyennes de prévisions ponctuelles ne constituent pas des quantiles horaires calibrés.</p></section>
+<section><h2>Fichiers et traçabilité</h2><p><a href="metrics.csv">Métriques détaillées</a> · <a href="paired_deltas.csv">Écarts et intervalles</a> · <a href="regime_checks.csv">Régimes</a> · <a href="predictions.csv">Prévisions horaires évaluées</a> · <a href="summary.json">Résumé machine</a> · <a href="kalman_governance.json">Choix Kalman</a> · <a href="analysis_manifest.json">Empreintes des fichiers</a></p><p>Les entrées, le brut, le code scellé et les 3 208 fichiers des quatre workers natifs ont été vérifiés avant calcul des scores. Cette analyse ne réentraîne aucun modèle.</p><p>Calcul source : <code>C:\Users\BQ6757\chronos2_v1\runs\experiments\nyx_fullquarterhour_v1\20260916T111425Z_dff7f605</code><br>Protocole : <code>6d9552cd7a066ec1617461b6c81569c65c9d3f13fe0079dc655fb90095fc3b4d</code></p></section>
+<footer>Instantané provisoire indépendant du rapport final · Données locales · Production inchangée</footer></main></body></html>

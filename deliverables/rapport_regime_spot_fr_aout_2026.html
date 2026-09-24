@@ -1,0 +1,613 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Pourquoi le prix spot FR change de régime — 16 et 25 août 2026</title>
+  <style>
+    :root {
+      --ink: #10233f;
+      --muted: #5e6b7c;
+      --paper: #f4f1e9;
+      --card: #fffdf8;
+      --line: #d9d5ca;
+      --navy: #17385e;
+      --blue: #4667d8;
+      --cyan: #2f91aa;
+      --orange: #ec7a42;
+      --red: #c8403d;
+      --green: #3d8068;
+      --gold: #c49332;
+      --low: #e8eef7;
+      --shadow: 0 12px 36px rgba(16, 35, 63, .08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 0%, rgba(70, 103, 216, .10), transparent 28rem),
+        linear-gradient(180deg, #f9f7f1 0, var(--paper) 36rem);
+      font-family: Inter, Aptos, "Segoe UI", Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.58;
+    }
+
+    a { color: #2750b8; text-underline-offset: 3px; }
+    a:hover { color: #163887; }
+    .skip-link {
+      position: absolute; left: -9999px; top: 8px; z-index: 100;
+      background: #fff; color: #000; padding: 10px 14px; border-radius: 8px;
+    }
+    .skip-link:focus { left: 8px; }
+
+    .shell { width: min(1180px, calc(100% - 40px)); margin-inline: auto; }
+    .masthead {
+      position: relative;
+      padding: 42px 0 54px;
+      color: #fff;
+      overflow: hidden;
+      background: linear-gradient(122deg, #10233f 0%, #17385e 58%, #22587a 100%);
+    }
+    .masthead::after {
+      content: "";
+      position: absolute; width: 560px; height: 560px; right: -180px; top: -360px;
+      border: 78px solid rgba(255,255,255,.06); border-radius: 50%;
+    }
+    .eyebrow {
+      display: inline-flex; gap: 8px; align-items: center;
+      margin: 0 0 18px; color: #bcd5f2; letter-spacing: .13em;
+      font-weight: 750; font-size: .77rem; text-transform: uppercase;
+    }
+    .eyebrow::before { content: ""; width: 28px; height: 2px; background: #eea45f; }
+    h1 {
+      max-width: 930px; margin: 0; font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(2.25rem, 5.5vw, 5rem); line-height: .98; letter-spacing: -.045em;
+      font-weight: 650;
+    }
+    .dek { max-width: 810px; margin: 24px 0 0; color: #e3ebf4; font-size: clamp(1.05rem, 2vw, 1.35rem); }
+    .meta { display: flex; flex-wrap: wrap; gap: 10px 26px; margin-top: 28px; color: #bcd0e5; font-size: .88rem; }
+    .meta span { display: inline-flex; gap: 8px; align-items: center; }
+    .meta span::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #eea45f; }
+
+    .summary-wrap { margin-top: -26px; position: relative; z-index: 2; }
+    .summary {
+      display: grid; grid-template-columns: 1.25fr .75fr; gap: 0;
+      border: 1px solid rgba(16,35,63,.09); border-radius: var(--radius);
+      background: var(--card); box-shadow: var(--shadow); overflow: hidden;
+    }
+    .summary-main { padding: 30px 34px; }
+    .summary-main h2 { margin: 0 0 10px; font-size: 1.12rem; text-transform: uppercase; letter-spacing: .08em; color: var(--blue); }
+    .summary-main p { margin: 0; font-family: Georgia, serif; font-size: clamp(1.25rem, 2.4vw, 1.78rem); line-height: 1.35; }
+    .summary-side { display: grid; grid-template-columns: 1fr 1fr; background: #ecf0f6; }
+    .stat { padding: 27px 22px; border-left: 1px solid #d7deea; display: flex; flex-direction: column; justify-content: center; }
+    .stat strong { font-size: 2rem; line-height: 1; color: var(--red); font-variant-numeric: tabular-nums; }
+    .stat span { margin-top: 8px; color: var(--muted); font-size: .82rem; line-height: 1.35; }
+
+    .toc { display: flex; flex-wrap: wrap; gap: 8px; padding: 24px 0 8px; }
+    .toc a { text-decoration: none; padding: 7px 12px; background: rgba(255,255,255,.68); border: 1px solid var(--line); border-radius: 999px; font-size: .84rem; color: var(--navy); }
+    .toc a:hover { background: #fff; border-color: #aab5c7; }
+
+    main { padding-bottom: 72px; }
+    section { padding-top: 70px; scroll-margin-top: 20px; }
+    .section-head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, .55fr); gap: 28px; align-items: end; margin-bottom: 28px; }
+    .kicker { margin: 0 0 7px; color: var(--orange); font-weight: 800; letter-spacing: .12em; text-transform: uppercase; font-size: .75rem; }
+    h2 { margin: 0; font-family: Georgia, serif; font-size: clamp(1.9rem, 4vw, 3.35rem); line-height: 1.07; letter-spacing: -.025em; }
+    .section-intro { margin: 0; color: var(--muted); font-size: .98rem; }
+    h3 { margin: 0 0 10px; font-size: 1.15rem; line-height: 1.25; }
+    h4 { margin: 0 0 6px; font-size: .95rem; }
+    p { margin: 0 0 14px; }
+    .small { font-size: .82rem; color: var(--muted); }
+    .note { color: var(--muted); font-size: .9rem; }
+    .mono { font-variant-numeric: tabular-nums; }
+
+    .card {
+      background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+      box-shadow: 0 8px 28px rgba(16,35,63,.055);
+    }
+    .chart-card { padding: 24px 24px 18px; position: relative; }
+    .chart-top { display: flex; justify-content: space-between; align-items: start; gap: 20px; margin-bottom: 8px; }
+    .chart-top p { margin: 4px 0 0; color: var(--muted); font-size: .88rem; }
+    .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: .78rem; color: var(--muted); }
+    .legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend i { width: 18px; height: 3px; border-radius: 5px; display: inline-block; }
+    #price-chart { width: 100%; min-height: 345px; }
+    #price-chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+    .chart-tooltip {
+      position: fixed; z-index: 20; pointer-events: none; opacity: 0;
+      min-width: 145px; padding: 9px 11px; border-radius: 9px;
+      background: rgba(16,35,63,.96); color: #fff; font-size: .78rem;
+      box-shadow: 0 8px 30px rgba(0,0,0,.18); transform: translate(10px, -42px);
+      transition: opacity .12s;
+    }
+    .chart-tooltip strong { display: block; font-size: .95rem; }
+    figcaption { padding-top: 10px; border-top: 1px solid #ece8df; color: var(--muted); font-size: .79rem; }
+
+    .read-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 18px; }
+    .read-item { padding: 17px; border: 1px solid var(--line); border-radius: 13px; background: rgba(255,255,255,.52); }
+    .read-item b { display: block; color: var(--navy); font-size: .86rem; margin-bottom: 4px; }
+    .read-item span { font-size: .84rem; color: var(--muted); }
+
+    .mechanism { display: grid; grid-template-columns: 1.08fr .92fr; gap: 22px; align-items: stretch; }
+    .merit { padding: 24px; overflow: hidden; }
+    .merit svg { width: 100%; height: auto; display: block; }
+    .mechanism-copy { padding: 26px; background: var(--navy); color: #fff; border-radius: var(--radius); }
+    .mechanism-copy h3 { color: #fff; font-family: Georgia, serif; font-size: 1.55rem; }
+    .mechanism-copy p { color: #dce7f2; }
+    .equation { margin: 20px 0; padding: 13px 15px; border-radius: 11px; background: rgba(255,255,255,.09); font-size: .93rem; }
+    .equation strong { color: #ffbd7d; }
+    .steps { display: grid; gap: 11px; counter-reset: step; }
+    .step { display: grid; grid-template-columns: 31px 1fr; gap: 10px; align-items: start; color: #e7eff7; font-size: .88rem; }
+    .step::before { counter-increment: step; content: counter(step); width: 27px; height: 27px; display: grid; place-items: center; border-radius: 50%; background: #fff; color: var(--navy); font-weight: 800; }
+
+    .case-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+    .case { overflow: hidden; }
+    .case-head { padding: 25px 26px 22px; color: #fff; min-height: 188px; position: relative; }
+    .case:first-child .case-head { background: linear-gradient(135deg, #254f78, #17385e); }
+    .case:last-child .case-head { background: linear-gradient(135deg, #b84b37, #d36b3c); }
+    .case-no { opacity: .64; text-transform: uppercase; font-size: .72rem; letter-spacing: .12em; font-weight: 800; }
+    .case-head h3 { margin: 7px 0 9px; font-family: Georgia, serif; font-size: 2rem; }
+    .case-head p { margin: 0; max-width: 95%; color: rgba(255,255,255,.84); font-size: .9rem; }
+    .price-jump { position: absolute; right: 22px; top: 20px; text-align: right; }
+    .price-jump strong { display: block; font-size: 1.55rem; }
+    .price-jump span { font-size: .7rem; opacity: .74; }
+    .case-body { padding: 25px 26px 26px; }
+    .verdict { display: grid; grid-template-columns: 88px 1fr; gap: 12px; margin-bottom: 17px; align-items: start; }
+    .verdict b { font-size: .7rem; text-transform: uppercase; letter-spacing: .1em; color: var(--orange); padding-top: 3px; }
+    .verdict p { margin: 0; font-weight: 650; line-height: 1.43; }
+    .evidence { display: grid; gap: 9px; }
+    .evidence-row { display: grid; grid-template-columns: 9px 1fr auto; gap: 10px; align-items: center; padding: 10px 0; border-top: 1px solid #ece8df; }
+    .evidence-row i { width: 8px; height: 8px; border-radius: 50%; background: var(--blue); }
+    .case:last-child .evidence-row i { background: var(--orange); }
+    .evidence-row span { font-size: .86rem; }
+    .evidence-row strong { white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .confidence { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-top: 17px; margin-top: 6px; border-top: 1px solid #ece8df; font-size: .78rem; color: var(--muted); }
+    .badge { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 5px 9px; background: #e4f0ea; color: #27634f; font-weight: 750; }
+    .badge::before { content: ""; width: 7px; height: 7px; background: var(--green); border-radius: 50%; }
+    .bridge {
+      display: grid; grid-template-columns: auto 1fr; gap: 18px; align-items: center;
+      margin-top: 22px; padding: 20px 24px; border-radius: 15px;
+      color: #eaf1f7; background: linear-gradient(105deg, #17385e, #245c76);
+    }
+    .bridge strong { color: #ffbd7d; font-family: Georgia, serif; font-size: 1.25rem; }
+    .bridge p { margin: 0; font-size: .88rem; }
+
+    .decomp { display: grid; grid-template-columns: .86fr 1.14fr; gap: 22px; margin-top: 22px; }
+    .decomp-card { padding: 25px; }
+    .shock-total { display: flex; justify-content: space-between; gap: 20px; align-items: end; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+    .shock-total strong { font-size: 2.1rem; color: var(--red); line-height: 1; }
+    .shock-bars { display: grid; gap: 15px; margin-top: 20px; }
+    .shock-line { display: grid; grid-template-columns: 124px 1fr 60px; gap: 12px; align-items: center; font-size: .83rem; }
+    .track { height: 12px; background: #e8e5dd; border-radius: 999px; overflow: hidden; }
+    .fill { height: 100%; border-radius: inherit; background: var(--blue); }
+    .fill.wind { background: var(--red); }
+    .fill.solar { background: var(--gold); }
+    .fill.ror { background: var(--cyan); min-width: 3px; }
+    .zone-bars { display: grid; gap: 12px; margin-top: 16px; }
+    .zone-line { display: grid; grid-template-columns: 44px 1fr 67px; align-items: center; gap: 10px; font-size: .82rem; }
+    .zone-track { height: 23px; border-radius: 5px; background: #e9e5dc; overflow: hidden; }
+    .zone-fill { height: 100%; background: #7087c5; border-radius: inherit; }
+    .zone-line.fr .zone-fill { background: var(--red); }
+    .zone-line.be .zone-fill { background: var(--orange); }
+    .zone-line.es .zone-fill { background: var(--green); }
+    .zone-line strong { text-align: right; font-variant-numeric: tabular-nums; }
+
+    .chronology { display: grid; gap: 0; position: relative; }
+    .chronology::before { content: ""; position: absolute; left: 21px; top: 14px; bottom: 14px; width: 2px; background: #ccd4df; }
+    .event { display: grid; grid-template-columns: 44px 148px 1fr auto; gap: 15px; align-items: start; padding: 14px 0; position: relative; }
+    .event::before { content: ""; z-index: 1; margin: 4px 0 0 14px; width: 15px; height: 15px; border: 4px solid var(--paper); background: var(--blue); border-radius: 50%; }
+    .event.late::before { background: #adb5c0; }
+    .event time { font-weight: 750; font-size: .82rem; }
+    .event p { margin: 0; font-size: .87rem; color: var(--muted); }
+    .event .tag { white-space: nowrap; padding: 4px 8px; border-radius: 999px; background: #e3eef7; color: #285d78; font-size: .68rem; font-weight: 750; text-transform: uppercase; }
+    .event.late .tag { background: #ececeb; color: #6c7075; }
+
+    .matrix-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); }
+    table { width: 100%; border-collapse: collapse; min-width: 760px; }
+    th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid #e7e3da; vertical-align: top; }
+    th { color: var(--muted); background: #f1eee7; text-transform: uppercase; letter-spacing: .07em; font-size: .7rem; }
+    td { font-size: .84rem; }
+    tbody tr:last-child td { border-bottom: 0; }
+    .signal { font-weight: 750; color: var(--navy); }
+    .pill { display: inline-block; padding: 3px 8px; border-radius: 999px; font-size: .7rem; font-weight: 750; white-space: nowrap; }
+    .pill.high { background: #e4f0ea; color: #27634f; }
+    .pill.mid { background: #f6ecd7; color: #805a17; }
+    .pill.no { background: #ececeb; color: #676d74; }
+
+    .workflow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; counter-reset: workflow; }
+    .workflow-item { padding: 18px 16px; border-radius: 14px; background: var(--card); border: 1px solid var(--line); min-height: 150px; }
+    .workflow-item::before { counter-increment: workflow; content: "0" counter(workflow); display: block; margin-bottom: 15px; color: var(--orange); font-weight: 850; font-size: .76rem; }
+    .workflow-item h3 { font-size: .94rem; }
+    .workflow-item p { margin: 0; color: var(--muted); font-size: .79rem; }
+    .warning { margin-top: 18px; padding: 18px 20px; border-left: 4px solid var(--red); background: #f8eae5; border-radius: 0 12px 12px 0; font-size: .88rem; }
+
+    .sources { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .source-group { padding: 23px; }
+    .source-list { margin: 0; padding-left: 19px; }
+    .source-list li { margin: 9px 0; color: var(--muted); font-size: .82rem; }
+    .method { margin-top: 20px; padding: 22px 24px; border-radius: 15px; background: #e9edf3; color: #394a61; font-size: .83rem; }
+    .method strong { color: var(--navy); }
+
+    footer { margin-top: 66px; padding: 28px 0 42px; border-top: 1px solid var(--line); color: var(--muted); font-size: .78rem; }
+    footer .shell { display: flex; justify-content: space-between; gap: 20px; }
+
+    @media (max-width: 900px) {
+      .summary, .section-head, .mechanism, .case-grid, .decomp, .sources { grid-template-columns: 1fr; }
+      .summary-side { min-height: 135px; }
+      .read-grid { grid-template-columns: 1fr 1fr; }
+      .bridge { grid-template-columns: 1fr; gap: 6px; }
+      .workflow { grid-template-columns: 1fr 1fr; }
+      .event { grid-template-columns: 44px 115px 1fr; }
+      .event .tag { grid-column: 3; justify-self: start; }
+    }
+    @media (max-width: 580px) {
+      .shell { width: min(100% - 24px, 1180px); }
+      .masthead { padding-top: 31px; }
+      .summary-main { padding: 24px 21px; }
+      .stat { padding: 21px 14px; }
+      .read-grid, .workflow { grid-template-columns: 1fr; }
+      .chart-card, .case-body, .decomp-card, .source-group { padding: 19px; }
+      .chart-top { display: block; }
+      .legend { margin-top: 10px; }
+      .shock-line { grid-template-columns: 105px 1fr 52px; }
+      .event { grid-template-columns: 44px 1fr; gap: 9px; }
+      .event time { grid-column: 2; }
+      .event p { grid-column: 2; }
+      .event .tag { grid-column: 2; }
+      footer .shell { display: block; }
+    }
+
+    @media print {
+      @page { size: A4; margin: 13mm; }
+      body { background: #fff; font-size: 10pt; }
+      .shell { width: 100%; }
+      .masthead { padding: 22px 0 30px; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+      h1 { font-size: 35pt; }
+      .toc { display: none; }
+      section { padding-top: 34px; }
+      .summary, .card, .mechanism-copy, .workflow-item { box-shadow: none; break-inside: avoid; }
+      .case-grid, .decomp, .sources, .mechanism { gap: 12px; }
+      .case, .decomp-card, .chart-card, .source-group { break-inside: avoid; }
+      a { color: inherit; text-decoration: none; }
+      .chart-tooltip { display: none; }
+      footer { margin-top: 32px; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#contenu">Aller au contenu</a>
+
+  <header class="masthead">
+    <div class="shell">
+      <p class="eyebrow">Diagnostic du marché day-ahead France</p>
+      <h1>Pourquoi les heures solaires ont changé de régime</h1>
+      <p class="dek">Lecture causale des bascules observées les 16 et 25 août 2026 — et du mécanisme qui permet au prix de bondir alors que le soleil produit encore.</p>
+      <div class="meta">
+        <span>Fenêtre étudiée : 10 h–16 h, Europe/Paris</span>
+        <span>Données arrêtées au 27 août 2026</span>
+        <span>Rapport d’analyse, non conseil de trading</span>
+      </div>
+    </div>
+  </header>
+
+  <main id="contenu" class="shell">
+    <div class="summary-wrap">
+      <article class="summary" aria-labelledby="verdict-title">
+        <div class="summary-main">
+          <h2 id="verdict-title">Verdict en une phrase</h2>
+          <p>Ce n’est pas le solaire qui devient soudain cher : le système franchit le <em>coude</em> de la courbe d’offre, et le dernier mégawatt nécessaire est alors valorisé par une ressource beaucoup plus coûteuse.</p>
+        </div>
+        <div class="summary-side" aria-label="Deux chiffres clés">
+          <div class="stat"><strong>+34</strong><span>€/MWh entre les 15 et 16 août, puis le plateau se matérialise le 17</span></div>
+          <div class="stat"><strong>+101</strong><span>€/MWh entre les 24 et 25 août sur les heures 10 h–16 h</span></div>
+        </div>
+      </article>
+    </div>
+
+    <nav class="toc" aria-label="Sommaire">
+      <a href="#lecture">Lire la bascule</a>
+      <a href="#mecanisme">Mécanisme marginal</a>
+      <a href="#deux-episodes">Deux épisodes</a>
+      <a href="#chronologie">Chronologie</a>
+      <a href="#surveillance">Méthode de surveillance</a>
+      <a href="#sources">Sources & limites</a>
+    </nav>
+
+    <section id="lecture">
+      <div class="section-head">
+        <div><p class="kicker">01 — Le signal</p><h2>Une succession de régimes, pas une hausse régulière</h2></div>
+        <p class="section-intro">La moyenne masque la forme horaire, mais elle révèle nettement les transitions : tension à partir du 16, détente spectaculaire les 22–24, puis nouveau plateau tendu le 25.</p>
+      </div>
+
+      <figure class="card chart-card" aria-labelledby="price-title price-caption">
+        <div class="chart-top">
+          <div><h3 id="price-title">Prix spot FR moyen pendant les heures solaires</h3><p>Moyenne arithmétique des heures 10:00 à 16:59, en €/MWh</p></div>
+          <div class="legend" aria-label="Légende"><span><i style="background:#4667d8"></i>Prix FR</span><span><i style="background:#ec7a42"></i>Dates de bascule</span></div>
+        </div>
+        <div id="price-chart" role="img" aria-label="Courbe du prix moyen français entre le 14 et le 26 août 2026. Les prix montent le 16, restent élevés jusqu'au 21, tombent près de zéro le 23, puis remontent fortement le 25."></div>
+        <figcaption id="price-caption">Lecture : 30,50 €/MWh le 15 août, 64,20 le 16, 152,98 le 17 ; −1,60 le 23, 20,85 le 24, puis 122,33 le 25. Source prix : ENTSO-E/RTE, extraction locale ; calcul sur 7 heures.</figcaption>
+      </figure>
+
+      <div class="read-grid" aria-label="Lecture des quatre régimes">
+        <div class="read-item"><b>1–15 août · souple</b><span>43,36 €/MWh en moyenne : les heures centrales bénéficient souvent du surplus renouvelable.</span></div>
+        <div class="read-item"><b>16–21 août · tendu</b><span>118,30 €/MWh : faible coussin pilotable français et tension régionale.</span></div>
+        <div class="read-item"><b>22–24 août · excédentaire</b><span>11,40 €/MWh : le creux solaire revient jusqu’aux prix proches de zéro.</span></div>
+        <div class="read-item"><b>25–27 août · tendu</b><span>131,19 €/MWh : chute du vent et capacité d’import insuffisante pour lisser le choc.</span></div>
+      </div>
+    </section>
+
+    <section id="mecanisme">
+      <div class="section-head">
+        <div><p class="kicker">02 — Comment est-ce possible ?</p><h2>Le prix rémunère le dernier MWh appelé, pas le coût moyen du mix</h2></div>
+        <p class="section-intro">L’enchère day-ahead est marginale et couplée : dans chaque zone, l’offre la plus chère encore nécessaire pour satisfaire la demande fixe le prix de toutes les offres acceptées.</p>
+      </div>
+
+      <div class="mechanism">
+        <figure class="card merit" aria-labelledby="merit-title merit-caption">
+          <h3 id="merit-title">Le coude de la courbe d’offre</h3>
+          <svg viewBox="0 0 650 390" role="img" aria-labelledby="merit-svg-title merit-svg-desc">
+            <title id="merit-svg-title">Schéma simplifié du merit order</title>
+            <desc id="merit-svg-desc">Un déplacement modeste de la demande résiduelle fait passer le prix d'une offre renouvelable ou nucléaire bon marché à une offre thermique chère.</desc>
+            <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#c8403d"/></marker></defs>
+            <g stroke="#d8d4ca" stroke-width="1"><line x1="65" y1="325" x2="615" y2="325"/><line x1="65" y1="255" x2="615" y2="255"/><line x1="65" y1="185" x2="615" y2="185"/><line x1="65" y1="115" x2="615" y2="115"/></g>
+            <line x1="65" y1="335" x2="620" y2="335" stroke="#10233f" stroke-width="2"/><line x1="65" y1="335" x2="65" y2="55" stroke="#10233f" stroke-width="2"/>
+            <path d="M66 318 H240 V300 H385 V263 H470 V185 H530 V98 H610" fill="none" stroke="#4667d8" stroke-width="9" stroke-linejoin="round"/>
+            <line x1="443" y1="337" x2="443" y2="245" stroke="#3d8068" stroke-width="3" stroke-dasharray="7 5"/>
+            <line x1="508" y1="337" x2="508" y2="150" stroke="#c8403d" stroke-width="4"/>
+            <line x1="448" y1="226" x2="500" y2="176" stroke="#c8403d" stroke-width="3" marker-end="url(#arrow)"/>
+            <circle cx="443" cy="263" r="7" fill="#3d8068"/><circle cx="508" cy="185" r="8" fill="#c8403d"/>
+            <g fill="#5e6b7c" font-size="14" font-family="Segoe UI, Arial"><text x="72" y="310">Renouvelables</text><text x="265" y="292">Nucléaire / hydro</text><text x="398" y="251">Imports</text><text x="485" y="173">Gaz / rareté</text><text x="15" y="70" transform="rotate(-90 15 70)">Prix</text><text x="520" y="365">Volume requis</text></g>
+            <g font-family="Segoe UI, Arial"><text x="350" y="225" fill="#27634f" font-size="15" font-weight="700">régime souple</text><text x="515" y="145" fill="#c8403d" font-size="15" font-weight="700">régime tendu</text><text x="446" y="211" fill="#c8403d" font-size="13">quelques GW</text></g>
+          </svg>
+          <figcaption id="merit-caption">Schéma conceptuel : la pente réelle dépend des offres, de la disponibilité des actifs et des capacités transfrontalières heure par heure.</figcaption>
+        </figure>
+
+        <article class="mechanism-copy">
+          <h3>Pourquoi le creux solaire peut disparaître</h3>
+          <p>Le solaire réduit bien la quantité qu’il reste à servir. Mais si le vent chute, si la charge monte, si le nucléaire disponible baisse ou si une frontière sature, cette réduction ne suffit plus à rester sur la partie bon marché du carnet d’ordres.</p>
+          <div class="equation"><strong>Charge résiduelle</strong> ≈ consommation − éolien − solaire − hydraulique au fil de l’eau</div>
+          <div class="steps">
+            <div class="step">Le marché anticipe la charge et la production renouvelable pour chaque heure du lendemain.</div>
+            <div class="step">Il optimise simultanément les zones européennes, dans la limite des capacités d’échange.</div>
+            <div class="step">Une perte de quelques GW peut appeler une technologie située beaucoup plus haut dans le merit order.</div>
+            <div class="step">Le coût de ce dernier MWh devient le prix uniforme de la zone : la réponse est discontinue.</div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="deux-episodes">
+      <div class="section-head">
+        <div><p class="kicker">03 — Attribution</p><h2>Les 16 et 25 août ne sont pas le même choc</h2></div>
+        <p class="section-intro">La bonne lecture sépare le déclencheur, les amplificateurs et le contexte. Elle privilégie les informations disponibles avant l’enchère plutôt que les réalisations connues après coup.</p>
+      </div>
+
+      <div class="case-grid">
+        <article class="card case">
+          <header class="case-head">
+            <span class="case-no">Épisode A</span><h3>16 août</h3>
+            <p>Le dimanche amorce la bascule ; le véritable plateau tendu se matérialise le lundi 17.</p>
+            <div class="price-jump"><strong>30,50 → 64,20</strong><span>€/MWh, 15 → 16 août</span></div>
+          </header>
+          <div class="case-body">
+            <div class="verdict"><b>Lecture</b><p>Tension nord-ouest européenne transmise par le couplage, sur un coussin nucléaire français déjà très abaissé.</p></div>
+            <div class="evidence">
+              <div class="evidence-row"><i></i><span>Prévision nucléaire FR, heures solaires</span><strong>−7,5 à −9,0 GW</strong></div>
+              <div class="evidence-row"><i></i><span>Prix FR = DE/LU = BE = NL le 16</span><strong>64,20 €</strong></div>
+              <div class="evidence-row"><i></i><span>Charge résiduelle FR prévue</span><strong>ne monte pas</strong></div>
+              <div class="evidence-row"><i></i><span>Prix FR le lundi 17</span><strong>152,98 €</strong></div>
+            </div>
+            <div class="confidence"><span>Facteur dominant : rareté régionale + faible marge pilotable</span><span class="badge">Confiance élevée</span></div>
+          </div>
+        </article>
+
+        <article class="card case">
+          <header class="case-head">
+            <span class="case-no">Épisode B</span><h3>25 août</h3>
+            <p>Après deux jours très abondants, le marché anticipe brutalement beaucoup plus de demande à servir hors renouvelables.</p>
+            <div class="price-jump"><strong>20,85 → 122,33</strong><span>€/MWh, 24 → 25 août</span></div>
+          </header>
+          <div class="case-body">
+            <div class="verdict"><b>Lecture</b><p>Effondrement éolien prévu + charge anticipée en hausse ; le solaire recule peu et le nucléaire n’est pas le déclencheur.</p></div>
+            <div class="evidence">
+              <div class="evidence-row"><i></i><span>Prévision éolienne FR</span><strong>−5,85 GW</strong></div>
+              <div class="evidence-row"><i></i><span>Prévision de charge FR</span><strong>+1,62 GW</strong></div>
+              <div class="evidence-row"><i></i><span>Prévision solaire FR</span><strong>−0,55 GW</strong></div>
+              <div class="evidence-row"><i></i><span>Charge résiduelle prévue</span><strong>+8,04 GW</strong></div>
+            </div>
+            <div class="confidence"><span>Facteur dominant : trou d’éolien anticipé</span><span class="badge">Confiance élevée</span></div>
+          </div>
+        </article>
+      </div>
+
+      <div class="bridge">
+        <strong>Deux chemins vers le même coude</strong>
+        <p>Le 16, c’est surtout le <b>coussin de production disponible</b> qui se contracte ; le 25, c’est surtout la <b>quantité à servir hors renouvelables</b> qui augmente. Dans les deux cas, la marge avant les offres chères se réduit d’environ 6 GW selon un proxy nucléaire disponible moins charge résiduelle — proxy qui n’inclut ni hydro modulable, ni thermique, ni stockage, ni échanges.</p>
+      </div>
+
+      <div class="decomp">
+        <article class="card decomp-card">
+          <div class="shock-total"><div><h3>Décomposition du choc du 25</h3><p class="small">Prévisions disponibles à J−1 08:00, 24 → 25 août</p></div><strong>+8,04 GW</strong></div>
+          <div class="shock-bars">
+            <div class="shock-line"><span>Vent en moins</span><div class="track"><div class="fill wind" style="width:73%"></div></div><strong>+5,85</strong></div>
+            <div class="shock-line"><span>Charge en plus</span><div class="track"><div class="fill" style="width:20%"></div></div><strong>+1,62</strong></div>
+            <div class="shock-line"><span>Solaire en moins</span><div class="track"><div class="fill solar" style="width:7%"></div></div><strong>+0,55</strong></div>
+            <div class="shock-line"><span>Fil de l’eau</span><div class="track"><div class="fill ror" style="width:.4%"></div></div><strong>+0,03</strong></div>
+          </div>
+          <p class="note" style="margin-top:18px">Les quatre contributions expliquent presque exactement le déplacement de la charge résiduelle prévue. Le vent représente environ 73 % du choc. Le réalisé corrobore le signal : vent −6,01 GW, résiduel +4,47 GW, tandis que le nucléaire augmente de 0,49 GW et que la charge plus faible compense une partie du choc.</p>
+        </article>
+
+        <article class="card decomp-card">
+          <div><h3>Le 25, les voisins bon marché ne suffisent pas</h3><p class="small">Prix moyens 10 h–16 h ; €/MWh</p></div>
+          <div class="zone-bars" aria-label="Comparaison des prix zonaux le 25 août">
+            <div class="zone-line be"><span>BE</span><div class="zone-track"><div class="zone-fill" style="width:92.96%"></div></div><strong>130,15</strong></div>
+            <div class="zone-line fr"><span>FR</span><div class="zone-track"><div class="zone-fill" style="width:87.38%"></div></div><strong>122,33</strong></div>
+            <div class="zone-line"><span>DE/LU</span><div class="zone-track"><div class="zone-fill" style="width:61.00%"></div></div><strong>85,41</strong></div>
+            <div class="zone-line"><span>NL</span><div class="zone-track"><div class="zone-fill" style="width:29.25%"></div></div><strong>40,96</strong></div>
+            <div class="zone-line es"><span>ES</span><div class="zone-track"><div class="zone-fill" style="width:12.03%"></div></div><strong>16,84</strong></div>
+          </div>
+          <p class="note" style="margin-top:18px">La dispersion des prix est la signature de contraintes réseau : la France se rapproche de la Belgique, tandis que l’énergie moins chère en Espagne, aux Pays-Bas ou en Allemagne ne peut pas discipliner entièrement le prix français.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="chronologie">
+      <div class="section-head">
+        <div><p class="kicker">04 — Discipline causale</p><h2>Ce qui était connu avant l’enchère compte ; le reste n’explique pas le day-ahead</h2></div>
+        <p class="section-intro">Pour une livraison le jour J, le prix est fixé lors de l’enchère du jour J−1. Un incident survenu après cette clôture peut affecter l’intraday ou le système réel, mais pas rétroactivement le prix day-ahead.</p>
+      </div>
+
+      <div class="card" style="padding:25px 27px">
+        <div class="chronology">
+          <div class="event"><time>8–15 août</time><p>Chaleur et températures élevées des fleuves, limitations ou indisponibilités documentées à Golfech, Bugey et Saint-Alban ; faible coussin nucléaire connu du marché.</p><span class="tag">Contexte causal</span></div>
+          <div class="event"><time>15 août, J−1</time><p>L’enchère fixe les 24 prix horaires du 16. Le système nord-ouest est couplé et le parc français est déjà contraint.</p><span class="tag">Dans l’information</span></div>
+          <div class="event late"><time>16 août, 08:15</time><p>Arrêt de Paluel 4 : trop tard pour causer le prix day-ahead du 16, même s’il peut peser sur l’équilibre réel.</p><span class="tag">Écarté du DA</span></div>
+          <div class="event"><time>23 août, 13:30</time><p>Déconnexion de Paluel 3 : connue avant l’enchère du 24 pour livraison le 25 ; elle réduit la marge mais n’explique pas à elle seule le saut.</p><span class="tag">Amplificateur</span></div>
+          <div class="event"><time>24 août, matin</time><p>Les prévisions montrent un trou d’éolien, une charge plus haute et un résiduel en hausse de 8,04 GW pour le 25.</p><span class="tag">Déclencheur</span></div>
+          <div class="event late"><time>24 août, 17:50</time><p>Arrêt de Golfech 2 : postérieur à la clôture day-ahead du 25 ; il ne peut être retenu comme cause directe de ce prix.</p><span class="tag">Écarté du DA</span></div>
+          <div class="event late"><time>25 août, ~16:00</time><p>Arrêt de Saint-Laurent 1 : lui aussi trop tardif pour expliquer l’enchère day-ahead déjà fixée.</p><span class="tag">Écarté du DA</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <div><p class="kicker">05 — Test des hypothèses</p><h2>Cause, amplificateur ou simple coïncidence ?</h2></div>
+        <p class="section-intro">Ce tableau résume la force des indices. Il évite une attribution mono-causale dans un marché couplé et non linéaire.</p>
+      </div>
+      <div class="matrix-wrap">
+        <table>
+          <thead><tr><th>Hypothèse</th><th>16 août</th><th>25 août</th><th>Verdict</th><th>Indice déterminant</th></tr></thead>
+          <tbody>
+            <tr><td class="signal">Chute du solaire FR</td><td>Faible contribution</td><td>−0,55 GW prévu</td><td><span class="pill no">Non dominante</span></td><td>Amplitude trop petite face au vent et à la marge pilotable.</td></tr>
+            <tr><td class="signal">Chute du vent FR</td><td>Faible production, contexte</td><td>−5,85 GW prévu</td><td><span class="pill high">Déclencheur le 25</span></td><td>73 % de la hausse calculée du résiduel.</td></tr>
+            <tr><td class="signal">Indisponibilité nucléaire</td><td>Baisse annoncée d’environ 7,5–9,0 GW ; chaleur/arrêts</td><td>Pas de décrochage comparable</td><td><span class="pill high">Marge le 16</span></td><td>Réduit le coussin ; ne déclenche pas le 25.</td></tr>
+            <tr><td class="signal">Hausse de la demande</td><td>Résiduel FR non haussier</td><td>Charge prévue +1,62 GW</td><td><span class="pill mid">Contributeur</span></td><td>Le prix DA porte sur l’anticipation, pas sur le réalisé ex post.</td></tr>
+            <tr><td class="signal">Couplage / congestion</td><td>FR=DE=BE=NL</td><td>FR≈BE, loin de NL/ES</td><td><span class="pill high">Transmission / amplification</span></td><td>Convergence le 16, dispersion zonale le 25.</td></tr>
+            <tr><td class="signal">Gaz cher</td><td colspan="2">Contexte de coût élevé pour les moyens thermiques marginaux</td><td><span class="pill mid">Amplificateur</span></td><td>Explique la hauteur possible du plateau, pas son timing exact.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="surveillance">
+      <div class="section-head">
+        <div><p class="kicker">06 — Rendre le diagnostic systématique</p><h2>Un tableau de bord J−1 en cinq étages</h2></div>
+        <p class="section-intro">Pour détecter ces bascules avant livraison, il faut surveiller la distance au coude du système, et pas seulement projeter la forme habituelle du prix.</p>
+      </div>
+      <div class="workflow">
+        <article class="workflow-item"><h3>Résiduel attendu</h3><p>Charge − vent − solaire − hydraulique au fil de l’eau, heure par heure, avec variations versus J−1 et J−7.</p></article>
+        <article class="workflow-item"><h3>Marge pilotable</h3><p>Résiduel moins nucléaire disponible, hydro modulable et capacité thermique réellement offerte.</p></article>
+        <article class="workflow-item"><h3>Rareté régionale</h3><p>Résiduels prévus DE, BE, NL, CH, GB et IT : une heure française se valorise dans un système couplé.</p></article>
+        <article class="workflow-item"><h3>Import headroom</h3><p>Capacités transfrontalières disponibles J−1 et marge avant saturation, par frontière pertinente.</p></article>
+        <article class="workflow-item"><h3>Coût marginal</h3><p>TTF, EUA, charbon et rendement thermique : ils fixent la hauteur du saut une fois le coude franchi.</p></article>
+      </div>
+      <div class="warning"><strong>Attention à la fuite d’information :</strong> les prix voisins du jour J et les flux physiques réalisés sont d’excellents outils d’explication <em>ex post</em>, mais ne doivent pas être utilisés tels quels comme variables prédictives J−1. Pour prévoir, utiliser les forecasts et les capacités disponibles connues avant la clôture.</div>
+    </section>
+
+    <section id="sources">
+      <div class="section-head">
+        <div><p class="kicker">07 — Sources & limites</p><h2>Une attribution robuste, mais pas une identification de l’offre marginale exacte</h2></div>
+        <p class="section-intro">Les résultats combinent prix zonaux, prévisions horodatées, données physiques et chronologie officielle. Les valeurs sont arrondies ; les périmètres horaires sont explicités.</p>
+      </div>
+      <div class="sources">
+        <article class="card source-group">
+          <h3>Marché, système et météo</h3>
+          <ul class="source-list">
+            <li><a href="https://www.rte-france.com/donnees-publications/eco2mix-donnees-temps-reel/donnees-marche">RTE — données de marché éCO2mix</a> : prix day-ahead par zone.</li>
+            <li><a href="https://odre.opendatasoft.com/explore/dataset/eco2mix-national-tr/api/">RTE/ODRÉ — éCO2mix national</a> : charge, production et échanges physiques.</li>
+            <li><a href="https://www.epexspot.com/en/basicspowermarket">EPEX SPOT — Basics of the power market</a> : enchère marginale et formation du prix.</li>
+            <li><a href="https://www.nemo-committee.eu/sdac">NEMO Committee — SDAC</a> : couplage day-ahead européen.</li>
+            <li><a href="https://opendata.elia.be/explore/dataset/ods201/api/">Elia — production belge</a> et <a href="https://opendata.elia.be/explore/dataset/ods001/api/">charge belge</a>.</li>
+            <li><a href="https://meteofrance.com/actualites/canicule-poursuite-de-la-baisse-des-temperatures-orages-sur-lest-et-maintien-des-fortes">Météo-France — fin de la canicule, 17 août</a> et <a href="https://meteofrance.com/actualites/meteo-nouvelle-forte-degradation-orageuse-sur-louest-mercredi">dégradation orageuse, 24 août</a>.</li>
+          </ul>
+        </article>
+        <article class="card source-group">
+          <h3>Chronologie du parc nucléaire</h3>
+          <ul class="source-list">
+            <li><a href="https://www.edf.fr/maintien-en-production-des-unites-de-production-ndeg4-et-ndeg5-dans-le-contexte-des-conditions-climatiques-exceptionnelles-cce">EDF — conditions climatiques exceptionnelles à Bugey</a>.</li>
+            <li><a href="https://www.edf.fr/la-centrale-nucleaire-de-golfech/les-actualites-de-la-centrale-nucleaire-de-golfech/adaptation-de-la-production-de-l-unite-de-production-ndeg2-de-la-centrale-nucleaire-de-golfech-en-raison-des-conditions-climatiques-0">EDF — arrêt de Golfech 2 lié à la Garonne</a>.</li>
+            <li><a href="https://www.edf.fr/la-centrale-nucleaire-de-saint-alban-saint-maurice/les-actualites-de-la-centrale-nucleaire-de-saint-alban/fin-des-conditions-climatiques-exceptionnelles-a-la-centrale-nucleaire-de-saint-alban-saint-maurice">EDF — Saint-Alban, 15–16 août</a>.</li>
+            <li><a href="https://www.edf.fr/la-centrale-nucleaire-de-paluel/les-actualites-de-la-centrale-nucleaire-de-paluel/deconnexion-de-l-unite-de-production-ndeg3-du-reseau-electrique-national">EDF — déconnexion de Paluel 3, 23 août</a>.</li>
+            <li><a href="https://www.edf.fr/la-centrale-nucleaire-de-golfech/les-actualites-de-la-centrale-nucleaire-de-golfech/edf-golfech-deconnexion-du-reseau-electrique-de-l-unite-de-production-ndeg2">EDF — déconnexion de Golfech 2, 24 août à 17:50</a>.</li>
+            <li><a href="https://www.edf.fr/actualite-de-l-unite-de-production-ndeg1-2">EDF — arrêt de Saint-Laurent 1, 25 août</a>.</li>
+          </ul>
+        </article>
+      </div>
+      <div class="method"><strong>Méthode.</strong> Prix et fondamentaux agrégés sur 10:00–16:59 Europe/Paris. Les prévisions du 25 sont les dernières versions disponibles à J−1 08:00 dans la base de travail, donc antérieures à la clôture de l’enchère. Les données réalisées servent à corroborer, jamais à réécrire l’information du marché. <strong>Limite.</strong> Sans carnet d’ordres EPEX, shadow prices du couplage et capacités cross-zonales détaillées par heure, on ne peut pas identifier avec certitude la centrale ou l’offre qui a fixé chaque prix. La confiance est élevée sur les familles de facteurs, moyenne sur l’unité marginale et la frontière exacte.</div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="shell"><span>Rapport généré le 27 août 2026 · Europe/Paris</span><span>Diagnostic reproductible à partir des séries RTE/ENTSO-E et des vintages J−1.</span></div>
+  </footer>
+  <div id="tooltip" class="chart-tooltip" aria-hidden="true"></div>
+
+  <script>
+    (() => {
+      const data = [
+        {d:'14', v:76.16}, {d:'15', v:30.50}, {d:'16', v:64.20, mark:true},
+        {d:'17', v:152.98}, {d:'18', v:135.08}, {d:'19', v:135.49},
+        {d:'20', v:91.43}, {d:'21', v:108.91}, {d:'22', v:2.68},
+        {d:'23', v:-1.60}, {d:'24', v:20.85}, {d:'25', v:122.33, mark:true},
+        {d:'26', v:130.77}
+      ];
+      const root = document.getElementById('price-chart');
+      const tooltip = document.getElementById('tooltip');
+      const NS = 'http://www.w3.org/2000/svg';
+      const W = 1000, H = 350, m = {l:58,r:26,t:30,b:56};
+      const minY = -20, maxY = 180;
+      const x = i => m.l + i * (W-m.l-m.r)/(data.length-1);
+      const y = v => m.t + (maxY-v) * (H-m.t-m.b)/(maxY-minY);
+      const el = (name, attrs={}, text='') => {
+        const n = document.createElementNS(NS,name);
+        Object.entries(attrs).forEach(([k,v]) => n.setAttribute(k,v));
+        if (text) n.textContent = text;
+        return n;
+      };
+      const svg = el('svg',{viewBox:`0 0 ${W} ${H}`,'aria-hidden':'true'});
+
+      const bandX = x(8)-22, bandW = x(10)-x(8)+44;
+      svg.appendChild(el('rect',{x:bandX,y:m.t,width:bandW,height:H-m.t-m.b,rx:10,fill:'#e5eee9',opacity:.75}));
+      svg.appendChild(el('text',{x:bandX+10,y:m.t+19,fill:'#3d8068','font-size':13,'font-family':'Segoe UI,Arial','font-weight':700},'détente 22–24'));
+
+      [-0,50,100,150].forEach(t => {
+        svg.appendChild(el('line',{x1:m.l,y1:y(t),x2:W-m.r,y2:y(t),stroke:'#d8d4ca','stroke-width':1}));
+        svg.appendChild(el('text',{x:m.l-12,y:y(t)+5,'text-anchor':'end',fill:'#6b7582','font-size':13,'font-family':'Segoe UI,Arial'},String(t)));
+      });
+      svg.appendChild(el('line',{x1:m.l,y1:y(0),x2:W-m.r,y2:y(0),stroke:'#8a96a6','stroke-width':1.7}));
+      svg.appendChild(el('text',{x:11,y:20,fill:'#6b7582','font-size':12,'font-family':'Segoe UI,Arial'},'€/MWh'));
+
+      data.forEach((p,i) => {
+        svg.appendChild(el('text',{x:x(i),y:H-24,'text-anchor':'middle',fill:p.mark?'#c8403d':'#6b7582','font-size':13,'font-family':'Segoe UI,Arial','font-weight':p.mark?800:500},`${p.d} août`));
+        if (p.mark) {
+          svg.appendChild(el('line',{x1:x(i),y1:m.t,x2:x(i),y2:H-m.b,stroke:'#ec7a42','stroke-width':2,'stroke-dasharray':'6 6',opacity:.78}));
+        }
+      });
+
+      const path = data.map((p,i) => `${i?'L':'M'} ${x(i)} ${y(p.v)}`).join(' ');
+      const area = `${path} L ${x(data.length-1)} ${y(minY)} L ${x(0)} ${y(minY)} Z`;
+      svg.appendChild(el('path',{d:area,fill:'#4667d8',opacity:.09}));
+      svg.appendChild(el('path',{d:path,fill:'none',stroke:'#4667d8','stroke-width':4,'stroke-linecap':'round','stroke-linejoin':'round'}));
+
+      data.forEach((p,i) => {
+        const c = el('circle',{cx:x(i),cy:y(p.v),r:p.mark?7:5,fill:p.mark?'#ec7a42':'#fff',stroke:p.mark?'#fff':'#4667d8','stroke-width':p.mark?3:3,tabindex:0});
+        const show = ev => {
+          tooltip.innerHTML = `<strong>${p.d} août 2026</strong>${p.v.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})} €/MWh`;
+          tooltip.style.left = `${ev.clientX || innerWidth/2}px`; tooltip.style.top = `${ev.clientY || innerHeight/2}px`; tooltip.style.opacity = 1; tooltip.setAttribute('aria-hidden','false');
+        };
+        c.addEventListener('pointerenter',show); c.addEventListener('pointermove',show);
+        c.addEventListener('pointerleave',()=>{tooltip.style.opacity=0;tooltip.setAttribute('aria-hidden','true');});
+        c.addEventListener('focus',()=>{tooltip.innerHTML=`<strong>${p.d} août 2026</strong>${p.v.toLocaleString('fr-FR',{minimumFractionDigits:2})} €/MWh`;tooltip.style.left='50%';tooltip.style.top='50%';tooltip.style.opacity=1;});
+        c.addEventListener('blur',()=>{tooltip.style.opacity=0;});
+        svg.appendChild(c);
+      });
+      root.appendChild(svg);
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#090a0e">
+  <link rel="icon" href="data:,">
+  <title>NYX · Suivi des calculs</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+  <div class="shell">
+    <header class="masthead">
+      <div class="brand"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M3 18h5l3-10 5 19 5-23 3 14h5"/></svg><div><span class="brand-name">NYX</span><span class="brand-sub">OBSERVATOIRE DES CALCULS</span></div></div>
+      <div class="header-right"><span class="read-only">Lecture seule</span><a class="console-link" href="http://127.0.0.1:8765" target="_blank" rel="noopener noreferrer">Console NYX <span aria-hidden="true">↗</span></a></div>
+    </header>
+
+    <div class="connection-row">
+      <div class="connection" id="connection" data-state="loading"><span class="connection-dot" aria-hidden="true"></span><span id="connection-label" role="status">Connexion au suivi local…</span></div>
+      <div class="update-info"><span id="last-update">En attente d’une première lecture</span><span class="separator">·</span><span id="refresh-label">Actualisation continue · 1 s</span></div>
+    </div>
+
+    <div class="page-head"><div><span class="eyebrow">TÉLÉMÉTRIE / TEMPS RÉEL</span><h1>Calculs en cours<span>.</span></h1><p class="subtitle">Processus actifs, ressources et estimation du temps restant.</p></div><span class="live-instrument"><span aria-hidden="true">◈</span> LIVE MONITOR</span></div>
+
+    <section class="summary" aria-label="Vue d’ensemble">
+      <div class="summary-tile"><span class="tile-label">CALCULS ACTIFS</span><div><strong id="count-running">—</strong><span class="tile-note" id="process-total">en attente de lecture</span></div></div>
+      <div class="summary-tile"><span class="tile-label">CPU / MACHINE</span><div><strong id="total-cpu">—</strong><span class="tile-note">tous calculs surveillés</span></div></div>
+      <div class="summary-tile"><span class="tile-label">MÉMOIRE / RAM</span><div><strong id="total-memory">—</strong><span class="tile-note">processus surveillés</span></div></div>
+    </section>
+
+    <div class="notice error-notice" id="connection-error" role="alert" hidden></div>
+    <div class="notice" id="global-warnings" hidden></div>
+
+    <main>
+      <div class="section-heading"><h2>Processus actifs</h2><span class="section-note" id="active-scope">Sans historique · lecture seule</span></div>
+      <div id="jobs" class="jobs"></div>
+      <div class="empty-state" id="empty-state"><span class="empty-icon" aria-hidden="true">◌</span><h3 id="empty-title">Lecture des processus…</h3><p id="empty-text">Seuls les calculs encore actifs apparaissent ici.</p></div>
+    </main>
+
+    <footer><span class="footer-status"><span aria-hidden="true">◈</span> Fermer cette fenêtre n’arrête aucun calcul.</span><span>Les temps restants sont des estimations révisables, jamais des garanties.</span></footer>
+  </div>
+
+  <template id="job-template">
+    <article class="job-card">
+      <div class="job-main">
+        <div class="job-heading"><div class="job-titles"><span class="job-kind eyebrow"></span><h3 class="job-title"></h3><p class="job-subtitle"></p></div><span class="status-badge"><span class="status-dot" aria-hidden="true"></span><span class="status-text"></span></span></div>
+        <div class="phase-row"><span class="phase-label"></span><span class="elapsed" title="Temps écoulé depuis le démarrage."></span></div>
+        <div class="eta-panel"><div class="eta-primary"><span class="instrument-label">TEMPS RESTANT ESTIMÉ</span><strong class="eta-value"></strong><span class="eta-end"></span></div><div class="eta-secondary"><span class="eta-confidence"></span><span class="eta-range"></span><span class="eta-basis"></span></div></div>
+        <div class="progress-track" role="progressbar" aria-label="Avancement déclaré"><span class="progress-fill"></span></div>
+        <div class="progress-caption"><span class="progress-label"></span><span class="progress-value"></span></div>
+        <p class="progress-explanation">La progression déclarée et l’estimation de durée sont deux mesures distinctes.</p>
+        <div class="job-bottom"><div class="zones" aria-label="État par pays"></div><div class="resources"><span title="Part du CPU total de la machine, agrégée sur les processus surveillés. 100 % = tous les cœurs.">CPU <strong class="cpu-value"></strong></span><span>RAM <strong class="memory-value"></strong></span><span class="process-count"></span></div></div>
+        <div class="job-warnings notice" hidden></div>
+      </div>
+      <details class="job-details"><summary><span>Processus et journaux</span><span class="details-hint">PID · commandes · sortie</span><span class="chevron" aria-hidden="true">⌄</span></summary><div class="details-body">
+        <h4>Arbre des processus</h4><p class="tree-help">Un lanceur Python et ses workers appartiennent au même calcul. Identité = PID + date de création.</p><div class="process-tree"></div>
+        <div class="log-heading"><div class="log-tabs" role="group" aria-label="Choisir un journal"><button type="button" data-log="stdout" aria-pressed="true">Sortie standard</button><button type="button" data-log="stderr" aria-pressed="false">Sortie d’erreur</button></div><label class="follow-label"><input class="follow-log" type="checkbox" checked> Suivre la fin</label></div>
+        <div class="log-meta"><span class="log-updated"></span><span>Dernières lignes disponibles</span></div><pre class="log-output" tabindex="0" aria-label="Dernières lignes du journal"></pre><p class="stderr-hint" hidden>La sortie d’erreur peut aussi contenir des avertissements ; sa présence ne signifie pas que le calcul a échoué.</p>
+      </div></details>
+    </article>
+  </template>
+</body>
+</html>

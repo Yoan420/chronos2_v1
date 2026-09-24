@@ -1,0 +1,492 @@
+<html><main><section data-report-section="actual-price-reference"><p><strong>Prix réalisés et référence des scores : EPEX via Saturn.</strong> Les observations affichées et les métriques NYX/Storm utilisent les mêmes prix horaires du snapshot vérifié, y compris pour les dates historiques. Extraction du snapshot : 18/09/2026 14:52 CEST.</p></section><details data-report-section="nuclear-methodology"><summary>Variante nucléaire — méthode et traçabilité</summary><section data-report-section="nuclear-diagnostic" data-diagnostic-only="true" data-production="false"><h2>Variante nucléaire</h2><p>Variante intégrée au lancement Forecast; ses sorties restent distinctes des modèles historiques. Cette publication ne constitue pas à elle seule une validation prospective en production. Aucun entraînement n'est effectué par le rapport.</p><p>Scores FINAL365: 2025-09-09 au 2026-09-08, 8760 heures physiques observées. Le jour de livraison n'entre pas dans ces scores de backtest.</p><p>Warm-up: 365 jours de sorties du correcteur avant FINAL365; 365 jours de sorties Chronos-2 avant FINAL365. Le Kalman reçoit le correcteur nucléaire recalculé; son warm-up précède le FINAL365 et n'est pas inclus dans les scores affichés.</p><p>Statistics: 365 jours observés glissants, plus le jour de livraison s'il est encore sans observations; mêmes heures physiques et mêmes prix observés pour les deux variantes. Les Statistics, prix moyens, calendrier et profils horaires comparent le modèle à un snapshot Storm officiel vérifié, uniquement sur les heures observées communes. Les jours sans Storm restent visibles, sans inventer de comparaison.</p><p>DST: toute duplication de l'heure d'automne concerne uniquement la covariable nucléaire dérivée lorsque sa source l'exige; elle ne crée ni prix observé ni prévision supplémentaire. Les heures physiques distinctes restent identifiées en UTC. La traçabilité des vintages d'entrée reste soumise à l'audit source.</p><p>P10/P50/P90 sont conservés; les déciles intermédiaires et le CRPS du moteur de rapport sont une approximation linéaire d'affichage.</p><details><summary>Audit du rapport</summary><pre>{
+  &quot;schema_version&quot;: 1,
+  &quot;diagnostic_only&quot;: true,
+  &quot;production&quot;: false,
+  &quot;publication_mode&quot;: &quot;forecast_run&quot;,
+  &quot;report_variants&quot;: [
+    &quot;autonomous&quot;,
+    &quot;kalman&quot;
+  ],
+  &quot;zone&quot;: &quot;FR&quot;,
+  &quot;timezone&quot;: &quot;Europe/Paris&quot;,
+  &quot;delivery_day&quot;: &quot;2026-09-09&quot;,
+  &quot;evaluation_start_day&quot;: &quot;2025-09-09&quot;,
+  &quot;evaluation_end_day&quot;: &quot;2026-09-08&quot;,
+  &quot;evaluation_days&quot;: 365,
+  &quot;evaluation_hours&quot;: 8760,
+  &quot;same_actual_hours&quot;: true,
+  &quot;actual_price_reference&quot;: {
+    &quot;status&quot;: &quot;verified&quot;,
+    &quot;mode&quot;: &quot;latest_report_only_refresh&quot;,
+    &quot;compared_hours&quot;: 8784,
+    &quot;actual_reference&quot;: &quot;EPEX&quot;,
+    &quot;actual_reference_label&quot;: &quot;EPEX&quot;,
+    &quot;source_kind&quot;: &quot;saturn_epex_latest_extraction&quot;,
+    &quot;policy&quot;: &quot;epex_only_v1&quot;,
+    &quot;series&quot;: &quot;power.price.fr.euromwh.h.obs.epex&quot;,
+    &quot;extracted_at_utc&quot;: &quot;2026-09-18 12:52:15.921668+00:00&quot;,
+    &quot;artifact_sha256&quot;: &quot;25706f52bc9ffcd78d924431117e20208f0b6f3b9aaae081b55193c8efff6cf6&quot;,
+    &quot;artifact_path&quot;: &quot;C:\\Users\\BQ6757\\chronos2_v1\\tmp\\epex-report-regressions\\test_refreshed_canonical_revis0\\report_only\\sources\\20260918T125215921668Z_5d0d0dc4\\inputs\\observed_latest.parquet&quot;,
+    &quot;used_for_prediction&quot;: false,
+    &quot;calibration_inputs_modified&quot;: false
+  },
+  &quot;historical_observation_precision&quot;: {
+    &quot;mode&quot;: &quot;verified_latest_canonical_reporting_observations&quot;,
+    &quot;compared_hours&quot;: 8760,
+    &quot;changed_hours&quot;: 8760,
+    &quot;max_absolute_revision_eur_mwh&quot;: 50.999999998977735,
+    &quot;training_inputs_modified&quot;: false,
+    &quot;source&quot;: {
+      &quot;status&quot;: &quot;verified&quot;,
+      &quot;mode&quot;: &quot;latest_report_only_refresh&quot;,
+      &quot;compared_hours&quot;: 8784,
+      &quot;actual_reference&quot;: &quot;EPEX&quot;,
+      &quot;actual_reference_label&quot;: &quot;EPEX&quot;,
+      &quot;source_kind&quot;: &quot;saturn_epex_latest_extraction&quot;,
+      &quot;policy&quot;: &quot;epex_only_v1&quot;,
+      &quot;series&quot;: &quot;power.price.fr.euromwh.h.obs.epex&quot;,
+      &quot;extracted_at_utc&quot;: &quot;2026-09-18 12:52:15.921668+00:00&quot;,
+      &quot;artifact_sha256&quot;: &quot;25706f52bc9ffcd78d924431117e20208f0b6f3b9aaae081b55193c8efff6cf6&quot;,
+      &quot;artifact_path&quot;: &quot;C:\\Users\\BQ6757\\chronos2_v1\\tmp\\epex-report-regressions\\test_refreshed_canonical_revis0\\report_only\\sources\\20260918T125215921668Z_5d0d0dc4\\inputs\\observed_latest.parquet&quot;,
+      &quot;used_for_prediction&quot;: false,
+      &quot;calibration_inputs_modified&quot;: false
+    }
+  },
+  &quot;delivery_day_observed_hours&quot;: 24,
+  &quot;delivery_day_placeholder_hours&quot;: 0,
+  &quot;delivery_day_actual_reason&quot;: null,
+  &quot;delivery_day_actual_extracted_at_utc&quot;: &quot;2026-09-18 12:52:15.921668+00:00&quot;,
+  &quot;statistics_window&quot;: &quot;latest_365_observed_local_days_plus_unobserved_delivery_placeholder&quot;,
+  &quot;storm_status&quot;: &quot;verified_standard_report_comparator&quot;,
+  &quot;storm_hourly_comparison&quot;: {
+    &quot;status&quot;: &quot;complete&quot;,
+    &quot;used_for_prediction&quot;: false,
+    &quot;native_statistics_modified&quot;: false,
+    &quot;statistics_comparison_attached&quot;: true,
+    &quot;snapshot&quot;: {
+      &quot;archive&quot;: &quot;C:\\Users\\BQ6757\\chronos2_v1\\tmp\\epex-report-regressions\\test_refreshed_canonical_revis0\\report_only\\sources\\20260918T125215921668Z_5d0d0dc4&quot;,
+      &quot;artifact_path&quot;: &quot;C:\\Users\\BQ6757\\chronos2_v1\\tmp\\epex-report-regressions\\test_refreshed_canonical_revis0\\report_only\\sources\\20260918T125215921668Z_5d0d0dc4\\inputs\\storm_dashboard_official_statistics.parquet&quot;,
+      &quot;artifact_sha256&quot;: &quot;d63c10842d0822d25036b282e946f8f779cd5249077ccdb791ff4f492b5cc382&quot;,
+      &quot;audit_path&quot;: &quot;C:\\Users\\BQ6757\\chronos2_v1\\tmp\\epex-report-regressions\\test_refreshed_canonical_revis0\\report_only\\sources\\20260918T125215921668Z_5d0d0dc4\\statistics_history_audit.json&quot;,
+      &quot;audit_sha256&quot;: &quot;f719270132f29a17638961491a29226655de2be72455b459f6e33fd0a353d9ca&quot;
+    },
+    &quot;variants&quot;: {
+      &quot;autonomous&quot;: {
+        &quot;role&quot;: &quot;evaluation_only_dashboard_comparator&quot;,
+        &quot;contract&quot;: &quot;explicit materialized Storm dashboard comparator&quot;,
+        &quot;series&quot;: &quot;power.price.fr.euromwh.h.fcst.3mv.storm.da.cache&quot;,
+        &quot;column&quot;: &quot;storm_dashboard_official__q50&quot;,
+        &quot;source&quot;: {
+          &quot;kind&quot;: &quot;saturn_storm_day_ahead_cache_with_native_gap_fallback&quot;,
+          &quot;series&quot;: &quot;power.price.fr.euromwh.h.fcst.3mv.storm.da.cache&quot;,
+          &quot;primary_series&quot;: &quot;power.price.fr.euromwh.h.fcst.3mv.storm.da.cache&quot;,
+          &quot;zone&quot;: &quot;FR&quot;,
+          &quot;fallback_series&quot;: &quot;power.price.fr.euromwh.h.fcst.3mv.storm&quot;,
+          &quot;extracted_at_utc&quot;: &quot;2026-09-18 12:52:15.921668+00:00&quot;,
+          &quot;used_for_prediction&quot;: false,
+          &quot;series_kind&quot;: &quot;frozen_day_ahead_cache&quot;,
+          &quot;fallback_policy&quot;: &quot;native_only_where_day_ahead_cache_is_missing&quot;,
+          &quot;cache_precedence&quot;: true
+        },
+        &quot;period&quot;: {
+          &quot;start_utc&quot;: &quot;2025-09-09 22:00:00+00:00&quot;,
+          &quot;end_utc&quot;: &quot;2026-09-09 21:00:00+00:00&quot;,
+          &quot;start_local_day&quot;: &quot;2025-09-10&quot;,
+          &quot;end_local_day&quot;: &quot;2026-09-09&quot;,
+          &quot;timezone&quot;: &quot;Europe/Paris&quot;
+        },
+        &quot;expected_hours&quot;: 8760,
+        &quot;source_rows&quot;: 8784,
+        &quot;source_extra_hours_outside_period&quot;: 24,
+        &quot;available_hours&quot;: 8759,
+        &quot;missing_hours&quot;: 1,
+        &quot;coverage&quot;: 0.9998858447488584,
+        &quot;minimum_coverage&quot;: 0.0,
+        &quot;maximum_missing_hours&quot;: 1,
+        &quot;missing_timestamps&quot;: [
+          {
+            &quot;utc&quot;: &quot;2025-10-26 00:00:00+00:00&quot;,
+            &quot;local&quot;: &quot;2025-10-26 02:00:00+02:00&quot;,
+            &quot;fold&quot;: 0
+          }
+        ],
+        &quot;missing_timestamps_truncated&quot;: false,
+        &quot;dst&quot;: {
+          &quot;expected_local_day_hour_histogram&quot;: {
+            &quot;23&quot;: 1,
+            &quot;24&quot;: 363,
+            &quot;25&quot;: 1
+          },
+          &quot;available_local_day_hour_histogram&quot;: {
+            &quot;23&quot;: 1,
+            &quot;24&quot;: 364
+          },
+          &quot;transition_days&quot;: [
+            {
+              &quot;local_day&quot;: &quot;2025-10-26&quot;,
+              &quot;expected_hours&quot;: 25,
+              &quot;available_hours&quot;: 24,
+              &quot;missing_hours&quot;: 1
+            },
+            {
+              &quot;local_day&quot;: &quot;2026-03-29&quot;,
+              &quot;expected_hours&quot;: 23,
+              &quot;available_hours&quot;: 23,
+              &quot;missing_hours&quot;: 0
+            }
+          ],
+          &quot;interpolation&quot;: false,
+          &quot;strict_08_fallback&quot;: false
+        },
+        &quot;actual_available_hours&quot;: 8760,
+        &quot;actual_missing_hours&quot;: 0,
+        &quot;allowed_missing_actual_hours&quot;: 0,
+        &quot;actual_missing_contract_satisfied&quot;: true,
+        &quot;metrics&quot;: {
+          &quot;n&quot;: 8759,
+          &quot;mae&quot;: 5.0,
+          &quot;rmse&quot;: 5.0,
+          &quot;bias&quot;: 5.0
+        },
+        &quot;used_for_prediction&quot;: false,
+        &quot;used_for_live_forecast&quot;: false,
+        &quot;candidate_frozen_before_comparator_attachment&quot;: true,
+        &quot;source_materialization&quot;: {
+          &quot;role&quot;: &quot;evaluation_only_dashboard_comparator&quot;,
+          &quot;contract&quot;: &quot;explicit materialized Storm dashboard comparator&quot;,
+          &quot;series&quot;: &quot;power.price.fr.euromwh.h.fcst.3mv.storm.da.cache&quot;,
+          &quot;column&quot;: &quot;storm_dashboard_official__q50&quot;,
+          &quot;source&quot;: {
+            &quot;kind&quot;: &quot;saturn_storm_day_ahead_cache_with_native_gap_fallback&quot;,
+            &quot;series&quot;: &quot;power.price.fr.euromwh.h.fcst.3mv.storm.da.cache&quot;,
+            &quot;primary_series&quot;: &quot;power.price.fr.euromwh.h.fcst.3mv.storm.da.cache&quot;,
+            &quot;zone&quot;: &quot;FR&quot;,
+            &quot;fallback_series&quot;: &quot;power.price.fr.euromwh.h.fcst.3mv.storm&quot;,
+            &quot;extracted_at_utc&quot;: &quot;2026-09-18 12:52:15.921668+00:00&quot;,
+            &quot;used_for_prediction&quot;: false,
+            &quot;series_kind&quot;: &quot;frozen_day_ahead_cache&quot;,
+            &quot;fallback_policy&quot;: &quot;native_only_where_day_ahead_cache_is_missing&quot;,
+            &quot;cache_precedence&quot;: true
+          },
+          &quot;period&quot;: {
+            &quot;start_utc&quot;: &quot;2025-09-08 22:00:00+00:00&quot;,
+            &quot;end_utc&quot;: &quot;2026-09-09 21:00:00+00:00&quot;,
+            &quot;start_local_day&quot;: &quot;2025-09-09&quot;,
+            &quot;end_local_day&quot;: &quot;2026-09-09&quot;,
+            &quot;timezone&quot;: &quot;Europe/Paris&quot;
+          },
+          &quot;expected_hours&quot;: 8784,
+          &quot;source_rows&quot;: 8784,
+          &quot;source_extra_hours_outside_period&quot;: 0,
+          &quot;available_hours&quot;: 8783,
+          &quot;missing_hours&quot;: 1,
+          &quot;coverage&quot;: 0.9998861566484517,
+          &quot;minimum_coverage&quot;: 0.0,
+          &quot;maximum_missing_hours&quot;: 1,
+          &quot;missing_timestamps&quot;: [
+            {
+              &quot;utc&quot;: &quot;2025-10-26 00:00:00+00:00&quot;,
+              &quot;local&quot;: &quot;2025-10-26 02:00:00+02:00&quot;,
+              &quot;fold&quot;: 0
+            }
+          ],
+          &quot;missing_timestamps_truncated&quot;: false,
+          &quot;dst&quot;: {
+            &quot;expected_local_day_hour_histogram&quot;: {
+              &quot;23&quot;: 1,
+              &quot;24&quot;: 364,
+              &quot;25&quot;: 1
+            },
+            &quot;available_local_day_hour_histogram&quot;: {
+              &quot;23&quot;: 1,
+              &quot;24&quot;: 365
+            },
+            &quot;transition_days&quot;: [
+              {
+                &quot;local_day&quot;: &quot;2025-10-26&quot;,
+                &quot;expected_hours&quot;: 25,
+                &quot;available_hours&quot;: 24,
+                &quot;missing_hours&quot;: 1
+              },
+              {
+                &quot;local_day&quot;: &quot;2026-03-29&quot;,
+                &quot;expected_hours&quot;: 23,
+                &quot;available_hours&quot;: 23,
+                &quot;missing_hours&quot;: 0
+              }
+            ],
+            &quot;interpolation&quot;: false,
+            &quot;strict_08_fallback&quot;: false,
+            &quot;native_allowed_missing_hours&quot;: 1,
+            &quot;native_allowed_missing_utc&quot;: [
+              &quot;2025-10-26 00:00:00+00:00&quot;
+            ],
+            &quot;native_actual_missing_matches_allowed&quot;: true
+          },
+          &quot;actual_available_hours&quot;: 8784,
+          &quot;actual_missing_hours&quot;: 0,
+          &quot;allowed_missing_actual_hours&quot;: 0,
+          &quot;actual_missing_contract_satisfied&quot;: true,
+          &quot;metrics&quot;: {
+            &quot;n&quot;: 8783,
+            &quot;mae&quot;: 5.0,
+            &quot;rmse&quot;: 5.0,
+            &quot;bias&quot;: 5.0
+          },
+          &quot;used_for_prediction&quot;: false,
+          &quot;used_for_live_forecast&quot;: false,
+          &quot;candidate_frozen_before_comparator_attachment&quot;: true,
+          &quot;delivery_placeholder&quot;: {
+            &quot;delivery_day_local&quot;: &quot;2026-09-09&quot;,
+            &quot;timezone&quot;: &quot;Europe/Paris&quot;,
+            &quot;allowed_missing_utc&quot;: [],
+            &quot;allowed_missing_hours&quot;: 0,
+            &quot;status&quot;: &quot;complete&quot;,
+            &quot;used_for_prediction&quot;: false
+          },
+          &quot;normalized_artifact_path&quot;: &quot;inputs/storm_dashboard_official_statistics.parquet&quot;,
+          &quot;normalized_artifact_sha256&quot;: &quot;d63c10842d0822d25036b282e946f8f779cd5249077ccdb791ff4f492b5cc382&quot;
+        },
+        &quot;snapshot&quot;: {
+          &quot;archive&quot;: &quot;C:\\Users\\BQ6757\\chronos2_v1\\tmp\\epex-report-regressions\\test_refreshed_canonical_revis0\\report_only\\sources\\20260918T125215921668Z_5d0d0dc4&quot;,
+          &quot;artifact_path&quot;: &quot;C:\\Users\\BQ6757\\chronos2_v1\\tmp\\epex-report-regressions\\test_refreshed_canonical_revis0\\report_only\\sources\\20260918T125215921668Z_5d0d0dc4\\inputs\\storm_dashboard_official_statistics.parquet&quot;,
+          &quot;artifact_sha256&quot;: &quot;d63c10842d0822d25036b282e946f8f779cd5249077ccdb791ff4f492b5cc382&quot;,
+          &quot;audit_path&quot;: &quot;C:\\Users\\BQ6757\\chronos2_v1\\tmp\\epex-report-regressions\\test_refreshed_canonical_revis0\\report_only\\sources\\20260918T125215921668Z_5d0d0dc4\\statistics_history_audit.json&quot;,
+          &quot;audit_sha256&quot;: &quot;f719270132f29a17638961491a29226655de2be72455b459f6e33fd0a353d9ca&quot;
+        },
+        &quot;variant&quot;: &quot;autonomous&quot;,
+        &quot;expected_comparison_hours&quot;: 8760,
+        &quot;matched_hours&quot;: 8759,
+        &quot;observed_hours&quot;: 8760,
+        &quot;unmatched_observed_hours&quot;: 1,
+        &quot;forecast_placeholder_hours&quot;: 0,
+        &quot;storm_missing_hours&quot;: 1,
+        &quot;storm_missing_dst_hours&quot;: 1,
+        &quot;storm_missing_outside_archive_hours&quot;: 0,
+        &quot;fully_paired_days&quot;: 364,
+        &quot;partially_paired_days&quot;: 1,
+        &quot;full_observed_coverage&quot;: false,
+        &quot;native_statistics_modified&quot;: false,
+        &quot;observations_source&quot;: &quot;supplied_nuclear_result_only&quot;,
+        &quot;comparison_scope&quot;: &quot;latest_365_observed_civil_days_plus_unobserved_delivery_placeholder&quot;,
+        &quot;missing_benchmark_utc&quot;: [
+          &quot;2025-10-26T00:00:00+00:00&quot;
+        ]
+      },
+      &quot;kalman&quot;: {
+        &quot;role&quot;: &quot;evaluation_only_dashboard_comparator&quot;,
+        &quot;contract&quot;: &quot;explicit materialized Storm dashboard comparator&quot;,
+        &quot;series&quot;: &quot;power.price.fr.euromwh.h.fcst.3mv.storm.da.cache&quot;,
+        &quot;column&quot;: &quot;storm_dashboard_official__q50&quot;,
+        &quot;source&quot;: {
+          &quot;kind&quot;: &quot;saturn_storm_day_ahead_cache_with_native_gap_fallback&quot;,
+          &quot;series&quot;: &quot;power.price.fr.euromwh.h.fcst.3mv.storm.da.cache&quot;,
+          &quot;primary_series&quot;: &quot;power.price.fr.euromwh.h.fcst.3mv.storm.da.cache&quot;,
+          &quot;zone&quot;: &quot;FR&quot;,
+          &quot;fallback_series&quot;: &quot;power.price.fr.euromwh.h.fcst.3mv.storm&quot;,
+          &quot;extracted_at_utc&quot;: &quot;2026-09-18 12:52:15.921668+00:00&quot;,
+          &quot;used_for_prediction&quot;: false,
+          &quot;series_kind&quot;: &quot;frozen_day_ahead_cache&quot;,
+          &quot;fallback_policy&quot;: &quot;native_only_where_day_ahead_cache_is_missing&quot;,
+          &quot;cache_precedence&quot;: true
+        },
+        &quot;period&quot;: {
+          &quot;start_utc&quot;: &quot;2025-09-09 22:00:00+00:00&quot;,
+          &quot;end_utc&quot;: &quot;2026-09-09 21:00:00+00:00&quot;,
+          &quot;start_local_day&quot;: &quot;2025-09-10&quot;,
+          &quot;end_local_day&quot;: &quot;2026-09-09&quot;,
+          &quot;timezone&quot;: &quot;Europe/Paris&quot;
+        },
+        &quot;expected_hours&quot;: 8760,
+        &quot;source_rows&quot;: 8784,
+        &quot;source_extra_hours_outside_period&quot;: 24,
+        &quot;available_hours&quot;: 8759,
+        &quot;missing_hours&quot;: 1,
+        &quot;coverage&quot;: 0.9998858447488584,
+        &quot;minimum_coverage&quot;: 0.0,
+        &quot;maximum_missing_hours&quot;: 1,
+        &quot;missing_timestamps&quot;: [
+          {
+            &quot;utc&quot;: &quot;2025-10-26 00:00:00+00:00&quot;,
+            &quot;local&quot;: &quot;2025-10-26 02:00:00+02:00&quot;,
+            &quot;fold&quot;: 0
+          }
+        ],
+        &quot;missing_timestamps_truncated&quot;: false,
+        &quot;dst&quot;: {
+          &quot;expected_local_day_hour_histogram&quot;: {
+            &quot;23&quot;: 1,
+            &quot;24&quot;: 363,
+            &quot;25&quot;: 1
+          },
+          &quot;available_local_day_hour_histogram&quot;: {
+            &quot;23&quot;: 1,
+            &quot;24&quot;: 364
+          },
+          &quot;transition_days&quot;: [
+            {
+              &quot;local_day&quot;: &quot;2025-10-26&quot;,
+              &quot;expected_hours&quot;: 25,
+              &quot;available_hours&quot;: 24,
+              &quot;missing_hours&quot;: 1
+            },
+            {
+              &quot;local_day&quot;: &quot;2026-03-29&quot;,
+              &quot;expected_hours&quot;: 23,
+              &quot;available_hours&quot;: 23,
+              &quot;missing_hours&quot;: 0
+            }
+          ],
+          &quot;interpolation&quot;: false,
+          &quot;strict_08_fallback&quot;: false
+        },
+        &quot;actual_available_hours&quot;: 8760,
+        &quot;actual_missing_hours&quot;: 0,
+        &quot;allowed_missing_actual_hours&quot;: 0,
+        &quot;actual_missing_contract_satisfied&quot;: true,
+        &quot;metrics&quot;: {
+          &quot;n&quot;: 8759,
+          &quot;mae&quot;: 5.0,
+          &quot;rmse&quot;: 5.0,
+          &quot;bias&quot;: 5.0
+        },
+        &quot;used_for_prediction&quot;: false,
+        &quot;used_for_live_forecast&quot;: false,
+        &quot;candidate_frozen_before_comparator_attachment&quot;: true,
+        &quot;source_materialization&quot;: {
+          &quot;role&quot;: &quot;evaluation_only_dashboard_comparator&quot;,
+          &quot;contract&quot;: &quot;explicit materialized Storm dashboard comparator&quot;,
+          &quot;series&quot;: &quot;power.price.fr.euromwh.h.fcst.3mv.storm.da.cache&quot;,
+          &quot;column&quot;: &quot;storm_dashboard_official__q50&quot;,
+          &quot;source&quot;: {
+            &quot;kind&quot;: &quot;saturn_storm_day_ahead_cache_with_native_gap_fallback&quot;,
+            &quot;series&quot;: &quot;power.price.fr.euromwh.h.fcst.3mv.storm.da.cache&quot;,
+            &quot;primary_series&quot;: &quot;power.price.fr.euromwh.h.fcst.3mv.storm.da.cache&quot;,
+            &quot;zone&quot;: &quot;FR&quot;,
+            &quot;fallback_series&quot;: &quot;power.price.fr.euromwh.h.fcst.3mv.storm&quot;,
+            &quot;extracted_at_utc&quot;: &quot;2026-09-18 12:52:15.921668+00:00&quot;,
+            &quot;used_for_prediction&quot;: false,
+            &quot;series_kind&quot;: &quot;frozen_day_ahead_cache&quot;,
+            &quot;fallback_policy&quot;: &quot;native_only_where_day_ahead_cache_is_missing&quot;,
+            &quot;cache_precedence&quot;: true
+          },
+          &quot;period&quot;: {
+            &quot;start_utc&quot;: &quot;2025-09-08 22:00:00+00:00&quot;,
+            &quot;end_utc&quot;: &quot;2026-09-09 21:00:00+00:00&quot;,
+            &quot;start_local_day&quot;: &quot;2025-09-09&quot;,
+            &quot;end_local_day&quot;: &quot;2026-09-09&quot;,
+            &quot;timezone&quot;: &quot;Europe/Paris&quot;
+          },
+          &quot;expected_hours&quot;: 8784,
+          &quot;source_rows&quot;: 8784,
+          &quot;source_extra_hours_outside_period&quot;: 0,
+          &quot;available_hours&quot;: 8783,
+          &quot;missing_hours&quot;: 1,
+          &quot;coverage&quot;: 0.9998861566484517,
+          &quot;minimum_coverage&quot;: 0.0,
+          &quot;maximum_missing_hours&quot;: 1,
+          &quot;missing_timestamps&quot;: [
+            {
+              &quot;utc&quot;: &quot;2025-10-26 00:00:00+00:00&quot;,
+              &quot;local&quot;: &quot;2025-10-26 02:00:00+02:00&quot;,
+              &quot;fold&quot;: 0
+            }
+          ],
+          &quot;missing_timestamps_truncated&quot;: false,
+          &quot;dst&quot;: {
+            &quot;expected_local_day_hour_histogram&quot;: {
+              &quot;23&quot;: 1,
+              &quot;24&quot;: 364,
+              &quot;25&quot;: 1
+            },
+            &quot;available_local_day_hour_histogram&quot;: {
+              &quot;23&quot;: 1,
+              &quot;24&quot;: 365
+            },
+            &quot;transition_days&quot;: [
+              {
+                &quot;local_day&quot;: &quot;2025-10-26&quot;,
+                &quot;expected_hours&quot;: 25,
+                &quot;available_hours&quot;: 24,
+                &quot;missing_hours&quot;: 1
+              },
+              {
+                &quot;local_day&quot;: &quot;2026-03-29&quot;,
+                &quot;expected_hours&quot;: 23,
+                &quot;available_hours&quot;: 23,
+                &quot;missing_hours&quot;: 0
+              }
+            ],
+            &quot;interpolation&quot;: false,
+            &quot;strict_08_fallback&quot;: false,
+            &quot;native_allowed_missing_hours&quot;: 1,
+            &quot;native_allowed_missing_utc&quot;: [
+              &quot;2025-10-26 00:00:00+00:00&quot;
+            ],
+            &quot;native_actual_missing_matches_allowed&quot;: true
+          },
+          &quot;actual_available_hours&quot;: 8784,
+          &quot;actual_missing_hours&quot;: 0,
+          &quot;allowed_missing_actual_hours&quot;: 0,
+          &quot;actual_missing_contract_satisfied&quot;: true,
+          &quot;metrics&quot;: {
+            &quot;n&quot;: 8783,
+            &quot;mae&quot;: 5.0,
+            &quot;rmse&quot;: 5.0,
+            &quot;bias&quot;: 5.0
+          },
+          &quot;used_for_prediction&quot;: false,
+          &quot;used_for_live_forecast&quot;: false,
+          &quot;candidate_frozen_before_comparator_attachment&quot;: true,
+          &quot;delivery_placeholder&quot;: {
+            &quot;delivery_day_local&quot;: &quot;2026-09-09&quot;,
+            &quot;timezone&quot;: &quot;Europe/Paris&quot;,
+            &quot;allowed_missing_utc&quot;: [],
+            &quot;allowed_missing_hours&quot;: 0,
+            &quot;status&quot;: &quot;complete&quot;,
+            &quot;used_for_prediction&quot;: false
+          },
+          &quot;normalized_artifact_path&quot;: &quot;inputs/storm_dashboard_official_statistics.parquet&quot;,
+          &quot;normalized_artifact_sha256&quot;: &quot;d63c10842d0822d25036b282e946f8f779cd5249077ccdb791ff4f492b5cc382&quot;
+        },
+        &quot;snapshot&quot;: {
+          &quot;archive&quot;: &quot;C:\\Users\\BQ6757\\chronos2_v1\\tmp\\epex-report-regressions\\test_refreshed_canonical_revis0\\report_only\\sources\\20260918T125215921668Z_5d0d0dc4&quot;,
+          &quot;artifact_path&quot;: &quot;C:\\Users\\BQ6757\\chronos2_v1\\tmp\\epex-report-regressions\\test_refreshed_canonical_revis0\\report_only\\sources\\20260918T125215921668Z_5d0d0dc4\\inputs\\storm_dashboard_official_statistics.parquet&quot;,
+          &quot;artifact_sha256&quot;: &quot;d63c10842d0822d25036b282e946f8f779cd5249077ccdb791ff4f492b5cc382&quot;,
+          &quot;audit_path&quot;: &quot;C:\\Users\\BQ6757\\chronos2_v1\\tmp\\epex-report-regressions\\test_refreshed_canonical_revis0\\report_only\\sources\\20260918T125215921668Z_5d0d0dc4\\statistics_history_audit.json&quot;,
+          &quot;audit_sha256&quot;: &quot;f719270132f29a17638961491a29226655de2be72455b459f6e33fd0a353d9ca&quot;
+        },
+        &quot;variant&quot;: &quot;kalman&quot;,
+        &quot;expected_comparison_hours&quot;: 8760,
+        &quot;matched_hours&quot;: 8759,
+        &quot;observed_hours&quot;: 8760,
+        &quot;unmatched_observed_hours&quot;: 1,
+        &quot;forecast_placeholder_hours&quot;: 0,
+        &quot;storm_missing_hours&quot;: 1,
+        &quot;storm_missing_dst_hours&quot;: 1,
+        &quot;storm_missing_outside_archive_hours&quot;: 0,
+        &quot;fully_paired_days&quot;: 364,
+        &quot;partially_paired_days&quot;: 1,
+        &quot;full_observed_coverage&quot;: false,
+        &quot;native_statistics_modified&quot;: false,
+        &quot;observations_source&quot;: &quot;supplied_nuclear_result_only&quot;,
+        &quot;comparison_scope&quot;: &quot;latest_365_observed_civil_days_plus_unobserved_delivery_placeholder&quot;,
+        &quot;missing_benchmark_utc&quot;: [
+          &quot;2025-10-26T00:00:00+00:00&quot;
+        ]
+      }
+    }
+  },
+  &quot;storm_used_as_input&quot;: false,
+  &quot;warmup&quot;: {
+    &quot;residual_days_before_final365&quot;: 365,
+    &quot;raw_days_before_final365&quot;: 365,
+    &quot;excluded_from_report_metrics&quot;: true
+  },
+  &quot;dst_policy&quot;: &quot;source-audited duplication of derived nuclear covariate only; UTC physical-hour pairing&quot;,
+  &quot;engine_audit&quot;: {
+    &quot;diagnostic_only&quot;: true,
+    &quot;production&quot;: false
+  },
+  &quot;source_audit&quot;: {}
+}</pre></details></section></details>Chronos-2 + nucl. + correcteur + Kalman<p>Prévision opérationnelle du jour</p></main></html>

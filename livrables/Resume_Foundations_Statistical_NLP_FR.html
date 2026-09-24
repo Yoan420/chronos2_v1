@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Synthèse — Foundations of Statistical Natural Language Processing</title>
+  <style>
+    @page { size: A4; margin: 2.1cm 1.9cm 2cm 1.9cm; }
+    body { font-family: Aptos, Calibri, Arial, sans-serif; color: #24343b; font-size: 10.5pt; line-height: 1.34; }
+    h1, h2, h3 { font-family: Aptos Display, Calibri, Arial, sans-serif; color: #0b5967; page-break-after: avoid; }
+    h1 { font-size: 22pt; margin: 0 0 12pt; border-bottom: 2.5pt solid #d89b45; padding-bottom: 6pt; }
+    h2 { font-size: 16pt; margin: 18pt 0 7pt; }
+    h3 { font-size: 12.5pt; margin: 13pt 0 4pt; color: #2f6f75; }
+    p { margin: 0 0 7pt; }
+    ul, ol { margin: 4pt 0 9pt 18pt; }
+    li { margin: 0 0 3pt; }
+    strong { color: #173f47; }
+    .cover { text-align: left; padding-top: 5.2cm; page-break-after: always; }
+    .eyebrow { color: #d07f22; font-weight: bold; letter-spacing: 1.6pt; text-transform: uppercase; font-size: 10pt; }
+    .cover-title { font-size: 31pt; line-height: 1.05; color: #0b5967; font-weight: bold; margin: 12pt 0 16pt; }
+    .cover-subtitle { font-size: 16pt; color: #486269; margin-bottom: 32pt; }
+    .cover-rule { width: 4.5cm; border-top: 6pt solid #d89b45; margin: 24pt 0; }
+    .meta { font-size: 11pt; color: #536970; }
+    .meta p { margin-bottom: 5pt; }
+    .toc { page-break-after: always; }
+    .toc a { color: #245f69; text-decoration: none; }
+    .toc ol { list-style: none; margin-left: 0; padding-left: 0; }
+    .toc li { border-bottom: 0.5pt dotted #b9c6c9; padding: 3pt 0; }
+    .chapter { page-break-before: always; }
+    .part-label { color: #d07f22; font-weight: bold; text-transform: uppercase; letter-spacing: 1pt; }
+    .lead { font-size: 12pt; color: #37565e; line-height: 1.4; }
+    .callout { background: #edf5f4; border-left: 5pt solid #2d7c83; padding: 10pt 12pt; margin: 10pt 0 12pt; }
+    .warning { background: #fff6e8; border-left-color: #d89b45; }
+    .formula { font-family: Cambria Math, Cambria, serif; background: #f3f5f5; border: 0.5pt solid #d4dddd; padding: 7pt 10pt; margin: 7pt 0; text-align: center; }
+    table { width: 100%; border-collapse: collapse; margin: 8pt 0 13pt; page-break-inside: avoid; }
+    th { background: #0b5967; color: white; text-align: left; font-weight: bold; padding: 6pt; }
+    td { border: 0.5pt solid #c9d3d5; padding: 6pt; vertical-align: top; }
+    tr:nth-child(even) td { background: #f5f8f8; }
+    .small { font-size: 9pt; color: #596c72; }
+    .tag { display: inline-block; background: #dceceb; color: #0b5967; font-weight: bold; padding: 1pt 5pt; margin-right: 3pt; }
+    .takeaway { font-weight: bold; color: #0b5967; }
+    .page-break { page-break-before: always; }
+    .source-note { font-size: 9pt; border-top: 1pt solid #aebdc0; padding-top: 7pt; margin-top: 16pt; color: #5b6d72; }
+  </style>
+</head>
+<body>
+
+<section class="cover">
+  <div class="eyebrow">Synthèse structurée</div>
+  <div class="cover-title">Foundations of Statistical<br>Natural Language Processing</div>
+  <div class="cover-subtitle">Les idées, méthodes et équations essentielles</div>
+  <div class="cover-rule"></div>
+  <div class="meta">
+    <p><strong>Auteurs :</strong> Christopher D. Manning et Hinrich Schütze</p>
+    <p><strong>Éditeur :</strong> The MIT Press — 1999, second tirage corrigé 2000</p>
+    <p><strong>Objet :</strong> résumé analytique en français du document fourni</p>
+    <p><strong>Date de synthèse :</strong> 20 août 2026</p>
+  </div>
+</section>
+
+<section class="toc" id="sommaire">
+  <h1>Sommaire</h1>
+  <ol>
+    <li><a href="#resume">1. Résumé exécutif</a></li>
+    <li><a href="#architecture">2. Architecture et fil directeur de l’ouvrage</a></li>
+    <li><a href="#partie1">3. Partie I — Fondements</a></li>
+    <li><a href="#partie2">4. Partie II — Les mots</a></li>
+    <li><a href="#partie3">5. Partie III — La grammaire</a></li>
+    <li><a href="#partie4">6. Partie IV — Applications et techniques</a></li>
+    <li><a href="#formules">7. Formules et concepts à retenir</a></li>
+    <li><a href="#methode">8. Leçons méthodologiques</a></li>
+    <li><a href="#limites">9. Portée, limites et actualité</a></li>
+    <li><a href="#conclusion">10. Conclusion générale</a></li>
+  </ol>
+</section>
+
+<section id="resume">
+  <h1>1. Résumé exécutif</h1>
+  <p class="lead">L’ouvrage expose les fondements du traitement automatique statistique des langues (TAL statistique). Son idée centrale est que la langue ne se laisse pas décrire uniquement par des règles catégoriques : elle est ambiguë, variable et productive. Il faut donc apprendre ses régularités à partir de corpus et raisonner en termes de probabilités.</p>
+
+  <div class="callout">
+    <strong>Thèse principale.</strong> Un système de TAL efficace combine des connaissances linguistiques, une représentation adaptée des données, des modèles probabilistes capables de gérer l’incertitude et une évaluation rigoureuse sur des données jamais observées pendant l’apprentissage.
+  </div>
+
+  <p>Le parcours intellectuel du livre suit une chaîne récurrente :</p>
+  <table>
+    <tr><th>Étape</th><th>Question centrale</th><th>Exemples</th></tr>
+    <tr><td>1. Observer</td><td>Quelles régularités apparaissent dans les corpus ?</td><td>Fréquences, loi de Zipf, concordances, cooccurrences</td></tr>
+    <tr><td>2. Représenter</td><td>Quelles unités et quels traits conserver ?</td><td>Tokens, catégories grammaticales, vecteurs, arbres, états cachés</td></tr>
+    <tr><td>3. Estimer</td><td>Comment transformer les comptes en probabilités fiables ?</td><td>Maximum de vraisemblance, lissage, interpolation, Good–Turing</td></tr>
+    <tr><td>4. Inférer</td><td>Quelle analyse ou décision est la plus probable ?</td><td>Viterbi, Bayes, algorithmes inside/outside, classement</td></tr>
+    <tr><td>5. Évaluer</td><td>Le modèle généralise-t-il à des données nouvelles ?</td><td>Jeu de test, précision, rappel, F-mesure, perplexité</td></tr>
+  </table>
+
+  <h2>Huit idées à retenir</h2>
+  <ol>
+    <li><strong>L’ambiguïté est la norme.</strong> Un mot, une catégorie grammaticale, un rattachement ou un arbre syntaxique peuvent recevoir plusieurs analyses plausibles.</li>
+    <li><strong>Le contexte résout l’ambiguïté.</strong> Les mots voisins, les structures syntaxiques, le discours et le domaine modifient fortement les probabilités.</li>
+    <li><strong>La fréquence seule ne suffit pas.</strong> Les associations pertinentes exigent des mesures qui comparent l’observation à ce qui serait attendu par hasard.</li>
+    <li><strong>La rareté des données est structurelle.</strong> Plus le modèle tient compte du contexte, plus il discrimine, mais moins il dispose d’exemples comparables.</li>
+    <li><strong>Le lissage est indispensable.</strong> Un événement absent du corpus d’apprentissage ne doit généralement pas recevoir une probabilité nulle.</li>
+    <li><strong>Les hypothèses d’indépendance rendent les calculs possibles.</strong> Elles simplifient le monde réel ; leur pertinence doit être vérifiée et, si possible, compensée par une meilleure représentation.</li>
+    <li><strong>Les connaissances lexicales sont décisives.</strong> L’identité des mots et leurs préférences expliquent souvent mieux les choix linguistiques que la structure abstraite seule.</li>
+    <li><strong>L’évaluation doit être séparée de l’apprentissage.</strong> La performance sur le corpus d’entraînement ne mesure pas la capacité de généralisation.</li>
+  </ol>
+</section>
+
+<section id="architecture" class="chapter">
+  <h1>2. Architecture et fil directeur</h1>
+  <p>L’ouvrage compte seize chapitres regroupés en quatre parties. Il progresse des prérequis vers les unités lexicales, puis les structures grammaticales, avant d’aborder des applications complètes.</p>
+  <table>
+    <tr><th>Partie</th><th>Chapitres</th><th>Rôle</th></tr>
+    <tr><td>I. Fondements</td><td>1 à 4</td><td>Motivation empirique, probabilités, théorie de l’information, linguistique et travail sur corpus</td></tr>
+    <tr><td>II. Les mots</td><td>5 à 8</td><td>Collocations, modèles n-grammes, désambiguïsation lexicale et acquisition du lexique</td></tr>
+    <tr><td>III. Grammaire</td><td>9 à 12</td><td>Modèles de Markov, étiquetage morphosyntaxique, grammaires probabilistes et analyse syntaxique</td></tr>
+    <tr><td>IV. Applications</td><td>13 à 16</td><td>Alignement et traduction, clustering, recherche d’information et catégorisation de textes</td></tr>
+  </table>
+
+  <p>Le livre défend une position empiriste sans rejeter la théorie linguistique. Les corpus ne dispensent pas de choisir des unités, des traits et des structures ; inversement, les règles linguistiques seules ne suffisent pas à hiérarchiser les interprétations possibles. Le TAL statistique est donc présenté comme une articulation entre <strong>connaissances préalables</strong> et <strong>preuves quantitatives</strong>.</p>
+
+  <div class="callout warning">
+    <strong>Lecture conseillée par les auteurs.</strong> Les chapitres de fondements servent de référence et peuvent être mobilisés au besoin. La partie sur la grammaire forme la séquence la plus cumulative ; les chapitres d’applications sont plus indépendants.
+  </div>
+</section>
+
+<section id="partie1" class="chapter">
+  <div class="part-label">Partie I — Fondements</div>
+  <h1>3. Préliminaires : des corpus aux probabilités</h1>
+
+  <h2>Chapitre 1 — Introduction</h2>
+  <p>Le chapitre oppose deux traditions. L’approche <strong>rationaliste</strong> insiste sur les structures et connaissances préalables ; l’approche <strong>empiriste</strong> privilégie ce qui peut être appris à partir des usages observés. Le livre adopte une orientation empirique : plutôt que de séparer strictement phrases grammaticales et non grammaticales, il cherche les patrons plus ou moins probables de la langue réelle.</p>
+  <ul>
+    <li>La langue présente des phénomènes graduels et non catégoriques.</li>
+    <li>Son ambiguïté existe à plusieurs niveaux : segmentation, sens lexical, catégorie grammaticale, rattachement syntaxique, portée sémantique.</li>
+    <li>Les comptages de mots révèlent des distributions très inégales. La <strong>loi de Zipf</strong> relie approximativement la fréquence d’un mot à son rang : quelques types sont extrêmement fréquents, tandis qu’une longue traîne apparaît rarement.</li>
+    <li>Les concordances et les collocations montrent qu’un mot se caractérise largement par ses contextes d’emploi.</li>
+  </ul>
+  <p class="takeaway">À retenir : la statistique ne remplace pas l’analyse linguistique ; elle permet de modéliser la préférence, l’incertitude et les exceptions que des règles binaires saisissent mal.</p>
+
+  <h2>Chapitre 2 — Fondements mathématiques</h2>
+  <p>Le chapitre fournit le socle probabiliste et informationnel utilisé dans tout le livre.</p>
+  <ul>
+    <li><strong>Probabilités :</strong> espaces d’événements, probabilités conjointes et conditionnelles, indépendance, variables aléatoires, espérance, variance et distributions usuelles.</li>
+    <li><strong>Théorème de Bayes :</strong> il inverse le sens d’un conditionnement et combine vraisemblance et connaissance a priori. Une grande partie du TAL peut se formuler comme un problème de décodage : choisir l’hypothèse linguistique la plus probable étant donné les observations.</li>
+    <li><strong>Statistique bayésienne :</strong> les croyances initiales sont mises à jour par les données.</li>
+    <li><strong>Théorie de l’information :</strong> l’entropie quantifie l’incertitude ; l’information mutuelle mesure une dépendance ; la divergence de Kullback–Leibler compare deux distributions.</li>
+    <li><strong>Entropie croisée et perplexité :</strong> elles évaluent la qualité d’un modèle probabiliste sur des données nouvelles.</li>
+    <li><strong>Canal bruité :</strong> on reconstruit une source cachée à partir d’une observation transformée ou bruitée, cadre réutilisé notamment en reconnaissance, correction et traduction.</li>
+  </ul>
+
+  <h2>Chapitre 3 — Notions linguistiques essentielles</h2>
+  <p>Ce chapitre présente le vocabulaire nécessaire pour définir les objets que les modèles statistiques doivent prédire.</p>
+  <ul>
+    <li><strong>Morphologie et catégories grammaticales :</strong> noms, pronoms, déterminants, adjectifs, verbes, adverbes, prépositions et autres classes ; flexion, dérivation, nombre, personne, temps, aspect et voix.</li>
+    <li><strong>Structure syntagmatique :</strong> les mots se regroupent en constituants hiérarchiques représentables par des arbres.</li>
+    <li><strong>Dépendances :</strong> les têtes gouvernent des arguments et des modifieurs ; la distinction argument/adjoint est centrale pour la sous-catégorisation.</li>
+    <li><strong>Ambiguïté structurale :</strong> une même chaîne peut recevoir plusieurs arbres, donc plusieurs interprétations.</li>
+    <li><strong>Sémantique et pragmatique :</strong> le sens dépend à la fois de la composition, des relations lexicales, du contexte discursif et de la situation.</li>
+  </ul>
+  <p class="takeaway">À retenir : une représentation linguistique n’est pas neutre. Le choix des catégories, des têtes, des frontières et des relations détermine ce que le modèle pourra apprendre.</p>
+
+  <h2>Chapitre 4 — Travail fondé sur les corpus</h2>
+  <p>Avant la modélisation vient la préparation des données. Le chapitre insiste sur des décisions souvent sous-estimées :</p>
+  <ul>
+    <li>choisir un corpus adapté et connaître ses biais de genre, de domaine et d’époque ;</li>
+    <li>normaliser les encodages, balises, erreurs de reconnaissance et éléments non textuels ;</li>
+    <li>définir ce qu’est un mot, gérer ponctuation, apostrophes, traits d’union, nombres, abréviations et majuscules ;</li>
+    <li>segmenter les phrases, tâche ambiguë à cause des points et abréviations ;</li>
+    <li>utiliser le balisage et les annotations grammaticales sans oublier leurs conventions et erreurs ;</li>
+    <li>organiser efficacement les comptages et distinguer <strong>tokens</strong> (occurrences) et <strong>types</strong> (formes distinctes).</li>
+  </ul>
+  <div class="callout">
+    <strong>Principe pratique.</strong> Les résultats d’un modèle dépendent autant de la définition et de la qualité des données que de l’algorithme. Les conventions de prétraitement doivent être documentées et reproduisibles.
+  </div>
+</section>
+
+<section id="partie2" class="chapter">
+  <div class="part-label">Partie II — Les mots</div>
+  <h1>4. Associations, rareté et acquisition lexicale</h1>
+
+  <h2>Chapitre 5 — Collocations</h2>
+  <p>Une collocation est une combinaison conventionnelle de plusieurs mots, souvent seulement partiellement compositionnelle : <em>strong tea</em>, un verbe à particule, un terme technique ou un idiome. Les collocations importent pour la génération, la lexicographie, l’analyse syntaxique, la terminologie et la recherche d’information.</p>
+  <p>Le chapitre compare plusieurs méthodes de détection :</p>
+  <ul>
+    <li><strong>Fréquence brute :</strong> simple, mais dominée par les mots fonctionnels fréquents ; elle gagne à être précédée d’un filtrage morphosyntaxique.</li>
+    <li><strong>Moyenne et variance de la distance :</strong> utiles quand les deux éléments d’une expression apparaissent à une distance relativement stable.</li>
+    <li><strong>Tests d’hypothèse :</strong> test t, chi carré et rapport de vraisemblance évaluent si une cooccurrence dépasse ce que prévoirait l’indépendance.</li>
+    <li><strong>Information mutuelle :</strong> valorise les couples dont la cooccurrence observée est forte relativement aux fréquences marginales, mais peut surévaluer les événements très rares.</li>
+  </ul>
+  <p class="takeaway">À retenir : une bonne mesure d’association doit équilibrer force du lien et fiabilité statistique. Aucun score unique ne correspond parfaitement à toutes les définitions linguistiques de la collocation.</p>
+
+  <h2>Chapitre 6 — Inférence statistique et modèles n-grammes</h2>
+  <p>Le modèle de langue prédit le mot suivant à partir d’un historique. Comme il est impossible de mémoriser tous les contextes, un modèle n-gramme approxime cet historique par les <em>n − 1</em> mots précédents.</p>
+  <div class="formula">P(w₁…wₘ) ≈ ∏ᵢ P(wᵢ | wᵢ₋ₙ₊₁ … wᵢ₋₁)</div>
+  <p>Ce cadre illustre le compromis fondamental entre <strong>discrimination</strong> et <strong>fiabilité</strong> : davantage de contexte rend les classes plus précises, mais réduit le nombre d’observations par classe.</p>
+  <ul>
+    <li>Le <strong>maximum de vraisemblance</strong> utilise des fréquences relatives, mais attribue zéro aux événements non observés.</li>
+    <li>Les lois de <strong>Laplace, Lidstone et Jeffreys–Perks</strong> ajoutent une pseudo-fréquence.</li>
+    <li>L’estimation sur données tenues à part et la validation croisée évaluent et règlent les modèles sur des données distinctes.</li>
+    <li><strong>Good–Turing</strong> réalloue une partie de la masse probabiliste aux événements non observés à partir de la « fréquence des fréquences ».</li>
+    <li>L’<strong>interpolation</strong> combine des modèles de plusieurs ordres ; le <strong>repli de Katz</strong> utilise le modèle détaillé lorsque les comptes sont fiables et se rabat sinon sur un contexte plus court.</li>
+  </ul>
+  <p>La performance se mesure par entropie croisée ou perplexité sur un jeu de test. Un modèle de faible perplexité prédit mieux la séquence, mais cette amélioration n’implique pas automatiquement un gain équivalent dans toute application aval.</p>
+
+  <h2>Chapitre 7 — Désambiguïsation du sens des mots</h2>
+  <p>La tâche consiste à choisir, d’après le contexte, le sens pertinent d’un mot polysémique. Le livre souligne d’emblée une difficulté conceptuelle : les dictionnaires ne découpent pas tous le sens de la même manière, et de nombreux usages forment un continuum plutôt que des classes nettement séparées.</p>
+  <ul>
+    <li><strong>Méthodes supervisées :</strong> classification bayésienne et sélection de traits informatifs à partir d’exemples étiquetés.</li>
+    <li><strong>Méthodes fondées sur des ressources :</strong> recouvrement entre contexte et définitions, usage de thésaurus, ou correspondances de traduction dans un corpus bilingue.</li>
+    <li><strong>Régularités fortes :</strong> « un sens par discours » et « un sens par collocation » fournissent des contraintes utiles.</li>
+    <li><strong>Méthodes non supervisées :</strong> regroupement des contextes pour induire des classes d’usage sans inventaire de sens préétabli.</li>
+  </ul>
+  <p>Une évaluation sérieuse doit inclure des références simples : sens majoritaire comme borne inférieure, accord humain comme indication d’une borne supérieure, et séparation stricte entre entraînement et test.</p>
+
+  <h2>Chapitre 8 — Acquisition lexicale</h2>
+  <p>L’acquisition lexicale apprend automatiquement les propriétés syntaxiques et sémantiques des mots. Elle répond à la couverture limitée et au coût de maintenance des dictionnaires construits à la main.</p>
+  <ul>
+    <li><strong>Sous-catégorisation verbale :</strong> apprendre quels types de compléments un verbe accepte.</li>
+    <li><strong>Ambiguïté de rattachement :</strong> décider, par exemple, si un groupe prépositionnel modifie un verbe ou un nom à partir des préférences lexicales.</li>
+    <li><strong>Préférences sélectionnelles :</strong> caractériser les classes sémantiques typiques des arguments d’un prédicat.</li>
+    <li><strong>Similarité sémantique :</strong> représenter un mot par ses contextes et comparer ces représentations à l’aide de mesures vectorielles ou probabilistes.</li>
+  </ul>
+  <p>Le chapitre formalise aussi <strong>précision</strong>, <strong>rappel</strong>, <strong>F-mesure</strong> et exactitude. Il insiste sur le fait que les mots rares et nouveaux, bien que peu nombreux, portent souvent l’information la plus importante d’un document.</p>
+  <div class="callout">
+    <strong>Idée structurante.</strong> Une grande partie du TAL statistique peut être vue comme de l’acquisition lexicale : apprendre, pour chaque mot, ses distributions, constructions et voisins typiques. Les meilleures méthodes combinent corpus, ressources lexicales et contraintes linguistiques.
+  </div>
+</section>
+
+<section id="partie3" class="chapter">
+  <div class="part-label">Partie III — Grammaire</div>
+  <h1>5. Des séquences aux arbres probabilistes</h1>
+
+  <h2>Chapitre 9 — Modèles de Markov</h2>
+  <p>Un modèle de Markov représente une séquence d’états et suppose que le prochain état dépend d’un historique limité. Un modèle n-gramme est donc un modèle de Markov d’ordre fini, éventuellement après encodage de l’historique dans l’état.</p>
+  <p>Dans un <strong>modèle de Markov caché (HMM)</strong>, les états ne sont pas observés directement ; ils émettent des observations selon une distribution. Cette distinction correspond bien à des tâches où une structure latente — par exemple les catégories grammaticales — génère une séquence visible de mots.</p>
+  <table>
+    <tr><th>Question fondamentale</th><th>But</th><th>Algorithme associé</th></tr>
+    <tr><td>Probabilité des observations</td><td>Sommer la probabilité de tous les chemins compatibles</td><td>Algorithme forward</td></tr>
+    <tr><td>Meilleure séquence d’états</td><td>Trouver le chemin caché le plus probable</td><td>Algorithme de Viterbi</td></tr>
+    <tr><td>Estimation des paramètres</td><td>Apprendre transitions et émissions à partir d’observations</td><td>Baum–Welch / espérance-maximisation (EM)</td></tr>
+  </table>
+  <p>La programmation dynamique rend ces calculs efficaces en réutilisant les sous-problèmes. Les hypothèses markoviennes limitent toutefois les dépendances à longue distance.</p>
+
+  <h2>Chapitre 10 — Étiquetage morphosyntaxique</h2>
+  <p>L’étiquetage assigne à chaque mot sa catégorie grammaticale dans son contexte. C’est une désambiguïsation syntaxique limitée, plus facile que l’analyse complète mais utile pour l’extraction d’information, l’analyse superficielle et d’autres traitements.</p>
+  <ul>
+    <li>Deux sources d’information dominent : les <strong>séquences de catégories</strong> probables et la <strong>préférence lexicale</strong> d’un mot pour certaines catégories.</li>
+    <li>Une référence simple consistant à choisir la catégorie la plus fréquente de chaque mot est déjà forte, car les usages d’un même mot sont souvent très déséquilibrés.</li>
+    <li>Les étiqueteurs markoviens et HMM combinent probabilités de transition et d’émission ; Viterbi recherche la séquence optimale.</li>
+    <li>L’<strong>apprentissage fondé sur les transformations</strong> part d’un étiquetage initial puis apprend des règles correctives ordonnées à partir des erreurs.</li>
+    <li>Les mots inconnus nécessitent des indices morphologiques et orthographiques : suffixes, majuscules, chiffres ou traits d’union.</li>
+  </ul>
+  <p>Le livre rapporte des exactitudes de l’ordre de 96–97 % pour les meilleurs systèmes de l’époque, mais rappelle qu’une petite erreur par mot peut se traduire par plus d’une erreur dans une phrase longue.</p>
+
+  <h2>Chapitre 11 — Grammaires hors contexte probabilistes</h2>
+  <p>Les modèles séquentiels ne représentent pas naturellement la récursivité et les dépendances hiérarchiques. Une <strong>PCFG</strong> ajoute à chaque règle d’une grammaire hors contexte une probabilité, les probabilités des règles partageant le même côté gauche sommant à un.</p>
+  <ul>
+    <li>La probabilité d’un arbre est le produit des probabilités des règles utilisées.</li>
+    <li>La probabilité d’une phrase somme les probabilités de tous ses arbres possibles.</li>
+    <li>L’algorithme <strong>inside</strong> calcule efficacement les probabilités internes ; <strong>outside</strong> complète ce calcul pour l’estimation.</li>
+    <li>Une version de Viterbi trouve l’arbre le plus probable.</li>
+    <li>L’algorithme <strong>inside–outside</strong>, instance d’EM, peut estimer les règles à partir de phrases non annotées.</li>
+  </ul>
+  <p>Les PCFG sont robustes et constituent un modèle probabiliste naturel des arbres, mais leurs hypothèses sont fortes : le choix d’une règle dépend uniquement du non-terminal développé, pas des mots précis ni du contexte structural. Elles modélisent donc mal les dépendances lexicales.</p>
+
+  <h2>Chapitre 12 — Analyse syntaxique probabiliste</h2>
+  <p>Le chapitre élargit la perspective au-delà des PCFG de base. Les probabilités peuvent servir à choisir entre analyses, ordonner la recherche ou agir comme modèle de langue. Les <strong>treebanks</strong>, corpus annotés en arbres, deviennent la principale source d’apprentissage et d’évaluation.</p>
+  <ul>
+    <li><strong>Lexicalisation :</strong> associer un mot tête aux nœuds syntagmatiques pour modéliser les relations entre têtes et dépendants.</li>
+    <li><strong>Contexte structural :</strong> conditionner les expansions par le parent, la position ou l’historique de dérivation afin d’affaiblir les indépendances irréalistes.</li>
+    <li><strong>Modèles par dépendances :</strong> représenter directement les liens entre têtes lexicales.</li>
+    <li><strong>Recherche :</strong> utiliser programmation dynamique, faisceaux ou élagage pour gérer l’immense espace d’arbres.</li>
+    <li><strong>Évaluation :</strong> comparer les constituants proposés à une référence à l’aide de précision et rappel, tout en reconnaissant que le score dépend du schéma d’annotation.</li>
+  </ul>
+  <p class="takeaway">À retenir : la syntaxe probabiliste performante exige un équilibre entre richesse contextuelle et possibilité d’estimer les paramètres. La lexicalisation améliore la discrimination, mais aggrave la rareté des données.</p>
+</section>
+
+<section id="partie4" class="chapter">
+  <div class="part-label">Partie IV — Applications et techniques</div>
+  <h1>6. Traduire, regrouper, rechercher et classer</h1>
+
+  <h2>Chapitre 13 — Alignement statistique et traduction automatique</h2>
+  <p>La traduction ne peut pas se réduire à une substitution mot à mot : les langues diffèrent par leurs découpages lexicaux, leur ordre, leurs structures et leurs façons d’exprimer le sens. Le chapitre situe plusieurs familles, du transfert syntaxique à l’interlangue, puis se concentre sur les apports statistiques.</p>
+  <ul>
+    <li><strong>Alignement de phrases et de paragraphes :</strong> relier les segments correspondants d’un corpus parallèle à partir de la longueur, de positions relatives ou d’indices lexicaux.</li>
+    <li><strong>Alignement de mots :</strong> apprendre quelles unités de la langue source correspondent à quelles unités cibles.</li>
+    <li><strong>Canal bruité :</strong> choisir la traduction qui combine une forte probabilité dans la langue cible et une bonne probabilité de générer la phrase source.</li>
+  </ul>
+  <div class="formula">traduction* = argmax<sub>t</sub> P(t) × P(source | t)</div>
+  <p>Les corpus parallèles servent aussi à construire automatiquement dictionnaires bilingues et ressources de transfert. Le livre décrit une période où les systèmes complets restent souvent hybrides, combinant composants probabilistes et règles.</p>
+
+  <h2>Chapitre 14 — Clustering</h2>
+  <p>Le clustering regroupe sans étiquettes des objets similaires. En TAL, un mot peut être représenté par la distribution de ses voisins : des mots partageant des contextes tendent à avoir des fonctions ou sens proches.</p>
+  <ul>
+    <li><strong>Usages :</strong> exploration des données et généralisation à des événements rares en créant des classes d’équivalence apprises.</li>
+    <li><strong>Clustering hiérarchique :</strong> méthodes ascendantes à lien simple, lien complet ou moyenne de groupe ; les dendrogrammes montrent les regroupements à plusieurs niveaux.</li>
+    <li><strong>K-means :</strong> alterne affectation au centroïde le plus proche et recalcul des centroïdes ; il dépend du choix de <em>k</em>, de l’initialisation et de la métrique.</li>
+    <li><strong>EM et modèles de mélange :</strong> représentent une appartenance probabiliste plutôt qu’une affectation entièrement rigide.</li>
+  </ul>
+  <p class="takeaway">À retenir : le résultat dépend autant de la représentation et de la mesure de similarité que de l’algorithme de regroupement.</p>
+
+  <h2>Chapitre 15 — Recherche d’information</h2>
+  <p>La recherche d’information classe des documents selon leur pertinence pour une requête. Contrairement à la correspondance booléenne exacte, le classement probabiliste accepte une pertinence graduelle.</p>
+  <ul>
+    <li><strong>Évaluation :</strong> précision, rappel, courbes précision–rappel et principe de classement par probabilité de pertinence.</li>
+    <li><strong>Modèle vectoriel :</strong> documents et requêtes sont des vecteurs de termes ; le cosinus mesure leur similarité.</li>
+    <li><strong>Pondération :</strong> la fréquence locale d’un terme est combinée à sa rareté dans la collection, principe à l’origine de TF–IDF.</li>
+    <li><strong>Modèles de distribution :</strong> Poisson, modèle à deux Poisson et modèles de mélange cherchent à distinguer termes informatifs et bruit de fond.</li>
+    <li><strong>Indexation sémantique latente :</strong> la décomposition en valeurs singulières réduit la dimension et rapproche des documents reliés même s’ils n’emploient pas exactement les mêmes mots.</li>
+    <li><strong>Segmentation discursive :</strong> détecter des changements de thème améliore l’accès à des passages pertinents dans de longs documents.</li>
+  </ul>
+
+  <h2>Chapitre 16 — Catégorisation de textes</h2>
+  <p>La catégorisation attribue à un document une ou plusieurs classes thématiques. Elle généralise une structure commune à de nombreuses tâches du livre : représenter l’objet par des traits, apprendre une règle de décision sur un jeu étiqueté, puis mesurer la performance sur un jeu indépendant.</p>
+  <ul>
+    <li><strong>Arbres de décision :</strong> découpent récursivement l’espace selon les traits les plus informatifs ; ils sont interprétables mais sensibles au surapprentissage.</li>
+    <li><strong>Maximum d’entropie :</strong> apprend un modèle log-linéaire satisfaisant les contraintes empiriques sans ajouter de préférences non justifiées ; l’estimation est présentée via l’itération généralisée.</li>
+    <li><strong>Perceptron :</strong> apprend une frontière linéaire en corrigeant les poids lors des erreurs ; il converge si les classes sont linéairement séparables.</li>
+    <li><strong>K plus proches voisins :</strong> classe un document à partir des étiquettes de ses exemples les plus similaires ; la méthode est simple mais coûteuse à la prédiction et sensible à la métrique.</li>
+  </ul>
+  <p>Pour plusieurs catégories, la <strong>macro-moyenne</strong> donne le même poids à chaque catégorie, tandis que la <strong>micro-moyenne</strong> donne le même poids à chaque exemple et favorise donc les grandes catégories.</p>
+</section>
+
+<section id="formules" class="chapter">
+  <h1>7. Formules et concepts à retenir</h1>
+  <table>
+    <tr><th>Concept</th><th>Forme essentielle</th><th>Interprétation en TAL</th></tr>
+    <tr><td>Probabilité conditionnelle</td><td>P(A | B) = P(A,B) / P(B)</td><td>Probabilité d’une analyse sachant le contexte</td></tr>
+    <tr><td>Bayes</td><td>P(h | d) = P(d | h)P(h) / P(d)</td><td>Combiner vraisemblance des données et a priori sur l’hypothèse</td></tr>
+    <tr><td>Entropie</td><td>H(X) = −Σ p(x) log₂ p(x)</td><td>Incertitude moyenne d’une source</td></tr>
+    <tr><td>Information mutuelle</td><td>I(X;Y) = Σ p(x,y) log[p(x,y)/(p(x)p(y))]</td><td>Dépendance entre mots ou variables</td></tr>
+    <tr><td>Divergence KL</td><td>D(p‖q) = Σ p(x) log[p(x)/q(x)]</td><td>Écart orienté entre deux distributions</td></tr>
+    <tr><td>Perplexité</td><td>PP = 2<sup>H</sup></td><td>Nombre effectif de choix laissé au modèle ; plus bas est meilleur</td></tr>
+    <tr><td>Estimation MLE n-gramme</td><td>P(w | h) = C(h,w) / C(h)</td><td>Fréquence relative du mot après l’historique</td></tr>
+    <tr><td>Précision</td><td>VP / (VP + FP)</td><td>Part des éléments sélectionnés qui sont corrects</td></tr>
+    <tr><td>Rappel</td><td>VP / (VP + FN)</td><td>Part des éléments pertinents effectivement retrouvés</td></tr>
+    <tr><td>F1</td><td>2PR / (P + R)</td><td>Moyenne harmonique de précision et rappel</td></tr>
+    <tr><td>Cosinus</td><td>(x · y) / (‖x‖‖y‖)</td><td>Similarité entre vecteurs de documents ou de mots</td></tr>
+  </table>
+  <p class="small">Notation : VP = vrais positifs, FP = faux positifs, FN = faux négatifs, h = historique ou hypothèse selon le contexte, d = données.</p>
+</section>
+
+<section id="methode" class="chapter">
+  <h1>8. Leçons méthodologiques</h1>
+
+  <h2>1. Construire des références simples</h2>
+  <p>Un système complexe doit être comparé à une baseline crédible : classe majoritaire, catégorie la plus fréquente d’un mot, fréquence brute ou modèle d’ordre inférieur. Sans cette référence, un score élevé peut être trompeur.</p>
+
+  <h2>2. Séparer apprentissage, réglage et test</h2>
+  <p>Les paramètres sont estimés sur l’entraînement ; les choix de modèle sont effectués sur des données de développement ou par validation croisée ; le test final reste intact jusqu’à l’évaluation. Cette séparation évite de mesurer la mémorisation comme s’il s’agissait de généralisation.</p>
+
+  <h2>3. Examiner les erreurs, pas seulement le score moyen</h2>
+  <p>Une exactitude globale peut masquer les catégories rares et les erreurs les plus coûteuses. Précision, rappel, macro/micro-moyennes et matrices de confusion apportent des vues complémentaires.</p>
+
+  <h2>4. Adapter le modèle aux données disponibles</h2>
+  <p>Ajouter du contexte ou lexicaliser augmente le pouvoir discriminant, mais multiplie les paramètres. Il faut compenser par lissage, repli, interpolation, regroupement ou partage de paramètres.</p>
+
+  <h2>5. Rendre explicites les hypothèses</h2>
+  <p>Les modèles supposent indépendance, stationnarité, inventaires de catégories, frontières de tokens ou structures d’arbres. Ces hypothèses sont des approximations opérationnelles, non des vérités sur la langue.</p>
+
+  <h2>6. Mesurer ce qui compte pour l’application</h2>
+  <p>La perplexité et les scores de composants sont utiles au développement, mais la validation ultime est un gain sur la tâche réelle : meilleure traduction, recherche plus pertinente ou analyse plus exacte.</p>
+
+  <div class="callout">
+    <strong>Schéma de travail recommandé.</strong> Définir la tâche → choisir un corpus représentatif → documenter le prétraitement → construire une baseline → entraîner avec gestion de la rareté → évaluer hors échantillon → analyser les erreurs → réviser représentation et hypothèses.
+  </div>
+</section>
+
+<section id="limites" class="chapter">
+  <h1>9. Portée, limites et actualité</h1>
+  <p>L’ouvrage est une référence historique publiée à la charnière des années 1990 et 2000. Il offre une synthèse profonde du TAL statistique classique, mais son périmètre et ses résultats doivent être lus dans ce contexte.</p>
+  <ul>
+    <li>Il précède les représentations distribuées modernes, les réseaux neuronaux profonds, les Transformers et les grands modèles de langue.</li>
+    <li>Les corpus, logiciels, capacités matérielles et chiffres de performance cités sont datés.</li>
+    <li>La reconnaissance de la parole est volontairement exclue ; certaines applications ne sont traitées que partiellement.</li>
+    <li>De nombreux modèles reposent sur des traits conçus à la main et des hypothèses d’indépendance aujourd’hui souvent remplacées ou complétées par des représentations apprises.</li>
+  </ul>
+  <p>Ses principes restent néanmoins fondamentaux : formulation probabiliste, importance du contexte, rareté des données, qualité des corpus, séparation entraînement/test, baselines, métriques d’évaluation, programmation dynamique et analyse critique des hypothèses. Les méthodes modernes ne suppriment pas ces questions ; elles les déplacent à une autre échelle.</p>
+</section>
+
+<section id="conclusion" class="chapter">
+  <h1>10. Conclusion générale</h1>
+  <p class="lead">Le livre montre comment transformer l’usage réel de la langue en objets mesurables, puis en décisions probabilistes. Son apport principal n’est pas une recette unique, mais une méthode de pensée pour le TAL.</p>
+  <p>Cette méthode part de la diversité des données, accepte l’ambiguïté, choisit une représentation linguistiquement motivée, estime les probabilités avec prudence malgré la rareté, et juge les résultats sur des exemples nouveaux. Les mêmes principes relient les tâches étudiées : trouver des collocations, prédire un mot, choisir un sens, apprendre un lexique, étiqueter, analyser une phrase, aligner des traductions, regrouper, rechercher ou classer des documents.</p>
+  <div class="callout">
+    <strong>En une phrase :</strong> le TAL statistique consiste à exploiter les régularités de grands ensembles de textes pour choisir, parmi plusieurs interprétations linguistiques possibles, celles qui sont les mieux soutenues par les données — tout en mesurant honnêtement l’incertitude et la capacité de généralisation.
+  </div>
+
+  <p class="source-note"><strong>Source résumée :</strong> Christopher D. Manning et Hinrich Schütze, <em>Foundations of Statistical Natural Language Processing</em>, The MIT Press, 1999 ; second tirage avec corrections, 2000. La présente synthèse reformule les idées principales du PDF fourni et ne remplace pas la consultation de l’ouvrage pour les démonstrations, exemples, exercices et références bibliographiques détaillées.</p>
+</section>
+
+</body>
+</html>
