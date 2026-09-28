@@ -23,6 +23,7 @@ import pandas as pd
 from chronos2_hourly.nyx_annual_live_preflight import (
     FAMILIES, SOURCE_GROUPS, ZONES, delivery_grid, inspect_bundle, sha256,
 )
+from chronos2_hourly.nyx_annual_nyx_quantiles_gate import validate_nyx_quantiles_source
 from chronos2_hourly.nyx_negative_probability_cpu import (
     PROTOCOL as NEGATIVE_PROTOCOL, fit_predict_block as fit_negative_block,
     physical_grid,
@@ -48,6 +49,7 @@ QUALIFICATION_CODE = (
     "run_nyx_annual_cpu_live.py",
     "chronos2_hourly/nyx_annual_cpu_live.py",
     "chronos2_hourly/nyx_annual_live_preflight.py",
+    "chronos2_hourly/nyx_annual_nyx_quantiles_gate.py",
     "chronos2_hourly/nyx_pooled_cpu_price_model.py",
     "chronos2_hourly/nyx_negative_probability_cpu.py",
 )
@@ -173,6 +175,11 @@ def preflight(bundle: Path, delivery_day: str, output: Path) -> dict:
     except (OSError, ValueError, KeyError, TypeError) as error:
         input_report = None
         blockers.append(f"Bundle: {error}")
+    try:
+        baseline_report = validate_nyx_quantiles_source(bundle, delivery_day)
+    except (OSError, ValueError, KeyError, TypeError) as error:
+        baseline_report = None
+        blockers.append(f"NYX CPU baseline: {error}")
     if output.exists():
         blockers.append("Output already exists; choose a new immutable run directory")
     if output.resolve() == bundle.resolve() or output.resolve().is_relative_to(bundle.resolve()):
@@ -181,6 +188,7 @@ def preflight(bundle: Path, delivery_day: str, output: Path) -> dict:
             "bundle": str(bundle.resolve()), "output": str(output.resolve()),
             "requires_external_bundle": True, "saturn_fetched": False,
             "activation": activation, "bundle_inspection": input_report,
+            "nyx_cpu_baseline_inspection": baseline_report,
             "ready": not blockers, "blockers": blockers}
 
 

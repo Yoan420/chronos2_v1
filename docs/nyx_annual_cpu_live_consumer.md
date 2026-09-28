@@ -15,6 +15,11 @@ annuelle des experts CPU.
 - les références `reference/{FR,BE,NL}.parquet` pour la journée future ;
 - les neuf reçus dans `source_receipts/`, chacun lié par empreinte à ses artefacts et à la coupure D−1 08 h.
 
+Le même précontrôle appelle aussi `nyx_annual_nyx_quantiles_gate` : les quatre
+baselines doivent porter leurs quantiles, les origines exactes et les reçus des
+étages CPU Chronos, correcteur et Kalman. Un simple reçu générique ou les
+anciennes prévisions GPU ne déverrouillent pas le lancement.
+
 Le consommateur recontrôle et hache chaque entrée avant et après l'entraînement.
 Un changement interrompt la publication. Aucun ancien fichier de
 `runs/experiments` ne sert de prévision future.

@@ -32,6 +32,15 @@ def test_current_manifest_and_missing_bundle_block_without_writes(tmp_path):
                for message in nested["blockers"])
 
 
+def test_generic_bundle_cannot_bypass_cpu_nyx_baseline_lineage(tmp_path, monkeypatch):
+    monkeypatch.setattr(live, "verify_activation", lambda: {"qualification_sha256": "a" * 64})
+    monkeypatch.setattr(live, "inspect_bundle", lambda *_: {"input_bundle_valid": True})
+    report = live.preflight(tmp_path / "bundle", "2026-09-29", tmp_path / "output")
+    assert report["ready"] is False
+    assert report["nyx_cpu_baseline_inspection"] is None
+    assert any("NYX CPU baseline" in reason for reason in report["blockers"])
+
+
 def test_activation_needs_pinned_annual_cpu_score_and_code(tmp_path):
     config = tmp_path / "config"
     config.mkdir()
