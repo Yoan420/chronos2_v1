@@ -1,2 +1,0 @@
-Ce dossier est volontairement vide dans le paquet léger.
-Les poids Amazon Chronos-2 y seront téléchargés lors du premier lancement avec -AllowModelDownload.

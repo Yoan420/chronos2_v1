@@ -25,3 +25,11 @@ Thumbs.db
 !data/
 !data/**
 
+# Local runs, generated reports and desktop shortcuts are rebuilt on each host.
+tmp/
+deliverables/
+output/
+research/
+.codex_presentation*/
+*.lnk
+
