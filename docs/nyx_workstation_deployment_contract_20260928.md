@@ -22,6 +22,12 @@ DE ne bat pas Storm en RMSE. Les choix sont rétrospectifs. Le sélecteur pur
 points historiques enregistrés : 10 944 points FR et 8 760 points DE/BE/NL.
 Il ne produit pas les experts en entrée.
 
+La colonne `reference` du sélecteur vient de `scarcity_confirmed_pair` sur
+l'année évaluée. Elle dépend des prévisions Test2, d'une probabilité de pic et
+d'une politique utilisant les erreurs des 90 jours antérieurs. Les quantiles
+`nuclear_kalman` que publie la console NYX ne sont pas cette référence. Aucun
+de ces fichiers de référence sous `runs/experiments` n'est suivi par Git.
+
 Le détecteur de prix négatifs est un modèle CPU séparé. Il exige 123 variables
 compactes ordonnées, 365 jours de prix passés et la fenêtre de livraison.
 Il n'a actuellement ni collecte continue ni branchement dans la console NYX.
