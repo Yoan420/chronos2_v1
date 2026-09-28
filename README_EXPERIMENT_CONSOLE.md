@@ -55,6 +55,33 @@ Edge ou Chrome. Elle ne crée ni service Windows ni démarrage automatique à
 l'ouverture de session et ne nécessite pas de droits administrateur. Le
 raccourci reste lié à ces chemins : ce n'est pas un exécutable portable autonome.
 
+## Tester la branche CPU à côté de NYX
+
+Cloner uniquement la branche de test dans un nouveau dossier ; conserver le
+clone de production sur sa branche actuelle. Depuis ce nouveau clone, installer
+les dépendances dans le Python indiqué par `config/experiment_console.json`,
+puis créer le raccourci séparé :
+
+```powershell
+git clone --filter=blob:none --single-branch --branch codex/nyx-regional-rmse-production https://github.com/Yoan420/chronos2_v1.git "$env:USERPROFILE\chronos2_nyx_cpu_preview"
+Set-Location -LiteralPath "$env:USERPROFILE\chronos2_nyx_cpu_preview"
+$nyxPython = (Get-Content -LiteralPath 'config\experiment_console.json' -Raw | ConvertFrom-Json).python_executable
+& $nyxPython -m pip install -r requirements_console.txt -r requirements_nyx_regional_cpu.txt
+& .\Install-NyxCpuPreview.ps1
+```
+
+Ouvrir **NYX CPU Preview** depuis le Bureau ou le menu Démarrer. Ce raccourci
+utilise `NYX_CPU_Preview.pyw` et le même Python configuré pour ce clone. Son
+service écoute sur `http://127.0.0.1:8766` ; sa file, ses journaux et son profil
+de navigateur sont sous `runs/.experiment_console_cpu_preview`. Le script
+d'installation crée uniquement des liens **NYX CPU Preview** et ne modifie pas
+les liens **NYX** existants. Relancer ce script après un changement de Python
+ou de chemin du clone.
+
+Le lanceur de prévisualisation isole l'application et son historique local.
+La recette régionale reste soumise au backtest et aux précontrôles affichés
+dans NYX ; ce raccourci ne valide pas les modèles à lui seul.
+
 ## Démarrage technique et maintenance (facultatif)
 
 Le lanceur PowerShell reste disponible pour un démarrage explicite du serveur :
@@ -104,7 +131,7 @@ Options du lanceur :
 
 ```powershell
 & 'C:\Users\BQ6757\chronos2_v1\Start-ExperimentConsole.ps1' -NoOpen
-& 'C:\Users\BQ6757\chronos2_v1\Start-ExperimentConsole.ps1' -Port 8766
+& 'C:\Users\BQ6757\chronos2_v1\Start-ExperimentConsole.ps1' -Port 8767
 & 'C:\Users\BQ6757\chronos2_v1\Start-ExperimentConsole.ps1' -Settings 'C:\Users\BQ6757\chronos2_v1\config\experiment_console.json'
 ```
 
@@ -156,6 +183,8 @@ le dossier du lancement. Le reçu et les scores de confirmation par pays restent
 consultables même si les critères échouent. La prévision reste verrouillée jusqu'à ce que les
 critères du backtest valident la recette ; aucun score des anciens modèles GPU
 n'est attribué à cette nouvelle recette.
+Le contrôle exploratoire du 28 septembre et ses scores par pays figurent dans
+`docs/nyx_regional_cpu_probe_20260928.md` ; il ne déclenche pas l'activation.
 
 Si le précontrôle signale une dépendance absente, installer
 `requirements_nyx_regional_cpu.txt` dans le Python indiqué par
