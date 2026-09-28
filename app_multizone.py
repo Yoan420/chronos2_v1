@@ -14,6 +14,7 @@ import altair as alt
 import numpy as np
 import pandas as pd
 
+from app_nyx_annual_cpu import render_annual_cpu_controls
 from chronos2_hourly.app_service import (
     APP_ZONES,
     ExistingForecastArchiveError,
@@ -86,6 +87,7 @@ def _init_state(st: Any) -> None:
         "launch_options": {},
         "results_refresh_pending": False,
         "results_refresh_completed": False,
+        "annual_cpu_process": None,
     }
     for key, value in defaults.items():
         if key not in st.session_state:
@@ -972,6 +974,12 @@ def main() -> None:
             variant=variant,
         )
 
+    @st.cache_data(ttl=30, max_entries=4, show_spinner=False)
+    def cached_annual_cpu_status(project_root: str, delivery_day: str) -> dict:
+        from chronos2_hourly.nyx_annual_app_service import inspect_annual_cpu_launch
+
+        return inspect_annual_cpu_launch(project_root, delivery_day)
+
     @st.cache_data(max_entries=16, show_spinner=False)
     def cached_consolidated_report(
         _comparison: Any,
@@ -1097,11 +1105,13 @@ def main() -> None:
         st.session_state.active_forecast
         or st.session_state.forecast_queue
     )
+    annual_handle = st.session_state.annual_cpu_process
+    annual_busy = annual_handle is not None and annual_handle.return_code is None
     if st.button(
         "Lancer le forecast",
         icon=":material/play_arrow:",
         type="primary",
-        disabled=busy or not chosen,
+        disabled=busy or annual_busy or not chosen,
         width="stretch",
     ):
         # Sequential execution avoids competing GPU jobs and shared-cache
@@ -1178,6 +1188,14 @@ def main() -> None:
             st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch")
 
     render_run_monitor()
+
+    render_annual_cpu_controls(
+        st,
+        project_root=PROJECT_ROOT,
+        delivery_day=delivery_day.isoformat(),
+        conventional_busy=busy,
+        status_provider=cached_annual_cpu_status,
+    )
 
     st.subheader("Comparaison des derniers forecasts", anchor=False)
     st.caption(
