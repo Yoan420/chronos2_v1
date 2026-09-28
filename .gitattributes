@@ -1,2 +1,17 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Qualification hashes raw bytes; keep those files identical on Windows clones.
+chronos2_hourly/nyx_annual_cpu_live.py text eol=lf
+chronos2_hourly/nyx_annual_cpu_qualification.py text eol=lf
+chronos2_hourly/nyx_annual_live_preflight.py text eol=lf
+chronos2_hourly/nyx_annual_nyx_quantiles_gate.py text eol=lf
+chronos2_hourly/nyx_negative_probability_cpu.py text eol=lf
+chronos2_hourly/nyx_pooled_cpu_price_model.py text eol=lf
+qualify_nyx_annual_cpu.py text eol=lf
+run_nyx_annual_cpu_live.py text eol=lf
+run_nyx_negative_annual_replay.py text eol=lf
+run_nyx_selected_cpu_historical.py text eol=lf
+config/nyx_annual_cpu_qualification_receipt.json text eol=lf
+config/nyx_annual_cpu_ordered_features.json -text
+config/nyx_negative_annual_replay.json -text
