@@ -1,0 +1,119 @@
+{
+  "code_sha256": {
+    "chronos2_hourly/nyx_annual_cpu_live.py": "e82733ee43b554bceb19fcebce0711c48d05e5a3272a8166daeef143c3879467",
+    "chronos2_hourly/nyx_annual_cpu_qualification.py": "658edb67206f714dd0be35d5eebd258f505b0621d2815c4c21050528bc1cb505",
+    "chronos2_hourly/nyx_annual_live_preflight.py": "98044ccc42ceb9af8d0033d2d7ada75a3632b1337965cc9443f0d224b20f253a",
+    "chronos2_hourly/nyx_annual_nyx_quantiles_gate.py": "7596ed144d6aa1c03cc9b9c2d831b930724cb546fc0a494a1387f609d296187b",
+    "chronos2_hourly/nyx_negative_probability_cpu.py": "967d9c3f38c38d045b0d8142cef6495e7eee579bbd16366330c5d2b6e03df6f8",
+    "chronos2_hourly/nyx_pooled_cpu_price_model.py": "58a13eebcdeae47b209782978c767e0bdfd55e916d663f78ab89fc691859f082",
+    "qualify_nyx_annual_cpu.py": "ad4976f6bd11f3cb4832d74840d4f4ee94a50e53be2e1eaaeaad6cf52a52975f",
+    "run_nyx_annual_cpu_live.py": "1472dae4d3cf47587ded6e4fa702c8c16ffaaf8a45bd1938efc9742eaa2ef6f1",
+    "run_nyx_negative_annual_replay.py": "d3f760177743d67d0af52bcd8129ed14b614b18297ca8a21199272268007af99",
+    "run_nyx_selected_cpu_historical.py": "a18cffee72dac65e4fb0ddf4f569e013137fe041a48dee5a685c909dc9ddf13c"
+  },
+  "compositions": {
+    "BE": "boosting_mean_disagreement20",
+    "FR": "fr_residual_disagreement20",
+    "NL": "boosting_mean_all"
+  },
+  "evidence_sha256": {
+    "negative_probabilities": {
+      "BE": "b86d8f5069305a7d970c4b08970d2a406b9327339af3013543f7779d446bf151",
+      "FR": "e78f7f61ef40d7d3871e4b355cac09bdf4be6a015c906cadf956687565fb677c",
+      "NL": "197e20b4342471b2b79d9022d871ff4c10a9b039340380ec8b9a1986ecc1ec32"
+    },
+    "negative_replay_config": "1e0c974639f6d932f89ca011a7c6257277a127298a745f66e3bcd5e46cf38c4f",
+    "ordered_feature_schema": "ba8be2a69017ae217d40d4c0b6245078b33c6c356639c2b2249ef2c5bcbb94ef",
+    "price_checkpoint_tree": "89876bce72ff2e97b1eadc5a8e9fe9e7ae2d0aad467e7f4f1f951ded54551560",
+    "price_run_manifest": "92d67eefdc0dcc42e129633fd7076c70e96dd05e7d4a4c793a58afe44d566abf",
+    "price_selected_points": {
+      "BE": "f4d3eaa21dfae60db2843e926e2a81b694266d54874c7b32f521256ffb6ebdf6",
+      "FR": "e8d50bb8544ae1d5f3f29d03f8a05ce282bf9530f4e2337508e409e8f4ec8709",
+      "NL": "90aa6f31030cb9db569e50d9778c4e233a9da56a27e7a21b1904c921260302fe"
+    }
+  },
+  "first_delivery_day": "2025-09-24",
+  "full_input_chain_qualified": false,
+  "historical_publication_vintages_certified": false,
+  "last_delivery_day": "2026-09-23",
+  "manifest_activated": false,
+  "negative_country_metrics": {
+    "BE": {
+      "brier": 0.013765561088228854,
+      "hours": 8760,
+      "negative_hours": 328
+    },
+    "FR": {
+      "brier": 0.023431041496344274,
+      "hours": 8760,
+      "negative_hours": 580
+    },
+    "NL": {
+      "brier": 0.014937370846933024,
+      "hours": 8760,
+      "negative_hours": 434
+    }
+  },
+  "negative_model_protocol": "nyx_negative_price_fixed_platt_cpu_v1",
+  "negative_replay_execution_code_sha_embedded": false,
+  "negative_replay_verified": true,
+  "negative_threads": 2,
+  "origins_per_country": 53,
+  "price_country_metrics": {
+    "BE": {
+      "hours": 8759,
+      "rmse": 21.202686840287583,
+      "storm_common_hours": 8759,
+      "storm_rmse": 23.60958305229219,
+      "strict_win_rate": 0.5003995889941775,
+      "strict_wins": 4383
+    },
+    "FR": {
+      "hours": 8759,
+      "rmse": 18.596481350684698,
+      "storm_common_hours": 8759,
+      "storm_rmse": 18.847596732638056,
+      "strict_win_rate": 0.5002854207101267,
+      "strict_wins": 4382
+    },
+    "NL": {
+      "hours": 8759,
+      "rmse": 20.56667435723672,
+      "storm_common_hours": 8759,
+      "storm_rmse": 20.797265435578478,
+      "strict_win_rate": 0.5177531681698824,
+      "strict_wins": 4535
+    }
+  },
+  "price_expert_replay_qualified": true,
+  "price_experts": [
+    "fr_residual_1000",
+    "cwe_residual_2000",
+    "cwe_absolute_2000"
+  ],
+  "price_source_artifacts_verified": 28,
+  "price_threads": 8,
+  "prospective_input_bundle_required": true,
+  "protocol": "nyx_annual_cpu_price_qualification_v1",
+  "qualified": false,
+  "replay_receipts_sha256": {
+    "negative": "3df9f414552b3b18c3f5dc3c2d77b3b3d090672402698ea30605ab052fd5a7e1",
+    "price": "4239966eb24359def2595809e43bc101769537260a467f05ab36d370c41e031a"
+  },
+  "retrospective_evaluation": true,
+  "runtime_versions": {
+    "negative": {
+      "catboost": "1.2.10",
+      "numpy": "2.4.6",
+      "pandas": "2.3.3",
+      "scikit-learn": "1.9.1"
+    },
+    "price": {
+      "catboost": "1.2.10",
+      "numpy": "2.4.6",
+      "pandas": "2.3.3",
+      "pyarrow": "23.0.1",
+      "python": "3.11.15"
+    }
+  }
+}

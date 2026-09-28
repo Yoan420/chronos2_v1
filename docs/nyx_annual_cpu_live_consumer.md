@@ -112,10 +112,12 @@ python qualify_nyx_annual_cpu.py --price-replay runs/experiments/nyx_selected_cw
 
 Sans `--preflight`, le même appel écrit une fois
 `config/nyx_annual_cpu_qualification_receipt.json` si les deux replays passent.
-Le replay prix actuellement disponible est partiel ; l'appel doit donc rester
-bloqué et ne produire aucun reçu.
-Les scores GPU historiques et le replay des classifieurs seuls ne satisfont
-pas ce verrou.
+Le replay prix est maintenant complet : 159 fits et les deux critères contre
+Storm passent pour FR, BE et NL. Le reçu canonique a été créé, mais il atteste
+seulement les experts sur les entrées historiques :
+`full_input_chain_qualified: false` et `qualified: false`. La prévision future
+reste donc bloquée. Les chiffres et leurs limites figurent dans
+`docs/nyx_annual_cpu_evaluation_20260928.md`.
 
 Commande de contrôle en lecture seule :
 
@@ -125,5 +127,5 @@ python run_nyx_annual_cpu_live.py --bundle <dossier_bundle> --delivery-day 2026-
 
 Le producteur prospectif des 12 matrices, des baselines NYX et des références
 de rareté n'est pas encore présent dans le clone GitHub. La qualification
-annuelle des trois experts CPU n'est pas encore disponible. Le contrôle
-retourne donc `ready: false` aujourd'hui.
+des experts CPU est conditionnelle aux archives ; la chaîne complète n'est
+pas qualifiée. Le contrôle retourne donc `ready: false` aujourd'hui.
