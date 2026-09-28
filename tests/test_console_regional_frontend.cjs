@@ -18,6 +18,15 @@ async function main() {
   let gate={delivery_day:'2026-10-01',countries:['FR'],ready:false,recipe_status:'pending_backtest',blockers:['Backtest à valider.']};
   const evaluationGate={operation:'evaluate',ready:true,recipe_status:'pending_backtest',blockers:[]};
   const annualGate=country=>({manifest_valid:true,forecast_ready:false,origin_day:'2026-09-23',
+    cpu_replay:{available:true,forecast_ready:false,replay_date:'2026-09-28',price_expert_replay_qualified:true,
+      full_input_chain_qualified:false,qualified:false,
+      price:{composition:country==='FR'?'fr_residual_disagreement20':'boosting_mean_disagreement20',
+        hours:8759,rmse:country==='FR'?18.596481350684698:21.202686840287583,
+        storm_rmse:country==='FR'?18.847596732638056:23.60958305229219,strict_wins:country==='FR'?4382:4383,
+        strict_win_rate:country==='FR'?.5002854207101267:.5003995889941775},
+      negative:{hours:8760,brier:country==='FR'?.023431041496344274:.013765561088228854,
+        precision:country==='FR'?.8086021505376344:.7305194805194806,
+        recall:country==='FR'?.6482758620689655:.6859756097560976}},
     evidence:{session_summary:{status:'missing'}},source_feature_matrices:{compact_FR:{status:'missing'}},
     checkpoints:{negative_FR:{verified:false}},countries:{[country]:{archived_files_verified:false,forecast_ready:false,
       price:{candidate:country==='FR'?'residual__disagreement20__w1p0':'boosting_2000_mean_disagreement20',
@@ -68,6 +77,11 @@ async function main() {
   assert.ok(calls.some(call=>call.path==='/api/annual-cwe-preflight?country=FR'));
   assert.ok(element('#annual-cwe-status').innerHTML.includes('Prévision annuelle indisponible'));
   assert.ok(element('#annual-cwe-status').innerHTML.includes('residual__disagreement20__w1p0'));
+  assert.ok(element('#annual-cwe-status').innerHTML.includes('Rejeu CPU · 28 septembre 2026'));
+  assert.ok(element('#annual-cwe-status').innerHTML.includes('Étude GPU historique · 23 septembre 2026'));
+  assert.ok(element('#annual-cwe-status').innerHTML.includes('18,596'));
+  assert.ok(element('#annual-cwe-status').innerHTML.includes('80,86 %'));
+  assert.ok(element('#annual-cwe-status').innerHTML.includes('chaîne complète des entrées futures non qualifiée'));
   assert.equal(evaluate('state.regional.annualPreflight.forecast_ready'),false);
   await evaluate("state.regional.annualCountry='BE';checkAnnualCwe()");
   assert.ok(calls.some(call=>call.path==='/api/annual-cwe-preflight?country=BE'));

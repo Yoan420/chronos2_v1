@@ -112,10 +112,15 @@ def test_regional_preflights_are_read_only_and_keep_the_launch_gated(api, monkey
 
 
 def test_desktop_annual_cwe_preflight_is_read_only_and_never_unlocks_forecasts(api):
-    source = PROJECT_ROOT / "config/nyx_annual_cwe_historical.json"
-    target = api.project / "config/nyx_annual_cwe_historical.json"
-    target.parent.mkdir(parents=True, exist_ok=True)
-    target.write_bytes(source.read_bytes())
+    for relative in (
+        "config/nyx_annual_cwe_historical.json",
+        "config/nyx_annual_cpu_qualification_receipt.json",
+        "config/nyx_annual_cpu_desktop_results.json",
+    ):
+        source = PROJECT_ROOT / relative
+        target = api.project / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(source.read_bytes())
     before = sorted(path.relative_to(api.project).as_posix() for path in api.project.rglob("*") if path.is_file())
     response = api.client.get("/api/annual-cwe-preflight", params={"country": "FR"})
     assert response.status_code == 200, response.text
@@ -124,6 +129,11 @@ def test_desktop_annual_cwe_preflight_is_read_only_and_never_unlocks_forecasts(a
     assert result["forecast_ready"] is False
     assert result["countries"]["FR"]["forecast_ready"] is False
     assert result["countries"]["FR"]["price"]["candidate"] == "residual__disagreement20__w1p0"
+    assert result["cpu_replay"]["available"] is True
+    assert result["cpu_replay"]["price"]["rmse"] == 18.596481350684698
+    assert result["cpu_replay"]["negative"]["precision"] == 0.8086021505376344
+    assert result["cpu_replay"]["full_input_chain_qualified"] is False
+    assert result["cpu_replay"]["forecast_ready"] is False
     assert result["source_feature_matrices"]["pooled_FR"]["status"] == "missing"
     assert api.client.get("/api/annual-cwe-preflight", params={"country": "DE"}).status_code == 404
     assert not api.manager.list_runs()
