@@ -25,6 +25,10 @@ Thumbs.db
 !data/
 !data/**
 
+# Immutable daily source captures stay on the host and are never committed.
+data/pit/nyx_annual_exchange_captures/
+data/pit/nyx_annual_jao_initial_live/
+
 # Local runs, generated reports and desktop shortcuts are rebuilt on each host.
 tmp/
 deliverables/
