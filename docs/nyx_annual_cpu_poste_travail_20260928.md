@@ -10,19 +10,34 @@
    cd NYX_CWE_CPU
    ```
 
-2. Vérifier que le Python indiqué dans `config/experiment_console.json` existe
-   sur le poste. Cette branche utilise le port local **8766** ; l'installation
-   NYX actuelle garde son port **8765**. Le chemin Python configuré est celui
-   de l'installation professionnelle actuelle
-   (`C:\Users\BQ6757\venvs\pricefm311\Scripts\python.exe`). Si ce chemin
-   est différent sur le poste, corriger uniquement la valeur
-   `python_executable` dans cette seconde installation ; le même dossier doit
-   contenir `pythonw.exe`.
+2. Dans **le même PowerShell**, après `cd NYX_CWE_CPU`, copier ce bloc. Il
+   vérifie le Python déjà indiqué dans la configuration et le port séparé
+   **8766**. Le message attendu est `Python NYX OK` :
 
-3. Ouvrir `NYX.pyw` dans `NYX_CWE_CPU`, puis **Modèles régionaux → Modèles
-   annuels FR / BE / NL**. Choisir le pays. Le panneau affiche séparément les
-   scores CPU du replay et les scores GPU des rapports historiques, ainsi que
-   la disponibilité des archives sur ce poste.
+   ```powershell
+   $config = Get-Content .\config\experiment_console.json -Raw | ConvertFrom-Json
+   $python = $config.python_executable
+   if ($config.port -ne 8766) { throw 'Branche NYX_CWE_CPU attendue (port 8766).' }
+   if (-not (Test-Path -LiteralPath $python)) { throw "Python NYX introuvable : $python" }
+   $pythonw = Join-Path (Split-Path -Parent $python) 'pythonw.exe'
+   if (-not (Test-Path -LiteralPath $pythonw)) { throw "pythonw.exe introuvable : $pythonw" }
+   & $python -c "import filelock, yaml; print('Python NYX OK')"
+   ```
+
+   Si le chemin configuré n'existe pas sur ce poste, il faut trouver le
+   `python.exe` de l'installation NYX actuelle ; un Python quelconque ne
+   garantit pas les dépendances nécessaires.
+
+3. Toujours dans ce PowerShell, lancer :
+
+   ```powershell
+   & $python .\NYX.pyw
+   ```
+
+   Dans la fenêtre NYX, ouvrir **Modèles régionaux → Modèles annuels FR / BE /
+   NL**, puis choisir le pays. Le panneau affiche séparément les scores CPU
+   du replay et les scores GPU des rapports historiques, ainsi que la
+   disponibilité des archives sur ce poste.
 
 4. Lire [le rapport CPU](nyx_annual_cpu_evaluation_20260928.md) pour les
    chiffres exacts : FR, BE et NL passent les deux critères contre Storm sur
