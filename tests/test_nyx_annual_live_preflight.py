@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 from pathlib import Path
 
 import numpy as np
@@ -10,16 +11,23 @@ import pytest
 
 from chronos2_hourly.nyx_annual_live_preflight import (
     FAMILIES,
+    MATERIALIZATION_PATH,
+    MATERIALIZATION_PROTOCOL,
+    MATERIALIZER_CODE,
     SOURCE_GROUPS,
+    SOURCE_PROTOCOL,
     ZONES,
     delivery_grid,
     inspect_bundle,
     load_schema,
+    materialized_outputs,
     validate_baseline,
     validate_feature_frame,
+    validate_materialization_manifest,
     validate_reference,
     validate_source_receipt,
 )
+from chronos2_hourly.nyx_annual_cpu_live import bundle_hashes
 
 
 def test_ordered_schemas_are_independent_of_historical_cache():
@@ -35,10 +43,11 @@ def test_ordered_schemas_are_independent_of_historical_cache():
 def test_clean_clone_has_explicit_missing_inputs(tmp_path: Path):
     report = inspect_bundle(tmp_path, "2026-09-29")
     assert report["input_bundle_valid"] is False
-    assert len(report["checks"]) == len(SOURCE_GROUPS) + 4 * len(FAMILIES) + 4 + 3
+    assert len(report["checks"]) == len(SOURCE_GROUPS) + 4 * len(FAMILIES) + 4 + 3 + 1
     assert all(item["passed"] is False for item in report["checks"])
     assert any(item["input"] == "source/saturn" for item in report["checks"])
     assert any(item["input"] == "reference/FR" for item in report["checks"])
+    assert any(item["input"] == "materialization/feature_bundle" for item in report["checks"])
 
 
 def test_physical_dst_grid_and_strict_order_availability():
@@ -110,3 +119,95 @@ def test_source_receipt_is_date_bound_and_hash_bound(tmp_path: Path):
     receipt["artifact_sha256"] = {"../outside": "0" * 64}
     with pytest.raises(ValueError, match="escapes live bundle"):
         validate_source_receipt(receipt, group="saturn", day=day, bundle=tmp_path, cutoff=cutoff)
+
+
+def _bound_materialization(tmp_path: Path):
+    """Small hash graph; frame schemas are validated separately."""
+    day = "2026-09-29"
+    _, _, cutoff = delivery_grid(day)
+    bundle = tmp_path / "bundle"
+    code_root = tmp_path / "checkout"
+    code_path = code_root / MATERIALIZER_CODE[0]
+    code_path.parent.mkdir(parents=True)
+    code_path.write_text("# deterministic materializer\n", encoding="utf-8")
+    schema = tmp_path / "schema.json"
+    schema.write_text('{"schema": "test"}\n', encoding="utf-8")
+    receipts, sources = {}, {}
+    for group in SOURCE_GROUPS:
+        relative = f"source_snapshots/{group}.bin"
+        source = bundle / relative
+        source.parent.mkdir(parents=True, exist_ok=True)
+        source.write_bytes(group.encode("ascii"))
+        sources[relative] = hashlib.sha256(source.read_bytes()).hexdigest()
+        receipt = {"protocol": SOURCE_PROTOCOL, "source_group": group,
+                   "delivery_day": day, "state": "COMPLETE",
+                   "asof_cutoff_verified": True, "training_window_complete": True,
+                   "asof_state_utc": cutoff.isoformat(),
+                   "artifact_sha256": {relative: sources[relative]}}
+        receipt_path = bundle / "source_receipts" / f"{group}.json"
+        receipt_path.parent.mkdir(parents=True, exist_ok=True)
+        receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+        receipts[group] = hashlib.sha256(receipt_path.read_bytes()).hexdigest()
+    outputs = {}
+    for relative in materialized_outputs():
+        path = bundle / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(relative.encode("ascii"))
+        outputs[relative] = hashlib.sha256(path.read_bytes()).hexdigest()
+    for zone in ZONES:
+        path = bundle / "baseline" / f"{zone}.parquet"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(zone.encode("ascii"))
+    manifest = {"protocol": MATERIALIZATION_PROTOCOL, "delivery_day": day,
+                "state": "COMPLETE", "asof_cutoff_utc": cutoff.isoformat(),
+                "deterministic_transform": True, "future_labels_used": False,
+                "storm_used_as_model_input": False, "parameters": {},
+                "schema_sha256": hashlib.sha256(schema.read_bytes()).hexdigest(),
+                "source_receipts_sha256": receipts,
+                "source_artifacts_sha256": sources,
+                "transform_code_sha256": {MATERIALIZER_CODE[0]:
+                    hashlib.sha256(code_path.read_bytes()).hexdigest()},
+                "output_sha256": outputs}
+    manifest_path = bundle / MATERIALIZATION_PATH
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    return bundle, code_root, schema, manifest, code_path
+
+
+def test_materialization_binds_all_outputs_sources_and_code(tmp_path: Path):
+    bundle, code_root, schema, manifest, code_path = _bound_materialization(tmp_path)
+    result = validate_materialization_manifest(bundle, "2026-09-29",
+        schema_path=schema, code_root=code_root)
+    assert set(result["output_sha256"]) == set(materialized_outputs())
+    assert result["manifest_sha256"] == bundle_hashes(bundle)[MATERIALIZATION_PATH]
+
+    output = bundle / materialized_outputs()[0]
+    output.write_bytes(b"changed")
+    with pytest.raises(ValueError, match="Materialized input missing or changed"):
+        validate_materialization_manifest(bundle, "2026-09-29",
+            schema_path=schema, code_root=code_root)
+    output.write_bytes(materialized_outputs()[0].encode("ascii"))
+    code_path.write_text("# replaced code\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="transformation code missing or changed"):
+        validate_materialization_manifest(bundle, "2026-09-29",
+            schema_path=schema, code_root=code_root)
+
+
+def test_materialization_rejects_unrelated_source_hashes(tmp_path: Path):
+    bundle, code_root, schema, manifest, _ = _bound_materialization(tmp_path)
+    manifest["source_artifacts_sha256"] = {"unrelated.bin": "0" * 64}
+    (bundle / MATERIALIZATION_PATH).write_text(json.dumps(manifest), encoding="utf-8")
+    with pytest.raises(ValueError, match="source digest graph differs"):
+        validate_materialization_manifest(bundle, "2026-09-29",
+            schema_path=schema, code_root=code_root)
+
+
+def test_materialization_rejects_unapproved_code_even_when_hash_matches(tmp_path: Path):
+    bundle, code_root, schema, manifest, _ = _bound_materialization(tmp_path)
+    unrelated = code_root / "chronos2_hourly/unrelated.py"
+    unrelated.write_text("# unrelated\n", encoding="utf-8")
+    manifest["transform_code_sha256"] = {"chronos2_hourly/unrelated.py":
+        hashlib.sha256(unrelated.read_bytes()).hexdigest()}
+    (bundle / MATERIALIZATION_PATH).write_text(json.dumps(manifest), encoding="utf-8")
+    with pytest.raises(ValueError, match="approved transformation code"):
+        validate_materialization_manifest(bundle, "2026-09-29",
+            schema_path=schema, code_root=code_root)

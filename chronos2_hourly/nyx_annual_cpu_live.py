@@ -21,7 +21,8 @@ import numpy as np
 import pandas as pd
 
 from chronos2_hourly.nyx_annual_live_preflight import (
-    FAMILIES, SOURCE_GROUPS, ZONES, delivery_grid, inspect_bundle, sha256,
+    FAMILIES, MATERIALIZATION_PATH, SOURCE_GROUPS, ZONES, delivery_grid,
+    inspect_bundle, sha256,
 )
 from chronos2_hourly.nyx_annual_nyx_quantiles_gate import validate_nyx_quantiles_source
 from chronos2_hourly.nyx_negative_probability_cpu import (
@@ -200,7 +201,8 @@ def _inside(bundle: Path, relative: str) -> Path:
 
 def bundle_hashes(bundle: Path) -> dict[str, str]:
     """Bind every consumed matrix, receipt and receipt-bound source artifact."""
-    relatives = [f"features/{family}/{zone}.parquet"
+    relatives = [MATERIALIZATION_PATH]
+    relatives += [f"features/{family}/{zone}.parquet"
                  for family in FAMILIES for zone in ZONES]
     relatives += [f"baseline/{zone}.parquet" for zone in ZONES]
     relatives += [f"reference/{zone}.parquet" for zone in COUNTRIES]

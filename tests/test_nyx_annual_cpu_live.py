@@ -137,11 +137,44 @@ def test_bundle_fingerprints_include_all_receipts_and_bound_artifacts(tmp_path):
         (receipts / f"{group}.json").write_text(json.dumps({
             "artifact_sha256": {"source.bin": hashlib.sha256(b"source").hexdigest()}}),
             encoding="utf-8")
+    (receipts / "materialization.json").write_text('{"protocol":"test"}', encoding="utf-8")
     first = live.bundle_hashes(tmp_path)
-    assert len(first) == 12 + 4 + 3 + len(live.SOURCE_GROUPS) + 1
+    assert len(first) == 12 + 4 + 3 + len(live.SOURCE_GROUPS) + 2
+    assert "source_receipts/materialization.json" in first
     artifact.write_bytes(b"revised")
     second = live.bundle_hashes(tmp_path)
     assert first["source.bin"] != second["source.bin"]
+    (receipts / "materialization.json").write_text('{"protocol":"changed"}', encoding="utf-8")
+    third = live.bundle_hashes(tmp_path)
+    assert second["source_receipts/materialization.json"] != third["source_receipts/materialization.json"]
+    feature = tmp_path / "features" / next(iter(live.FAMILIES)) / "FR.parquet"
+    feature.write_bytes(b"feature changed")
+    fourth = live.bundle_hashes(tmp_path)
+    assert third[f"features/{next(iter(live.FAMILIES))}/FR.parquet"] != fourth[
+        f"features/{next(iter(live.FAMILIES))}/FR.parquet"]
+
+
+def test_run_rejects_manifest_changed_during_fit(tmp_path, monkeypatch):
+    bundle = tmp_path / "bundle"
+    manifest = bundle / "source_receipts/materialization.json"
+    manifest.parent.mkdir(parents=True)
+    manifest.write_bytes(b"before")
+    output = tmp_path / "output"
+    monkeypatch.setattr(cli, "preflight", lambda *_: {
+        "ready": True, "blockers": [], "activation": {"test": True}})
+    monkeypatch.setattr(cli, "bundle_hashes", lambda *_: {
+        "source_receipts/materialization.json": hashlib.sha256(manifest.read_bytes()).hexdigest()})
+    monkeypatch.setattr(cli, "load_bundle", lambda *_: object())
+
+    def changed_during_fit(*_args, **_kwargs):
+        manifest.write_bytes(b"after")
+        return {}, {}
+
+    monkeypatch.setattr(cli, "execute_models", changed_during_fit)
+    with pytest.raises(ValueError, match="changed during CPU retraining"):
+        cli.run(bundle=bundle, delivery_day="2026-09-29", output=output)
+    assert not (output / "receipt.json").exists()
+    assert json.loads((output / "status.json").read_text(encoding="utf-8"))["status"] == "FAILED"
 
 
 @pytest.mark.parametrize("fallback", [False, True])

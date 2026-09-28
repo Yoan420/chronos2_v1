@@ -14,6 +14,27 @@ annuelle des experts CPU.
 - les 4 baselines `baseline/{FR,DE,BE,NL}.parquet`, avec 365 jours de prix réalisés, NYX `q50` et aucune étiquette future ;
 - les références `reference/{FR,BE,NL}.parquet` pour la journée future ;
 - les neuf reçus dans `source_receipts/`, chacun lié par empreinte à ses artefacts et à la coupure D−1 08 h.
+- `source_receipts/materialization.json`, qui lie cryptographiquement les
+  neuf reçus sources, l'ensemble exact de leurs artefacts hachés, les 12
+  matrices et les trois références consommées, le schéma ordonné et les
+  fichiers Python de transformation présents dans le clone.
+
+Le manifeste de transformation porte le protocole
+`nyx_annual_cpu_materialization_v1`, la journée, la coupure UTC exacte, l'état
+`COMPLETE`, les paramètres de transformation et les déclarations
+`deterministic_transform: true`, `future_labels_used: false` et
+`storm_used_as_model_input: false`. Ses tables `source_receipts_sha256`,
+`source_artifacts_sha256`, `output_sha256` et `transform_code_sha256` doivent
+correspondre aux fichiers présents. Le seul code de transformation accepté est
+`chronos2_hourly/nyx_annual_cpu_bundle_builder.py`, actuellement absent du
+dépôt : sa création et son évaluation seront nécessaires avant qu'un bundle
+puisse passer ce contrôle. Un reçu source isolé, tel qu'un simple `source.bin`,
+ne suffit plus : le manifeste doit englober les artefacts des neuf reçus et
+les quinze sorties exactes, avec le SHA du code de transformation approuvé.
+Le consommateur hache également ce manifeste avant et après les fits.
+Cette liaison d'intégrité ne prouve pas à elle seule que le code déclaré a
+produit les valeurs ou que les fournisseurs les avaient publiées à la coupure ;
+la qualification de la chaîne complète reste obligatoire.
 
 Le même précontrôle appelle aussi `nyx_annual_nyx_quantiles_gate` : les quatre
 baselines doivent porter leurs quantiles, les origines exactes et les reçus des

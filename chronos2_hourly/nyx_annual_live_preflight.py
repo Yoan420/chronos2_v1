@@ -11,7 +11,7 @@ from __future__ import annotations
 from datetime import date, timedelta
 import hashlib
 import json
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 
 import numpy as np
 import pandas as pd
@@ -21,6 +21,9 @@ ROOT = Path(__file__).resolve().parents[1]
 SCHEMA = ROOT / "config/nyx_annual_cpu_ordered_features.json"
 PROTOCOL = "nyx_annual_cpu_live_inputs_v1"
 SOURCE_PROTOCOL = "nyx_annual_cpu_live_source_receipt_v1"
+MATERIALIZATION_PROTOCOL = "nyx_annual_cpu_materialization_v1"
+MATERIALIZATION_PATH = "source_receipts/materialization.json"
+MATERIALIZER_CODE = ("chronos2_hourly/nyx_annual_cpu_bundle_builder.py",)
 ZONES = ("FR", "DE", "BE", "NL")
 FAMILIES = {"fr_residual_1000": 449, "cwe_residual_2000": 123,
             "cwe_absolute_2000": 503}
@@ -191,6 +194,93 @@ def validate_source_receipt(receipt: dict, *, group: str, day: str,
                  f"{group}: source artifact missing or changed: {relative}")
 
 
+def materialized_outputs() -> tuple[str, ...]:
+    """The complete set of feature and reference files consumed by the CPU run."""
+    return (*(
+        f"features/{family}/{zone}.parquet"
+        for family in FAMILIES for zone in ZONES
+    ), *(f"reference/{zone}.parquet" for zone in ("FR", "BE", "NL")))
+
+
+def validate_materialization_manifest(bundle: Path, delivery_day: str, *,
+                                      schema_path: Path = SCHEMA,
+                                      code_root: Path = ROOT) -> dict:
+    """Bind derived inputs to the source snapshots and exact transformation code.
+
+    This checks a hash graph and producer declarations. It cannot independently
+    establish when external data were published or that the named code created
+    the files; full-chain qualification remains a separate activation gate.
+    """
+    bundle, code_root = bundle.resolve(), code_root.resolve()
+    _, _, cutoff = delivery_grid(delivery_day)
+    manifest_path = _inside(bundle, MATERIALIZATION_PATH)
+    _require(manifest_path.is_file(), "Annual CPU materialization manifest missing")
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    _require(isinstance(manifest, dict)
+             and manifest.get("protocol") == MATERIALIZATION_PROTOCOL
+             and manifest.get("delivery_day") == delivery_day
+             and manifest.get("state") == "COMPLETE"
+             and manifest.get("asof_cutoff_utc") == cutoff.isoformat()
+             and manifest.get("deterministic_transform") is True
+             and manifest.get("future_labels_used") is False
+             and manifest.get("storm_used_as_model_input") is False
+             and isinstance(manifest.get("parameters"), dict),
+             "Annual CPU materialization identity or causal declaration differs")
+    _require(manifest.get("schema_sha256") == sha256(schema_path),
+             "Annual CPU materialization schema digest differs")
+
+    expected_receipts = {}
+    expected_artifacts = {}
+    for group in SOURCE_GROUPS:
+        receipt_path = _inside(bundle, f"source_receipts/{group}.json")
+        _require(receipt_path.is_file(), f"{group}: source receipt missing")
+        receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+        validate_source_receipt(receipt, group=group, day=delivery_day,
+                                bundle=bundle, cutoff=cutoff)
+        expected_receipts[group] = sha256(receipt_path)
+        for relative, digest in receipt["artifact_sha256"].items():
+            _require(relative != MATERIALIZATION_PATH,
+                     "Materialization manifest cannot be its own source artifact")
+            _require(relative not in expected_artifacts or
+                     expected_artifacts[relative] == digest,
+                     f"Conflicting source artifact digests: {relative}")
+            expected_artifacts[relative] = digest
+    _require(manifest.get("source_receipts_sha256") == expected_receipts
+             and manifest.get("source_artifacts_sha256") == expected_artifacts,
+             "Annual CPU materialization source digest graph differs")
+
+    outputs = manifest.get("output_sha256")
+    _require(isinstance(outputs, dict) and set(outputs) == set(materialized_outputs()),
+             "Annual CPU materialization must bind all 12 features and three references")
+    for relative, expected in outputs.items():
+        _require(isinstance(expected, str) and len(expected) == 64
+                 and all(char in "0123456789abcdef" for char in expected),
+                 f"Malformed materialized output digest: {relative}")
+        path = _inside(bundle, relative)
+        _require(path.is_file() and sha256(path) == expected,
+                 f"Materialized input missing or changed: {relative}")
+
+    code = manifest.get("transform_code_sha256")
+    _require(isinstance(code, dict) and set(code) == set(MATERIALIZER_CODE),
+             "Annual CPU approved transformation code digests required")
+    for relative, expected in code.items():
+        posix, windows = PurePosixPath(relative), PureWindowsPath(relative)
+        _require(isinstance(relative, str) and relative and "\\" not in relative
+                 and not posix.is_absolute() and not windows.drive
+                 and ".." not in posix.parts and posix.suffix == ".py"
+                 and isinstance(expected, str) and len(expected) == 64
+                 and all(char in "0123456789abcdef" for char in expected),
+                 f"Unsafe or malformed transformation code digest: {relative}")
+        path = (code_root / Path(*posix.parts)).resolve()
+        _require(path.is_relative_to(code_root) and path.is_file()
+                 and sha256(path) == expected,
+                 f"Annual CPU transformation code missing or changed: {relative}")
+    return {"manifest_sha256": sha256(manifest_path),
+            "source_receipts": expected_receipts,
+            "output_sha256": outputs.copy(),
+            "transform_code_sha256": code.copy()}
+
+
 def inspect_bundle(bundle: Path, delivery_day: str,
                    schema_path: Path = SCHEMA) -> dict:
     """Inspect a future bundle; return all failures without changing files."""
@@ -247,6 +337,9 @@ def inspect_bundle(bundle: Path, delivery_day: str,
             validate_reference(read_parquet(relative), current, cutoff, relative)
 
         check(f"reference/{zone}", reference_action)
+    check("materialization/feature_bundle", lambda:
+          validate_materialization_manifest(bundle, delivery_day,
+                                            schema_path=schema_path))
     return {"protocol": PROTOCOL, "delivery_day": delivery_day,
             "bundle": str(bundle), "input_bundle_valid": all(c["passed"] for c in checks),
             "checks": checks,
