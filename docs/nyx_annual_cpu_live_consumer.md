@@ -55,6 +55,39 @@ propre vérifie l'empreinte du reçu de qualification, qui lie ces SHA, mais ne
 peut pas recalculer lui-même les deux SHA sans leurs fichiers. L'outil de
 qualification doit vérifier les deux reçus originaux avant de sceller le reçu
 agrégé suivi dans Git.
+
+`qualify_nyx_annual_cpu.py` prépare ce reçu à partir des replays prix et
+probabilité négative complets. Il vérifie les 159 checkpoints de prix, reconstruit
+les trois prix annuels, recalcule leurs scores sur EPEX/Storm, contrôle les trois
+séries négatives contre les archives hachées et vérifie les versions de code et
+de dépendances enregistrées. Il ne crée le fichier canonique que si la règle de
+prix fixée avant le replay passe dans chaque pays : RMSE strictement inférieure
+à Storm et plus de 50 % de victoires horaires strictes sur les 8 759 heures
+communes. Le replay négatif doit couvrir exactement 8 760 heures par pays et
+reproduire ses métriques scellées.
+
+Ce reçu atteste seulement les experts CPU **conditionnellement aux entrées
+historiques**. Le replay utilise un NYX q50 et des références issus d'une chaîne
+historique GPU/archive ; leur génération prospective équivalente depuis un clone
+propre n'est pas qualifiée. Le builder inscrit donc
+`price_expert_replay_qualified: true`, `full_input_chain_qualified: false` et
+`qualified: false`. Le consommateur exige explicitement les trois validations
+positives et les mêmes versions de Python et des bibliothèques que le replay
+qualifié. Le manifeste reste à `forecast_enabled: false`. Le replay négatif
+ne porte pas dans son propre reçu le SHA du code effectivement exécuté ; le
+builder revérifie ses séries, ses sources, ses métriques et le code actuel, sans
+prétendre certifier cette provenance manquante.
+
+Contrôle du builder, sans écriture :
+
+```powershell
+python qualify_nyx_annual_cpu.py --price-replay runs/experiments/nyx_selected_cwe_cpu_20260928 --negative-replay runs/nyx_negative_annual_replay/fr_be_nl_20260928 --preflight
+```
+
+Sans `--preflight`, le même appel écrit une fois
+`config/nyx_annual_cpu_qualification_receipt.json` si les deux replays passent.
+Le replay prix actuellement disponible est partiel ; l'appel doit donc rester
+bloqué et ne produire aucun reçu.
 Les scores GPU historiques et le replay des classifieurs seuls ne satisfont
 pas ce verrou.
 

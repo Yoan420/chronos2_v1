@@ -38,12 +38,16 @@ def test_activation_needs_pinned_annual_cpu_score_and_code(tmp_path):
     manifest = json.loads(live.MANIFEST.read_text(encoding="utf-8"))
     manifest["forecast_enabled"] = True
     qualification = {"protocol": live.QUALIFICATION_PROTOCOL, "qualified": True,
+        "price_expert_replay_qualified": True,
+        "negative_replay_verified": True,
+        "full_input_chain_qualified": True,
         "price_experts": list(live.PRICE_EXPERTS),
         "negative_model_protocol": live.NEGATIVE_PROTOCOL,
         "compositions": live.COMPOSITIONS,
         "first_delivery_day": "2025-09-24", "last_delivery_day": "2026-09-23",
         "origins_per_country": 53,
         "price_threads": 8, "negative_threads": 2,
+        "runtime_versions": live._runtime_versions(),
         "replay_receipts_sha256": {"price": "a" * 64, "negative": "b" * 64},
         "price_country_metrics": {zone: {"hours": 8759,
             "storm_common_hours": 8759, "rmse": 10., "storm_rmse": 11.,
@@ -66,6 +70,14 @@ def test_activation_needs_pinned_annual_cpu_score_and_code(tmp_path):
     manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
     verified = live.verify_activation(tmp_path)
     assert verified["qualification_sha256"] == manifest["cpu_annual_qualification"]["sha256"]
+    qualification["full_input_chain_qualified"] = False
+    changed = json.dumps(qualification).encode()
+    receipt.write_bytes(changed)
+    manifest["cpu_annual_qualification"]["sha256"] = hashlib.sha256(changed).hexdigest()
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    with pytest.raises(ValueError, match="Annual CPU qualification scope or recipe differs"):
+        live.verify_activation(tmp_path)
+    qualification["full_input_chain_qualified"] = True
     qualification["price_country_metrics"]["BE"]["rmse"] = 12.
     changed = json.dumps(qualification).encode()
     receipt.write_bytes(changed)

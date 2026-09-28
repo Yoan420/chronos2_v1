@@ -8,10 +8,12 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import timedelta
+from importlib.metadata import version
 import json
 import math
 import os
 from pathlib import Path
+import platform
 import tempfile
 from typing import Any
 
@@ -67,6 +69,14 @@ def _digest(value: object) -> bool:
             and all(character in "0123456789abcdef" for character in value))
 
 
+def _runtime_versions() -> dict:
+    return {"price": {"python": platform.python_version(),
+            **{name: version(name) for name in
+               ("catboost", "numpy", "pandas", "pyarrow")}},
+            "negative": {name: version(name) for name in
+                         ("catboost", "numpy", "pandas", "scikit-learn")}}
+
+
 def verify_activation(root: Path = ROOT, manifest_path: Path | None = None) -> dict:
     """Fail closed on the fixed production manifest and pinned annual score."""
     manifest_file = manifest_path or root / "config" / MANIFEST.name
@@ -98,6 +108,9 @@ def verify_activation(root: Path = ROOT, manifest_path: Path | None = None) -> d
             "Annual CPU qualification must bind price and negative replay receipts")
     require(receipt.get("protocol") == QUALIFICATION_PROTOCOL
             and receipt.get("qualified") is True
+            and receipt.get("price_expert_replay_qualified") is True
+            and receipt.get("negative_replay_verified") is True
+            and receipt.get("full_input_chain_qualified") is True
             and receipt.get("price_experts") == list(PRICE_EXPERTS)
             and receipt.get("negative_model_protocol") == NEGATIVE_PROTOCOL
             and receipt.get("compositions") == COMPOSITIONS
@@ -105,7 +118,8 @@ def verify_activation(root: Path = ROOT, manifest_path: Path | None = None) -> d
             and receipt.get("last_delivery_day") == "2026-09-23"
             and receipt.get("origins_per_country") == 53
             and receipt.get("price_threads") == PRICE_THREADS
-            and receipt.get("negative_threads") == NEGATIVE_THREADS,
+            and receipt.get("negative_threads") == NEGATIVE_THREADS
+            and receipt.get("runtime_versions") == _runtime_versions(),
             "Annual CPU qualification scope or recipe differs")
     code = receipt.get("code_sha256")
     require(isinstance(code, dict) and set(QUALIFICATION_CODE) <= set(code)
@@ -149,7 +163,7 @@ def preflight(bundle: Path, delivery_day: str, output: Path) -> dict:
     blockers = []
     try:
         activation = verify_activation()
-    except (OSError, ValueError, KeyError, TypeError) as error:
+    except (OSError, ValueError, KeyError, TypeError, ImportError) as error:
         activation = None
         blockers.append(f"Activation: {error}")
     try:
