@@ -17,6 +17,12 @@ async function main() {
   };
   let gate={delivery_day:'2026-10-01',countries:['FR'],ready:false,recipe_status:'pending_backtest',blockers:['Backtest à valider.']};
   const evaluationGate={operation:'evaluate',ready:true,recipe_status:'pending_backtest',blockers:[]};
+  const annualGate=country=>({manifest_valid:true,forecast_ready:false,origin_day:'2026-09-23',
+    evidence:{session_summary:{status:'missing'}},source_feature_matrices:{compact_FR:{status:'missing'}},
+    checkpoints:{negative_FR:{verified:false}},countries:{[country]:{archived_files_verified:false,forecast_ready:false,
+      price:{candidate:country==='FR'?'residual__disagreement20__w1p0':'boosting_2000_mean_disagreement20',
+        score:{rmse:18.474,storm_rmse:18.848,strict_win_rate:.5005}},
+      negative:{score:{brier:.02343,average_precision:.8352}},blockers:[{code:'inspection_only'}]}}});
   let runs=[];
   let regionalArtifacts=[];
   let evaluationArtifacts=[];
@@ -39,6 +45,7 @@ async function main() {
       else if(path==='/api/bootstrap')value={token:'token',catalog:[{id:'nyx_regional_cpu',parameters:[{name:'delivery_day',default:'2026-10-01'}]}]};
       else if(path.startsWith('/api/regional-preflight'))value=gate;
       else if(path==='/api/regional-evaluation-preflight')value=evaluationGate;
+      else if(path.startsWith('/api/annual-cwe-preflight?country='))value=annualGate(decodeURIComponent(path.split('=')[1]));
       else if(path==='/api/runs')value={runs};
       else if(path==='/api/preview')value={id:JSON.parse(options.body).adapter_id==='nyx_regional_cpu_backtest'?'eval-plan':'plan-1'};
       else if(path==='/api/launch'){
@@ -57,6 +64,15 @@ async function main() {
   await new Promise(resolve=>setImmediate(resolve));
   const evaluate=code=>vm.runInContext(code,context);
   assert.equal(evaluate('state.route'),'regional');
+  assert.ok(element('#main').innerHTML.includes('Modèles annuels FR / BE / NL'));
+  assert.ok(calls.some(call=>call.path==='/api/annual-cwe-preflight?country=FR'));
+  assert.ok(element('#annual-cwe-status').innerHTML.includes('Prévision annuelle indisponible'));
+  assert.ok(element('#annual-cwe-status').innerHTML.includes('residual__disagreement20__w1p0'));
+  assert.equal(evaluate('state.regional.annualPreflight.forecast_ready'),false);
+  await evaluate("state.regional.annualCountry='BE';checkAnnualCwe()");
+  assert.ok(calls.some(call=>call.path==='/api/annual-cwe-preflight?country=BE'));
+  assert.ok(element('#annual-cwe-status').innerHTML.includes('boosting_2000_mean_disagreement20'));
+  assert.ok(!calls.some(call=>call.path.startsWith('/api/annual-cwe')&&call.options.method==='POST'));
   assert.equal(evaluate('state.regional.day'),'2026-10-01');
   assert.equal(element('#regional-launch').disabled,true);
   assert.ok(element('#regional-check').innerHTML.includes('Backtest à valider.'));

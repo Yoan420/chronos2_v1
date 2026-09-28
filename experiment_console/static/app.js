@@ -4,6 +4,7 @@ const $$ = (s, root=document) => [...root.querySelectorAll(s)];
 const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const state = {route:'',primary:{days:[],warnings:[]},runInfo:null,runRevision:0,boot:null,selectedDay:null,launchDay:null,refreshing:false,loaded:false,launching:false,
   regional:{day:null,country:'FR',preflight:null,checking:false,launching:false,evaluationPreflight:null,evaluationChecking:false,evaluationLaunching:false,
+    annualCountry:'FR',annualPreflight:null,annualChecking:false,
     runs:[],detail:null,statusDoc:null,receiptDoc:null,logs:null,error:null,pinnedRunId:null,refreshing:false,lastCompletedEvaluationId:null}};
 const warnings = (items, kind='') => items?.length ? `<div class="notice ${kind}">${items.map(esc).join('<br>')}</div>` : '';
 const formatDay = value => value ? new Date(`${value}T12:00:00`).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}) : 'Date indisponible';
@@ -159,15 +160,43 @@ function renderRegional(){
   const main=$('#main');
   const regional=state.regional;
   if(!main.nyxRegional){
-    main.innerHTML=pageHead('NYX / MODÈLES RÉGIONAUX','Prévisions par pays','Prix horaire et probabilité de prix négatif avec réentraînement CPU.')+
+    const annualPanel=`<section class="panel padded regional-panel" aria-label="Modèles annuels CWE historiques"><div class="section-heading"><div><div class="eyebrow">ÉTUDE ANNUELLE · 2026-09-23</div><h2>Modèles annuels FR / BE / NL</h2></div></div><p>Consultez le prix retenu et la probabilité de prix négatif sur l’année étudiée. Cette comparaison est rétrospective : aucune prévision future n’est activée ici.</p><div class="regional-controls"><label>Pays historique<select id="annual-cwe-country">${['FR','BE','NL'].map(zone=>`<option value="${zone}" ${zone===regional.annualCountry?'selected':''}>${zone}</option>`).join('')}</select></label><button id="annual-cwe-check" data-annual-cwe-check>Vérifier les archives</button></div><div id="annual-cwe-status" role="status"></div></section>`;
+    main.innerHTML=pageHead('NYX / MODÈLES RÉGIONAUX','Prévisions par pays et archives annuelles','Prix horaire et probabilité de prix négatif.')+annualPanel+
       `<section class="panel padded regional-panel" aria-label="Évaluation de la recette CPU"><div class="section-heading"><div><div class="eyebrow">VALIDATION</div><h2>Évaluer la recette CPU</h2></div></div><p>Synchronise Saturn, rejoue les origines historiques et produit un reçu. Si les critères passent, les prévisions par pays deviennent disponibles.</p><button id="regional-evaluate" data-regional-evaluate disabled>▷ Évaluer la recette CPU</button><div id="regional-evaluation-check" role="status"></div></section>`+
       `<section class="panel padded regional-panel" aria-label="Lancement régional"><div class="section-heading"><div><div class="eyebrow">NOUVELLE RECETTE CPU</div><h2>Calculer un pays</h2></div></div><p>Le moteur actualise Saturn et réentraîne le modèle avant chaque prévision. Le lancement sera disponible après validation du backtest.</p><div class="regional-controls"><label>Date de livraison<input id="regional-day" type="date" required value="${esc(regional.day)}"></label><label>Pays<select id="regional-country">${['FR','DE','BE','NL'].map(zone=>`<option value="${zone}" ${zone===regional.country?'selected':''}>${zone}</option>`).join('')}</select></label><button class="primary" id="regional-launch" data-regional-launch disabled>▷ Lancer ce pays</button></div><div id="regional-check" role="status"></div></section><section class="regional-history"><div class="section-heading"><h2>Derniers lancements</h2></div><div id="regional-runs"></div></section><section id="regional-output" aria-label="Sorties du lancement régional"></section>`;
     main.nyxRegional=true;
   }
   renderRegionalStatus();
 }
+function renderAnnualCweStatus(){
+  if(state.route!=='regional')return;
+  const regional=state.regional;
+  const button=$('#annual-cwe-check');
+  const target=$('#annual-cwe-status');
+  if(!button||!target)return;
+  button.disabled=regional.annualChecking;
+  button.textContent=regional.annualChecking?'Vérification…':'Vérifier les archives';
+  if(regional.annualChecking){target.innerHTML='<p class="publication-time">Contrôle local des reçus, matrices et checkpoints historiques…</p>';return;}
+  const inspection=regional.annualPreflight;
+  if(!inspection){target.innerHTML='<p class="publication-time">Précontrôle annuel non chargé.</p>';return;}
+  if(!inspection.manifest_valid){target.innerHTML=warnings((inspection.blockers||[]).map(item=>item.message||item.code||String(item)),'error');return;}
+  const country=regional.annualCountry;
+  const row=inspection.countries?.[country];
+  if(!row){target.innerHTML=warnings(['Aucun résultat historique disponible pour ce pays.'],'error');return;}
+  const metric=(value,digits=3)=>typeof value==='number'&&Number.isFinite(value)?new Intl.NumberFormat('fr-FR',{maximumFractionDigits:digits}).format(value):'—';
+  const price=row.price?.score||{},negative=row.negative?.score||{};
+  const verifiedEvidence=Object.values(inspection.evidence||{}).length>0&&Object.values(inspection.evidence||{}).every(item=>item.status==='verified');
+  const featureFiles=Object.values(inspection.source_feature_matrices||{});
+  const checkpointFiles=Object.values(inspection.checkpoints||{});
+  const featureCount=featureFiles.filter(item=>item.status==='verified').length;
+  const checkpointCount=checkpointFiles.filter(item=>item.verified===true).length;
+  const archiveStatus=row.archived_files_verified===true?'Archives et références vérifiées sur ce poste.':`Archives incomplètes sur ce poste : ${featureCount}/${featureFiles.length} matrices et ${checkpointCount}/${checkpointFiles.length} checkpoints vérifiés.`;
+  const provenance=verifiedEvidence?'Scores du rapport annuel vérifié localement.':'Scores du manifeste historique ; les reçus originaux ne sont pas tous présents sur ce poste.';
+  target.innerHTML=`<div class="notice ${row.archived_files_verified?'info':'error'}">${esc(archiveStatus)}</div><p class="publication-time">${esc(provenance)} Période : 24 septembre 2025 au 23 septembre 2026. Même année que la sélection, sans validation indépendante.</p><div class="table-wrap"><table><thead><tr><th>Pays</th><th>Prix retenu</th><th>RMSE NYX</th><th>RMSE Storm</th><th>Heures gagnées</th><th>Brier négatif</th><th>AP négatif</th></tr></thead><tbody><tr><td><strong>${esc(country)}</strong></td><td>${esc(row.price?.candidate||'—')}</td><td>${esc(metric(price.rmse))}</td><td>${esc(metric(price.storm_rmse))}</td><td>${esc(typeof price.strict_win_rate==='number'?metric(price.strict_win_rate*100,2)+' %':'—')}</td><td>${esc(metric(negative.brier,5))}</td><td>${esc(metric(negative.average_precision,4))}</td></tr></tbody></table></div><div class="notice error">Prévision annuelle indisponible : les matrices et checkpoints historiques ne fournissent pas les variables futures, le réentraînement CPU équivalent des modèles de prix ni une validation indépendante. Ce panneau est en lecture seule.</div>`;
+}
 function renderRegionalStatus(){
   if(state.route!=='regional')return;
+  renderAnnualCweStatus();
   const regional=state.regional;
   const launch=$('#regional-launch');
   if(!launch)return;
@@ -232,6 +261,19 @@ async function checkRegionalEvaluation(){
   try{regional.evaluationPreflight=await api('/api/regional-evaluation-preflight');}
   catch(error){regional.evaluationPreflight={ready:false,blockers:[error.message]};}
   finally{regional.evaluationChecking=false;renderRegionalStatus();}
+}
+async function checkAnnualCwe(){
+  const regional=state.regional;
+  const country=regional.annualCountry;
+  regional.annualChecking=true;regional.annualPreflight=null;renderAnnualCweStatus();
+  try{
+    const result=await api(`/api/annual-cwe-preflight?country=${encodeURIComponent(country)}`);
+    if(country===regional.annualCountry)regional.annualPreflight=result;
+  }catch(error){
+    if(country===regional.annualCountry)regional.annualPreflight={manifest_valid:false,blockers:[{message:error.message}]};
+  }finally{
+    if(country===regional.annualCountry){regional.annualChecking=false;renderAnnualCweStatus();}
+  }
 }
 async function refreshRegional(){
   const regional=state.regional;
@@ -349,7 +391,7 @@ async function route(){
       if(!state.boot)state.boot=await api('/api/bootstrap');
       if(!state.regional.day)state.regional.day=state.boot.catalog?.find(item=>item.id==='nyx_regional_cpu')?.parameters?.find(item=>item.name==='delivery_day')?.default||state.runInfo?.defaults?.delivery_day||'';
       renderRegional();
-      await Promise.allSettled([checkRegional(),checkRegionalEvaluation(),refreshRegional()]);
+      await Promise.allSettled([checkRegional(),checkRegionalEvaluation(),checkAnnualCwe(),refreshRegional()]);
     }else renderPublications();
   }
   catch(error){$('#main').innerHTML=empty('Chargement impossible',error.message);}
@@ -394,11 +436,16 @@ document.addEventListener('click',event=>{
   if(event.target.closest('[data-launch]'))void launchForecast();
   if(event.target.closest('[data-regional-launch]'))void launchRegional();
   if(event.target.closest('[data-regional-evaluate]'))void launchRegionalEvaluation();
+  if(event.target.closest('[data-annual-cwe-check]'))void checkAnnualCwe();
 });
 document.addEventListener('change',event=>{if(event.target.id==='delivery-day'){state.selectedDay=event.target.value;renderDashboard();}
   if(event.target.id==='regional-day'||event.target.id==='regional-country'){
     state.regional[event.target.id==='regional-day'?'day':'country']=event.target.value;
     state.regional.preflight=null;void checkRegional();
+  }
+  if(event.target.id==='annual-cwe-country'){
+    state.regional.annualCountry=event.target.value;
+    state.regional.annualPreflight=null;void checkAnnualCwe();
   }});
 document.addEventListener('input',event=>{if(event.target.id==='launch-delivery-day'&&!state.launching&&!state.runInfo?.active)state.launchDay=event.target.value;});
 $('#dialog').addEventListener('close',()=>{$('#dialog').innerHTML='';});

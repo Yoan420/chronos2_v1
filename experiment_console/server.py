@@ -22,6 +22,7 @@ import webbrowser
 import yaml
 
 from .artifacts import inspect_run, list_artifacts, compare_scopes, read_forecast
+from .annual_cwe_inspection import inspect_annual_cwe
 from .manager import Manager, PrimaryRunConflict
 from .primary_results import build_primary_results, read_primary_artifact
 from .security import MASK, is_secret_key, redact, redact_text
@@ -328,6 +329,10 @@ class Handler(BaseHTTPRequestHandler):
             if query:
                 raise ValueError('Le précontrôle de l’évaluation n’accepte pas de paramètres.')
             self.json(manager.registry.regional_evaluation_preflight())
+        elif path == '/api/annual-cwe-preflight':
+            if set(query) != {'country'} or len(query['country']) != 1 or query['country'][0] not in {'FR', 'BE', 'NL'}:
+                raise ValueError('Choisissez un pays annuel parmi FR, BE et NL.')
+            self.json(inspect_annual_cwe(manager.project_root, (query['country'][0],)))
         elif path == '/api/primary-artifact':
             if len(query.get('path', [])) != 1:
                 raise ValueError('Un chemin de résultat principal est requis.')
