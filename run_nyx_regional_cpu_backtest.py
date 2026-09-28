@@ -187,10 +187,30 @@ def _select_negative_method(frame: pd.DataFrame) -> tuple[str, dict[str, dict]]:
     return method, scores
 
 
+def _source_files(source_audit: dict) -> dict[str, tuple[Path, str]]:
+    """Join logical Saturn source names to the paths captured at load time."""
+    hashes = source_audit.get("source_sha256", {})
+    paths = source_audit.get("source_paths", {})
+    _require(isinstance(hashes, dict) and isinstance(paths, dict) and hashes
+             and set(hashes) == set(paths),
+             "Saturn source audit is missing paths or checksums")
+    root = ROOT.resolve()
+    files = {name: (Path(paths[name]).resolve(), hashes[name])
+             for name in sorted(hashes)}
+    _require(all(path.is_relative_to(root) for path, _ in files.values()),
+             "Saturn source audit points outside the project")
+    return files
+
+
 def _public_source_hashes(source_audit: dict) -> dict[str, str]:
-    raw = source_audit.get("source_sha256", {})
-    return {Path(path).resolve().relative_to(ROOT.resolve()).as_posix(): value
-            for path, value in sorted(raw.items())}
+    root = ROOT.resolve()
+    return {path.relative_to(root).as_posix(): digest
+            for path, digest in _source_files(source_audit).values()}
+
+
+def _sources_unchanged(source_audit: dict) -> bool:
+    return all(_sha(path) == digest
+               for path, digest in _source_files(source_audit).values())
 
 
 def evaluate_sources(sources: dict, benchmark: dict[str, pd.DataFrame],
@@ -468,8 +488,7 @@ def main(argv=None) -> int:
             result = evaluate_sources(sources, benchmark, result_dir,
                                       threads=args.threads, progress=lambda item: status(
                                           {"status": "running", **item}))
-            _require(all(_sha(Path(path)) == digest for path, digest in
-                         source_audit["source_sha256"].items()),
+            _require(_sources_unchanged(source_audit),
                      "Saturn sources changed during evaluation")
             result.update(source_sha256=_public_source_hashes(source_audit),
                           benchmark_sources=benchmark_audit,

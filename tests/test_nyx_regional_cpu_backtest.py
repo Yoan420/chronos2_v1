@@ -78,6 +78,22 @@ def test_canonical_epex_alignment_counts_price_and_event_drift():
         backtest._target_alignment(incomplete, epex, zone="FR")
 
 
+def test_saturn_source_hashes_use_audited_paths_not_logical_names(tmp_path, monkeypatch):
+    source = tmp_path / "data" / "pit" / "residual.parquet"
+    source.parent.mkdir(parents=True)
+    source.write_bytes(b"original Saturn bank")
+    audit = {"source_sha256": {"residual_bank": backtest._sha(source)},
+             "source_paths": {"residual_bank": str(source)}}
+    monkeypatch.setattr(backtest, "ROOT", tmp_path)
+    assert backtest._public_source_hashes(audit) == {
+        "data/pit/residual.parquet": backtest._sha(source)}
+    assert backtest._sources_unchanged(audit)
+    source.write_bytes(b"changed Saturn bank")
+    assert not backtest._sources_unchanged(audit)
+    with pytest.raises(ValueError, match="missing paths"):
+        backtest._public_source_hashes({"source_sha256": audit["source_sha256"]})
+
+
 def test_activation_requires_a_pinned_passed_receipt(tmp_path, monkeypatch):
     root = tmp_path
     config_dir = root / "config"
@@ -128,7 +144,8 @@ def test_activation_requires_a_pinned_passed_receipt(tmp_path, monkeypatch):
     monkeypatch.setattr(backtest, "CANONICAL_RECEIPT",
                         config_dir / "nyx_regional_cpu_backtest_receipt.json")
     backtest._activate(result, output,
-                       {"source_sha256": {str(source): backtest._sha(source)}}, {})
+                       {"source_sha256": {"target_FR": backtest._sha(source)},
+                        "source_paths": {"target_FR": str(source)}}, {})
     applied, blockers = live._validate_activation(root)
     assert applied["status"] == "validated"
     assert applied["negative_selected"] == negative_selected
