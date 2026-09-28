@@ -44,18 +44,16 @@ sélection.
 
 Chaque journée de livraison requiert ses prévisions et signaux publiés avant
 **D−1 à 08 h locale**, ainsi que les prix passés disponibles à cette date.
-L'apprentissage Test2 est antérieur à son origine hebdomadaire ; la décision
+Le modèle Test2 est entraîné à son origine hebdomadaire, puis ses signaux de
+livraison sont fournis **jour par jour** à chaque coupure D−1 08 h. Il ne faut
+pas calculer les sept journées dès l'origine hebdomadaire en utilisant des
+données qui ne seraient publiées que les jours suivants. La décision
 `prior90_active` emploie 90 journées OOF strictement antérieures. Les heures
 des transitions été/hiver restent des heures UTC distinctes. Les archives
 locales originales reconnaissent que la publication historique de certaines
 sources n'est pas certifiée et que quelques trous ont été comblés par des
 proxys documentés. Leur horodatage logique ne certifie pas une disponibilité
 effective de fournisseur.
-
-Le modèle Test2 peut être réentraîné une fois par semaine, mais ses entrées de
-prévision pour chaque journée doivent être capturées à **D−1 08 h**. Calculer
-dès l'origine hebdomadaire les sept journées avec des versions de données
-publiées plus tard violerait ce contrat temporel.
 
 ## Contrat de lancement sur un clone GitHub
 
@@ -73,9 +71,18 @@ historique et sa préparation indique elle-même qu'elle n'accède pas à
 Saturn. Le sélecteur autonome ne masque pas ces absences : il assemble
 seulement six prévisions **déjà produites** et refuse un schéma incomplet.
 
-Pour rendre ce chemin prospectif, il faut porter les producteurs NYX et
-Test2, les trois HGB et leurs sources de variables vers un collecteur
+Le code autonome porte maintenant la formule de l'ensemble
+(`nyx_annual_equal_ensemble.py`), l'entraînement CPU Test2 à une origine
+hebdomadaire et son scoring quotidien (`nyx_annual_test2_cpu.py`), la règle
+prior90 (`nyx_annual_prior90_cpu.py`) et la confirmation par paire
+(`nyx_annual_reference_pair.py`). Les tests rapprochent leurs points ou
+décisions des archives quand elles sont présentes. Ces modules consomment des
+matrices et prévisions fournies ; ils ne collectent aucune source.
+
+Pour rendre ce chemin prospectif, il faut relier la baseline NYX, les trois
+HGB et leurs sources de variables à un collecteur
 quotidien horodaté, conserver les prédictions OOF et prix de 90 jours, puis
-évaluer la chaîne CPU entière sur des origines chronologiques. La nouvelle
+enregistrer les modèles Test2 d'une semaine à l'autre et évaluer la chaîne
+CPU entière sur des origines chronologiques. La nouvelle
 évaluation des experts CPU avec la référence historique fixe mesure une
 étape distincte ; elle ne valide pas seule cette chaîne future.
