@@ -114,3 +114,20 @@ def test_de_accepts_only_pinned_complete_replay_and_keeps_actual_failed_score(tm
     assert result["performance_exception_authorized"] is True
     path.write_text(path.read_text()+" ")
     assert inspect_annual_cpu_results(root,"DE")["available"] is False
+
+
+def test_real_de_cpu_result_is_portable_and_preserves_failed_storm_criterion(tmp_path):
+    root = _fixture_root(tmp_path)
+    (root / DE_RESULTS_PATH).write_bytes((REPO_ROOT / DE_RESULTS_PATH).read_bytes())
+    result = inspect_annual_cpu_results(root, "DE")
+    assert result["available"] is True
+    assert result["forecast_ready"] is False and result["full_input_chain_qualified"] is False
+    assert result["performance_exception_authorized"] is True
+    assert result["price_expert_replay_qualified"] is False
+    assert result["price"]["rmse"] == 21.23112573005414
+    assert result["price"]["storm_rmse"] == 20.306583759838535
+    assert result["price"]["strict_wins"] == 4775
+    assert result["price"]["strict_win_rate"] == 4775/8759
+    assert result["negative"]["brier"] == 0.013845741445702215
+    assert result["negative"]["precision"] == 0.841897233201581
+    assert result["negative"]["recall"] == 0.8239845261121856

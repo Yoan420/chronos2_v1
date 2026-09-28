@@ -25,7 +25,7 @@ from chronos2_hourly.nyx_annual_live_preflight import (
     MATERIALIZER_CODE, delivery_grid, inspect_bundle, sha256,
 )
 from chronos2_hourly.nyx_annual_nyx_quantiles_gate import validate_nyx_quantiles_source
-from chronos2_hourly.nyx_local_io import replace_retry
+from chronos2_hourly.nyx_local_io import promote_directory_retry, replace_retry
 from chronos2_hourly.nyx_negative_probability_cpu import probability_metrics
 from chronos2_hourly.process_lock import exclusive_process_lock
 
@@ -282,7 +282,7 @@ def _predict_day(root: Path, output: Path, plan: dict, day: str, digest: str, bu
             and folder.resolve().is_relative_to(output.resolve()),
             "Evaluation publication path escapes its output root")
         folder.parent.mkdir(parents=True, exist_ok=True)
-        attempt.rename(folder)
+        promote_directory_retry(attempt, folder)
 
 
 def predict_plan(*, root: Path, output: Path, max_days: int | None = None) -> dict:

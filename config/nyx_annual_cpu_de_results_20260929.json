@@ -1,0 +1,286 @@
+{
+  "identity": "nyx_de_cpu_annual_results_20260929_v1",
+  "country": "DE",
+  "replay_date": "2026-09-29",
+  "composition": "boosting_mean_disagreement20",
+  "first_delivery_day": "2025-09-24",
+  "last_delivery_day": "2026-09-23",
+  "price_fits": 106,
+  "negative_fits": 53,
+  "frozen_legacy_baseline_and_reference": true,
+  "negative_replay_verified": true,
+  "retrospective_evaluation": true,
+  "independent_validation": false,
+  "full_input_chain_qualified": false,
+  "qualified": false,
+  "historical_publication_vintages_certified": false,
+  "performance_exception_authorized": true,
+  "replay_receipts_sha256": {
+    "price": "133ad3807ad103ce0c13831575ad42419a25c37d6619dec8612a0ac1f98d9bad",
+    "negative": "dca0b478a92c62e0c849cbb6293136840cd528b8a410ade94a9aa314b800464b"
+  },
+  "output_sha256": {
+    "price": "e0fd4e68b9a365e2367e66779cf002580a74bc98f59067a49f425dd9d3fe4009",
+    "negative": "88c4f8ef863afce7690ec9c1fefa0faf7b2b9008f1c1c05eaa729bd610211545"
+  },
+  "price": {
+    "hours": 8759,
+    "storm_common_hours": 8759,
+    "strict_wins": 4775,
+    "strict_win_rate": 0.5451535563420482,
+    "rmse": 21.23112573005414,
+    "storm_rmse": 20.306583759838535,
+    "both_criteria_met": false
+  },
+  "negative": {
+    "hours": 8760,
+    "negative_hours": 517,
+    "brier": 0.013845741445702215,
+    "log_loss": 0.045196609023703455,
+    "average_precision": 0.9149763463948614,
+    "threshold": 0.5,
+    "true_positive": 426,
+    "false_positive": 80,
+    "false_negative": 91,
+    "true_negative": 8163,
+    "precision": 0.841897233201581,
+    "recall": 0.8239845261121856
+  },
+  "runtime_versions": {
+    "python": "3.11.15",
+    "catboost": "1.2.10",
+    "numpy": "2.4.6",
+    "pandas": "2.3.3"
+  },
+  "price_fit_seconds_total": 4687.036999999895,
+  "original_cpu_prediction_hashes_matched": {
+    "cwe_residual_2000": 53,
+    "cwe_absolute_2000": 53
+  },
+  "evidence": {
+    "role_manifests": {
+      "cwe_residual_2000": {
+        "manifest_sha256": "faa20a0be9fc80bdf3d95abd325bfaefd49acfe26f9af92847d823b30b32ad39",
+        "features": {
+          "FR": {
+            "path": "runs\\experiments\\nyx_improvement_to20260923\\feature_sets\\pooled_jao_refresh_v1\\compact\\features_FR.parquet",
+            "sha256": "d7aeae6af1e0e9e017a1f9fb92de49787541451963538fbfdf4cb6c9a573a347",
+            "hours": 17880,
+            "columns": 123
+          },
+          "DE": {
+            "path": "runs\\experiments\\nyx_improvement_to20260923\\feature_sets\\pooled_jao_refresh_v1\\compact\\features_DE.parquet",
+            "sha256": "0c33c75b19fc0f73cc85c90011d35b60ff10bedf6b03429426d393b17c4230c7",
+            "hours": 17880,
+            "columns": 123
+          },
+          "BE": {
+            "path": "runs\\experiments\\nyx_improvement_to20260923\\feature_sets\\pooled_jao_refresh_v1\\compact\\features_BE.parquet",
+            "sha256": "c9f5be47190d95e096e1dd22ce59b8e62bf98563a3d4285b8228d18434da44be",
+            "hours": 17880,
+            "columns": 123
+          },
+          "NL": {
+            "path": "runs\\experiments\\nyx_improvement_to20260923\\feature_sets\\pooled_jao_refresh_v1\\compact\\features_NL.parquet",
+            "sha256": "c8ddfed989652f07b06d833e79cbd3cc87e2e0b597791dce36183d19581e0eac",
+            "hours": 17880,
+            "columns": 123
+          }
+        },
+        "baselines": {
+          "FR": {
+            "path": "runs\\experiments\\nyx_local_365_to20260923\\baseline\\FR.parquet",
+            "sha256": "798be38aa3a7528083db934b7876d8b4136b7f83bc30fb668b1acb182b8506e8",
+            "hours": 17880
+          },
+          "DE": {
+            "path": "runs\\experiments\\nyx_local_365_to20260923\\baseline\\DE.parquet",
+            "sha256": "5590ff03cce0cc17472fb7a247a2e25974e850ec81f35efd1cff30553f520783",
+            "hours": 17880
+          },
+          "BE": {
+            "path": "runs\\experiments\\nyx_local_365_to20260923\\baseline\\BE.parquet",
+            "sha256": "5d9b2f5530461b360056ee125b9fc4058612117fd50a4571b14840a789c3cf7a",
+            "hours": 17880
+          },
+          "NL": {
+            "path": "runs\\experiments\\nyx_local_365_to20260923\\baseline\\NL.parquet",
+            "sha256": "2283bca8edfe88ad377b0f9c308321a1eb7e365e55d1b5905d228ebdb80504e4",
+            "hours": 17880
+          }
+        },
+        "model_code_sha256": "58a13eebcdeae47b209782978c767e0bdfd55e916d663f78ab89fc691859f082",
+        "runner_code_sha256": "c682755e9a6d92fdc67a2cec73d616d275bb7db3cbcbfd52323995b6d9b0a788"
+      },
+      "cwe_absolute_2000": {
+        "manifest_sha256": "0483ae326432eb7d2ee19ee7ad2f36feee78965fce4844f4ab6563dfc9d56b85",
+        "features": {
+          "FR": {
+            "path": "runs\\experiments\\nyx_improvement_to20260923\\feature_sets\\pooled_jao_refresh_v1\\features_FR.parquet",
+            "sha256": "5dd85914d881683075e84a8f0f1427c647346f770bb74a2fecbe63b931dd0a5a",
+            "hours": 17880,
+            "columns": 503
+          },
+          "DE": {
+            "path": "runs\\experiments\\nyx_improvement_to20260923\\feature_sets\\pooled_jao_refresh_v1\\features_DE.parquet",
+            "sha256": "067c4c419cbbb866268bca333b490e14428c003b63a3f4b675da92c4cecf1102",
+            "hours": 17880,
+            "columns": 503
+          },
+          "BE": {
+            "path": "runs\\experiments\\nyx_improvement_to20260923\\feature_sets\\pooled_jao_refresh_v1\\features_BE.parquet",
+            "sha256": "c8f98dcfca6817cc537758e6eb6769c3d6fc6ee360bb9e75d0c4455aa5d1c07f",
+            "hours": 17880,
+            "columns": 503
+          },
+          "NL": {
+            "path": "runs\\experiments\\nyx_improvement_to20260923\\feature_sets\\pooled_jao_refresh_v1\\features_NL.parquet",
+            "sha256": "88d9b4dd30157f59c3eb941014c557e4e3973d745b347fa5b32bb1740a951dc5",
+            "hours": 17880,
+            "columns": 503
+          }
+        },
+        "baselines": {
+          "FR": {
+            "path": "runs\\experiments\\nyx_local_365_to20260923\\baseline\\FR.parquet",
+            "sha256": "798be38aa3a7528083db934b7876d8b4136b7f83bc30fb668b1acb182b8506e8",
+            "hours": 17880
+          },
+          "DE": {
+            "path": "runs\\experiments\\nyx_local_365_to20260923\\baseline\\DE.parquet",
+            "sha256": "5590ff03cce0cc17472fb7a247a2e25974e850ec81f35efd1cff30553f520783",
+            "hours": 17880
+          },
+          "BE": {
+            "path": "runs\\experiments\\nyx_local_365_to20260923\\baseline\\BE.parquet",
+            "sha256": "5d9b2f5530461b360056ee125b9fc4058612117fd50a4571b14840a789c3cf7a",
+            "hours": 17880
+          },
+          "NL": {
+            "path": "runs\\experiments\\nyx_local_365_to20260923\\baseline\\NL.parquet",
+            "sha256": "2283bca8edfe88ad377b0f9c308321a1eb7e365e55d1b5905d228ebdb80504e4",
+            "hours": 17880
+          }
+        },
+        "model_code_sha256": "58a13eebcdeae47b209782978c767e0bdfd55e916d663f78ab89fc691859f082",
+        "runner_code_sha256": "c682755e9a6d92fdc67a2cec73d616d275bb7db3cbcbfd52323995b6d9b0a788"
+      }
+    },
+    "checkpoint_sha256": {
+      "cwe_residual_2000": {
+        "2025-09-24": "3796e5d76b1b73537fb758f94b0594470ca39bf1b5967dd374517e51a92b52b7",
+        "2025-10-01": "23035c3f064387c8704106799e9e0d0e279846344674a370332fa9ec3c83ace8",
+        "2025-10-08": "3d99c00cdb783ec87e53240680baf7fa1abf69c939e79f008d4003d12f7dd529",
+        "2025-10-15": "b0310a089fe82ac6ff8d57a0054a531927e6f303a0b97b88a29688a2e58e0670",
+        "2025-10-22": "8beaadcdd4390024882e57e32097058f3074b79585a1148a0bee7abfc668b30a",
+        "2025-10-29": "f2fd69f733c1a49d1169e788971294919565de601327d8db9a0a0973c16a5cf2",
+        "2025-11-05": "ccbe22abfde28a9b8ca2b476755de76d000ee1ce877e628dd826479ac19b0982",
+        "2025-11-12": "734cf0d5ea90af30177c1a404f258b802d378faf0e83e9abc5e73e060952793f",
+        "2025-11-19": "904b05c8d3f9471decf26719d65bb7b86cd6bf71046c8292f0f18b9ee701f1d8",
+        "2025-11-26": "47dc9b52353fbb3bed3468942c371608a0701cc26870ced03febb511ba2b4617",
+        "2025-12-03": "72718c0a50074dd171cbd44536abf6bcf549a562596eee6a4f241b29a5baacc3",
+        "2025-12-10": "ef5bd1ddbd2c9300528a32015b33adcdb5983cb6237e1cd16dab4995e448d4b6",
+        "2025-12-17": "99b9cb95909ff3bc9c2570be631d32b9d391807cce825791475869f405d03f54",
+        "2025-12-24": "815d038172158214eabfbfe263a07d4d489cf1df2e3ebe6b731e9ec05db09342",
+        "2025-12-31": "d23f158933e5d4a50ffde8b654c0366f75cb43404361b5de78f477cf89c048b7",
+        "2026-01-07": "beeb166020aebd99d3df3587a48f7ff9beea14f37b559b0555bbae99d0dd54bc",
+        "2026-01-14": "31fafd75bb19a3299960d60c469c114768493dfd3cb37d9702e07919b7ef3d69",
+        "2026-01-21": "5bcc0a9837af918bfabb760c26a53e083938eb35c01f8a76019a3055b2e40c40",
+        "2026-01-28": "ed2de5d882dc7fc8f90ba01de51e919fa45cccbf82b3d5306befcfeb15f4fbae",
+        "2026-02-04": "8decef9b510ee32b1e47266dd8cc747edf80f51d21439ee962ed33ddb7b0d0d3",
+        "2026-02-11": "8f853e67bb847cd0cd4c50229a72726b79aa294d506fa77a1e1f854353818041",
+        "2026-02-18": "bad1153543662399847712ef50fa83d16c4bd3c6c693a462f85ab623de4e7ee9",
+        "2026-02-25": "6263fb4eab1b98cd207e344ea7da81f2608f41aec5959bf473b1a740e604ea52",
+        "2026-03-04": "a21eabb586d385913d71fefd0f24c9eb6521f05f96d83e6370c31608dc47f1b1",
+        "2026-03-11": "c5d886f2cb0ce69e52e6746c514ed60b9e2ad4f88d58e0bdf8e97d887563c622",
+        "2026-03-18": "960635b3312a177b02d400d265ee915918c76ffd0597010b88a3dc507c66f235",
+        "2026-03-25": "fe331578c115536de6da3903fe60e3ac45ac0a8644e63c1b2cbe92a650964c2b",
+        "2026-04-01": "a970034ba204665c2bb2eff58926ae543410323d21e175443f946dc6edf75a61",
+        "2026-04-08": "704dc12328f78fb4b8755248ac5174723c6fa06ff4cbc1b647053194a7e3f4ac",
+        "2026-04-15": "cfc8c9c90efef04de8fd80ef0012748e2aab3f7189044ae00900121881803c99",
+        "2026-04-22": "6830ad5f199d23a2fced8e0cf877c2518817a7d3b967da769790390b83ad312d",
+        "2026-04-29": "0f82f833bece35848ea0c3cce5198fe39610a03ff2c6ad3bfd0d1c62ca03d7b3",
+        "2026-05-06": "64cf82232b37d7f7c9bade644eccc016090606309bee020f5d879bd4e57e97a7",
+        "2026-05-13": "eab3729483f2ac39fb97bf3db012c43b5a203b1c706dadb549f4b6509159d536",
+        "2026-05-20": "407d265d853e7b941789c6a6fdf21857e7badc733f6aaafd356c89f6fb696d18",
+        "2026-05-27": "cf075212a2079c24c4f4983d0c91d3fd360f6b0cbeb88588bfe3011d4bd8edf4",
+        "2026-06-03": "e6b7e7ae8f6e46fc51e9227b1e58dd34be27d290379f30e9849f7f833b167b18",
+        "2026-06-10": "8354bff0c2ab0879d2ed1a7336edeef244c2bdfb090c1f5fc1232a674b165fde",
+        "2026-06-17": "f6ffd23f6dcfca9dc9d65cfa32a1933a01d108b41929a1302c5ca6b02f4c2f6c",
+        "2026-06-24": "06aa666724a5e0793b3db454c6b792489ede576ac041d6c0272867b1be3ea5be",
+        "2026-07-01": "fd97e33ab7921de4667d2c254424520834f74a42054e94a1ea1d047e70d655ff",
+        "2026-07-08": "49b3c1735fc229bba697fe0462064d6c52953a7c90b62a943f8e16017174a4e6",
+        "2026-07-15": "febb68937d596c5fe469134678eb559241a3d7f8fcf1f850179f5906b5f21908",
+        "2026-07-22": "48984d13e465e107fa57bce991217f7d626fbcab5ee01f58c7a1c42f4576bc55",
+        "2026-07-29": "02a90eb6e0dc69c46cdf311fdbddf93b7f6c3669fd856934ced600b1fc08880a",
+        "2026-08-05": "5bea5751641fb9df83ba2c33cad5cd1bbcdc67b9ad63446993598cb6fc1d4371",
+        "2026-08-12": "b1130fbe43326e8961b29002a49154371c205596137161324d7ea6db16c59068",
+        "2026-08-19": "e6cef3688a33375fdff860401a132ff2c6b52fc7407998896a869b50ff9e5c76",
+        "2026-08-26": "d2b0cfa040b1c0af8b3947e80f6f90afa54525e075b833011f39331a4c274ab8",
+        "2026-09-02": "38379e21c6cf17cda9c269d81267fedc5d76e23c7dcc8c01db05c4ef2f6bfa0a",
+        "2026-09-09": "af6dbed3b335995af24b206f6aeada43409a83fdaf05127ab10458ed7a038e58",
+        "2026-09-16": "a2e0df569a6c146c7e393a45ffee0aabdfb7193b0ed71c3e0113da11e4aa16de",
+        "2026-09-23": "bf5b62be4e960a742a55cdc625303db17362e06ae8d37bd3c562f82960597509"
+      },
+      "cwe_absolute_2000": {
+        "2025-09-24": "fd27bacce1ce7666cda0d1b7df3bcde886ea552cc2890af31aea459d84eab419",
+        "2025-10-01": "3c49db240568736097dac031587778458f5edd76a77a5da4db9ffc61e2d663a3",
+        "2025-10-08": "f32ad5f6c96f7f082713e4cfb18829faeeeea79be69543a8d7812419064bf2ff",
+        "2025-10-15": "aa49240e147d79f52c46a84df81279d78f38a9622048e8a533991ef002f6012b",
+        "2025-10-22": "fa35afbd722ff91993883adf400951b43a26d97e686aa4d276df39644b206a38",
+        "2025-10-29": "d17f1cccbab3b607f18573493af39ddd7102d0f526f44757de07aec7d6e9e761",
+        "2025-11-05": "400678269495d90dff6b2fd57abefaeec0d1342fb2e356e9df47dc3a023a0460",
+        "2025-11-12": "3d06b72c574951143a4f6c9547554988fcfc895da5e552e7900f4f612ce40355",
+        "2025-11-19": "b5802c04dbf635807410b5c51ca46be07d5f4cf44727c4ddd5f83b470da4dcd2",
+        "2025-11-26": "8b994c653a7be90b0da8267adb632d3e5121a5dee5477708e19628358f16c134",
+        "2025-12-03": "ea30774e3a74f9084a741c3090b67e7683b036ae320ec3a77340c32243448308",
+        "2025-12-10": "9961caf80746d8fd73c57387a1df40a0679700943edd9f02b6629cd96010498e",
+        "2025-12-17": "9be081a97048b11990f01d188bd43717ab7d71236d7c78ba4f30520c216b1b6c",
+        "2025-12-24": "f22f4536d8f8774b10272c0a74f2c93a524f415639f1a11521b31c28b3ae1c20",
+        "2025-12-31": "4d3247157584854d451fe6eaf90055b2dcc480a285aa865e6bb81befab9c0acf",
+        "2026-01-07": "19f2f08a1e163ba20710bafa50673f11d42bce5116e80607b19ff1c25014229a",
+        "2026-01-14": "92b347f05673ac8fe4036f9daeed2db8c8a6691c697aa2d796bded1504c386d3",
+        "2026-01-21": "14200b736a150dd639923adf64a93d77afa08b54683915dc3894062e27710c6e",
+        "2026-01-28": "8c71e389047d5d6b63d293aeaa8718cd34e827ddf7583d75532d00f336ab053a",
+        "2026-02-04": "d6abdfb08643e000f4d4e80d11ddf0bb8a38373cf5b81d6760d515f95e10ba93",
+        "2026-02-11": "2891b64e9482252176d27326185e0b609c000c62dad07ddd9e0dac25d3f6de17",
+        "2026-02-18": "fbe9c6e64407e9243c01dca79384d15640e8e716cf43ff4793959911e8133f09",
+        "2026-02-25": "89701baaa91b0d7c6b2f6253e2f008a06473dda38713c27053f520d4dde362a5",
+        "2026-03-04": "65a66df72f85c116c0aaf5e0329f69162aae89fa18abee811ef3bba6207847a6",
+        "2026-03-11": "0a6627d5c0107ef9053f955fdeb64f9160281d14724b35436b0e6555ad662459",
+        "2026-03-18": "89e4ef75713e1446e8629067937b905021ef9d3abfc9d59660c17ee81c9833c9",
+        "2026-03-25": "40cc041b062493c220d77a80883189cbfe4b86e9e524fa1c89559f37d4a49acd",
+        "2026-04-01": "6be56f3d0e01cf688b98aeaf629db86661be56e45a777ea914f1d3761ea53aae",
+        "2026-04-08": "21554f6dc176f89e2009dc713a970f5f639be505b92d9820af6d3127c2881906",
+        "2026-04-15": "604db53e4353ce8d29d55a377b1eba57c58d15a40c254ad509132910710082ee",
+        "2026-04-22": "dabb67b635f4c633a32bd2afab1afbcdfdcb0e77e74b7ffddd9872d11c9bf754",
+        "2026-04-29": "2464678eec773655e2f214a612f2be304202bc59a2dc09349c8c1a5d297f4553",
+        "2026-05-06": "d1be9625ba959d810f7a0b0f0addd0f26f82b0ae704e2d5c53bc1152bb3aa0ee",
+        "2026-05-13": "b8e8dc53b8cdca551bbbbf0f0ee11a448f1f368985dd3e3e10d14c2904b9fcc8",
+        "2026-05-20": "81d9c928feb373633a46d505d149a44d8d5c45a54c0f4b3d7a18fe40bef73186",
+        "2026-05-27": "a81d6a3ded18b0cc7d708b3cee69beac1783b8dcabf905eaae1f0cc0e8b3e16f",
+        "2026-06-03": "798f8f5e588e91c3bec1a987c6405db81972e424c91241bed848738cb7589daa",
+        "2026-06-10": "d87f1d2da0ec3ddf0f997d0aa486955c8d9af6f4fb8a70bdd6181109ee9e5957",
+        "2026-06-17": "11436d51dafc59b8ddc8621bb9666a208f2e70e91d60a04b3e4413ca807b8721",
+        "2026-06-24": "237c7e31ec840155fa45737222bf96f8df908538174a7f6724466976e13732f2",
+        "2026-07-01": "94a09e1fbe6cb5a2f5f3d91eb0d605e75c5bd71e60bc1130ccb4d00b588b2a29",
+        "2026-07-08": "e427eff67db17e837e725ff4a5fc17127a860f02858e14d4308e7271e6b92177",
+        "2026-07-15": "fbbf440e7b0711834e08be80a39a7f68507c5801532815aefaddb5764198d1be",
+        "2026-07-22": "1bb06cc1e0a360b05049708177f010cacf1435fefa00e7d30edb333b363d6478",
+        "2026-07-29": "dbe72d6dad92f20a5af8720f8cd4e4c97ca80ba9f490123c2877f404117a7a12",
+        "2026-08-05": "d5490af5695f8b2f502cbf7b60409a48203a32e61f56d6e7508febaa3cbf533c",
+        "2026-08-12": "5a2a8db2f0af425aef72eebbfb8229c2e07e301f62cfbf246772a8ddc5ca1d05",
+        "2026-08-19": "0687a7b390e304cb43b6acca17fabc65b3fe7730e2953470a838c37816074abf",
+        "2026-08-26": "b2892cb40b39814b5116c6c8d823d1597772f24dce7dfc5010050c0d84b1cef5",
+        "2026-09-02": "6484440ae29690039f76e193204d64adc569605109c4278cc42f5739316d8797",
+        "2026-09-09": "9442d38f3116b1d2afd2f2c239f23e5b82bae164548e629280e3c2fe157fb5f3",
+        "2026-09-16": "f18fa371aa8d36874d4c79050491e339452648b658458f7720b77abbbeba0729",
+        "2026-09-23": "75570616005656568cfd4d48fa29c2f66260e06795d6eb8a6e012653559e674d"
+      }
+    },
+    "reference_sha256": "76bfa6875e019a206fa9b21a2251c8d24b8669e774d8f2065ed1b77711b05bb5",
+    "comparison_sha256": "0d2bb2bb1c658aac1bad792ff47fd3462fde45cca720c4865f662c040e041f4c",
+    "negative_replay_config_sha256": "0c49ee7dbfd2261c1aaaa82ca5465b835858ae817d386c6eaa9a14082a72948c"
+  },
+  "scope": "Conditional replay on frozen historical baseline, features and reference; this is not the new full-chain production qualification."
+}

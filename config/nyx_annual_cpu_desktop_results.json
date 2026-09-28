@@ -18,5 +18,9 @@
       "precision": 0.786697247706422,
       "recall": 0.7903225806451613
     }
+  },
+  "de_cpu_results": {
+    "path": "config/nyx_annual_cpu_de_results_20260929.json",
+    "sha256": "15747cfd93b8c974623daf7ecbba40cbee4a27f1456ff3dd268a7e4c273531db"
   }
 }

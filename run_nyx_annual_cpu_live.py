@@ -19,7 +19,7 @@ from chronos2_hourly.nyx_annual_cpu_live import (
 from chronos2_hourly.nyx_annual_live_preflight import inspect_bundle, sha256
 from chronos2_hourly.nyx_annual_cpu_reporting import write_country_report
 from chronos2_hourly.process_lock import exclusive_process_lock
-from chronos2_hourly.nyx_local_io import replace_retry
+from chronos2_hourly.nyx_local_io import promote_directory_retry, replace_retry
 
 
 def _atomic_json(path: Path, value: dict) -> None:
@@ -132,7 +132,7 @@ def _run_attempt(*, bundle: Path, delivery_day: str, output: Path, plan: dict) -
         require(attempt.resolve().is_relative_to(output.parent)
                 and output.resolve().is_relative_to(output.parent),
                 "Forecast publication path escapes output parent")
-        attempt.rename(output)
+        promote_directory_retry(attempt, output)
         return receipt
     except BaseException as error:
         status("failed", "FAILED", error=f"{type(error).__name__}: {error}",

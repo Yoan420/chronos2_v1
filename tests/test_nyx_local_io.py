@@ -97,3 +97,39 @@ def test_other_io_failure_is_not_treated_as_transient(tmp_path, monkeypatch):
     with pytest.raises(OSError, match="disk failure"):
         io.publish_bytes(tmp_path / "status.json", b"new")
     assert not list(tmp_path.iterdir())
+
+
+def test_directory_promotion_retries_transient_locks_and_keeps_sealed_files(tmp_path, monkeypatch):
+    source, target = tmp_path / "attempt", tmp_path / "published"
+    source.mkdir()
+    (source / "model.cbm").write_bytes(b"sealed model")
+    original, calls = Path.rename, []
+    def rename(path, destination):
+        calls.append(path)
+        if len(calls) < 3:
+            assert (source / "model.cbm").read_bytes() == b"sealed model"
+            assert not target.exists()
+            raise PermissionError("transient folder sharing violation")
+        return original(path, destination)
+    monkeypatch.setattr(Path, "rename", rename)
+    monkeypatch.setattr(io.time, "sleep", lambda *_: None)
+    io.promote_directory_retry(source, target)
+    assert len(calls) == 3 and not source.exists()
+    assert (target / "model.cbm").read_bytes() == b"sealed model"
+
+
+def test_directory_promotion_never_overwrites_and_preserves_permanent_failure(tmp_path, monkeypatch):
+    source, target = tmp_path / "attempt", tmp_path / "published"
+    source.mkdir()
+    (source / "model.cbm").write_bytes(b"sealed model")
+    target.mkdir()
+    (target / "receipt.json").write_bytes(b"completed receipt")
+    with pytest.raises(FileExistsError, match="Publication already exists"):
+        io.promote_directory_retry(source, target)
+    assert (target / "receipt.json").read_bytes() == b"completed receipt"
+    def denied(*_):
+        raise PermissionError("permanent")
+    monkeypatch.setattr(Path, "rename", denied)
+    with pytest.raises(PermissionError, match="permanent"):
+        io.promote_directory_retry(source, tmp_path/"unused", timeout=0)
+    assert (source / "model.cbm").read_bytes() == b"sealed model"

@@ -24,6 +24,30 @@ def replace_retry(source, target, *, timeout=10.):
             delay = min(delay * 2, .25)
 
 
+def promote_directory_retry(source, target, *, timeout=10.):
+    """Publish a sealed directory, refusing existing destinations on every try.
+
+    Callers hold their publication lock and validate both workspace paths.
+    Windows rename itself also refuses a destination created concurrently.
+    """
+    source, target = Path(source), Path(target)
+    if not source.is_dir() or source.is_symlink():
+        raise ValueError("A real sealed source directory is required")
+    deadline, delay = time.monotonic() + timeout, .01
+    while True:
+        if os.path.lexists(target):
+            raise FileExistsError(f"Publication already exists: {target}")
+        try:
+            source.rename(target)
+            return
+        except PermissionError:
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise
+            time.sleep(min(delay, remaining))
+            delay = min(delay * 2, .25)
+
+
 def publish_bytes(path, value):
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
