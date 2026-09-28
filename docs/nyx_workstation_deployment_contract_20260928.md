@@ -25,6 +25,9 @@ Il ne produit pas les experts en entrée.
 Le détecteur de prix négatifs est un modèle CPU séparé. Il exige 123 variables
 compactes ordonnées, 365 jours de prix passés et la fenêtre de livraison.
 Il n'a actuellement ni collecte continue ni branchement dans la console NYX.
+Ses scores historiques Brier sur 8 760 heures par pays sont : FR 0,023431,
+DE 0,013846, BE 0,013766 et NL 0,014937. Ces scores concernent la
+probabilité, pas l'erreur de la prévision de prix.
 
 ## Entrées et tests nécessaires avant activation
 
@@ -58,5 +61,4 @@ supprimer ces archives locales : Git ne peut pas les restaurer.
 L'arbre de travail comporte également des modifications suivies et plusieurs
 centaines de fichiers non suivis d'autres travaux. Aucun `git clean` global ni
 suppression du code historique n'est sûr avant un inventaire des dépendances et
-une sauvegarde vérifiée. Le push demande une authentification GitHub absente
-sur cette machine.
+une sauvegarde vérifiée.
