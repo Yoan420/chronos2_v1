@@ -11,6 +11,7 @@ import os
 from pathlib import Path
 import socket
 import subprocess
+import tempfile
 import time
 from urllib.error import HTTPError, URLError
 from urllib.request import HTTPRedirectHandler, ProxyHandler, build_opener
@@ -24,6 +25,14 @@ class DesktopError(RuntimeError):
 
 class BackendBusy(DesktopError):
     """A bound service may still be warming up; never start a competing one."""
+
+
+class ForeignBackend(DesktopError):
+    """The port belongs to another checkout or an unrelated local service."""
+
+
+class BackendIdentityConflict(DesktopError):
+    """The same state is already served with a different interpreter."""
 
 
 class DesktopSettings:
@@ -52,7 +61,60 @@ class DesktopSettings:
 
 class _NoRedirect(HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
-        raise DesktopError('Une autre application répond à l’adresse locale de NYX.')
+        raise ForeignBackend('Une autre application répond à l’adresse locale de NYX.')
+
+
+def _set_port(settings, port):
+    settings.port = port
+    settings.url = f'http://127.0.0.1:{port}'
+
+
+def _saved_port(settings):
+    try:
+        data = json.loads((settings.state / 'desktop_port.json').read_text(encoding='utf-8'))
+        port = data.get('port')
+        if data.get('version') == 1 and type(port) is int and 1024 <= port <= 65535:
+            return port
+    except (OSError, ValueError, TypeError, AttributeError):
+        pass
+    return None
+
+
+def _remember_port(settings):
+    """Save the selected port only after its backend answered with this identity."""
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile('w', encoding='utf-8', dir=settings.state,
+                                         prefix='.desktop_port.', suffix='.tmp', delete=False) as stream:
+            temporary = Path(stream.name)
+            json.dump({'version': 1, 'port': settings.port}, stream)
+            stream.write('\n')
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary, settings.state / 'desktop_port.json')
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
+
+
+def _free_loopback_port():
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as probe:
+        if os.name == 'nt':
+            probe.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
+        probe.bind(('127.0.0.1', 0))
+        return probe.getsockname()[1]
+
+
+def _state_backend_locked(settings):
+    """A server at an unknown port must still prevent a second queue owner."""
+    lock = FileLock(str(settings.state / 'backend.lock'))
+    try:
+        lock.acquire(timeout=0)
+    except Timeout:
+        return True
+    else:
+        lock.release()
+        return False
 
 
 def _port_available(settings):
@@ -76,10 +138,10 @@ def backend_ready(settings, timeout=2.0):
         with opener.open(settings.url + '/api/bootstrap', timeout=timeout) as response:
             payload = response.read(1_000_001)
             if len(payload) > 1_000_000:
-                raise DesktopError('La réponse à l’adresse locale de NYX est inattendue.')
+                raise ForeignBackend('La réponse à l’adresse locale de NYX est inattendue.')
             data = json.loads(payload)
     except HTTPError as exc:
-        raise DesktopError(f'Le port {settings.port} est occupé par un service qui ne répond pas comme NYX.') from exc
+        raise ForeignBackend(f'Le port {settings.port} est occupé par un service qui ne répond pas comme NYX.') from exc
     except URLError as exc:
         reason = exc.reason
         if (isinstance(reason, (ConnectionRefusedError, TimeoutError)) or getattr(reason, 'errno', None) in {errno.ECONNREFUSED, 10061}) and _port_available(settings):
@@ -90,15 +152,18 @@ def backend_ready(settings, timeout=2.0):
             return False
         raise BackendBusy('Le service local met trop de temps à répondre. Patientez puis réessayez.') from exc
     except (ValueError, UnicodeError) as exc:
-        raise DesktopError('Une autre application utilise le port local de NYX.') from exc
+        raise ForeignBackend('Une autre application utilise le port local de NYX.') from exc
     if not isinstance(data, dict):
-        raise DesktopError('La réponse à l’adresse locale de NYX est inattendue.')
-    for key, expected in [('project_root', settings.root), ('state_root', settings.state), ('python_executable', settings.python)]:
+        raise ForeignBackend('La réponse à l’adresse locale de NYX est inattendue.')
+    def matches(key, expected):
         value = data.get(key)
-        if not isinstance(value, str) or Path(value).resolve() != expected.resolve():
-            raise DesktopError(f'Le port {settings.port} est déjà utilisé par une autre instance.\nFermez cette instance ou choisissez un autre port dans la configuration.')
+        return isinstance(value, str) and Path(value).resolve() == expected.resolve()
+    if not matches('project_root', settings.root) or not matches('state_root', settings.state):
+        raise ForeignBackend(f'Le port {settings.port} est déjà utilisé par une autre instance.')
+    if not matches('python_executable', settings.python):
+        raise BackendIdentityConflict('Cette console utilise déjà le même dossier de métadonnées avec un autre environnement Python. Fermez-la avant de relancer NYX.')
     if not isinstance(data.get('catalog'), list):
-        raise DesktopError('La réponse à l’adresse locale de NYX est inattendue.')
+        raise BackendIdentityConflict('La console ouverte sur ce dossier de métadonnées répond avec une identité incomplète.')
     return True
 
 
@@ -146,20 +211,90 @@ def ensure_backend(settings, startup_timeout=40.0):
         with FileLock(str(settings.state / 'desktop-launch.lock'), timeout=startup_timeout + 5):
             process = None
             deadline = time.monotonic() + startup_timeout
-            while time.monotonic() < deadline:
+            overall_deadline = deadline + startup_timeout
+            configured_port = settings.port
+            attempted = set()
+            busy_rounds = 0
+            while True:
+                if process is not None:
+                    try:
+                        if backend_ready(settings):
+                            _remember_port(settings)
+                            return True
+                    except BackendBusy:
+                        # The new server can bind before its bootstrap responds.
+                        pass
+                    except ForeignBackend:
+                        # Another process may have won the bind race. Wait for
+                        # our child to exit before considering another port.
+                        pass
+                    if process.poll() is not None:
+                        if _port_available(settings):
+                            raise DesktopError(f'NYX n’a pas pu démarrer.\nLe diagnostic est enregistré dans :\n{settings.state / "desktop_startup.log"}')
+                        process = None
+                        continue
+                    if time.monotonic() >= deadline:
+                        break
+                    time.sleep(0.25)
+                    continue
+
+                if time.monotonic() >= deadline:
+                    break
+
+                candidates = list(dict.fromkeys(port for port in (_saved_port(settings), configured_port) if port is not None))
+                free_ports = []
+                busy_ports = []
+                for port in candidates:
+                    _set_port(settings, port)
+                    try:
+                        ready = backend_ready(settings)
+                    except ForeignBackend:
+                        continue
+                    except BackendBusy:
+                        busy_ports.append(port)
+                        continue
+                    if ready:
+                        _remember_port(settings)
+                        return False
+                    free_ports.append(port)
+
+                # Manager's backend.lock protects the durable queue even when
+                # its listener is on a port we no longer know. Never compete
+                # with an existing owner of the same state directory.
+                if _state_backend_locked(settings):
+                    time.sleep(0.25)
+                    continue
+                if busy_ports and busy_rounds < 2:
+                    busy_rounds += 1
+                    time.sleep(0.25)
+                    continue
+                available = next((port for port in free_ports if port not in attempted), None)
+                if available is None:
+                    if len(attempted) >= 5:
+                        raise DesktopError('Plusieurs ports locaux ont été pris pendant le démarrage de NYX. Réessayez dans quelques instants.')
+                    available = _free_loopback_port()
+                    if available in attempted:
+                        continue
+                _set_port(settings, available)
                 try:
-                    if backend_ready(settings):
-                        return process is not None
+                    ready = backend_ready(settings)
+                except ForeignBackend:
+                    attempted.add(available)
+                    continue
                 except BackendBusy:
-                    # The socket can become bound between connect() and our
-                    # exclusive-bind probe. Wait for the same server to answer.
-                    pass
-                else:
-                    if process is None:
-                        process = start_backend(settings)
-                if process is not None and process.poll() is not None:
-                    raise DesktopError(f'NYX n’a pas pu démarrer.\nLe diagnostic est enregistré dans :\n{settings.state / "desktop_startup.log"}')
-                time.sleep(0.25)
+                    time.sleep(0.25)
+                    continue
+                if ready:
+                    _remember_port(settings)
+                    return False
+                if _state_backend_locked(settings):
+                    time.sleep(0.25)
+                    continue
+                attempted.add(available)
+                process = start_backend(settings)
+                deadline = min(overall_deadline, max(deadline, time.monotonic() + startup_timeout))
+                # Check an immediately failed child before the startup timeout
+                # expires; the next loop also catches a bind race promptly.
             # Do not kill an uncertain service: it may already own active runs.
             raise DesktopError('Le démarrage de NYX prend plus de temps que prévu.\nPatientez quelques instants, puis cliquez à nouveau sur l’icône.')
     except Timeout as exc:

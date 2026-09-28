@@ -242,15 +242,88 @@ def test_spawned_backend_survives_busy_socket_race_and_is_launched_only_once(con
     assert len(spawns) == 1
 
 
-def test_wrong_backend_identity_fails_immediately_without_busy_retry(configured, loopback_services, monkeypatch):
+@pytest.mark.parametrize("foreign_kind", ["another-checkout", "unrelated-service"])
+def test_foreign_service_on_configured_port_uses_a_separate_persisted_port(configured, loopback_services, monkeypatch, foreign_kind):
+    settings = configured.settings
+    other = loopback_services(settings)
+    if foreign_kind == "another-checkout":
+        other.payload["project_root"] = str(settings.root / "another checkout")
+    else:
+        other.response_status = 404
+    configured_port = other.server_port
+    spawns = []
+
+    def fake_child_spawn(command, **options):
+        spawns.append(command)
+        loopback_services(settings, port=settings.port)
+        return SimpleNamespace(poll=lambda: None)
+
+    monkeypatch.setattr(desktop.subprocess, "Popen", fake_child_spawn)
+    assert desktop.ensure_backend(settings, startup_timeout=3) is True
+    assert settings.port != configured_port
+    assert settings.url == f"http://127.0.0.1:{settings.port}"
+    assert spawns[0][-2:] == ["--port", str(settings.port)]
+    assert json.loads((settings.state / "desktop_port.json").read_text(encoding="utf-8"))["port"] == settings.port
+    assert other.requests and other.server_port == configured_port
+
+    # A fresh click starts with the configured port again, then uses the saved
+    # port and existing backend. The foreign service remains untouched.
+    again = desktop.DesktopSettings(configured.path)
+    again.port = configured_port
+    again.url = f"http://127.0.0.1:{configured_port}"
+    monkeypatch.setattr(desktop.subprocess, "Popen", lambda *args, **kwargs: pytest.fail("Existing backend must be reused"))
+    assert desktop.ensure_backend(again, startup_timeout=3) is False
+    assert again.port == settings.port
+    assert again.url == settings.url
+
+
+def test_same_checkout_state_with_different_python_refuses_second_backend(configured, loopback_services, monkeypatch):
     settings = configured.settings
     server = loopback_services(settings)
-    server.payload["state_root"] = str(settings.root / "different metadata")
-    monkeypatch.setattr(desktop.subprocess, "Popen", lambda *args, **kwargs: pytest.fail("Wrong app must not trigger another server"))
-    with pytest.raises(desktop.DesktopError, match="autre instance") as error:
+    server.payload["python_executable"] = str(settings.root / "another-python.exe")
+    monkeypatch.setattr(desktop.subprocess, "Popen", lambda *args, **kwargs: pytest.fail("Shared state must not get a second backend"))
+    with pytest.raises(desktop.BackendIdentityConflict, match="autre environnement Python"):
         desktop.ensure_backend(settings, startup_timeout=1)
-    assert not isinstance(error.value, desktop.BackendBusy)
     assert server.requests == ["/api/bootstrap"]
+
+
+def test_port_collision_after_probe_retries_without_stopping_other_service(configured, loopback_services, monkeypatch):
+    settings = configured.settings
+    use_free_port(settings)
+    configured_port = settings.port
+    spawns = []
+    taken = []
+
+    def fake_child_spawn(command, **options):
+        spawns.append(command)
+        server = loopback_services(settings, port=settings.port)
+        if len(spawns) == 1:
+            server.payload["project_root"] = str(settings.root / "racing checkout")
+            taken.append(server)
+            return SimpleNamespace(poll=lambda: 1)
+        return SimpleNamespace(poll=lambda: None)
+
+    monkeypatch.setattr(desktop.subprocess, "Popen", fake_child_spawn)
+    assert desktop.ensure_backend(settings, startup_timeout=3) is True
+    assert len(spawns) == 2
+    assert spawns[0][-1] == str(configured_port)
+    assert spawns[1][-1] == str(settings.port)
+    assert settings.port != configured_port
+    assert taken[0].requests
+    assert json.loads((settings.state / "desktop_port.json").read_text(encoding="utf-8"))["port"] == settings.port
+
+
+def test_unknown_port_with_same_state_lock_never_starts_second_queue(configured, monkeypatch):
+    settings = configured.settings
+    use_free_port(settings)
+    owner = Manager(settings.root, settings.state, settings.python,
+                    registry=SimpleNamespace(catalog=lambda: []), start_scheduler=False)
+    try:
+        monkeypatch.setattr(desktop.subprocess, "Popen", lambda *args, **kwargs: pytest.fail("Do not share a live queue"))
+        with pytest.raises(desktop.DesktopError, match="plus de temps"):
+            desktop.ensure_backend(settings, startup_timeout=.3)
+    finally:
+        owner.close()
 
 
 def test_concurrent_desktop_launches_start_exactly_one_server_with_structured_arguments(configured, loopback_services, monkeypatch):
