@@ -174,11 +174,11 @@ def validate_source_receipt(receipt: dict, *, group: str, day: str,
              and receipt.get("asof_cutoff_verified") is True
              and receipt.get("training_window_complete") is True,
              f"{group}: prospective source receipt incomplete")
-    stamps = receipt.get("latest_available_utc")
-    _require(isinstance(stamps, str), f"{group}: latest availability time required")
-    available = pd.Timestamp(stamps)
-    _require(available.tzinfo is not None and available.tz_convert("UTC") <= cutoff,
-             f"{group}: source availability exceeds D-1 08:00 cutoff")
+    stamps = receipt.get("asof_state_utc")
+    _require(isinstance(stamps, str), f"{group}: as-of state time required")
+    asof_state = pd.Timestamp(stamps)
+    _require(asof_state.tzinfo is not None and asof_state.tz_convert("UTC") <= cutoff,
+             f"{group}: as-of state exceeds D-1 08:00 cutoff")
     hashes = receipt.get("artifact_sha256")
     _require(isinstance(hashes, dict) and bool(hashes),
              f"{group}: bound source artifacts required")
@@ -250,4 +250,4 @@ def inspect_bundle(bundle: Path, delivery_day: str,
     return {"protocol": PROTOCOL, "delivery_day": delivery_day,
             "bundle": str(bundle), "input_bundle_valid": all(c["passed"] for c in checks),
             "checks": checks,
-            "scope": "Structural inputs only; no retraining, model score, or live rollout certification"}
+            "scope": "Structural inputs and collector as-of declarations only; provider publication times, retraining, model scores, and live rollout are not certified"}

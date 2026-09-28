@@ -101,7 +101,7 @@ def test_source_receipt_is_date_bound_and_hash_bound(tmp_path: Path):
     receipt = {"protocol": "nyx_annual_cpu_live_source_receipt_v1",
                "source_group": "saturn", "delivery_day": day, "state": "COMPLETE",
                "asof_cutoff_verified": True, "training_window_complete": True,
-               "latest_available_utc": cutoff.isoformat(),
+               "asof_state_utc": cutoff.isoformat(),
                "artifact_sha256": {"source.bin": hashlib.sha256(artifact.read_bytes()).hexdigest()}}
     validate_source_receipt(receipt, group="saturn", day=day, bundle=tmp_path, cutoff=cutoff)
     artifact.write_bytes(b"changed")
