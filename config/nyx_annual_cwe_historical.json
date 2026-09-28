@@ -1,0 +1,518 @@
+{
+  "schema_version": 1,
+  "identity": "nyx_annual_cwe_2026-09-23_historical_inspection_v1",
+  "origin_day": "2026-09-23",
+  "countries_order": [
+    "FR",
+    "DE",
+    "BE",
+    "NL"
+  ],
+  "forecast_enabled": false,
+  "historical_evaluation": {
+    "retrospective": true,
+    "independent_validation": false,
+    "regional_joint_goal_satisfied": false,
+    "publication_vintages_certified": false,
+    "source_checkpoints_are_historical_only": true
+  },
+  "architectures": {
+    "fr_residual_disagreement20": {
+      "model": "CatBoostRegressor",
+      "training_task_type": "GPU",
+      "iterations": 1000,
+      "depth": 7,
+      "learning_rate": 0.035,
+      "l2_leaf_reg": 10.0,
+      "seed": 20260925,
+      "target": "price_minus_nyx_q50",
+      "source_features_per_country": 449,
+      "formula": "residual expert if abs(expert - scarcity_confirmed_pair) >= 20 EUR/MWh, otherwise exact reference"
+    },
+    "boosting_mean_disagreement20": {
+      "models": [
+        "CatBoostRegressor residual",
+        "CatBoostRegressor absolute"
+      ],
+      "training_task_type": "GPU",
+      "iterations_per_model": 2000,
+      "depth": 7,
+      "learning_rate": 0.035,
+      "l2_leaf_reg": 10.0,
+      "seed": 20260925,
+      "residual_features_per_country": 123,
+      "absolute_features_per_country": 503,
+      "formula": "mean = float64(residual_point + absolute_point)/2; mean if abs(mean - scarcity_confirmed_pair) >= 20 EUR/MWh, otherwise exact reference"
+    },
+    "boosting_mean_all": {
+      "models": [
+        "CatBoostRegressor residual",
+        "CatBoostRegressor absolute"
+      ],
+      "training_task_type": "GPU",
+      "iterations_per_model": 2000,
+      "depth": 7,
+      "learning_rate": 0.035,
+      "l2_leaf_reg": 10.0,
+      "seed": 20260925,
+      "residual_features_per_country": 123,
+      "absolute_features_per_country": 503,
+      "formula": "float64(residual_point + absolute_point)/2 for every hour"
+    },
+    "negative_probability": {
+      "model": "CatBoostClassifier",
+      "training_task_type": "CPU",
+      "iterations": 120,
+      "depth": 4,
+      "learning_rate": 0.05,
+      "l2_leaf_reg": 3.0,
+      "seed": 20260927,
+      "loss_function": "Logloss",
+      "source_features_per_country": 123,
+      "training_civil_days": 365,
+      "classifier_days": 337,
+      "calibration_days": 28,
+      "calibration": "Platt C=1 lbfgs max_iter=1000",
+      "event": "actual_hourly_price < 0",
+      "alert_threshold": 0.5
+    }
+  },
+  "evidence": {
+    "session_summary": {
+      "path": "runs/experiments/nyx_improvement_to20260923/two_attempts_20260927/session_summary.json",
+      "sha256": "f146530b9aff455f58355e97d463b51053fc0e0bcb8356a8c85a0dc330f158b8"
+    },
+    "session_manifest": {
+      "path": "runs/experiments/nyx_improvement_to20260923/two_attempts_20260927/session_summary_manifest.json",
+      "sha256": "d0517f00e61a0c76cd6ec4ffc3cf568463a6b1c09ac2f25e646ddaa107698ee4"
+    },
+    "price_qa": {
+      "path": "runs/experiments/nyx_improvement_to20260923/two_attempts_20260927/prices/kpi/qa/receipt.json",
+      "sha256": "1682bbf83c85fa7f92a158b2c04a67537c3263955c82c9700cb3be1b716f4703"
+    },
+    "negative_qa": {
+      "path": "runs/experiments/nyx_improvement_to20260923/two_attempts_20260927/negative_prices/qa/receipt.json",
+      "sha256": "24a69b8bad9f520a4645617812c2fa40725c4f7b7f503279f130f44a105674dc"
+    },
+    "fr_composition_plan": {
+      "path": "runs/experiments/nyx_improvement_to20260923/rmse_pooled_composition_v1/plan.json",
+      "sha256": "ef3f909951f6121033748b4163b7bf46feec83bee1e65b5dc7820fecfca5cec7"
+    },
+    "boosting_composition_plan": {
+      "path": "runs/experiments/nyx_improvement_to20260923/rmse_boosting_2000_composition_v1/plan.json",
+      "sha256": "bf7202d000aa2864ad8a0b71faf504b1f291e130161945fc4fbafa6849a47164"
+    },
+    "pooled_model_plan": {
+      "path": "runs/experiments/nyx_improvement_to20260923/rmse_pooled_gpu_v1/plan.json",
+      "sha256": "c548cc6069724349d6ed1b6cb4d2bfc6c6fd567709acec62e415f64ca4fce7f1"
+    },
+    "boosting_model_plan": {
+      "path": "runs/experiments/nyx_improvement_to20260923/rmse_boosting_2000_gpu_v1/plan.json",
+      "sha256": "5b5d94ae39e9386b665797054d3a052c05d84e1e85eb653a57edd53c1af36357"
+    },
+    "negative_model_plan": {
+      "path": "runs/experiments/nyx_improvement_to20260923/negative_prices_v1/plan.json",
+      "sha256": "4a523ea2d20f02bd8dc889d6b3a57ea2ae1ae1c450399a51c12ac3b96388d804"
+    },
+    "negative_model_receipt": {
+      "path": "runs/experiments/nyx_improvement_to20260923/negative_prices_v1/receipt.json",
+      "sha256": "72d0f147b09f5b7c6945efce4878483a95c0cd80b5c63a5c0504d97d623362fe"
+    }
+  },
+  "source_feature_matrices": {
+    "pooled_FR": {
+      "path": "runs/experiments/nyx_improvement_to20260923/feature_sets/pooled_fundamentals_v1/features_FR.parquet",
+      "sha256": "03dd79794d70355a6e2ac68ca8453991e2e2a09affb68785b9caef29bb7b5757",
+      "columns": 449
+    },
+    "compact_FR": {
+      "path": "runs/experiments/nyx_improvement_to20260923/feature_sets/pooled_jao_refresh_v1/compact/features_FR.parquet",
+      "sha256": "d7aeae6af1e0e9e017a1f9fb92de49787541451963538fbfdf4cb6c9a573a347",
+      "columns": 123
+    },
+    "full_FR": {
+      "path": "runs/experiments/nyx_improvement_to20260923/feature_sets/pooled_jao_refresh_v1/features_FR.parquet",
+      "sha256": "5dd85914d881683075e84a8f0f1427c647346f770bb74a2fecbe63b931dd0a5a",
+      "columns": 503
+    },
+    "pooled_DE": {
+      "path": "runs/experiments/nyx_improvement_to20260923/feature_sets/pooled_fundamentals_v1/features_DE.parquet",
+      "sha256": "d628dbb0262ae7a1a1ff1ba12cc9c55a11c59027a35c12f4fec6cce3acc28f8d",
+      "columns": 449
+    },
+    "compact_DE": {
+      "path": "runs/experiments/nyx_improvement_to20260923/feature_sets/pooled_jao_refresh_v1/compact/features_DE.parquet",
+      "sha256": "0c33c75b19fc0f73cc85c90011d35b60ff10bedf6b03429426d393b17c4230c7",
+      "columns": 123
+    },
+    "full_DE": {
+      "path": "runs/experiments/nyx_improvement_to20260923/feature_sets/pooled_jao_refresh_v1/features_DE.parquet",
+      "sha256": "067c4c419cbbb866268bca333b490e14428c003b63a3f4b675da92c4cecf1102",
+      "columns": 503
+    },
+    "pooled_BE": {
+      "path": "runs/experiments/nyx_improvement_to20260923/feature_sets/pooled_fundamentals_v1/features_BE.parquet",
+      "sha256": "63663e72b948dfa36f029c88bb7e91b6f5a1d08b0b7416adb354258fa13e8a10",
+      "columns": 449
+    },
+    "compact_BE": {
+      "path": "runs/experiments/nyx_improvement_to20260923/feature_sets/pooled_jao_refresh_v1/compact/features_BE.parquet",
+      "sha256": "c9f5be47190d95e096e1dd22ce59b8e62bf98563a3d4285b8228d18434da44be",
+      "columns": 123
+    },
+    "full_BE": {
+      "path": "runs/experiments/nyx_improvement_to20260923/feature_sets/pooled_jao_refresh_v1/features_BE.parquet",
+      "sha256": "c8f98dcfca6817cc537758e6eb6769c3d6fc6ee360bb9e75d0c4455aa5d1c07f",
+      "columns": 503
+    },
+    "pooled_NL": {
+      "path": "runs/experiments/nyx_improvement_to20260923/feature_sets/pooled_fundamentals_v1/features_NL.parquet",
+      "sha256": "1767dab303240c39104d791ec51e29f1ca7b7ddddae69e6a14e42aefc135e051",
+      "columns": 449
+    },
+    "compact_NL": {
+      "path": "runs/experiments/nyx_improvement_to20260923/feature_sets/pooled_jao_refresh_v1/compact/features_NL.parquet",
+      "sha256": "c8ddfed989652f07b06d833e79cbd3cc87e2e0b597791dce36183d19581e0eac",
+      "columns": 123
+    },
+    "full_NL": {
+      "path": "runs/experiments/nyx_improvement_to20260923/feature_sets/pooled_jao_refresh_v1/features_NL.parquet",
+      "sha256": "88d9b4dd30157f59c3eb941014c557e4e3973d745b347fa5b32bb1740a951dc5",
+      "columns": 503
+    }
+  },
+  "historical_references": {
+    "FR": {
+      "path": "runs/experiments/nyx_improvement_to20260923/test2_confirmed_gate_v2/annual/FR.parquet",
+      "sha256": "3ec43939facf0b2e3ac27856cbdc361515ffcfedd4ab147dbf9604d8f74bded2",
+      "column": "scarcity_confirmed_pair",
+      "source_family": "test2_confirmed_gate_v2"
+    },
+    "DE": {
+      "path": "runs/experiments/nyx_improvement_to20260923/rmse_exchange_composition_v1/annual/DE.parquet",
+      "sha256": "5aad9755e0bb28b88109ed88630b411d41b60d127832b5844dba38696f2b1258",
+      "column": "scarcity_confirmed_pair",
+      "source_family": "rmse_exchange_composition_v1"
+    },
+    "BE": {
+      "path": "runs/experiments/nyx_improvement_to20260923/rmse_exchange_composition_v1/annual/BE.parquet",
+      "sha256": "fb2aa0cc5d358092738843b8a6cec7a5a16dfc94065fc0564311fa9270277e7b",
+      "column": "scarcity_confirmed_pair",
+      "source_family": "rmse_exchange_composition_v1"
+    },
+    "NL": {
+      "path": "runs/experiments/nyx_improvement_to20260923/rmse_exchange_composition_v1/annual/NL.parquet",
+      "sha256": "2075a5069557a30b25a1f1bf52a36d4f3a5307faaa7afa478775dbd4b0b44bb7",
+      "column": "scarcity_confirmed_pair",
+      "source_family": "rmse_exchange_composition_v1"
+    }
+  },
+  "checkpoints": {
+    "pooled_residual": {
+      "receipt": {
+        "path": "runs/experiments/nyx_improvement_to20260923/rmse_pooled_gpu_v1/residual/checkpoints/2026-09-23/receipt.json",
+        "sha256": "24af26910d2d73338f3a9759f68b935d548f7fc74e425fa8255f02ed200ba8b2"
+      },
+      "attempt_directory": "attempt-6dda685eff214acfbf409461c084fc4e",
+      "model": {
+        "path": "runs/experiments/nyx_improvement_to20260923/rmse_pooled_gpu_v1/residual/checkpoints/2026-09-23/attempt-6dda685eff214acfbf409461c084fc4e/model.cbm",
+        "sha256": "4fcf26b2a3fdfa33ab52f10ccb7ad40b833584ac9435b5c43fd2a98f95746650"
+      }
+    },
+    "boosting_residual": {
+      "receipt": {
+        "path": "runs/experiments/nyx_improvement_to20260923/rmse_boosting_2000_gpu_v1/residual/checkpoints/2026-09-23/receipt.json",
+        "sha256": "640b5f23cb615605f565d0561951f33395317a71daa96195d2214088c69005aa"
+      },
+      "attempt_directory": "attempt-ee55f2dde28c44498651fcdf20fa355f",
+      "model": {
+        "path": "runs/experiments/nyx_improvement_to20260923/rmse_boosting_2000_gpu_v1/residual/checkpoints/2026-09-23/attempt-ee55f2dde28c44498651fcdf20fa355f/model.cbm",
+        "sha256": "53e75b0cd4259c4d6c2ad81f9ce0ec760375a6a0529713859a6805c3211af7cb"
+      }
+    },
+    "boosting_absolute": {
+      "receipt": {
+        "path": "runs/experiments/nyx_improvement_to20260923/rmse_boosting_2000_gpu_v1/absolute/checkpoints/2026-09-23/receipt.json",
+        "sha256": "973b958ca01ebda0f30b49cf9a51a9a21b2b5e23f734e75a121d19147831456e"
+      },
+      "attempt_directory": "attempt-5957e49a0b6442d2aa6267e573313298",
+      "model": {
+        "path": "runs/experiments/nyx_improvement_to20260923/rmse_boosting_2000_gpu_v1/absolute/checkpoints/2026-09-23/attempt-5957e49a0b6442d2aa6267e573313298/model.cbm",
+        "sha256": "b7184ccb8d01efda16a1e40bab79cc69e541521979c22e3dd857cd9c642cd672"
+      }
+    },
+    "negative_FR": {
+      "receipt": {
+        "path": "runs/experiments/nyx_improvement_to20260923/negative_prices_v1/checkpoints/FR/2026-09-23/receipt.json",
+        "sha256": "bde1deaa7b5c1d08650a5468a3f253ec4408f073f97465ffea2c2d5fe562214a"
+      },
+      "attempt_directory": "attempt-8eb6833259eb4052b250ae797835aada",
+      "model": {
+        "path": "runs/experiments/nyx_improvement_to20260923/negative_prices_v1/checkpoints/FR/2026-09-23/attempt-8eb6833259eb4052b250ae797835aada/model.cbm",
+        "sha256": "00dcd8f357c693cbdd6ecf0778710efe2d9cb04ddf346901043f7f7ab1d12098"
+      },
+      "calibration": {
+        "path": "runs/experiments/nyx_improvement_to20260923/negative_prices_v1/checkpoints/FR/2026-09-23/attempt-8eb6833259eb4052b250ae797835aada/model.json",
+        "sha256": "35071509de0ab111ea5ad5c716d6404ef0460c532f805046ac9d55ff62fc3bdb"
+      }
+    },
+    "negative_DE": {
+      "receipt": {
+        "path": "runs/experiments/nyx_improvement_to20260923/negative_prices_v1/checkpoints/DE/2026-09-23/receipt.json",
+        "sha256": "75b1d68bdd2dd1007e5afd40c30ae11992c0000306500fe3e7e1ac225904a036"
+      },
+      "attempt_directory": "attempt-28e401077f80495d89fb6a3950beab82",
+      "model": {
+        "path": "runs/experiments/nyx_improvement_to20260923/negative_prices_v1/checkpoints/DE/2026-09-23/attempt-28e401077f80495d89fb6a3950beab82/model.cbm",
+        "sha256": "25785cae5c53d4db1e1c441180cc51710946166914a18ec924c5000d5cf23fe6"
+      },
+      "calibration": {
+        "path": "runs/experiments/nyx_improvement_to20260923/negative_prices_v1/checkpoints/DE/2026-09-23/attempt-28e401077f80495d89fb6a3950beab82/model.json",
+        "sha256": "cadb016949f95c6ec7e83032ce80c0f1873d08885072d78dfabeaa1c99bb2678"
+      }
+    },
+    "negative_BE": {
+      "receipt": {
+        "path": "runs/experiments/nyx_improvement_to20260923/negative_prices_v1/checkpoints/BE/2026-09-23/receipt.json",
+        "sha256": "e6f4f6a9b20cae12cc940597e67bd3399900b37445c2f47abe78c656265bc0d3"
+      },
+      "attempt_directory": "attempt-25970eae77f24cd8a265fb7ad44033fd",
+      "model": {
+        "path": "runs/experiments/nyx_improvement_to20260923/negative_prices_v1/checkpoints/BE/2026-09-23/attempt-25970eae77f24cd8a265fb7ad44033fd/model.cbm",
+        "sha256": "54d03793d1281183a352988397e8e64d41ed83cc4bd40cad43a27339a3c938bb"
+      },
+      "calibration": {
+        "path": "runs/experiments/nyx_improvement_to20260923/negative_prices_v1/checkpoints/BE/2026-09-23/attempt-25970eae77f24cd8a265fb7ad44033fd/model.json",
+        "sha256": "19cb590d2872cd5ada033140d1b1a0f85c6c1c61a80423887fab7d43f1c17d8e"
+      }
+    },
+    "negative_NL": {
+      "receipt": {
+        "path": "runs/experiments/nyx_improvement_to20260923/negative_prices_v1/checkpoints/NL/2026-09-23/receipt.json",
+        "sha256": "09780cb97880cb1c5841fe6eb64fa55cac3646d465c4d48303db3f6cb222e713"
+      },
+      "attempt_directory": "attempt-710cc82c293b47219596e94c1b0b09a3",
+      "model": {
+        "path": "runs/experiments/nyx_improvement_to20260923/negative_prices_v1/checkpoints/NL/2026-09-23/attempt-710cc82c293b47219596e94c1b0b09a3/model.cbm",
+        "sha256": "bc69b6faf74aaecff83da1fb0136a05e5de9228e61bf3056226af1813dd63a40"
+      },
+      "calibration": {
+        "path": "runs/experiments/nyx_improvement_to20260923/negative_prices_v1/checkpoints/NL/2026-09-23/attempt-710cc82c293b47219596e94c1b0b09a3/model.json",
+        "sha256": "a16d9d79382d71adc22ec86a7c370e72f6a09d8fe30f245e5618e70d16111e7a"
+      }
+    }
+  },
+  "countries": {
+    "FR": {
+      "price": {
+        "candidate": "residual__disagreement20__w1p0",
+        "composition": "fr_residual_disagreement20",
+        "checkpoint_keys": [
+          "pooled_residual"
+        ],
+        "source_feature_keys": [
+          "pooled_FR",
+          "pooled_DE",
+          "pooled_BE",
+          "pooled_NL"
+        ],
+        "score": {
+          "hours": 8759,
+          "mae": 12.041252862294483,
+          "rmse": 18.473772668055947,
+          "strict_win_rate": 0.5005137572782281,
+          "storm_rmse": 18.847596732638056,
+          "goal_satisfied": true
+        }
+      },
+      "negative": {
+        "checkpoint_key": "negative_FR",
+        "source_feature_key": "compact_FR",
+        "score": {
+          "hours": 8760,
+          "negative_hours": 580,
+          "brier": 0.023431041496344274,
+          "average_precision": 0.8351988811755119,
+          "threshold": 0.5
+        }
+      }
+    },
+    "DE": {
+      "price": {
+        "candidate": "boosting_2000_mean_disagreement20",
+        "composition": "boosting_mean_disagreement20",
+        "checkpoint_keys": [
+          "boosting_residual",
+          "boosting_absolute"
+        ],
+        "source_feature_keys": [
+          "compact_FR",
+          "compact_DE",
+          "compact_BE",
+          "compact_NL",
+          "full_FR",
+          "full_DE",
+          "full_BE",
+          "full_NL"
+        ],
+        "score": {
+          "hours": 8759,
+          "mae": 11.27984542839168,
+          "rmse": 21.142357355045846,
+          "strict_win_rate": 0.5450393880579975,
+          "storm_rmse": 20.306583759838535,
+          "goal_satisfied": false
+        }
+      },
+      "negative": {
+        "checkpoint_key": "negative_DE",
+        "source_feature_key": "compact_DE",
+        "score": {
+          "hours": 8760,
+          "negative_hours": 517,
+          "brier": 0.013845741445702215,
+          "average_precision": 0.9149763463948614,
+          "threshold": 0.5
+        }
+      }
+    },
+    "BE": {
+      "price": {
+        "candidate": "boosting_2000_mean_disagreement20",
+        "composition": "boosting_mean_disagreement20",
+        "checkpoint_keys": [
+          "boosting_residual",
+          "boosting_absolute"
+        ],
+        "source_feature_keys": [
+          "compact_FR",
+          "compact_DE",
+          "compact_BE",
+          "compact_NL",
+          "full_FR",
+          "full_DE",
+          "full_BE",
+          "full_NL"
+        ],
+        "score": {
+          "hours": 8759,
+          "mae": 11.291622194602605,
+          "rmse": 21.162363949320227,
+          "strict_win_rate": 0.5006279255622788,
+          "storm_rmse": 23.60958305229219,
+          "goal_satisfied": true
+        }
+      },
+      "negative": {
+        "checkpoint_key": "negative_BE",
+        "source_feature_key": "compact_BE",
+        "score": {
+          "hours": 8760,
+          "negative_hours": 328,
+          "brier": 0.013765561088228854,
+          "average_precision": 0.8108673283976502,
+          "threshold": 0.5
+        }
+      }
+    },
+    "NL": {
+      "price": {
+        "candidate": "boosting_2000_mean_all",
+        "composition": "boosting_mean_all",
+        "checkpoint_keys": [
+          "boosting_residual",
+          "boosting_absolute"
+        ],
+        "source_feature_keys": [
+          "compact_FR",
+          "compact_DE",
+          "compact_BE",
+          "compact_NL",
+          "full_FR",
+          "full_DE",
+          "full_BE",
+          "full_NL"
+        ],
+        "score": {
+          "hours": 8759,
+          "mae": 11.288005833662512,
+          "rmse": 20.553187154711374,
+          "strict_win_rate": 0.5159264756250713,
+          "storm_rmse": 20.797265435578478,
+          "goal_satisfied": true
+        }
+      },
+      "negative": {
+        "checkpoint_key": "negative_NL",
+        "source_feature_key": "compact_NL",
+        "score": {
+          "hours": 8760,
+          "negative_hours": 434,
+          "brier": 0.014937370846933024,
+          "average_precision": 0.8635129261775322,
+          "threshold": 0.5
+        }
+      }
+    }
+  },
+  "evaluation_period": {
+    "first_delivery_day": "2025-09-24",
+    "last_delivery_day": "2026-09-23"
+  },
+  "reports": {
+    "price_overview": {
+      "path": "runs/experiments/nyx_improvement_to20260923/two_attempts_20260927/prices/index.html",
+      "sha256": "c0fcb440d461d4cb1405c8f1ca5d03078041fd02b558726166b3485ab122eab9"
+    },
+    "price_kpi": {
+      "path": "runs/experiments/nyx_improvement_to20260923/two_attempts_20260927/prices/kpi/KPI.html",
+      "sha256": "b58158db48bc423a0d042879516c3764a42550c964f2829f5b54e4305f47c61f"
+    },
+    "negative_overview": {
+      "path": "runs/experiments/nyx_improvement_to20260923/two_attempts_20260927/negative_prices/index.html",
+      "sha256": "1d0c38ea95d134facfc351abedb3227c4524a9554342621b64dd8d7404843be0"
+    },
+    "countries": {
+      "FR": {
+        "price": {
+          "path": "runs/experiments/nyx_improvement_to20260923/two_attempts_20260927/prices/countries/exports/2026-09-23/fr/nyx_cwe_regional_point/forecast_fr_2026-09-23_nyx_cwe_regional_point.html",
+          "sha256": "2150be386df2376b2aefe844963205329d322a6cc3727cf039ad61599e45e5c9"
+        },
+        "negative": {
+          "path": "runs/experiments/nyx_improvement_to20260923/two_attempts_20260927/negative_prices/fr.html",
+          "sha256": "cd891f9bec80112354350783dd2d2de2114d5462a6dd9d363b4e77b691e9a9ff"
+        }
+      },
+      "DE": {
+        "price": {
+          "path": "runs/experiments/nyx_improvement_to20260923/two_attempts_20260927/prices/countries/exports/2026-09-23/de/nyx_cwe_regional_point/forecast_de_2026-09-23_nyx_cwe_regional_point.html",
+          "sha256": "fe64366686ca1f4efd322477226f502aab0d8cb1da96905c8c146cc1c3deabfa"
+        },
+        "negative": {
+          "path": "runs/experiments/nyx_improvement_to20260923/two_attempts_20260927/negative_prices/de.html",
+          "sha256": "4e39894c02ac9d18e71bd942bdb7e50d1f95690a1ba429cd2cc7dfdb9b81e6cc"
+        }
+      },
+      "BE": {
+        "price": {
+          "path": "runs/experiments/nyx_improvement_to20260923/two_attempts_20260927/prices/countries/exports/2026-09-23/be/nyx_cwe_regional_point/forecast_be_2026-09-23_nyx_cwe_regional_point.html",
+          "sha256": "2d536024e5ed39c0eaeecadd7b11ec57d015231861af0b4fd07854452475cabc"
+        },
+        "negative": {
+          "path": "runs/experiments/nyx_improvement_to20260923/two_attempts_20260927/negative_prices/be.html",
+          "sha256": "ba38ac5449305dc3d07cbbe3b64ea895d3be05cb48d231dfaaa5560993ec7b7e"
+        }
+      },
+      "NL": {
+        "price": {
+          "path": "runs/experiments/nyx_improvement_to20260923/two_attempts_20260927/prices/countries/exports/2026-09-23/nl/nyx_cwe_regional_point/forecast_nl_2026-09-23_nyx_cwe_regional_point.html",
+          "sha256": "c8a65774d323ee9e273eec2f27f7b8619f7633f9e6dc6337c5dd768bbb121d1b"
+        },
+        "negative": {
+          "path": "runs/experiments/nyx_improvement_to20260923/two_attempts_20260927/negative_prices/nl.html",
+          "sha256": "41ea4fab65688dcd68a4e17f5c11300db20337c632aa2b2a3c275d534087392f"
+        }
+      }
+    }
+  }
+}
