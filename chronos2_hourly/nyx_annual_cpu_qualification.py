@@ -26,7 +26,7 @@ import run_nyx_negative_annual_replay as negative_replay
 import run_nyx_selected_cpu_historical as price_replay
 from chronos2_hourly import nyx_negative_probability_cpu as negative_model
 from chronos2_hourly.nyx_annual_cpu_live import (
-    COMPOSITIONS, COUNTRIES, NEGATIVE_THREADS, PRICE_EXPERTS, PRICE_THREADS,
+    COMPOSITIONS as LIVE_COMPOSITIONS, NEGATIVE_THREADS, PRICE_EXPERTS, PRICE_THREADS,
     QUALIFICATION_CODE, QUALIFICATION_PROTOCOL, QUALIFICATION_RECEIPT,
     require,
 )
@@ -34,6 +34,10 @@ from chronos2_hourly.nyx_annual_live_preflight import load_schema, sha256
 
 
 ROOT = Path(__file__).resolve().parents[1]
+# Preserve the immutable original three-country, conditional replay audit.
+# Complete-chain four-country qualification is implemented separately.
+COUNTRIES = ("FR", "BE", "NL")
+COMPOSITIONS = {zone: LIVE_COMPOSITIONS[zone] for zone in COUNTRIES}
 FIRST = "2025-09-24"
 STOP = "2026-09-24"
 PRICE_HOURS = 8759

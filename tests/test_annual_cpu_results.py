@@ -4,7 +4,7 @@ import json
 import hashlib
 from pathlib import Path
 
-from experiment_console.annual_cpu_results import RESULTS_PATH, RECEIPT_PATH, inspect_annual_cpu_results
+from experiment_console.annual_cpu_results import RESULTS_PATH, RECEIPT_PATH, DE_RESULTS_PATH, inspect_annual_cpu_results
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -78,3 +78,39 @@ def test_cpu_replay_does_not_assume_a_new_qualification_state(tmp_path: Path) ->
     result = inspect_annual_cpu_results(root, "FR")
     assert result["available"] is False
     assert result["forecast_ready"] is False
+
+
+def test_new_production_qualification_does_not_destroy_original_fr_be_nl_scores(tmp_path):
+    root = _fixture_root(tmp_path)
+    canonical = root / "config/nyx_annual_cpu_qualification_receipt.json"
+    canonical.write_text('{"protocol":"new full-chain qualification"}')
+    assert inspect_annual_cpu_results(root, "FR")["price"]["rmse"] == 18.596481350684698
+
+
+def test_de_accepts_only_pinned_complete_replay_and_keeps_actual_failed_score(tmp_path):
+    root = _fixture_root(tmp_path)
+    receipt = {"identity": "nyx_de_cpu_annual_results_20260929_v1", "country": "DE",
+        "replay_date": "2026-09-29", "composition": "boosting_mean_disagreement20",
+        "first_delivery_day": "2025-09-24", "last_delivery_day": "2026-09-23",
+        "price_fits": 106, "negative_fits": 53, "frozen_legacy_baseline_and_reference": True,
+        "negative_replay_verified": True, "full_input_chain_qualified": False,
+        "qualified": False, "performance_exception_authorized": True,
+        "replay_receipts_sha256": {"price": "a"*64, "negative": "b"*64},
+        "output_sha256": {"price": "c"*64, "negative": "d"*64},
+        "price": {"hours": 8759, "storm_common_hours": 8759, "strict_wins": 5000,
+            "strict_win_rate": 5000/8759, "rmse": 21., "storm_rmse": 20.},
+        "negative": {"hours": 8760, "brier": .02, "precision": .8, "recall": .8}}
+    path = root / DE_RESULTS_PATH
+    path.write_text(json.dumps(receipt))
+    summary = json.loads((root/RESULTS_PATH).read_text())
+    summary["de_cpu_results"] = {"path": DE_RESULTS_PATH.as_posix(),
+        "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
+    (root/RESULTS_PATH).write_text(json.dumps(summary))
+    result = inspect_annual_cpu_results(root, "DE")
+    assert result["available"] is True
+    assert result["forecast_ready"] is False and result["full_input_chain_qualified"] is False
+    assert result["price"]["rmse"] == 21.
+    assert result["price_expert_replay_qualified"] is False
+    assert result["performance_exception_authorized"] is True
+    path.write_text(path.read_text()+" ")
+    assert inspect_annual_cpu_results(root,"DE")["available"] is False

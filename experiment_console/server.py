@@ -330,9 +330,29 @@ class Handler(BaseHTTPRequestHandler):
             if query:
                 raise ValueError('Le précontrôle de l’évaluation n’accepte pas de paramètres.')
             self.json(manager.registry.regional_evaluation_preflight())
+        elif path == '/api/annual-pipeline-preflight':
+            if set(query) != {'delivery_day'} or len(query['delivery_day']) != 1:
+                raise ValueError('Une date de livraison est requise.')
+            proposed = manager.project_root / 'runs/nyx_annual_cpu_live/_preflight' / secrets.token_hex(12)
+            self.json(manager.registry.annual_pipeline_preflight(query['delivery_day'][0], output=proposed))
+        elif path == '/api/annual-publications':
+            from .annual_publications import annual_publications
+            self.json(annual_publications(manager.project_root))
+        elif path == '/api/annual-artifact':
+            from .annual_publications import read_annual_artifact
+            if (set(query) - {'delivery_day', 'country', 'format', 'download'}
+                    or not {'delivery_day', 'country', 'format'} <= set(query)
+                    or any(len(values) != 1 for values in query.values())):
+                raise ValueError('Une date, un pays et un format sont requis.')
+            target, body = read_annual_artifact(manager.project_root, query['delivery_day'][0],
+                query['country'][0], query['format'][0], MAX_EXPORT_BYTES)
+            suffix = target.suffix.lower()
+            body = sanitized_artifact_text(body.decode('utf-8-sig'), suffix).encode('utf-8')
+            self.send_bytes(body, ('text/html' if suffix == '.html' else 'text/csv') + '; charset=utf-8',
+                attachment=target.name if query.get('download') == ['1'] else None, report=suffix == '.html')
         elif path == '/api/annual-cwe-preflight':
-            if set(query) != {'country'} or len(query['country']) != 1 or query['country'][0] not in {'FR', 'BE', 'NL'}:
-                raise ValueError('Choisissez un pays annuel parmi FR, BE et NL.')
+            if set(query) != {'country'} or len(query['country']) != 1 or query['country'][0] not in {'FR', 'DE', 'BE', 'NL'}:
+                raise ValueError('Choisissez un pays annuel parmi FR, DE, BE et NL.')
             country = query['country'][0]
             inspection = inspect_annual_cwe(manager.project_root, (country,))
             inspection['cpu_replay'] = inspect_annual_cpu_results(manager.project_root, country)
@@ -369,6 +389,8 @@ class Handler(BaseHTTPRequestHandler):
                     metrics = inspect_run(run['output_dir'])['metrics']
                     run = manager.store.update(run['id'], metrics=metrics)
                 rows.append({k: v for k, v in run.items() if k in fields})
+                if run.get('adapter_id') == 'nyx_annual_pipeline':
+                    rows[-1]['annual_action'] = run.get('request', {}).get('parameters', {}).get('action')
             self.json({'runs': rows, 'scheduler_error': manager.scheduler_error, 'import': self.server.import_state})
         elif path == '/api/import-status':
             self.json(self.server.import_state)

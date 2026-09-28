@@ -2,12 +2,21 @@
   "schema_version": 1,
   "identity": "nyx_annual_cpu_desktop_results_2026-09-28_v1",
   "replay_date": "2026-09-28",
-  "qualification_receipt": "config/nyx_annual_cpu_qualification_receipt.json",
+  "qualification_receipt": "config/nyx_annual_cpu_expert_replay_20260928.json",
   "qualification_receipt_sha256": "1c5f5972790f65919186b87cd6bd0d172f923509c899fcbe5ac080e358f4f939",
   "negative_replay_receipt_sha256": "3df9f414552b3b18c3f5dc3c2d77b3b3d090672402698ea30605ab052fd5a7e1",
   "negative_diagnostics": {
-    "FR": {"precision": 0.8086021505376344, "recall": 0.6482758620689655},
-    "BE": {"precision": 0.7305194805194806, "recall": 0.6859756097560976},
-    "NL": {"precision": 0.786697247706422, "recall": 0.7903225806451613}
+    "FR": {
+      "precision": 0.8086021505376344,
+      "recall": 0.6482758620689655
+    },
+    "BE": {
+      "precision": 0.7305194805194806,
+      "recall": 0.6859756097560976
+    },
+    "NL": {
+      "precision": 0.786697247706422,
+      "recall": 0.7903225806451613
+    }
   }
 }

@@ -4,7 +4,7 @@ const $$ = (s, root=document) => [...root.querySelectorAll(s)];
 const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const state = {route:'',primary:{days:[],warnings:[]},runInfo:null,runRevision:0,boot:null,selectedDay:null,launchDay:null,refreshing:false,loaded:false,launching:false,
   regional:{day:null,country:'FR',preflight:null,checking:false,launching:false,evaluationPreflight:null,evaluationChecking:false,evaluationLaunching:false,
-    annualCountry:'FR',annualPreflight:null,annualChecking:false,
+    annualCountry:'FR',annualPreflight:null,annualChecking:false,annualDay:null,annualLive:null,annualLiveBusy:false,annualPublications:null,
     runs:[],detail:null,statusDoc:null,receiptDoc:null,logs:null,error:null,pinnedRunId:null,refreshing:false,lastCompletedEvaluationId:null}};
 const warnings = (items, kind='') => items?.length ? `<div class="notice ${kind}">${items.map(esc).join('<br>')}</div>` : '';
 const formatDay = value => value ? new Date(`${value}T12:00:00`).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}) : 'Date indisponible';
@@ -156,17 +156,79 @@ function handleReportNavigation(event){
 }
 function regionalSelection(){return `${state.regional.day}|${state.regional.country}`;}
 function regionalActive(){return state.regional.runs.some(run=>['queued','starting','running','cancelling'].includes(run.status));}
+function regionalRunLabel(run){
+  if(run.adapter_id==='nyx_regional_cpu_backtest')return 'Évaluation';
+  if(run.adapter_id==='nyx_annual_pipeline')return {capture:'Capture des sources',prepare:'Préparation CPU',forecast:'Prévision annuelle'}[run.annual_action||run.request?.parameters?.action]||'Pipeline annuel';
+  return 'Prévision';
+}
 function renderRegional(){
   const main=$('#main');
   const regional=state.regional;
   if(!main.nyxRegional){
-    const annualPanel=`<section class="panel padded regional-panel" aria-label="Résultats annuels CWE"><div class="section-heading"><div><div class="eyebrow">ÉTUDE ANNUELLE · FR / BE / NL</div><h2>Modèles annuels FR / BE / NL</h2></div></div><p>Rejeu CPU du 28 septembre 2026 et étude GPU historique du 23 septembre 2026, sur la même année. Ces résultats sont rétrospectifs : aucune prévision future n’est activée ici.</p><div class="regional-controls"><label>Pays historique<select id="annual-cwe-country">${['FR','BE','NL'].map(zone=>`<option value="${zone}" ${zone===regional.annualCountry?'selected':''}>${zone}</option>`).join('')}</select></label><button id="annual-cwe-check" data-annual-cwe-check>Actualiser les résultats</button></div><div id="annual-cwe-status" role="status"></div></section>`;
-    main.innerHTML=pageHead('NYX / MODÈLES RÉGIONAUX','Prévisions par pays et archives annuelles','Prix horaire et probabilité de prix négatif.')+annualPanel+
-      `<section class="panel padded regional-panel" aria-label="Évaluation de la recette CPU"><div class="section-heading"><div><div class="eyebrow">VALIDATION</div><h2>Évaluer la recette CPU</h2></div></div><p>Synchronise Saturn, rejoue les origines historiques et produit un reçu. Si les critères passent, les prévisions par pays deviennent disponibles.</p><button id="regional-evaluate" data-regional-evaluate disabled>▷ Évaluer la recette CPU</button><div id="regional-evaluation-check" role="status"></div></section>`+
-      `<section class="panel padded regional-panel" aria-label="Lancement régional"><div class="section-heading"><div><div class="eyebrow">NOUVELLE RECETTE CPU</div><h2>Calculer un pays</h2></div></div><p>Le moteur actualise Saturn et réentraîne le modèle avant chaque prévision. Le lancement sera disponible après validation du backtest.</p><div class="regional-controls"><label>Date de livraison<input id="regional-day" type="date" required value="${esc(regional.day)}"></label><label>Pays<select id="regional-country">${['FR','DE','BE','NL'].map(zone=>`<option value="${zone}" ${zone===regional.country?'selected':''}>${zone}</option>`).join('')}</select></label><button class="primary" id="regional-launch" data-regional-launch disabled>▷ Lancer ce pays</button></div><div id="regional-check" role="status"></div></section><section class="regional-history"><div class="section-heading"><h2>Derniers lancements</h2></div><div id="regional-runs"></div></section><section id="regional-output" aria-label="Sorties du lancement régional"></section>`;
+    const annualPanel=`<section class="panel padded regional-panel" aria-label="Résultats annuels CWE"><div class="section-heading"><div><div class="eyebrow">ÉTUDE ANNUELLE · FR / DE / NL / BE</div><h2>Modèles annuels FR / DE / NL / BE</h2></div></div><p>Rejeux CPU des 28–29 septembre 2026 et étude GPU historique du 23 septembre 2026, sur la même année. Ces résultats sont rétrospectifs : aucune prévision future n’est activée ici.</p><div class="regional-controls"><label>Pays historique<select id="annual-cwe-country">${['FR','DE','NL','BE'].map(zone=>`<option value="${zone}" ${zone===regional.annualCountry?'selected':''}>${zone}</option>`).join('')}</select></label><button id="annual-cwe-check" data-annual-cwe-check>Actualiser les résultats</button></div><div id="annual-cwe-status" role="status"></div></section>`;
+    const annualLaunch=`<section class="panel padded regional-panel" aria-label="Production annuelle CWE"><div class="eyebrow">MODÈLES ANNUELS · CPU</div><h2>FR / DE / NL / BE</h2><p>Capturer les sources publiques avant 08 h Paris, puis préparer les données et réentraîner les modèles avec Saturn. Les prévisions deviennent disponibles après validation de la chaîne complète.</p><div class="regional-controls"><label>Date de livraison<input type="date" id="annual-pipeline-day" required value="${esc(regional.annualDay||regional.day)}"></label><button data-annual-live-check>Vérifier</button><button id="annual-capture" data-annual-action="capture" disabled>Capturer les sources</button><button id="annual-prepare" data-annual-action="prepare" disabled>Préparer les modèles CPU</button><button class="primary" id="annual-forecast" data-annual-action="forecast" disabled>Lancer les quatre pays</button></div><div id="annual-live-status" role="status"></div></section>`;
+    main.innerHTML=pageHead('NYX / MODÈLES RÉGIONAUX','Prévisions par pays et archives annuelles','Prix horaire et probabilité de prix négatif.')+annualLaunch+'<section id="annual-publications" aria-label="Prévisions annuelles publiées"></section>'+annualPanel+
+      `<details class="panel padded"><summary>Recherche régionale CPU</summary><section class="panel padded regional-panel" aria-label="Évaluation de la recette CPU"><div class="section-heading"><div><div class="eyebrow">VALIDATION</div><h2>Évaluer la recette CPU</h2></div></div><p>Synchronise Saturn, rejoue les origines historiques et produit un reçu. Si les critères passent, les prévisions par pays deviennent disponibles.</p><button id="regional-evaluate" data-regional-evaluate disabled>▷ Évaluer la recette CPU</button><div id="regional-evaluation-check" role="status"></div></section>`+
+      `<section class="panel padded regional-panel" aria-label="Lancement régional"><div class="section-heading"><div><div class="eyebrow">NOUVELLE RECETTE CPU</div><h2>Calculer un pays</h2></div></div><p>Le moteur actualise Saturn et réentraîne le modèle avant chaque prévision. Le lancement sera disponible après validation du backtest.</p><div class="regional-controls"><label>Date de livraison<input id="regional-day" type="date" required value="${esc(regional.day)}"></label><label>Pays<select id="regional-country">${['FR','DE','BE','NL'].map(zone=>`<option value="${zone}" ${zone===regional.country?'selected':''}>${zone}</option>`).join('')}</select></label><button class="primary" id="regional-launch" data-regional-launch disabled>▷ Lancer ce pays</button></div><div id="regional-check" role="status"></div></section></details><section class="regional-history"><div class="section-heading"><h2>Derniers lancements</h2></div><div id="regional-runs"></div></section><section id="regional-output" aria-label="Sorties du lancement régional"></section>`;
     main.nyxRegional=true;
   }
   renderRegionalStatus();
+  renderAnnualPipeline();
+  renderAnnualPublications();
+}
+const annualArtifactUrl=(day,country,format,download=false)=>`/api/annual-artifact?delivery_day=${encodeURIComponent(day)}&country=${encodeURIComponent(country)}&format=${format}${download?'&download=1':''}`;
+function renderAnnualPublications(){
+  const target=$('#annual-publications');if(!target)return;
+  const publications=state.regional.annualPublications;
+  if(!publications){target.innerHTML='';return;}
+  target.innerHTML=warnings(publications.warnings)+(publications.days?.length?`<details class="panel padded" open><summary>Prévisions annuelles publiées · ${publications.days.length} livraisons</summary><div class="table-wrap"><table><thead><tr><th>Livraison</th><th>Rapports et prix horaires</th></tr></thead><tbody>${publications.days.map(day=>`<tr><td>${esc(formatDay(day.delivery_day))}</td><td>${day.countries.map(row=>`${row.report_available?`<button data-annual-report-day="${esc(day.delivery_day)}" data-annual-report-country="${esc(row.zone)}">${esc(row.zone)} · rapport ↗</button>`:''} <a href="${esc(annualArtifactUrl(day.delivery_day,row.zone,'csv',true))}" download>${esc(row.zone)} CSV ↓</a>`).join(' · ')}</td></tr>`).join('')}</tbody></table></div></details>`:'<p class="publication-time">Aucune prévision annuelle automatique publiée. Les lancements depuis NYX figurent dans Derniers lancements.</p>');
+}
+function showAnnualReport(day,country){
+  const dialog=$('#dialog');dialog.className='report-dialog';
+  const title=`NYX annuel CPU · ${country} · ${formatDay(day)}`;
+  dialog.innerHTML=`<div class="section-heading"><h2 id="dialog-title">${esc(title)}</h2><button data-close aria-label="Fermer le rapport">Fermer ✕</button></div><iframe class="report-frame" title="${esc(title)}" sandbox="allow-scripts" src="${esc(annualArtifactUrl(day,country,'html'))}"></iframe>`;
+  if(!dialog.open)dialog.showModal();
+}
+function renderAnnualPipeline(){
+  if(state.route!=='regional')return;
+  const r=state.regional,live=r.annualLive;
+  for(const [action,key] of [['capture','can_capture'],['prepare','can_prepare'],['forecast','can_request_forecast']]){
+    const button=$(`#annual-${action}`);if(button)button.disabled=r.annualLiveBusy||regionalActive()||live?.[key]!==true;
+  }
+  const target=$('#annual-live-status');if(!target)return;
+  if(r.annualLiveBusy){target.innerHTML='<p>Vérification ou demande de lancement en cours…</p>';return;}
+  if(!live){target.innerHTML='<p>Cliquer sur Vérifier pour contrôler le poste, les sources et la qualification.</p>';return;}
+  const messages=[...(live.missing_modules?.length?['Installation annuelle à compléter avec Setup-NYXAnnualCPU.ps1'+(live.missing_modules.includes('tshistory_lite')?' ; le client Saturn est absent.':'.')]:[]),...(live.activation_error?['Production indisponible : la qualification complète doit être validée sur ce poste.']:[]),...(live.error?[live.error]:[])];
+  const labels={saturn:'Saturn',auction_prices:'Prix passés',fuel:'Combustibles',thermal_capacity:'Capacités thermiques',jao_initial:'JAO',public_hydro:'Hydro',lagged_exchange:'Échanges'};
+  const statuses={COMPLETE:'collecté',MISSING:'à collecter',INVALID:'à vérifier'};
+  const preparationMessage=live.ready?'Le lot du jour et la qualification sont valides.':live.can_prepare?'La préparation peut être exécutée sans publier de prévision.':'La préparation exige une installation complète et la coupure de 08 h Paris, la veille de la livraison.';
+  target.innerHTML=warnings(messages)+`<p>${preparationMessage}</p>`+(live.source_states?`<p>${Object.entries(live.source_states).map(([name,status])=>`${esc(labels[name]||name)} : ${esc(statuses[status]||status)}`).join(' · ')}</p>`:'');
+}
+async function checkAnnualPipeline(){
+  const r=state.regional,element=$('#annual-pipeline-day');
+  if(!element?.reportValidity())return false;
+  const day=element.value||r.annualDay||r.day;r.annualDay=day;r.annualLiveBusy=true;renderAnnualPipeline();
+  try{const result=await api(`/api/annual-pipeline-preflight?delivery_day=${encodeURIComponent(day)}`);if(r.annualDay===day){r.annualLive=result;return true;}return false;}
+  catch(error){r.annualLive={error:error.message};return false;}
+  finally{r.annualLiveBusy=false;renderAnnualPipeline();}
+}
+async function launchAnnualPipeline(action){
+  const r=state.regional;if(r.annualLiveBusy||regionalActive())return;
+  if(!await checkAnnualPipeline())return;
+  const key={capture:'can_capture',prepare:'can_prepare',forecast:'can_request_forecast'}[action];
+  if(!key||r.annualLive?.[key]!==true){toast('Le contrôle annuel bloque cette action.');return;}
+  r.annualLiveBusy=true;renderAnnualPipeline();
+  try{
+    if(!state.boot)state.boot=await api('/api/bootstrap');
+    const parameters={delivery_day:r.annualDay,action};
+    let intent;try{intent=JSON.parse(sessionStorage.getItem('nyx-annual-intent'));}catch{}
+    if(intent?.day!==r.annualDay||intent?.action!==action)intent={day:r.annualDay,action,key:crypto.randomUUID()};
+    if(!intent.plan_id){const plan=await api('/api/preview',{adapter_id:'nyx_annual_pipeline',config_id:'annual_cpu_four_countries',model:'annual_price_and_negative_probability',parameters,name:`NYX annuel · ${action} · ${r.annualDay}`});intent.plan_id=plan.id;sessionStorage.setItem('nyx-annual-intent',JSON.stringify(intent));}
+    const run=await api('/api/launch',{plan_id:intent.plan_id,idempotency_key:intent.key});
+    sessionStorage.removeItem('nyx-annual-intent');r.pinnedRunId=run.id;
+    toast('Lancement annuel demandé. Le journal apparaît dans les derniers lancements.');await refreshRegional();
+  }catch(error){if([400,404].includes(error.httpStatus))sessionStorage.removeItem('nyx-annual-intent');toast(error.message);}
+  finally{r.annualLiveBusy=false;renderAnnualPipeline();}
 }
 function renderAnnualCweStatus(){
   if(state.route!=='regional')return;
@@ -182,8 +244,8 @@ function renderAnnualCweStatus(){
   const country=regional.annualCountry;
   const metric=(value,digits=3)=>typeof value==='number'&&Number.isFinite(value)?new Intl.NumberFormat('fr-FR',{maximumFractionDigits:digits}).format(value):'—';
   const cpu=inspection.cpu_replay;
-  const cpuHtml=cpu?.available===true?`<div class="section-heading"><h3>Rejeu CPU · 28 septembre 2026</h3></div><p class="publication-time">Période : 24 septembre 2025 au 23 septembre 2026. Prix : ${esc(cpu.price.hours)} heures ; prix négatif : ${esc(cpu.negative.hours)} heures. Rejeu sur la même période, sans validation indépendante.</p><div class="table-wrap"><table><thead><tr><th>Pays</th><th>Assemblage CPU</th><th>RMSE CPU</th><th>RMSE Storm</th><th>Heures gagnées</th><th>Brier négatif</th><th>Précision</th><th>Rappel</th></tr></thead><tbody><tr><td><strong>${esc(country)}</strong></td><td>${esc(cpu.price.composition)}</td><td>${esc(metric(cpu.price.rmse))}</td><td>${esc(metric(cpu.price.storm_rmse))}</td><td>${esc(cpu.price.strict_wins)} / ${esc(cpu.price.hours)} (${esc(metric(cpu.price.strict_win_rate*100,2))} %)</td><td>${esc(metric(cpu.negative.brier,5))}</td><td>${esc(metric(cpu.negative.precision*100,2))} %</td><td>${esc(metric(cpu.negative.recall*100,2))} %</td></tr></tbody></table></div><div class="notice error">Rejeu des experts prix qualifié ; chaîne complète des entrées futures non qualifiée. Le lancement annuel reste verrouillé.</div>`:
-    `<div class="section-heading"><h3>Rejeu CPU · 28 septembre 2026</h3></div>${warnings((cpu?.blockers||[{message:'Résultats CPU suivis dans Git indisponibles sur ce poste.'}]).map(item=>item.message||item.code||String(item)),'error')}`;
+  const cpuHtml=cpu?.available===true?`<div class="section-heading"><h3>Rejeu CPU · ${esc(cpu?.replay_date?formatDay(cpu.replay_date):'28 septembre 2026')}</h3></div><p class="publication-time">Période : 24 septembre 2025 au 23 septembre 2026. Prix : ${esc(cpu.price.hours)} heures ; prix négatif : ${esc(cpu.negative.hours)} heures. Rejeu sur la même période, sans validation indépendante.</p><div class="table-wrap"><table><thead><tr><th>Pays</th><th>Assemblage CPU</th><th>RMSE CPU</th><th>RMSE Storm</th><th>Heures gagnées</th><th>Brier négatif</th><th>Précision</th><th>Rappel</th></tr></thead><tbody><tr><td><strong>${esc(country)}</strong></td><td>${esc(cpu.price.composition)}</td><td>${esc(metric(cpu.price.rmse))}</td><td>${esc(metric(cpu.price.storm_rmse))}</td><td>${esc(cpu.price.strict_wins)} / ${esc(cpu.price.hours)} (${esc(metric(cpu.price.strict_win_rate*100,2))} %)</td><td>${esc(metric(cpu.negative.brier,5))}</td><td>${esc(metric(cpu.negative.precision*100,2))} %</td><td>${esc(metric(cpu.negative.recall*100,2))} %</td></tr></tbody></table></div><div class="notice error">${cpu.price_expert_replay_qualified?'Critères historiques des experts prix atteints.':'Critères historiques des experts prix non tous atteints.'} ${cpu.full_input_chain_qualified?'Chaîne complète qualifiée ; vérifier le lot du jour dans le panneau de lancement.':'Chaîne complète des entrées futures non qualifiée. Le lancement annuel reste verrouillé.'}</div>`:
+    `<div class="section-heading"><h3>Rejeu CPU · ${esc(cpu?.replay_date?formatDay(cpu.replay_date):'28 septembre 2026')}</h3></div>${warnings((cpu?.blockers||[{message:'Résultats CPU suivis dans Git indisponibles sur ce poste.'}]).map(item=>item.message||item.code||String(item)),'error')}`;
   if(!inspection.manifest_valid){target.innerHTML=cpuHtml+warnings((inspection.blockers||[]).map(item=>item.message||item.code||String(item)),'error');return;}
   const row=inspection.countries?.[country];
   if(!row){target.innerHTML=cpuHtml+warnings(['Aucun résultat historique disponible pour ce pays.'],'error');return;}
@@ -220,7 +282,7 @@ function renderRegionalStatus(){
       warnings(regional.evaluationPreflight?.blockers||['Évaluation non disponible.'],'error');
   }
   const runs=regional.runs.slice(0,12);
-  $('#regional-runs').innerHTML=runs.length?`<div class="panel table-wrap"><table><thead><tr><th>Type</th><th>Livraison</th><th>Pays</th><th>État</th><th>Demandé</th><th></th></tr></thead><tbody>${runs.map(run=>`<tr><td>${run.adapter_id==='nyx_regional_cpu_backtest'?'Évaluation':'Prévision'}</td><td>${esc(run.delivery_day?formatDay(run.delivery_day):'—')}</td><td>${esc(run.countries?.join(', ')||'—')}</td><td><span class="badge ${esc(run.status)}">${esc(statusLabels[run.status]||run.status)}</span></td><td>${esc(formatTime(run.created_at))}</td><td><button data-regional-run="${esc(run.id)}">Voir les sorties →</button></td></tr>`).join('')}</tbody></table></div>`:empty('Aucun lancement régional','Les calculs de cette nouvelle recette apparaîtront ici.');
+  $('#regional-runs').innerHTML=runs.length?`<div class="panel table-wrap"><table><thead><tr><th>Type</th><th>Livraison</th><th>Pays</th><th>État</th><th>Demandé</th><th></th></tr></thead><tbody>${runs.map(run=>`<tr><td>${esc(regionalRunLabel(run))}</td><td>${esc(run.delivery_day?formatDay(run.delivery_day):'—')}</td><td>${esc(run.countries?.join(', ')||'—')}</td><td><span class="badge ${esc(run.status)}">${esc(statusLabels[run.status]||run.status)}</span></td><td>${esc(formatTime(run.created_at))}</td><td><button data-regional-run="${esc(run.id)}">Voir les sorties →</button></td></tr>`).join('')}</tbody></table></div>`:empty('Aucun lancement régional','Les calculs de cette nouvelle recette apparaîtront ici.');
   const detail=regional.detail;
   if(!detail){$('#regional-output').innerHTML=regional.error?warnings([regional.error],'error'):'';return;}
   const rawPhase=regional.statusDoc?.phase||regional.statusDoc?.stage||'';
@@ -232,9 +294,11 @@ function renderRegionalStatus(){
   const originCount=Number.isInteger(regional.statusDoc?.completed_origins)?` · ${regional.statusDoc.completed_origins} / ${regional.statusDoc.total_origins||173} origines`:'';
   const phase=rawPhase?`${phaseLabels[rawPhase]||rawPhase}${originCount}`:detail.activity||'';
   const evaluation=detail.adapter_id==='nyx_regional_cpu_backtest';
+  const annualAction=detail.adapter_id==='nyx_annual_pipeline'?detail.request?.parameters?.action:null;
+  const preparation=['capture','prepare'].includes(annualAction);
   const files=(detail.artifacts||[]).filter(file=>evaluation?file.path.endsWith('backtest_receipt.json')||file.path.endsWith('.html')||file.path.endsWith('.csv'):
-    /^zones\/(FR|DE|BE|NL)\/forecast_[a-z]{2}_\d{4}-\d{2}-\d{2}_nyx_regional_cpu\.(csv|html)$/.test(file.path));
-  const outputs=(evaluation||detail.status==='succeeded')&&files.length?`<div class="regional-files">${files.map(file=>file.path.endsWith('.html')?`<button data-regional-report="${esc(file.path)}" data-run-id="${esc(detail.id)}">Ouvrir le rapport ↗</button><a href="${esc(runArtifactUrl(detail.id,file.path,true))}" download="${esc(file.name)}">HTML ↓</a>`:`<a href="${esc(runArtifactUrl(detail.id,file.path,true))}" download="${esc(file.name)}">${esc(file.name)} ↓</a>`).join('')}</div>`:detail.status==='succeeded'?'<p class="notice error">Le calcul est terminé, mais aucun résultat consultable n’a été trouvé.</p>':'';
+    /^zones\/(FR|DE|BE|NL)\/forecast_[a-z]{2}_\d{4}-\d{2}-\d{2}_nyx_(regional|annual)_cpu\.(csv|html)$/.test(file.path));
+  const outputs=(evaluation||detail.status==='succeeded')&&files.length?`<div class="regional-files">${files.map(file=>file.path.endsWith('.html')?`<button data-regional-report="${esc(file.path)}" data-run-id="${esc(detail.id)}">Ouvrir le rapport ↗</button><a href="${esc(runArtifactUrl(detail.id,file.path,true))}" download="${esc(file.name)}">HTML ↓</a>`:`<a href="${esc(runArtifactUrl(detail.id,file.path,true))}" download="${esc(file.name)}">${esc(file.name)} ↓</a>`).join('')}</div>`:detail.status==='succeeded'?(preparation?`<p class="notice info">${annualAction==='capture'?'Captures quotidiennes enregistrées.':'Préparation des quatre modèles terminée.'} La qualification complète reste nécessaire avant la prévision.</p>`:'<p class="notice error">Le calcul est terminé, mais aucun résultat consultable n’a été trouvé.</p>'):'';
   const qualification=Array.isArray(regional.statusDoc?.qualification_blockers)?regional.statusDoc.qualification_blockers:[];
   const qualified=evaluation&&regional.statusDoc?.qualified===true?'<div class="notice info">Backtest qualifié. Le précontrôle des prévisions sera actualisé.</div>':
     evaluation&&regional.statusDoc?.qualified===false?'<div class="notice error">Les critères du backtest ne sont pas atteints. Les prévisions restent verrouillées.</div>':'';
@@ -246,7 +310,7 @@ function renderRegionalStatus(){
     return `<tr><td><strong>${zone}</strong></td><td>${esc(row.selected||'—')}</td><td>${esc(metric(row.confirmation?.rmse))}</td><td>${esc(metric(row.confirmation?.storm_rmse))}</td><td>${esc(typeof row.confirmation?.strict_win_rate==='number'?metric(row.confirmation.strict_win_rate*100,1)+' %':'—')}</td><td>${esc(metric(row.negative_confirmation?.brier,4))}</td></tr>`;
   }).join(''):'';
   const scores=countryScores?`<div class="regional-scores"><h3>Scores du backtest · confirmation</h3><p class="publication-time">Prix : RMSE en €/MWh face à Storm. Prix négatif : score de Brier (plus bas est meilleur). ${receipt.confirmation_first_day&&receipt.stop_day_exclusive?`Période ${esc(receipt.confirmation_first_day)} au ${esc(receipt.stop_day_exclusive)} exclu.`:''}</p><div class="table-wrap"><table><thead><tr><th>Pays</th><th>Prix retenu</th><th>RMSE NYX</th><th>RMSE Storm</th><th>Heures gagnées</th><th>Brier négatif</th></tr></thead><tbody>${countryScores}</tbody></table></div></div>`:'';
-  $('#regional-output').innerHTML=`<div class="section-heading"><h2>Suivi ${evaluation?'de l’évaluation':'de la prévision'}</h2><span class="secondary">${esc(detail.countries?.join(', ')||'')} ${esc(detail.delivery_day?formatDay(detail.delivery_day):'')}</span></div><div class="panel padded"><div class="primary-run-status"><span class="badge ${esc(detail.status)}">${esc(statusLabels[detail.status]||detail.status)}</span>${phase?`<span class="run-phase">${esc(phase)}</span>`:''}</div>${qualified}${qualification.length?warnings(qualification,'error'):''}${detail.status==='failed'||detail.status==='interrupted'?warnings([regional.statusDoc?.error||detail.activity||'Le calcul a échoué. Consultez le journal ci-dessous.'],'error'):''}${scores}${outputs}<p class="publication-time">Dossier : <code>${esc(detail.output_dir||'')}</code></p>${regional.logs?.available?`<details class="regional-log" ${detail.status==='failed'?'open':''}><summary>Journal du calcul</summary><pre>${esc(regional.logs.text?.slice(-6000)||'')}</pre></details>`:''}</div>`;
+  $('#regional-output').innerHTML=`<div class="section-heading"><h2>Suivi · ${esc(regionalRunLabel(detail))}</h2><span class="secondary">${esc(detail.countries?.join(', ')||'')} ${esc(detail.delivery_day?formatDay(detail.delivery_day):'')}</span></div><div class="panel padded"><div class="primary-run-status"><span class="badge ${esc(detail.status)}">${esc(statusLabels[detail.status]||detail.status)}</span>${phase?`<span class="run-phase">${esc(phase)}</span>`:''}</div>${qualified}${qualification.length?warnings(qualification,'error'):''}${detail.status==='failed'||detail.status==='interrupted'?warnings([regional.statusDoc?.error||detail.activity||'Le calcul a échoué. Consultez le journal ci-dessous.'],'error'):''}${scores}${outputs}<p class="publication-time">Dossier : <code>${esc(detail.output_dir||'')}</code></p>${regional.logs?.available?`<details class="regional-log" ${detail.status==='failed'?'open':''}><summary>Journal du calcul</summary><pre>${esc(regional.logs.text?.slice(-6000)||'')}</pre></details>`:''}</div>`;
 }
 async function checkRegional(){
   const regional=state.regional;
@@ -283,8 +347,9 @@ async function refreshRegional(){
   if(state.route!=='regional'||regional.refreshing)return;
   regional.refreshing=true;
   try{
-    const listing=await api('/api/runs');
-    regional.runs=(listing.runs||[]).filter(run=>['nyx_regional_cpu','nyx_regional_cpu_backtest'].includes(run.adapter_id));
+    const [listing,publications]=await Promise.all([api('/api/runs'),api('/api/annual-publications')]);
+    regional.annualPublications=publications;renderAnnualPublications();
+    regional.runs=(listing.runs||[]).filter(run=>['nyx_regional_cpu','nyx_regional_cpu_backtest','nyx_annual_pipeline'].includes(run.adapter_id));
     const completedEvaluation=regional.runs.find(run=>run.adapter_id==='nyx_regional_cpu_backtest'&&['succeeded','failed','interrupted'].includes(run.status));
     if(completedEvaluation&&completedEvaluation.id!==regional.lastCompletedEvaluationId){
       regional.lastCompletedEvaluationId=completedEvaluation.id;
@@ -300,13 +365,13 @@ async function refreshRegional(){
       if(detail.adapter_id==='nyx_regional_cpu_backtest'&&detail.artifacts?.some(file=>file.path==='results/backtest_receipt.json')){
         try{regional.receiptDoc=await api(runArtifactUrl(detail.id,'results/backtest_receipt.json'));}catch{/* The backtest may still be writing its receipt. */}
       }
-      if(['starting','running','failed','interrupted'].includes(detail.status)){
+      if(detail.adapter_id==='nyx_annual_pipeline'||['starting','running','failed','interrupted'].includes(detail.status)){
         try{regional.logs=await api(`/api/runs/${encodeURIComponent(detail.id)}/logs`);}catch{/* Status remains visible. */}
       }
     }else regional.detail=null;
     regional.error=null;
   }catch(error){regional.error=error.message;}
-  finally{regional.refreshing=false;renderRegionalStatus();}
+  finally{regional.refreshing=false;renderRegionalStatus();renderAnnualPipeline();}
 }
 async function launchRegional(){
   const regional=state.regional;
@@ -440,8 +505,12 @@ document.addEventListener('click',event=>{
   if(event.target.closest('[data-regional-launch]'))void launchRegional();
   if(event.target.closest('[data-regional-evaluate]'))void launchRegionalEvaluation();
   if(event.target.closest('[data-annual-cwe-check]'))void checkAnnualCwe();
+  if(event.target.closest('[data-annual-live-check]'))void checkAnnualPipeline();
+  const annualAction=event.target.closest('[data-annual-action]');if(annualAction)void launchAnnualPipeline(annualAction.dataset.annualAction);
+  const annualReport=event.target.closest('[data-annual-report-day]');if(annualReport)showAnnualReport(annualReport.dataset.annualReportDay,annualReport.dataset.annualReportCountry);
 });
 document.addEventListener('change',event=>{if(event.target.id==='delivery-day'){state.selectedDay=event.target.value;renderDashboard();}
+  if(event.target.id==='annual-pipeline-day'){state.regional.annualDay=event.target.value;state.regional.annualLive=null;renderAnnualPipeline();}
   if(event.target.id==='regional-day'||event.target.id==='regional-country'){
     state.regional[event.target.id==='regional-day'?'day':'country']=event.target.value;
     state.regional.preflight=null;void checkRegional();

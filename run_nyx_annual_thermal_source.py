@@ -52,6 +52,8 @@ REQUEST = {
     "revision_tz": "Europe/Paris", "maturity_offset": {"days": 1},
     "maturity_time": {"hour": 0},
 }
+DEFAULT_CACHE = ROOT / "data/pit/nyx_annual_thermal"
+CACHE_PROTOCOL = "nyx_annual_thermal_daily_state_v1"
 
 
 def require(ok: bool, message: str) -> None:
@@ -87,14 +89,88 @@ def grids(delivery_day: str) -> tuple[pd.DatetimeIndex, pd.DatetimeIndex, pd.Tim
     return days, full, cutoff
 
 
+def _cache_bytes(value: dict) -> bytes:
+    return json.dumps(value, sort_keys=True, separators=(",", ":"),
+                      ensure_ascii=True, allow_nan=False).encode("utf-8")
+
+
+def _independent_state(client, source: str, spec: dict, day: pd.Timestamp,
+                       *, cache: Path | None, identity_base: dict,
+                       retrieved_at_utc: pd.Timestamp):
+    """Retain the independent as-of query; never invent a state from staircase."""
+    identity = {**identity_base, "source": source, "series_spec": spec,
+                "delivery_day": day.date().isoformat(),
+                "asof_query_utc": civil_cutoff(day).isoformat()}
+    path = None if cache is None else cache / source / f"{day.date().isoformat()}.json"
+    if path is not None and path.exists():
+        try:
+            envelope = json.loads(path.read_text(encoding="utf-8"))
+            body = envelope["state"]
+            require(envelope.get("sha256") == hashlib.sha256(_cache_bytes(body)).hexdigest(),
+                    f"{source}/{day.date()}: thermal cache checksum changed")
+            require(body.get("protocol") == CACHE_PROTOCOL and body.get("identity") == identity,
+                    f"{source}/{day.date()}: thermal cache contract changed")
+            stamp = pd.Timestamp(body["retrieved_at_utc"])
+            require(stamp.tzinfo is not None and stamp >= civil_cutoff(day),
+                    f"{source}/{day.date()}: cached query predates its as-of state")
+            value = body["value"]
+            require(value is None or (type(value) in (int, float) and np.isfinite(value) and value >= 0.),
+                    f"{source}/{day.date()}: invalid cached capacity")
+            return value
+        except (KeyError, TypeError, json.JSONDecodeError) as error:
+            raise ValueError(f"{source}/{day.date()}: malformed immutable thermal cache") from error
+    value = _one_day(client, spec["series"], day)
+    require(value is None or (np.isfinite(value) and value >= 0),
+            f"{source}/{day.date()}: invalid independently queried capacity")
+    if path is not None:
+        body = {"protocol": CACHE_PROTOCOL, "identity": identity,
+                "value": None if value is None else float(value),
+                "retrieved_at_utc": retrieved_at_utc.isoformat()}
+        content = _cache_bytes({"state": body, "sha256": hashlib.sha256(_cache_bytes(body)).hexdigest()}) + b"\n"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with tempfile.NamedTemporaryFile(prefix="thermal_state.", suffix=".tmp", dir=path.parent,
+                                         delete=False) as stream:
+            temporary = Path(stream.name)
+            stream.write(content)
+        try:
+            # collect holds the shared cache lock. Publication is atomic, so an
+            # interrupted download never becomes an apparently complete cache.
+            require(not path.exists(), f"Concurrent thermal cache state appeared: {path}")
+            os.replace(temporary, path)
+        finally:
+            temporary.unlink(missing_ok=True)
+    return value
+
+
 def collect(client: Any, delivery_day: str, *,
-            now_utc: pd.Timestamp | None = None) -> tuple[dict[str, pd.Series], dict]:
+            now_utc: pd.Timestamp | None = None,
+            cache: Path | None = None) -> tuple[dict[str, pd.Series], dict]:
+    """Capture daily states, optionally resuming their immutable local cache.
+
+    Every run still reads the supplier's complete block staircase and compares
+    it with all independent per-day states. A new day requires only thirteen
+    new individual queries. Legacy callers retain uncached behavior.
+    """
+    if cache is None:
+        return _collect(client, delivery_day, now_utc=now_utc, cache=None)
+    cache = Path(cache).resolve()
+    with exclusive_process_lock(cache / "thermal_state_cache.lock"):
+        return _collect(client, delivery_day, now_utc=now_utc, cache=cache)
+
+
+def _collect(client: Any, delivery_day: str, *,
+             now_utc: pd.Timestamp | None, cache: Path | None) -> tuple[dict[str, pd.Series], dict]:
     """Read the complete dynamic daily span without substituting absent states."""
     days, _, cutoff = grids(delivery_day)
     now = pd.Timestamp.now(tz="UTC") if now_utc is None else pd.Timestamp(now_utc)
     require(now.tzinfo is not None and now.tz_convert("UTC") >= cutoff,
             "D-1 08:00 delivery cutoff has not occurred")
     source_plan = plan()
+    from marginal_cost_expert import sources as source_reader
+    identity_base = {"collector_code_sha256": sha256(Path(__file__)),
+        "reader_code_sha256": sha256(Path(source_reader.__file__)),
+        "saturn_endpoint_sha256": hashlib.sha256(source_plan["saturn_url"].encode()).hexdigest(),
+        "staircase_request": REQUEST}
     values: dict[str, pd.Series] = {}
     state_checks: dict[str, list[dict]] = {}
     for source, spec in source_plan["specs"].items():
@@ -112,7 +188,8 @@ def collect(client: Any, delivery_day: str, *,
         # requires an independent revision_date state for *every* civil day.
         # One verified daily Pmax is then broadcast to its 23/24/25 UTC hours.
         for day in days:
-            state = _one_day(client, spec["series"], day)
+            state = _independent_state(client, source, spec, day, cache=cache,
+                                       identity_base=identity_base, retrieved_at_utc=now.tz_convert("UTC"))
             block = bulk.loc[day]
             require((state is None and not np.isfinite(block)) or
                     (state is not None and np.isfinite(block) and
@@ -307,6 +384,8 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--delivery-day", required=True)
     parser.add_argument("--bundle", type=Path)
+    parser.add_argument("--cache", type=Path, default=DEFAULT_CACHE,
+                        help="Immutable per-series, per-day Saturn state cache")
     args = parser.parse_args(argv)
     day = date.fromisoformat(args.delivery_day)
     require(day.isoformat() == args.delivery_day, "Delivery day must be YYYY-MM-DD")
@@ -315,7 +394,7 @@ def main(argv: list[str] | None = None) -> int:
     client = create_saturn_client(source_plan["saturn_url"],
                                   os.getenv("SATURN_AUTHOR") or source_plan["saturn_author"])
     with exclusive_process_lock(bundle / "thermal_capacity_live.lock"):
-        daily, evidence = collect(client, args.delivery_day)
+        daily, evidence = collect(client, args.delivery_day, cache=args.cache)
         receipt = publish(bundle, args.delivery_day, daily, evidence, source_plan)
     print(json.dumps({"state": "COMPLETE", "source_group": "thermal_capacity",
                       "delivery_day": args.delivery_day, "receipt": str(receipt),

@@ -4,6 +4,7 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 .venv/
+.venv-annual/
 venv/
 .cache/
 huggingface/
@@ -28,6 +29,10 @@ Thumbs.db
 # Immutable daily source captures stay on the host and are never committed.
 data/pit/nyx_annual_exchange_captures/
 data/pit/nyx_annual_jao_initial_live/
+data/pit/nyx_annual_saturn/
+data/pit/nyx_annual_hydro_captures/
+data/pit/nyx_annual_cpu_live_fuel/
+data/pit/nyx_annual_thermal/
 
 # Local runs, generated reports and desktop shortcuts are rebuilt on each host.
 tmp/

@@ -1,4 +1,4 @@
-"""Capture tomorrow's annual CWE JAO and lagged-exchange PIT sources.
+"""Capture tomorrow's annual CWE JAO, hydro and lagged-exchange PIT sources.
 
 Schedule this command once per day at 07:00 Europe/Paris.  The command only
 captures immutable source observations.  It does not assemble a 366-day
@@ -22,6 +22,7 @@ from chronos2_hourly.nyx_annual_jao_source import (
 from chronos2_hourly.process_lock import exclusive_process_lock
 from materialize_jao_core_flowbased import _tls_configuration
 import run_nyx_annual_exchange_source as exchange_source
+import run_nyx_annual_hydro_source as hydro_source
 from run_nyx_annual_jao_source import DEFAULT_CACHE as DEFAULT_JAO_CACHE
 
 
@@ -54,6 +55,7 @@ def capture_daily(*, now_utc: pd.Timestamp | None = None,
                   requested_day: date | None = None,
                   jao_cache: Path = DEFAULT_JAO_CACHE,
                   exchange_archive: Path = exchange_source.DEFAULT_ARCHIVE,
+                  hydro_archive: Path = hydro_source.DEFAULT_ARCHIVE,
                   ca_bundle: Path | None = None) -> dict:
     """Run both existing collectors independently, keeping all their safeguards."""
     now = _clock(now_utc)
@@ -87,6 +89,14 @@ def capture_daily(*, now_utc: pd.Timestamp | None = None,
     except Exception as error:
         sources["lagged_exchange"] = {"state": "ERROR", "error": str(error)}
 
+    try:
+        hydro_archive = Path(hydro_archive).resolve()
+        with exclusive_process_lock(hydro_archive / "hydro_source.lock"):
+            receipt = hydro_source.capture(day.isoformat(), hydro_archive, now_utc=None)
+        sources["public_hydro"] = {"state": "COMPLETE", "capture_receipt": str(receipt)}
+    except Exception as error:
+        sources["public_hydro"] = {"state": "ERROR", "error": str(error)}
+
     return {
         "action": "capture",
         "delivery_day": day.isoformat(),
@@ -100,7 +110,8 @@ def capture_daily(*, now_utc: pd.Timestamp | None = None,
 
 
 def verify_daily(day: date, *, jao_cache: Path = DEFAULT_JAO_CACHE,
-                 exchange_archive: Path = exchange_source.DEFAULT_ARCHIVE) -> dict:
+                 exchange_archive: Path = exchange_source.DEFAULT_ARCHIVE,
+                 hydro_archive: Path = hydro_source.DEFAULT_ARCHIVE) -> dict:
     """Read and verify both daily PIT archives without contacting providers."""
     jao_cache = Path(jao_cache).resolve()
     exchange_archive = Path(exchange_archive).resolve()
@@ -124,6 +135,12 @@ def verify_daily(day: date, *, jao_cache: Path = DEFAULT_JAO_CACHE,
         }
     except Exception as error:
         sources["lagged_exchange"] = {"state": "ERROR", "error": str(error)}
+    try:
+        with exclusive_process_lock(Path(hydro_archive) / "hydro_source.lock"):
+            _, receipt = hydro_source.verify_capture(Path(hydro_archive) / day.isoformat(), day.isoformat())
+        sources["public_hydro"] = {"state": "COMPLETE", "retrieved_at_utc": receipt["retrieved_at_utc"]}
+    except Exception as error:
+        sources["public_hydro"] = {"state": "ERROR", "error": str(error)}
     return {
         "action": "verify", "delivery_day": day.isoformat(),
         "checked_at_utc": pd.Timestamp.now(tz="UTC").isoformat(),
@@ -154,6 +171,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--jao-cache", type=Path, default=DEFAULT_JAO_CACHE)
     parser.add_argument("--exchange-archive", type=Path,
                         default=exchange_source.DEFAULT_ARCHIVE)
+    parser.add_argument("--hydro-archive", type=Path, default=hydro_source.DEFAULT_ARCHIVE)
     parser.add_argument("--ca-bundle", type=Path,
                         help="Trusted PEM bundle for an enterprise JAO TLS proxy")
     parser.add_argument("--log-file", type=Path, default=DEFAULT_LOG,
@@ -164,11 +182,12 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if args.verify_only:
             result = verify_daily(args.delivery_day, jao_cache=args.jao_cache,
-                                  exchange_archive=args.exchange_archive)
+                                  exchange_archive=args.exchange_archive, hydro_archive=args.hydro_archive)
         else:
             result = capture_daily(requested_day=args.delivery_day,
                                    jao_cache=args.jao_cache,
                                    exchange_archive=args.exchange_archive,
+                                   hydro_archive=args.hydro_archive,
                                    ca_bundle=args.ca_bundle)
     except Exception as error:
         started = pd.Timestamp.now(tz="UTC")

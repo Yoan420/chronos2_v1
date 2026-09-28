@@ -449,6 +449,68 @@ class CovariateDstPolicyPlumbingTests(unittest.TestCase):
         self.assertTrue(retry.kwargs["nocache"])
         self.assertEqual(float(result.iloc[0]), 40.0)
 
+    def test_fetch_empty_response_preserves_nocache_failure(self) -> None:
+        client = Mock()
+        retry_error = TimeoutError("Saturn request timed out")
+        client.get.side_effect = [pd.Series(dtype=float), retry_error]
+        start = pd.Timestamp("2023-06-26 00:00", tz=PARIS)
+        end = pd.Timestamp("2023-06-27 00:00", tz=PARIS)
+        cutoff = pd.Timestamp("2023-06-25 06:00", tz="UTC")
+
+        with self.assertRaises(RuntimeError) as caught:
+            fetch_saturn_series_from_client(
+                client,
+                NUCLEAR,
+                start,
+                end,
+                PARIS,
+                revision_date=cutoff,
+            )
+
+        message = str(caught.exception)
+        self.assertIn(f"plage={start} -> {end}; cutoff={cutoff}", message)
+        self.assertIn(
+            "reponse vide (dialecte=from_value_date/to_value_date)", message
+        )
+        self.assertIn(
+            "reprise nocache TimeoutError: Saturn request timed out", message
+        )
+        self.assertIs(caught.exception.__cause__, retry_error)
+        self.assertEqual(client.get.call_count, 2)
+        first, retry = client.get.call_args_list
+        self.assertEqual(first.args, retry.args)
+        self.assertEqual(
+            first.kwargs,
+            {
+                "from_value_date": start,
+                "to_value_date": end,
+                "revision_date": cutoff,
+            },
+        )
+        self.assertEqual(retry.kwargs, {**first.kwargs, "nocache": True})
+
+    def test_fetch_allow_empty_still_accepts_nocache_failure(self) -> None:
+        client = Mock()
+        client.get.side_effect = [
+            pd.Series(dtype=float),
+            TimeoutError("Saturn request timed out"),
+        ]
+
+        result = fetch_saturn_series_from_client(
+            client,
+            NUCLEAR,
+            pd.Timestamp("2023-06-26 00:00", tz=PARIS),
+            pd.Timestamp("2023-06-27 00:00", tz=PARIS),
+            PARIS,
+            revision_date=pd.Timestamp("2023-06-25 06:00", tz="UTC"),
+            allow_empty=True,
+        )
+
+        self.assertTrue(result.empty)
+        self.assertEqual(result.name, NUCLEAR)
+        self.assertEqual(str(result.index.tz), PARIS)
+        self.assertEqual(client.get.call_count, 2)
+
     def test_fetch_changes_dialect_only_for_unexpected_keyword(self) -> None:
         raw = pd.Series(
             [40.0],

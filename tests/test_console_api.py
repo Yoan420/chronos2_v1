@@ -115,6 +115,7 @@ def test_desktop_annual_cwe_preflight_is_read_only_and_never_unlocks_forecasts(a
     for relative in (
         "config/nyx_annual_cwe_historical.json",
         "config/nyx_annual_cpu_qualification_receipt.json",
+        "config/nyx_annual_cpu_expert_replay_20260928.json",
         "config/nyx_annual_cpu_desktop_results.json",
     ):
         source = PROJECT_ROOT / relative
@@ -135,7 +136,10 @@ def test_desktop_annual_cwe_preflight_is_read_only_and_never_unlocks_forecasts(a
     assert result["cpu_replay"]["full_input_chain_qualified"] is False
     assert result["cpu_replay"]["forecast_ready"] is False
     assert result["source_feature_matrices"]["pooled_FR"]["status"] == "missing"
-    assert api.client.get("/api/annual-cwe-preflight", params={"country": "DE"}).status_code == 404
+    de = api.client.get("/api/annual-cwe-preflight", params={"country": "DE"})
+    assert de.status_code == 200
+    assert de.json()["countries"]["DE"]["price"]["candidate"] == "boosting_2000_mean_disagreement20"
+    assert de.json()["forecast_ready"] is False
     assert not api.manager.list_runs()
     after = sorted(path.relative_to(api.project).as_posix() for path in api.project.rglob("*") if path.is_file())
     assert before == after

@@ -29,25 +29,36 @@ publication du fournisseur ne sont pas certifiées.
 
 Sur un clone vide, la première collecte réalise 4 758 requêtes individuelles
 plus treize extractions de contrôle. Sa durée et l'authentification Saturn sur
-le poste professionnel n'ont pas été mesurées. Le code ne contient pas encore
-de réemploi vérifié des états d'un précédent lot. Les quatre blocs thermiques
+le poste professionnel n'ont pas été mesurées. Les états sont conservés dans
+`data/pit/nyx_annual_thermal`, par série et journée, avec leur coupure, leur contrat
+et leurs empreintes de code. La relance d'un même jour réutilise les états
+vérifiés ; le lendemain demande seulement **13 nouvelles requêtes individuelles**.
+Les treize extractions `block_staircase` restent effectuées à chaque passage et
+comparées à tous les états de la fenêtre. Une altération du cache ou une révision
+incompatible bloque la collecte. `--cache <dossier>` permet de choisir son
+emplacement. Les quatre blocs thermiques
 ne sont qu'une partie des matrices de 449/503 variables exigées par NYX ; ce
 collecteur ne lance aucune prévision.
 
 ## Hydro public français
 
 Le collecteur historique `collect_nyx_public_hydro.py` est un fichier de
-recherche **non suivi** dans Git. Il lit l'API Energy-Charts par mois, avec
+recherche local. Il lit l'API Energy-Charts par mois, avec
 des dates et un répertoire de sortie fixés jusqu'au 24 septembre 2026. Les
 réponses locales portent `generated_at` au moment de la collecte du 25
 septembre, après les origines de l'évaluation annuelle. Le constructeur
-`nyx_fr_hydro_lagged_features.py` est lui aussi non suivi. Son retard de 48
+`nyx_fr_hydro_lagged_features.py` est désormais livré pour réutiliser exactement
+les mêmes formules sur les captures prospectives. Son retard de 48
 heures prouve que l'intervalle physique utilisé précède l'origine ; il ne
 prouve pas que la valeur révisée était publiée à cette origine.
 
-Il manque un historique de versions fournisseur ou des captures prospectives
-immuables faites avant chaque coupure D−1 08 h, avec leurs horodatages réels.
-Sans cette preuve, un adaptateur ne peut pas émettre honnêtement
-`asof_cutoff_verified:true` pour `public_hydro`. Le précontrôle du bundle doit
-donc rester bloqué sur ce groupe. Recopier les fichiers de recherche ou le
-collecteur à dates fixes ne résout pas cette absence de vintage.
+Le collecteur prospectif livré est `run_nyx_annual_hydro_source.py`. Son action
+`capture` archive la réponse brute avant la coupure D−1 08 h, ainsi que les huit
+valeurs calculées et leurs indicateurs. Son action `assemble` exige les captures
+des 366 jours de la fenêtre, les revalide, puis lie leurs archives au bundle.
+Le validateur de chaîne peut extraire ces archives et refaire les calculs sans
+le cache du poste personnel.
+
+La présence du collecteur ne crée pas les captures passées. Sans historique
+admissible, l'assemblage reste bloqué. Recopier les réponses rétrospectives de
+recherche ne prouve pas leur disponibilité à l'époque.

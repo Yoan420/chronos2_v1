@@ -57,11 +57,13 @@ def _day(value: str) -> date:
     return parsed
 
 
-def price_grid(delivery_day: str) -> tuple[pd.DatetimeIndex, pd.Timestamp]:
+def price_grid(delivery_day: str, history_start_day: str | None = None) -> tuple[pd.DatetimeIndex, pd.Timestamp]:
     """Return 372 complete Paris civil days, ending before delivery D."""
     day = _day(delivery_day)
     _, current, cutoff = delivery_grid(delivery_day)
-    start = pd.Timestamp(day - timedelta(days=TRAIN_DAYS + LAG_DAYS),
+    first = _day(history_start_day) if history_start_day else day - timedelta(days=TRAIN_DAYS + LAG_DAYS)
+    require(first <= day - timedelta(days=TRAIN_DAYS + LAG_DAYS), "Auction history must cover training and lag warmup")
+    start = pd.Timestamp(first,
                          tz="Europe/Paris").tz_convert("UTC")
     expected = pd.date_range(start, current[0], freq="h", inclusive="left")
     require(len(expected) >= 24 * (TRAIN_DAYS + LAG_DAYS) - 1
@@ -94,9 +96,9 @@ def load_plan(root: Path = ROOT) -> dict:
 
 
 def collect(client: Any, delivery_day: str, *,
-            now_utc: pd.Timestamp | None = None) -> tuple[dict[str, pd.DataFrame], dict]:
+            now_utc: pd.Timestamp | None = None, history_start_day: str | None = None) -> tuple[dict[str, pd.DataFrame], dict]:
     """Read one as-of Saturn state and reject missing or future target hours."""
-    expected, cutoff = price_grid(delivery_day)
+    expected, cutoff = price_grid(delivery_day, history_start_day)
     now = pd.Timestamp.now(tz="UTC") if now_utc is None else pd.Timestamp(now_utc)
     require(now.tzinfo is not None and now.tz_convert("UTC") >= cutoff,
             "D-1 08:00 delivery cutoff has not occurred")
@@ -121,7 +123,8 @@ def collect(client: Any, delivery_day: str, *,
     return values, {"cutoff_utc": cutoff.isoformat(), "first_hour_utc": expected[0].isoformat(),
                     "last_hour_utc": expected[-1].isoformat(),
                     "hours_per_zone": len(expected), "training_days": TRAIN_DAYS,
-                    "lag_warmup_days": LAG_DAYS}
+                    "lag_warmup_days": LAG_DAYS,
+                    "history_start_day": expected[0].tz_convert("Europe/Paris").date().isoformat()}
 
 
 def _write_immutable_parquet(frame: pd.DataFrame, path: Path) -> str:
@@ -151,7 +154,7 @@ def publish(bundle: Path, delivery_day: str, values: dict[str, pd.DataFrame],
             evidence: dict, plan: dict, *, now_utc: pd.Timestamp | None = None) -> Path:
     """Bind all four complete histories in an immutable dated bundle."""
     bundle = bundle.resolve()
-    expected, cutoff = price_grid(delivery_day)
+    expected, cutoff = price_grid(delivery_day, evidence.get("history_start_day"))
     require(set(values) == set(SERIES) and evidence["cutoff_utc"] == cutoff.isoformat(),
             "Auction capture identity differs")
     now = pd.Timestamp.now(tz="UTC") if now_utc is None else pd.Timestamp(now_utc)
@@ -211,17 +214,18 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--delivery-day", required=True)
     parser.add_argument("--bundle", type=Path)
+    parser.add_argument("--history-start-day", help="Optional longer history for baseline/reference warmup")
     args = parser.parse_args(argv)
     day = _day(args.delivery_day)
     bundle = args.bundle or ROOT / "runs/live/nyx_annual_cpu" / day.isoformat()
-    expected, cutoff = price_grid(args.delivery_day)
+    expected, cutoff = price_grid(args.delivery_day, args.history_start_day)
     require(pd.Timestamp.now(tz="UTC") >= cutoff,
             "D-1 08:00 delivery cutoff has not occurred")
     plan = load_plan()
     client = create_saturn_client(plan["saturn_url"],
                                   os.getenv("SATURN_AUTHOR") or plan["saturn_author"])
     with exclusive_process_lock(bundle / "auction_prices_live.lock"):
-        values, evidence = collect(client, args.delivery_day)
+        values, evidence = collect(client, args.delivery_day, history_start_day=args.history_start_day)
         receipt = publish(bundle, args.delivery_day, values, evidence, plan)
     print(json.dumps({"state": "COMPLETE", "source_group": "auction_prices",
                       "delivery_day": args.delivery_day, "receipt": str(receipt),

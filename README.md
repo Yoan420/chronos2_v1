@@ -1,5 +1,13 @@
 # Forecast day-ahead multi-pays
 
+## Modèles annuels CWE sur CPU
+
+La branche `codex/nyx-regional-rmse-production` contient la chaîne annuelle
+FR/DE/NL/BE : collecte Saturn, captures publiques, construction des variables,
+réentraînement CPU, évaluation complète et lancement depuis NYX.
+L'activation exige les archives vérifiées et une qualification complète.
+Installation Windows et commandes : [guide annuel CPU](docs/nyx_annual_production_cpu.md).
+
 ## NYX — Prévisions et résultats locaux
 
 NYX lance la prévision complète avec `NuclearKalman.ps1` et présente les rapports

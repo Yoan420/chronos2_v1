@@ -43,7 +43,7 @@ def test_ordered_schemas_are_independent_of_historical_cache():
 def test_clean_clone_has_explicit_missing_inputs(tmp_path: Path):
     report = inspect_bundle(tmp_path, "2026-09-29")
     assert report["input_bundle_valid"] is False
-    assert len(report["checks"]) == len(SOURCE_GROUPS) + 4 * len(FAMILIES) + 4 + 3 + 1
+    assert len(report["checks"]) == len(SOURCE_GROUPS) + 4 * len(FAMILIES) + 4 + 4 + 1
     assert all(item["passed"] is False for item in report["checks"])
     assert any(item["input"] == "source/saturn" for item in report["checks"])
     assert any(item["input"] == "reference/FR" for item in report["checks"])
@@ -130,6 +130,8 @@ def _bound_materialization(tmp_path: Path):
     code_path = code_root / MATERIALIZER_CODE[0]
     code_path.parent.mkdir(parents=True)
     code_path.write_text("# deterministic materializer\n", encoding="utf-8")
+    for name in MATERIALIZER_CODE[1:]:
+        (code_root / name).write_text("# deterministic dependency\n", encoding="utf-8")
     schema = tmp_path / "schema.json"
     schema.write_text('{"schema": "test"}\n', encoding="utf-8")
     receipts, sources = {}, {}
@@ -165,8 +167,9 @@ def _bound_materialization(tmp_path: Path):
                 "schema_sha256": hashlib.sha256(schema.read_bytes()).hexdigest(),
                 "source_receipts_sha256": receipts,
                 "source_artifacts_sha256": sources,
-                "transform_code_sha256": {MATERIALIZER_CODE[0]:
-                    hashlib.sha256(code_path.read_bytes()).hexdigest()},
+                "transform_code_sha256": {name:
+                    hashlib.sha256((code_root / name).read_bytes()).hexdigest()
+                    for name in MATERIALIZER_CODE},
                 "output_sha256": outputs}
     manifest_path = bundle / MATERIALIZATION_PATH
     manifest_path.write_text(json.dumps(manifest), encoding="utf-8")

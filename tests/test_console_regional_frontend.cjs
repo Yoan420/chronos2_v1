@@ -56,6 +56,7 @@ async function main() {
       else if(path==='/api/regional-evaluation-preflight')value=evaluationGate;
       else if(path.startsWith('/api/annual-cwe-preflight?country='))value=annualGate(decodeURIComponent(path.split('=')[1]));
       else if(path==='/api/runs')value={runs};
+      else if(path==='/api/annual-publications')value={days:[],warnings:[]};
       else if(path==='/api/preview')value={id:JSON.parse(options.body).adapter_id==='nyx_regional_cpu_backtest'?'eval-plan':'plan-1'};
       else if(path==='/api/launch'){
         const evaluation=JSON.parse(options.body).plan_id==='eval-plan';
@@ -73,7 +74,7 @@ async function main() {
   await new Promise(resolve=>setImmediate(resolve));
   const evaluate=code=>vm.runInContext(code,context);
   assert.equal(evaluate('state.route'),'regional');
-  assert.ok(element('#main').innerHTML.includes('Modèles annuels FR / BE / NL'));
+  assert.ok(element('#main').innerHTML.includes('Modèles annuels FR / DE / NL / BE'));
   assert.ok(calls.some(call=>call.path==='/api/annual-cwe-preflight?country=FR'));
   assert.ok(element('#annual-cwe-status').innerHTML.includes('Prévision annuelle indisponible'));
   assert.ok(element('#annual-cwe-status').innerHTML.includes('residual__disagreement20__w1p0'));
@@ -81,7 +82,7 @@ async function main() {
   assert.ok(element('#annual-cwe-status').innerHTML.includes('Étude GPU historique · 23 septembre 2026'));
   assert.ok(element('#annual-cwe-status').innerHTML.includes('18,596'));
   assert.ok(element('#annual-cwe-status').innerHTML.includes('80,86 %'));
-  assert.ok(element('#annual-cwe-status').innerHTML.includes('chaîne complète des entrées futures non qualifiée'));
+  assert.ok(element('#annual-cwe-status').innerHTML.includes('Chaîne complète des entrées futures non qualifiée'));
   assert.equal(evaluate('state.regional.annualPreflight.forecast_ready'),false);
   await evaluate("state.regional.annualCountry='BE';checkAnnualCwe()");
   assert.ok(calls.some(call=>call.path==='/api/annual-cwe-preflight?country=BE'));

@@ -23,7 +23,14 @@ PROTOCOL = "nyx_annual_cpu_live_inputs_v1"
 SOURCE_PROTOCOL = "nyx_annual_cpu_live_source_receipt_v1"
 MATERIALIZATION_PROTOCOL = "nyx_annual_cpu_materialization_v1"
 MATERIALIZATION_PATH = "source_receipts/materialization.json"
-MATERIALIZER_CODE = ("chronos2_hourly/nyx_annual_cpu_bundle_builder.py",)
+MATERIALIZER_CODE = tuple("chronos2_hourly/" + name for name in (
+    "nyx_annual_cpu_bundle_builder.py", "nyx_local_price_features.py",
+    "nyx_local_extra_features.py", "nyx_pooled_calendar.py",
+    "nyx_fr_hydro_lagged_features.py", "nyx_forecast_profile_features.py",
+    "nyx_thermal_capacity_features.py", "nyx_lagged_exchange_features.py",
+    "nyx_live_hybrid.py", "solar_wind_scarcity_regime.py",
+    "nyx_annual_feature_projection.py", "nyx_annual_saturn_source.py")) + (
+    "run_nyx_annual_thermal_source.py",)
 ZONES = ("FR", "DE", "BE", "NL")
 FAMILIES = {"fr_residual_1000": 449, "cwe_residual_2000": 123,
             "cwe_absolute_2000": 503}
@@ -199,7 +206,7 @@ def materialized_outputs() -> tuple[str, ...]:
     return (*(
         f"features/{family}/{zone}.parquet"
         for family in FAMILIES for zone in ZONES
-    ), *(f"reference/{zone}.parquet" for zone in ("FR", "BE", "NL")))
+    ), *(f"reference/{zone}.parquet" for zone in ZONES))
 
 
 def validate_materialization_manifest(bundle: Path, delivery_day: str, *,
@@ -251,7 +258,7 @@ def validate_materialization_manifest(bundle: Path, delivery_day: str, *,
 
     outputs = manifest.get("output_sha256")
     _require(isinstance(outputs, dict) and set(outputs) == set(materialized_outputs()),
-             "Annual CPU materialization must bind all 12 features and three references")
+             "Annual CPU materialization must bind all 12 features and four references")
     for relative, expected in outputs.items():
         _require(isinstance(expected, str) and len(expected) == 64
                  and all(char in "0123456789abcdef" for char in expected),
@@ -330,7 +337,7 @@ def inspect_bundle(bundle: Path, delivery_day: str,
             validate_baseline(read_parquet(relative), full, current, cutoff, relative)
 
         check(f"baseline/{zone}", baseline_action)
-    for zone in ("FR", "BE", "NL"):
+    for zone in ZONES:
         relative = f"reference/{zone}.parquet"
 
         def reference_action(relative=relative):

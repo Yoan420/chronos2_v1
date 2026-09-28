@@ -11,6 +11,13 @@ import pytest
 import run_nyx_annual_daily_capture as daily
 
 
+@pytest.fixture(autouse=True)
+def synthetic_hydro(monkeypatch, tmp_path):
+    # These orchestration tests never contact the third collector either.
+    monkeypatch.setattr(daily.hydro_source, "capture", lambda day, archive, **kw: tmp_path / day / "capture.json")
+    monkeypatch.setattr(daily.hydro_source, "verify_capture", lambda directory, day: (None, {"retrieved_at_utc": _at("2026-09-29 07:00").isoformat()}))
+
+
 def _at(local: str) -> pd.Timestamp:
     return pd.Timestamp(local, tz="Europe/Paris").tz_convert("UTC")
 
@@ -94,6 +101,7 @@ def test_runs_both_existing_collectors_under_their_locks(monkeypatch, tmp_path):
                                   exchange_archive=archive)
     assert calls == ["jao", "exchange"]
     assert outcome["state"] == "COMPLETE"
+    assert outcome["sources"]["public_hydro"]["state"] == "COMPLETE"
     assert outcome["model_inputs_complete"] is False
     assert outcome["forecast_enabled"] is False
     assert not (jao_cache / "jao_live_capture.lock").exists()

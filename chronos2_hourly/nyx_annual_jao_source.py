@@ -15,7 +15,6 @@ import gzip
 import json
 import os
 from pathlib import Path
-import shutil
 import uuid
 
 import numpy as np
@@ -376,20 +375,9 @@ def build_strict_history_features(cache_root: Path,
 
 
 def _copy_immutable(source: Path, destination: Path) -> str:
+    from .nyx_local_io import publish_verified_immutable_copy
     digest = sha256(source)
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    if destination.exists():
-        require(sha256(destination) == digest,
-                f"Existing JAO bundle artifact differs: {destination}")
-        return digest
-    temporary = destination.with_name(f".{destination.name}.{uuid.uuid4().hex}.tmp")
-    try:
-        shutil.copyfile(source, temporary)
-        require(sha256(temporary) == digest and sha256(source) == digest,
-                "JAO source changed during copy")
-        os.replace(temporary, destination)
-    finally:
-        temporary.unlink(missing_ok=True)
+    publish_verified_immutable_copy(source, destination, digest)
     return digest
 
 
@@ -455,10 +443,16 @@ def publish_jao_receipt(*, day: date, cache_root: Path, bundle: Path) -> dict:
         finally:
             temporary.unlink(missing_ok=True)
         artifacts[feature_relative] = sha256(feature_path)
-        current_raw, current_audit, _, _ = _paths(cache_root, day)
-        for source in (current_raw, current_audit):
-            relative = f"{SOURCE_SUBDIR}/current/{source.name}"
-            artifacts[relative] = _copy_immutable(source, bundle / relative)
+        # The full chain evaluator must reconstruct the whole training window
+        # from RAW, not trust a ledger that names unavailable external files.
+        # Preserve the collector's directory layout so verify_daily_capture and
+        # build_strict_history_features can run on the portable bundle alone.
+        for capture in captured:
+            capture_day = date.fromisoformat(capture["delivery_day"])
+            for source in _paths(cache_root, capture_day):
+                member = source.relative_to(cache_root).as_posix()
+                relative = f"{SOURCE_SUBDIR}/captures/{member}"
+                artifacts[relative] = _copy_immutable(source, bundle / relative)
 
     receipt = {
         "protocol": SOURCE_PROTOCOL,

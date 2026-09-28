@@ -127,3 +127,63 @@ def test_receipt_refuses_incomplete_daily_state_evidence(tmp_path: Path):
     with pytest.raises(ValueError, match="366 daily as-of states"):
         m.publish(tmp_path / "bundle", DAY, daily, evidence, source_plan,
                   now_utc=cutoff)
+
+
+def test_incremental_state_cache_only_queries_thirteen_new_days(tmp_path):
+    specs = m.plan()["specs"]
+    cutoff = delivery_grid(DAY)[2]
+    first_client = Saturn(specs)
+    first, evidence = m.collect(first_client, DAY, now_utc=cutoff, cache=tmp_path)
+    assert sum(call[0] == "state" for call in first_client.calls) == 366 * 13
+    second_client = Saturn(specs)
+    second, repeated = m.collect(second_client, DAY, now_utc=cutoff, cache=tmp_path)
+    assert sum(call[0] == "block" for call in second_client.calls) == 13
+    assert not any(call[0] == "state" for call in second_client.calls)
+    assert evidence == repeated
+    for name in m.SOURCES:
+        pd.testing.assert_series_equal(first[name], second[name])
+    next_day = (pd.Timestamp(DAY) + pd.Timedelta(days=1)).date().isoformat()
+    third_client = Saturn(specs)
+    m.collect(third_client, next_day, now_utc=delivery_grid(next_day)[2], cache=tmp_path)
+    assert sum(call[0] == "state" for call in third_client.calls) == 13
+
+
+def test_incremental_state_cache_rejects_tampering(tmp_path):
+    specs = m.plan()["specs"]
+    cutoff = delivery_grid(DAY)[2]
+    _partial_cache(tmp_path, specs, cutoff)
+    first_day = m.grids(DAY)[0][0].date().isoformat()
+    path = tmp_path / m.SOURCES[0] / f"{first_day}.json"
+    envelope = json.loads(path.read_text(encoding="utf-8"))
+    envelope["state"]["value"] += 10.
+    path.write_text(json.dumps(envelope), encoding="utf-8")
+    with pytest.raises(ValueError, match="cache checksum changed"):
+        m.collect(Saturn(specs), DAY, now_utc=cutoff, cache=tmp_path)
+
+
+def test_incremental_state_cache_rejects_supplier_revision(tmp_path):
+    specs = m.plan()["specs"]
+    cutoff = delivery_grid(DAY)[2]
+    _partial_cache(tmp_path, specs, cutoff)
+
+    class Revised(Saturn):
+        def block_staircase(self, *args, **kwargs):
+            result = super().block_staircase(*args, **kwargs)
+            result.iloc[0] += 1.
+            return result
+
+    client = Revised(specs)
+    with pytest.raises(ValueError, match="block staircase disagrees with D-1 state"):
+        m.collect(client, DAY, now_utc=cutoff, cache=tmp_path)
+    assert not any(call[0] == "state" for call in client.calls)
+
+
+def _partial_cache(directory, specs, cutoff):
+    """A real interrupted collection leaves its first verified state resumable."""
+    class Interrupted(Saturn):
+        def get(self, *args, **kwargs):
+            if any(call[0] == "state" for call in self.calls):
+                raise RuntimeError("fixture interruption after one state")
+            return super().get(*args, **kwargs)
+    with pytest.raises(RuntimeError, match="fixture interruption"):
+        m.collect(Interrupted(specs), DAY, now_utc=cutoff, cache=directory)

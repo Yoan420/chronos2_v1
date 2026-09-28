@@ -893,6 +893,13 @@ class _Candidate:
         self.covariance_repairs = 0
         self.innovation_clips = 0
         self.market_feature_columns = tuple(map(str, market_feature_columns))
+        # Market/scaler inputs are frozen for the lifetime of a fitted candidate.
+        # Select the exact feature order once instead of rebuilding a pandas
+        # Series for every hourly observation of every rolling origin.
+        self._rolling_market_array = (
+            market.loc[:, list(self.market_feature_columns)].to_numpy(dtype=float, copy=True)
+            if kind in EXOGENOUS_FILTER_GROUPS else None
+        )
         if kind == "linear_bias":
             self.feature_names = ("intercept",)
             initial = np.zeros(1, dtype=float)
@@ -1129,6 +1136,11 @@ class _Candidate:
         self._repair_covariance()
         return predicted, innovation
 
+    def _rolling_market_values(self, timestamp: pd.Timestamp) -> np.ndarray:
+        """Read the unchanged market vector on the original unique UTC index."""
+        assert self._rolling_market_array is not None
+        return self._rolling_market_array[self.market.index.get_loc(timestamp)]
+
     def update_hour_rolling(self, row: pd.Series) -> tuple[float, float]:
         """Numerically equivalent small-matrix update for repeated refits.
 
@@ -1170,9 +1182,7 @@ class _Candidate:
                                 ],
                                 dtype=float,
                             ),
-                            self.market.loc[
-                                row.name, list(self.market_feature_columns)
-                            ].to_numpy(dtype=float),
+                            self._rolling_market_values(row.name),
                         ]
                     )
             else:

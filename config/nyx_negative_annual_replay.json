@@ -8,6 +8,7 @@
   "origins_per_country": 53,
   "countries": [
     "FR",
+    "DE",
     "BE",
     "NL"
   ],
@@ -76,6 +77,20 @@
       "archived_probabilities": {
         "path": "runs/experiments/nyx_improvement_to20260923/negative_prices_v1/annual/NL.parquet",
         "sha256": "0a71c1adaaa83417a5af031e5ac050cf51313bd1a3741be890a64a522fb2ebe9"
+      }
+    },
+    "DE": {
+      "features": {
+        "path": "runs/experiments/nyx_improvement_to20260923/feature_sets/pooled_jao_refresh_v1/compact/features_DE.parquet",
+        "sha256": "0c33c75b19fc0f73cc85c90011d35b60ff10bedf6b03429426d393b17c4230c7"
+      },
+      "baseline": {
+        "path": "runs/experiments/nyx_local_365_to20260923/baseline/DE.parquet",
+        "sha256": "5590ff03cce0cc17472fb7a247a2e25974e850ec81f35efd1cff30553f520783"
+      },
+      "archived_probabilities": {
+        "path": "runs/experiments/nyx_improvement_to20260923/negative_prices_v1/annual/DE.parquet",
+        "sha256": "f260874a6db34db257e9a763aaa299381923b480d6452fe4de0ed649a32fb992"
       }
     }
   }

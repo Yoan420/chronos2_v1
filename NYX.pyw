@@ -2,7 +2,11 @@
 if __name__ == '__main__':
     try:
         from experiment_console.desktop import main
-        main()
+        import argparse
+        parser = argparse.ArgumentParser(description='NYX desktop')
+        parser.add_argument('--settings', help='Optional isolated desktop settings JSON')
+        args = parser.parse_args()
+        main(args.settings)
     except Exception as error:
         # Keep an actionable GUI error even if a dependency cannot be imported.
         import ctypes

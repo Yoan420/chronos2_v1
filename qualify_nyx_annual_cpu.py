@@ -1,8 +1,9 @@
 #!/usr/bin/env python
-"""Audit the full price and negative CPU replays, then seal qualification.
+"""Verify a complete CPU-chain evaluation or inspect legacy expert replays.
 
-This command never starts a replay and never enables the NYX forecast gate.
-Both replay directories must contain completed, immutable annual results.
+Only --full-chain-evaluation combined with --activate can enable NYX forecasts.
+It rechecks daily source, producer, model and official score evidence first.
+Legacy expert replays remain conditional and cannot activate the forecast gate.
 """
 from __future__ import annotations
 
@@ -19,12 +20,32 @@ from chronos2_hourly.nyx_annual_cpu_qualification import (
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=ROOT)
-    parser.add_argument("--price-replay", type=Path, required=True)
-    parser.add_argument("--negative-replay", type=Path, required=True)
+    parser.add_argument("--price-replay", type=Path)
+    parser.add_argument("--negative-replay", type=Path)
+    parser.add_argument("--full-chain-evaluation", type=Path,
+        help="new chronological daily producer-bundle evaluation directory")
+    parser.add_argument("--activate", action="store_true",
+        help="enable production only after independently rechecking full-chain evidence")
     parser.add_argument("--preflight", action="store_true",
                         help="verify both replays in read-only mode")
     args = parser.parse_args(argv)
     try:
+        if args.full_chain_evaluation:
+            if args.price_replay or args.negative_replay:
+                parser.error("Full-chain and legacy expert replay modes are distinct")
+            from chronos2_hourly.nyx_annual_cpu_full_chain import qualify, score_plan
+            if args.preflight:
+                if args.activate:
+                    parser.error("--preflight is read-only and cannot be combined with --activate")
+                receipt = score_plan(root=args.root, output=args.full_chain_evaluation)
+            else:
+                receipt = qualify(root=args.root, output=args.full_chain_evaluation, activate=args.activate)
+            print(json.dumps(receipt, allow_nan=False))
+            return 0 if receipt["qualified"] else 2
+        if args.activate:
+            parser.error("--activate requires --full-chain-evaluation")
+        if not args.price_replay or not args.negative_replay:
+            parser.error("Legacy inspection requires --price-replay and --negative-replay")
         if args.preflight:
             receipt = prepare_receipt(args.root, args.price_replay,
                                       args.negative_replay)

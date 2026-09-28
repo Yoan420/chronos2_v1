@@ -211,6 +211,14 @@ def test_complete_ledger_produces_preflight_compatible_receipt(
     current_capture = source.verify_daily_capture(cache, day)
     history = [{**current_capture, "delivery_day": (day - timedelta(days=offset)).isoformat()}
                for offset in range(365, -1, -1)]
+    # This wiring fixture mocks RAW reconstruction below. Still provide every
+    # named partition so publication must copy a self-contained source packet.
+    current_bytes = [path.read_bytes() for path in source._paths(cache, day)]
+    for item in history[:-1]:
+        for path, raw in zip(source._paths(cache, date.fromisoformat(item["delivery_day"])),
+                             current_bytes, strict=True):
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(raw)
     monkeypatch.setattr(source, "inspect_history", lambda _cache, _day: (history, []))
     full, _, current_cutoff = delivery_grid(day.isoformat())
     frame = pd.DataFrame(0.0, index=full, columns=source.FEATURE_COLUMNS)
@@ -226,3 +234,8 @@ def test_complete_ledger_produces_preflight_compatible_receipt(
     assert receipt["captured_training_and_delivery_days"] == 366
     assert receipt["asof_state_utc"] == current_capture["retrieved_at_utc"]
     assert (bundle / source.SOURCE_SUBDIR / source.FEATURE_NAME).is_file()
+    captured_members = [name for name in receipt["artifact_sha256"] if "/captures/" in name]
+    assert len(captured_members) == 366 * 4
+    first = day - timedelta(days=365)
+    assert (bundle / source.SOURCE_SUBDIR / "captures/raw/initialComputation" /
+            f"{first.isoformat()}.json.gz").is_file()

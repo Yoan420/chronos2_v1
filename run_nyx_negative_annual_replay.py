@@ -23,7 +23,7 @@ from chronos2_hourly import nyx_negative_probability_cpu as negative
 
 
 CONFIG_PATH = Path("config/nyx_negative_annual_replay.json")
-SUPPORTED_COUNTRIES = ("FR", "BE", "NL")
+SUPPORTED_COUNTRIES = ("FR", "DE", "BE", "NL")
 METRIC_TOLERANCE = 1e-12
 SERIES_TOLERANCE = 1e-12
 
@@ -185,7 +185,7 @@ def preflight(root: Path, countries: tuple[str, ...] = SUPPORTED_COUNTRIES) -> d
     try:
         config = _load_config(root)
         if not countries or len(countries) != len(set(countries)) or set(countries) - set(SUPPORTED_COUNTRIES):
-            raise ValueError("Select one or more distinct FR/BE/NL countries")
+            raise ValueError("Select one or more distinct FR/DE/BE/NL countries")
         files = {"evidence": {}, "sources": {}}
         for key, spec in config["evidence"].items():
             files["evidence"][key] = _file_status(root, spec)

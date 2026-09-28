@@ -8,14 +8,18 @@ import os
 from pathlib import Path
 import tempfile
 import traceback
+from uuid import uuid4
 
 import pandas as pd
 
 from chronos2_hourly.nyx_annual_cpu_live import (
     COUNTRIES, MANIFEST, PROTOCOL, QUALIFICATION_CODE, ROOT, bundle_hashes,
-    execute_models, load_bundle, preflight, require, verify_activation,
+    execute_models, load_bundle, preflight, recoverable_output, require, verify_activation,
 )
 from chronos2_hourly.nyx_annual_live_preflight import inspect_bundle, sha256
+from chronos2_hourly.nyx_annual_cpu_reporting import write_country_report
+from chronos2_hourly.process_lock import exclusive_process_lock
+from chronos2_hourly.nyx_local_io import replace_retry
 
 
 def _atomic_json(path: Path, value: dict) -> None:
@@ -28,7 +32,7 @@ def _atomic_json(path: Path, value: dict) -> None:
             stream.write("\n")
             stream.flush()
             os.fsync(stream.fileno())
-        os.replace(filename, path)
+        replace_retry(filename, path)
     finally:
         Path(filename).unlink(missing_ok=True)
 
@@ -38,15 +42,36 @@ def run(*, bundle: Path, delivery_day: str, output: Path) -> dict:
     plan = preflight(bundle, delivery_day, output)
     require(plan["ready"], "; ".join(plan["blockers"]))
     bundle, output = bundle.resolve(), output.resolve()
-    output.mkdir(parents=True, exist_ok=False)
+    with exclusive_process_lock(output.parent / f".{output.name}.lock"):
+        return _run_attempt(bundle=bundle, delivery_day=delivery_day, output=output, plan=plan)
+
+
+def _run_attempt(*, bundle: Path, delivery_day: str, output: Path, plan: dict) -> dict:
+    """Preserve interruptions and expose only an entirely sealed publication."""
+    require(not output.exists() or recoverable_output(output, delivery_day),
+            "Output already exists; choose a new immutable run directory")
+    attempts = output.parent / f".{output.name}.attempts"
+    require(attempts.resolve().is_relative_to(output.parent)
+            and not attempts.resolve().is_relative_to(bundle),
+            "Attempts path escapes output parent or overlaps the immutable bundle")
+    attempts.mkdir(parents=True, exist_ok=True)
+    if output.exists():
+        interrupted = attempts / f"interrupted-{uuid4().hex}"
+        require(output.resolve().is_relative_to(output.parent)
+                and interrupted.resolve().is_relative_to(output.parent),
+                "Interrupted output escapes output parent")
+        output.rename(interrupted)
+    attempt = attempts / uuid4().hex
+    attempt.mkdir()
     started = pd.Timestamp.now(tz="UTC").isoformat()
 
     def status(phase: str, state: str = "RUNNING", **details) -> None:
         payload = {"protocol": PROTOCOL, "status": state, "phase": phase,
                    "delivery_day": delivery_day, "started_utc": started,
                    "updated_utc": pd.Timestamp.now(tz="UTC").isoformat(),
+                   "attempt": str(attempt),
                    **details}
-        _atomic_json(output / "status.json", payload)
+        _atomic_json(attempt / "status.json", payload)
         print(json.dumps(payload, ensure_ascii=False, default=str), flush=True)
 
     try:
@@ -55,8 +80,8 @@ def run(*, bundle: Path, delivery_day: str, output: Path) -> dict:
         data = load_bundle(bundle, delivery_day)
         require(bundle_hashes(bundle) == initial_hashes,
                 "Live bundle changed while inputs were loaded")
-        status("fit_models", total_models=6)
-        frames, model_audit = execute_models(data, delivery_day, output / "models",
+        status("fit_models", total_models=7)
+        frames, model_audit = execute_models(data, delivery_day, attempt / "models",
             progress=lambda phase, **details: status(phase, **details))
         require(bundle_hashes(bundle) == initial_hashes,
                 "Live bundle changed during CPU retraining")
@@ -68,7 +93,7 @@ def run(*, bundle: Path, delivery_day: str, output: Path) -> dict:
         countries = {}
         for zone in COUNTRIES:
             frame = frames[zone]
-            directory = output / "zones" / zone
+            directory = attempt / "zones" / zone
             directory.mkdir(parents=True, exist_ok=False)
             name = f"forecast_{zone.lower()}_{delivery_day}_nyx_annual_cpu"
             parquet_path, csv_path = (directory / f"{name}.{suffix}"
@@ -77,20 +102,37 @@ def run(*, bundle: Path, delivery_day: str, output: Path) -> dict:
                     "Forecast output already exists")
             frame.to_parquet(parquet_path, index=True)
             frame.to_csv(csv_path, index=True, float_format="%.17g")
+            html_path = directory / f"{name}.html"
+            write_country_report(frame, html_path, country=zone, delivery_day=delivery_day,
+                de_performance_exception=plan["activation"].get("de_price_performance_exception_used", False))
             countries[zone] = {"hours": len(frame), "composition":
                 model_audit["compositions"][zone],
-                "csv": str(csv_path), "csv_sha256": sha256(csv_path),
-                "parquet": str(parquet_path), "parquet_sha256": sha256(parquet_path)}
+                "csv": str(output / csv_path.relative_to(attempt)), "csv_sha256": sha256(csv_path),
+                "parquet": str(output / parquet_path.relative_to(attempt)), "parquet_sha256": sha256(parquet_path),
+                "html": str(output / html_path.relative_to(attempt)), "html_sha256": sha256(html_path)}
+        for family, item in model_audit["price_experts"].items():
+            item["model"]["path"] = str(output / "models" / f"{family}.cbm")
+        for zone, item in model_audit["negative_countries"].items():
+            item["model"]["path"] = str(output / "models" / f"negative_{zone}.cbm")
         receipt = {"protocol": PROTOCOL, "status": "COMPLETE",
             "delivery_day": delivery_day, "countries": countries,
             "bundle": str(bundle), "input_sha256": initial_hashes,
             "manifest_sha256": sha256(MANIFEST),
             "qualification_sha256": plan["activation"]["qualification_sha256"],
-            "code_sha256": {name: sha256(ROOT / name) for name in QUALIFICATION_CODE},
+            "chronos_model_identity": plan["activation"]["chronos_model_identity"],
+            "chronos_model_sha256": plan["activation"]["chronos_model_sha256"],
+            "de_price_performance_exception_used": plan["activation"].get(
+                "de_price_performance_exception_used", False),
+            "code_sha256": {name: sha256(ROOT / name) for name in
+                (*QUALIFICATION_CODE, "chronos2_hourly/nyx_annual_cpu_reporting.py")},
             "model_audit": model_audit, "saturn_fetched": False,
             "future_labels_used": False, "Storm_used_as_model_input": False}
-        _atomic_json(output / "receipt.json", receipt)
+        _atomic_json(attempt / "receipt.json", receipt)
         status("complete", "COMPLETE", receipt=str(output / "receipt.json"))
+        require(attempt.resolve().is_relative_to(output.parent)
+                and output.resolve().is_relative_to(output.parent),
+                "Forecast publication path escapes output parent")
+        attempt.rename(output)
         return receipt
     except BaseException as error:
         status("failed", "FAILED", error=f"{type(error).__name__}: {error}",

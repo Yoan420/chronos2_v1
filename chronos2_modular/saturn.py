@@ -584,6 +584,7 @@ def fetch_saturn_series_from_client(
     raw = None
     resolved_dialect: str | None = None
     resolved_kwargs: dict[str, Any] | None = None
+    nocache_error: Exception | None = None
 
     for dialect, kwargs in date_dialects:
         if revision_date is not None:
@@ -632,9 +633,7 @@ def fetch_saturn_series_from_client(
         try:
             retry_raw = client.get(series_name, **retry_kwargs)
         except Exception as exc:
-            errors.append(
-                f"reprise nocache {type(exc).__name__}: {exc}"
-            )
+            nocache_error = exc
         else:
             raw = retry_raw
 
@@ -655,12 +654,17 @@ def fetch_saturn_series_from_client(
             detail = (
                 f"reponse vide (dialecte={resolved_dialect})"
             )
+            if nocache_error is not None:
+                detail += (
+                    f" | reprise nocache {type(nocache_error).__name__}: "
+                    f"{nocache_error}"
+                )
         else:
             detail = " | ".join(errors[-4:]) or "aucune reponse exploitable"
         raise RuntimeError(
             f"Saturn indisponible ou vide pour {series_name}; "
             f"plage={start} -> {end}; cutoff={cutoff}. {detail}"
-        )
+        ) from nocache_error
 
     return normalize_saturn_series(
         raw,

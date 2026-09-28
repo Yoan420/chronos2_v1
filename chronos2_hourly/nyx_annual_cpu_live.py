@@ -10,7 +10,6 @@ from dataclasses import dataclass
 from datetime import timedelta
 from importlib.metadata import version
 import json
-import math
 import os
 from pathlib import Path
 import platform
@@ -39,9 +38,10 @@ MANIFEST = ROOT / "config" / "nyx_annual_cwe_historical.json"
 QUALIFICATION_RECEIPT = ROOT / "config" / "nyx_annual_cpu_qualification_receipt.json"
 PROTOCOL = "nyx_annual_cpu_prospective_consumer_v1"
 QUALIFICATION_PROTOCOL = "nyx_annual_cpu_price_qualification_v1"
-COUNTRIES = ("FR", "BE", "NL")
+COUNTRIES = ("FR", "DE", "BE", "NL")
 PRICE_EXPERTS = ("fr_residual_1000", "cwe_residual_2000", "cwe_absolute_2000")
 COMPOSITIONS = {"FR": "fr_residual_disagreement20",
+                "DE": "boosting_mean_disagreement20",
                 "BE": "boosting_mean_disagreement20",
                 "NL": "boosting_mean_all"}
 PRICE_THREADS = 8
@@ -94,7 +94,7 @@ def verify_activation(root: Path = ROOT, manifest_path: Path | None = None) -> d
         isinstance(countries.get(zone), dict)
         and isinstance(countries[zone].get("price"), dict)
         and countries[zone]["price"].get("composition") == COMPOSITIONS[zone]
-        for zone in COUNTRIES), "Frozen FR/BE/NL price compositions differ")
+        for zone in COUNTRIES), "Frozen FR/DE/BE/NL price compositions differ")
     pin = manifest.get("cpu_annual_qualification")
     require(isinstance(pin, dict)
             and pin.get("path") == f"config/{QUALIFICATION_RECEIPT.name}"
@@ -105,60 +105,34 @@ def verify_activation(root: Path = ROOT, manifest_path: Path | None = None) -> d
     require(receipt_path.is_file() and sha256(receipt_path) == pin["sha256"],
             "Annual CPU qualification receipt missing or SHA-256 differs")
     receipt = _json(receipt_path)
-    replay = receipt.get("replay_receipts_sha256")
-    require(isinstance(replay, dict) and set(replay) == {"price", "negative"}
-            and all(_digest(replay[name]) for name in ("price", "negative")),
-            "Annual CPU qualification must bind price and negative replay receipts")
-    require(receipt.get("protocol") == QUALIFICATION_PROTOCOL
-            and receipt.get("qualified") is True
-            and receipt.get("price_expert_replay_qualified") is True
-            and receipt.get("negative_replay_verified") is True
-            and receipt.get("full_input_chain_qualified") is True
-            and receipt.get("price_experts") == list(PRICE_EXPERTS)
-            and receipt.get("negative_model_protocol") == NEGATIVE_PROTOCOL
-            and receipt.get("compositions") == COMPOSITIONS
-            and receipt.get("first_delivery_day") == "2025-09-24"
-            and receipt.get("last_delivery_day") == "2026-09-23"
-            and receipt.get("origins_per_country") == 53
-            and receipt.get("price_threads") == PRICE_THREADS
-            and receipt.get("negative_threads") == NEGATIVE_THREADS
-            and receipt.get("runtime_versions") == _runtime_versions(),
-            "Annual CPU qualification scope or recipe differs")
-    code = receipt.get("code_sha256")
-    require(isinstance(code, dict) and set(QUALIFICATION_CODE) <= set(code)
-            and all(isinstance(code[name], str) and len(code[name]) == 64
-                    and sha256(root / name) == code[name]
-                    for name in QUALIFICATION_CODE),
-            "Annual CPU qualification code SHA-256 differs")
-    price_metrics = receipt.get("price_country_metrics")
-    negative_metrics = receipt.get("negative_country_metrics")
-    require(isinstance(price_metrics, dict) and set(price_metrics) == set(COUNTRIES)
-            and isinstance(negative_metrics, dict) and set(negative_metrics) == set(COUNTRIES),
-            "Annual CPU FR/BE/NL price and negative metrics required")
-    for zone in COUNTRIES:
-        p, n = price_metrics[zone], negative_metrics[zone]
-        require(isinstance(p, dict) and isinstance(n, dict),
-                f"{zone}: annual CPU score missing")
-        try:
-            rmse, storm_rmse, win_rate = (float(p[name]) for name in
-                ("rmse", "storm_rmse", "strict_win_rate"))
-            brier = float(n["brier"])
-        except (KeyError, TypeError, ValueError) as error:
-            raise ValueError(f"{zone}: annual CPU metric missing or invalid") from error
-        require(type(p.get("hours")) is int and p["hours"] == 8759
-                and type(p.get("storm_common_hours")) is int
-                and p["storm_common_hours"] == 8759
-                and math.isfinite(rmse) and math.isfinite(storm_rmse)
-                and math.isfinite(win_rate) and rmse < storm_rmse
-                and win_rate > .5,
-                f"{zone}: CPU price does not qualify against Storm")
-        require(type(n.get("hours")) is int and n["hours"] == 8760
-                and math.isfinite(brier) and 0 <= brier <= 1,
-                f"{zone}: annual CPU negative-probability score invalid")
+    from chronos2_hourly.nyx_annual_cpu_full_chain import (
+        PROTOCOL as FULL_CHAIN_PROTOCOL, _chronos_pin, verify_receipt,
+    )
+    require(receipt.get("protocol") == FULL_CHAIN_PROTOCOL,
+            "Production requires a new full-chain CPU evaluation; legacy expert-only scores cannot activate it")
+    verify_receipt(receipt, root=root)
     return {"manifest_sha256": sha256(manifest_file),
             "qualification_sha256": pin["sha256"],
             "qualification_receipt": str(receipt_path),
-            "compositions": COMPOSITIONS.copy()}
+            "compositions": COMPOSITIONS.copy(),
+            **_chronos_pin(receipt),
+            "de_price_performance_exception_used": not (
+                receipt["price_country_metrics"]["DE"]["rmse"]
+                < receipt["price_country_metrics"]["DE"]["storm_rmse"]
+                and receipt["price_country_metrics"]["DE"]["strict_win_rate"] > .5)}
+
+
+def recoverable_output(output: Path, delivery_day: str) -> bool:
+    """Recognize unfinished outputs from the former direct-write consumer."""
+    if not output.is_dir() or output.is_symlink() or (output / "receipt.json").exists():
+        return False
+    try:
+        state = _json(output / "status.json")
+        return (state.get("protocol") == PROTOCOL
+                and state.get("delivery_day") == delivery_day
+                and state.get("status") in ("RUNNING", "FAILED"))
+    except (OSError, ValueError, TypeError):
+        return False
 
 
 def preflight(bundle: Path, delivery_day: str, output: Path) -> dict:
@@ -181,15 +155,29 @@ def preflight(bundle: Path, delivery_day: str, output: Path) -> dict:
     except (OSError, ValueError, KeyError, TypeError) as error:
         baseline_report = None
         blockers.append(f"NYX CPU baseline: {error}")
-    if output.exists():
+    source_report = None
+    if input_report and input_report.get("input_bundle_valid") and baseline_report:
+        try:
+            from chronos2_hourly.nyx_annual_cpu_full_chain import _chronos_pin, _source_packet
+            source_report = _source_packet(bundle, delivery_day)
+            if activation is not None:
+                require(_chronos_pin(source_report["baseline"]) == _chronos_pin(activation),
+                        "Live CPU Chronos weights differ from the annually evaluated model")
+        except (OSError, ValueError, KeyError, TypeError, ImportError) as error:
+            blockers.append(f"Source and CPU producer evidence: {error}")
+    if output.exists() and not recoverable_output(output, delivery_day):
         blockers.append("Output already exists; choose a new immutable run directory")
     if output.resolve() == bundle.resolve() or output.resolve().is_relative_to(bundle.resolve()):
         blockers.append("Output must be outside the immutable input bundle")
+    attempts = output.parent / f".{output.name}.attempts"
+    if attempts.resolve().is_relative_to(bundle.resolve()):
+        blockers.append("Interrupted attempts must be outside the immutable input bundle")
     return {"protocol": PROTOCOL, "delivery_day": delivery_day,
             "bundle": str(bundle.resolve()), "output": str(output.resolve()),
             "requires_external_bundle": True, "saturn_fetched": False,
             "activation": activation, "bundle_inspection": input_report,
             "nyx_cpu_baseline_inspection": baseline_report,
+            "source_and_producer_inspection": source_report,
             "ready": not blockers, "blockers": blockers}
 
 
@@ -245,9 +233,9 @@ def load_bundle(bundle: Path, delivery_day: str) -> BundleData:
 
 def compose_price(zone: str, points: dict[str, pd.Series],
                   reference: pd.Series) -> pd.Series:
-    """Apply the three frozen FR/BE/NL choices without learning on labels."""
+    """Apply the four frozen country choices without learning on labels."""
     require(zone in COUNTRIES and set(points) == set(PRICE_EXPERTS),
-            "Exactly three price experts and an FR/BE/NL composition required")
+            "Exactly three price experts and an FR/DE/BE/NL composition required")
     index = reference.index
     require(isinstance(index, pd.DatetimeIndex) and str(index.tz) == "UTC"
             and all(point.index.equals(index) for point in points.values()),
@@ -262,7 +250,7 @@ def compose_price(zone: str, points: dict[str, pd.Series],
         else:
             proposed = (arrays["cwe_residual_2000"]
                         + arrays["cwe_absolute_2000"]) / 2.
-        if zone in ("FR", "BE"):
+        if zone in ("FR", "DE", "BE"):
             gap = np.abs(proposed - base)
             result = np.where(gap >= 20., proposed, base)
         else:
@@ -291,7 +279,7 @@ def _save_classifier(estimator: Any, path: Path) -> dict:
 def execute_models(data: BundleData, delivery_day: str, model_dir: Path,
                    price_fit=fit_pooled_block,
                    negative_fit=fit_negative_block, progress=None) -> tuple[dict, dict]:
-    """Exactly three pooled price fits and three country classifier fits."""
+    """Exactly three pooled price fits and four country classifier fits."""
     day = pd.Timestamp(delivery_day).date()
     stop = str(day + timedelta(days=1))
     expert_configs = {
@@ -306,6 +294,7 @@ def execute_models(data: BundleData, delivery_day: str, model_dir: Path,
             model_path=model_dir / f"{family}.cbm", thread_count=PRICE_THREADS)
         require(set(points) == set(ZONES) and audit.get("tree_count") ==
                 expert_configs[family].iterations
+                and audit.get("training_days") == 365
                 and audit.get("training_labels_before_origin") is True
                 and audit.get("Storm_used_as_input") is False,
                 f"{family}: pooled CPU fit audit invalid")
