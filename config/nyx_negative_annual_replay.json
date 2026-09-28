@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "identity": "nyx_negative_annual_cpu_replay_20260923_v1",
+  "first_origin_day": "2025-09-24",
+  "source_first_day": "2024-09-09",
+  "stop_day_exclusive": "2026-09-24",
+  "origin_step_civil_days": 7,
+  "origins_per_country": 53,
+  "countries": [
+    "FR",
+    "BE",
+    "NL"
+  ],
+  "expected_runtime": {
+    "catboost": "1.2.10",
+    "numpy": "2.4.6",
+    "pandas": "2.3.3",
+    "scikit-learn": "1.9.1"
+  },
+  "evidence": {
+    "plan": {
+      "path": "runs/experiments/nyx_improvement_to20260923/negative_prices_v1/plan.json",
+      "sha256": "4a523ea2d20f02bd8dc889d6b3a57ea2ae1ae1c450399a51c12ac3b96388d804"
+    },
+    "prediction_seal": {
+      "path": "runs/experiments/nyx_improvement_to20260923/negative_prices_v1/predictions_seal.json",
+      "sha256": "3e43bd065a716923aaca4989795564fca50bcdf7bc8bab78e129ce4345b09441"
+    },
+    "evaluation_receipt": {
+      "path": "runs/experiments/nyx_improvement_to20260923/negative_prices_v1/evaluation_receipt.json",
+      "sha256": "e7cea0e6afd72ceaa2ebd1dc1dc8eb6867b9e5498bca70b08eb4f5c20847f216"
+    },
+    "metrics": {
+      "path": "runs/experiments/nyx_improvement_to20260923/negative_prices_v1/metrics.json",
+      "sha256": "a11d06f46420d65a466c55d7fb2857879c70731dfddc759f1678b2afbacb87e7"
+    }
+  },
+  "sources": {
+    "FR": {
+      "features": {
+        "path": "runs/experiments/nyx_improvement_to20260923/feature_sets/pooled_jao_refresh_v1/compact/features_FR.parquet",
+        "sha256": "d7aeae6af1e0e9e017a1f9fb92de49787541451963538fbfdf4cb6c9a573a347"
+      },
+      "baseline": {
+        "path": "runs/experiments/nyx_local_365_to20260923/baseline/FR.parquet",
+        "sha256": "798be38aa3a7528083db934b7876d8b4136b7f83bc30fb668b1acb182b8506e8"
+      },
+      "archived_probabilities": {
+        "path": "runs/experiments/nyx_improvement_to20260923/negative_prices_v1/annual/FR.parquet",
+        "sha256": "984453fbf95aba1f6cec41437747d0a98e328ae5f074a65ead98a31b77f3aabe"
+      }
+    },
+    "BE": {
+      "features": {
+        "path": "runs/experiments/nyx_improvement_to20260923/feature_sets/pooled_jao_refresh_v1/compact/features_BE.parquet",
+        "sha256": "c9f5be47190d95e096e1dd22ce59b8e62bf98563a3d4285b8228d18434da44be"
+      },
+      "baseline": {
+        "path": "runs/experiments/nyx_local_365_to20260923/baseline/BE.parquet",
+        "sha256": "5d9b2f5530461b360056ee125b9fc4058612117fd50a4571b14840a789c3cf7a"
+      },
+      "archived_probabilities": {
+        "path": "runs/experiments/nyx_improvement_to20260923/negative_prices_v1/annual/BE.parquet",
+        "sha256": "6c0dce28c29d30c41b5328b7d58b79ebe612e8bc8289cbe131ef44113501e171"
+      }
+    },
+    "NL": {
+      "features": {
+        "path": "runs/experiments/nyx_improvement_to20260923/feature_sets/pooled_jao_refresh_v1/compact/features_NL.parquet",
+        "sha256": "c8ddfed989652f07b06d833e79cbd3cc87e2e0b597791dce36183d19581e0eac"
+      },
+      "baseline": {
+        "path": "runs/experiments/nyx_local_365_to20260923/baseline/NL.parquet",
+        "sha256": "2283bca8edfe88ad377b0f9c308321a1eb7e365e55d1b5905d228ebdb80504e4"
+      },
+      "archived_probabilities": {
+        "path": "runs/experiments/nyx_improvement_to20260923/negative_prices_v1/annual/NL.parquet",
+        "sha256": "0a71c1adaaa83417a5af031e5ac050cf51313bd1a3741be890a64a522fb2ebe9"
+      }
+    }
+  }
+}
