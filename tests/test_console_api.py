@@ -89,6 +89,28 @@ def test_bootstrap_exposes_usable_session_nonce_and_local_config(api):
     assert "same-origin" in response.headers["cross-origin-resource-policy"]
 
 
+def test_regional_preflights_are_read_only_and_keep_the_launch_gated(api, monkeypatch):
+    calls = []
+    def forecast(day, country, *, output):
+        calls.append((day, country, output))
+        return {"ready": False, "recipe_status": "pending_backtest", "delivery_day": day,
+                "countries": [country], "blockers": ["Backtest à valider."]}
+    def evaluation():
+        return {"operation": "evaluate", "ready": True,
+                "recipe_status": "pending_backtest", "blockers": []}
+    monkeypatch.setattr(api.manager.registry, "regional_preflight", forecast)
+    monkeypatch.setattr(api.manager.registry, "regional_evaluation_preflight", evaluation)
+    blocked = api.client.get("/api/regional-preflight", params={"delivery_day": "2026-10-01", "country": "FR"})
+    assert blocked.status_code == 200
+    assert blocked.json()["ready"] is False
+    assert calls[0][2].is_relative_to(api.project)
+    assert not calls[0][2].exists()
+    possible = api.client.get("/api/regional-evaluation-preflight")
+    assert possible.status_code == 200
+    assert possible.json()["ready"] is True
+    assert possible.json()["recipe_status"] == "pending_backtest"
+
+
 @pytest.mark.parametrize("headers", [
     {"Host": "evil.example"},
     {"Origin": "https://evil.example"},

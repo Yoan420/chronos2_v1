@@ -1,0 +1,13 @@
+# CPU regional price and negative-price forecasts in the desktop NYX console.
+# Use the same Python environment selected by config/experiment_console.json.
+pandas>=2.0,<3
+numpy>=1.24
+pyarrow>=14
+catboost>=1.2,<2
+scikit-learn>=1.4,<2
+scipy>=1.11,<2
+PyYAML>=6,<7
+requests>=2.31
+filelock>=3,<4
+psutil>=5.9,<8
+tshistory_lite==0.5

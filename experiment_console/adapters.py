@@ -28,7 +28,10 @@ SCRIPTS = {
     "hourly_report": "generate_hourly_html_report.py",
     "hourly_evaluation": "evaluate_hourly_backtest.py",
     "hourly_forecast": "run_chronos2_hourly.py",
+    "nyx_regional_cpu": "run_nyx_regional_cpu.py",
+    "nyx_regional_cpu_backtest": "run_nyx_regional_cpu_backtest.py",
 }
+REGIONAL_COUNTRIES = ("FR", "DE", "BE", "NL")
 
 
 def _field(name: str, label: str, kind: str = "text", default: Any = "", **extra: Any) -> dict:
@@ -289,8 +292,94 @@ class AdapterRegistry:
              "description": "Exécute Chronos-2, LEAR, CatBoost et le correcteur de la configuration. Calcul potentiellement long; caches locaux obligatoires.",
              "parameters": [_field("device", "Calcul", "select", "auto", options=["auto", "cpu", "cuda"]),
                             _field("log_level", "Niveau de journalisation", "select", "INFO", options=["DEBUG", "INFO", "WARNING", "ERROR"], advanced=True)]},
+            {"id": "nyx_regional_cpu", "label": "NYX régional · CPU", "type": "forecast",
+             "models": ["regional_price_and_negative_probability"],
+             "configs": [{"id": "regional_cpu_country", "label": "Prix et probabilité négative par pays"}],
+             "description": "Actualise Saturn puis réentraîne la recette CPU du pays. Disponible après validation du backtest.",
+             "parameters": [_field("delivery_day", "Date de livraison", "date", tomorrow),
+                            _field("country", "Pays", "select", "FR", options=list(REGIONAL_COUNTRIES))]},
+            {"id": "nyx_regional_cpu_backtest", "label": "Évaluer la recette CPU", "type": "evaluation",
+             "models": ["regional_cpu_backtest"],
+             "configs": [{"id": "regional_cpu_evaluation", "label": "Backtest régional 365 jours"}],
+             "description": "Synchronise Saturn, rejoue les origines historiques et valide la recette CPU si les critères passent.",
+             "parameters": []},
         ]
         return [entry for entry in result if (self.project_root / SCRIPTS[entry["id"]]).is_file() and entry["models"]]
+
+    def regional_preflight(self, delivery_day: str, country: str, *, output: Path | None = None) -> dict:
+        """Ask the regional CLI for its read-only execution gate.
+
+        The CLI owns recipe validation and data checks. This adapter rejects any
+        ambiguous response rather than presenting a launchable model.
+        """
+        delivery_day = validate_primary_delivery_day(delivery_day)
+        if country not in REGIONAL_COUNTRIES:
+            raise ValueError("Choisissez un pays parmi FR, DE, BE et NL.")
+        script = self.project_root / SCRIPTS["nyx_regional_cpu"]
+        if not script.is_file():
+            raise ValueError("Le moteur régional CPU est absent du dépôt.")
+        command = [str(self.python_executable), "-u", str(script), "--preflight",
+                   "--delivery-day", delivery_day, "--countries", country]
+        if output is not None:
+            target = Path(output).resolve()
+            if not target.is_relative_to(self.project_root):
+                raise ValueError("Les sorties régionales doivent rester dans ce dépôt.")
+            command += ["--output", str(target)]
+        try:
+            completed = subprocess.run(command, cwd=self.project_root, stdin=subprocess.DEVNULL,
+                                       capture_output=True, text=True, encoding="utf-8", errors="replace",
+                                       timeout=30, shell=False,
+                                       creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+        except (OSError, subprocess.SubprocessError) as exc:
+            raise ValueError("Impossible de vérifier le moteur régional CPU dans le Python configuré.") from exc
+        try:
+            result = json.loads(completed.stdout.strip())
+        except (ValueError, TypeError) as exc:
+            raise ValueError("Le précontrôle régional n’a pas renvoyé de réponse JSON valide.") from exc
+        if not isinstance(result, dict) or result.get("delivery_day") != delivery_day or result.get("countries") != [country]:
+            raise ValueError("Le précontrôle régional ne correspond pas à la date et au pays sélectionnés.")
+        if output is not None and result.get("output") != str(target):
+            raise ValueError("Le précontrôle régional ne correspond pas au dossier de sortie prévu.")
+        if completed.returncode not in (0, 2):
+            raise ValueError("Le précontrôle régional a échoué. Consultez le moteur CPU local.")
+        ready = completed.returncode == 0 and result.get("ready") is True and result.get("recipe_status") == "validated"
+        blockers = result.get("blockers")
+        if not isinstance(blockers, list) or not all(isinstance(item, str) for item in blockers):
+            blockers = []
+        if not ready and not blockers:
+            blockers = ["La recette CPU attend la validation du backtest et des données locales."]
+        return {"ready": ready, "recipe_status": result.get("recipe_status", "unknown"),
+                "delivery_day": delivery_day, "countries": [country], "blockers": blockers}
+
+    def regional_evaluation_preflight(self, *, output: Path | None = None) -> dict:
+        script = self.project_root / SCRIPTS["nyx_regional_cpu_backtest"]
+        if not script.is_file():
+            raise ValueError("Le moteur d’évaluation CPU est absent du dépôt.")
+        target = Path(output or self.project_root / "runs/nyx_regional_cpu/evaluation").resolve()
+        if not target.is_relative_to(self.project_root):
+            raise ValueError("Les sorties d’évaluation doivent rester dans ce dépôt.")
+        command = [str(self.python_executable), "-u", str(script), "--evaluate", "--dry-run", "--output", str(target)]
+        try:
+            completed = subprocess.run(command, cwd=self.project_root, stdin=subprocess.DEVNULL,
+                                       capture_output=True, text=True, encoding="utf-8", errors="replace",
+                                       timeout=30, shell=False,
+                                       creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+        except (OSError, subprocess.SubprocessError) as exc:
+            raise ValueError("Impossible de vérifier l’évaluation CPU dans le Python configuré.") from exc
+        try:
+            result = json.loads(completed.stdout.strip())
+        except (ValueError, TypeError) as exc:
+            raise ValueError("Le précontrôle de l’évaluation n’a pas renvoyé de réponse JSON valide.") from exc
+        if not isinstance(result, dict) or result.get("operation") != "evaluate" or completed.returncode not in (0, 2):
+            raise ValueError("Le précontrôle de l’évaluation ne respecte pas le contrat NYX.")
+        ready = completed.returncode == 0 and result.get("ready") is True
+        blockers = result.get("blockers")
+        if not isinstance(blockers, list) or not all(isinstance(item, str) for item in blockers):
+            blockers = []
+        if not ready and not blockers:
+            blockers = ["L’évaluation CPU n’est pas disponible dans cet environnement."]
+        return {"ready": ready, "recipe_status": result.get("recipe_status", "unknown"),
+                "operation": "evaluate", "blockers": blockers}
 
     def _parameters(self, schema: list[dict], supplied: Any) -> dict:
         if not isinstance(supplied, dict):
@@ -406,6 +495,27 @@ class AdapterRegistry:
         if aid == "model_storm_report":
             command += ["--delivery-day", params["delivery_day"], "--output", str(output / "model_storm.html")]
             warnings.append("Les données absentes restent indisponibles; une livraison sans résultat local fait échouer le rapport.")
+        elif aid == "nyx_regional_cpu":
+            country, delivery_day = params["country"], params["delivery_day"]
+            preflight = self.regional_preflight(delivery_day, country, output=output)
+            if not preflight["ready"]:
+                raise ValueError("Lancement régional indisponible : " + " ".join(preflight["blockers"]))
+            script = self.project_root / SCRIPTS[aid]
+            effective["source_script_sha256"] = hashlib.sha256(script.read_bytes()).hexdigest()
+            command += ["--delivery-day", delivery_day, "--countries", country, "--output", str(output)]
+            resources = ["scientific-cache", "nyx-primary-pipeline"]
+            warnings += ["Nouvelle recette CPU : prix et probabilité de prix négatif pour le pays choisi.",
+                         "La synchronisation Saturn et le réentraînement sont exécutés par le moteur régional."]
+        elif aid == "nyx_regional_cpu_backtest":
+            preflight = self.regional_evaluation_preflight(output=output)
+            if not preflight["ready"]:
+                raise ValueError("Évaluation régionale indisponible : " + " ".join(preflight["blockers"]))
+            script = self.project_root / SCRIPTS[aid]
+            effective["source_script_sha256"] = hashlib.sha256(script.read_bytes()).hexdigest()
+            command += ["--evaluate", "--output", str(output)]
+            resources = ["scientific-cache", "nyx-primary-pipeline"]
+            warnings += ["L’évaluation synchronise Saturn, rejoue les origines historiques et écrit un reçu.",
+                         "Le lancement des prévisions reste bloqué tant que le reçu ne valide pas les critères."]
         elif aid == "hourly_report":
             source = self._input_path(params["source_run"], directory=True)
             table = source / "backtest_hourly_oof.csv.gz"
@@ -475,6 +585,9 @@ class AdapterRegistry:
                   "cwd": str(self.project_root), "config": effective, "config_path": str(snapshot),
                   "output_dir": str(output), "warnings": warnings, "resource_keys": resources,
                   "request": {"adapter_id": aid, "config_id": config_id, "model": model, "parameters": params}}
+        if aid == "nyx_regional_cpu":
+            result["delivery_day"] = params["delivery_day"]
+            result["countries"] = [params["country"]]
         if source_config:
             result["source_config"] = str(source_config)
             result["source_config_sha256"] = hashlib.sha256(source_config.read_bytes()).hexdigest()

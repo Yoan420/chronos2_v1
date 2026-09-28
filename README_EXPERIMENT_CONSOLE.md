@@ -2,8 +2,8 @@
 
 Application fonctionnelle en français, dans une direction cyberpunk noir : fond
 presque noir, accents ambre, cyan et magenta, schéma interactif et résultats au
-premier plan. La navigation relie l'architecture du modèle, les résultats et les
-publications par date. La page Résultats permet de lancer la prévision complète.
+premier plan. La navigation relie l'architecture du modèle, les résultats, les
+modèles régionaux et les publications par date. La page Résultats permet de lancer la prévision complète.
 Aucun service cloud, Node, Docker ou
 compte n'est nécessaire pour l'utiliser.
 
@@ -13,9 +13,10 @@ configurations et les commandes existantes.
 
 ## Ouvrir NYX depuis le Bureau
 
-Double-cliquer sur l'icône **NYX** du Bureau. Ce raccourci est déjà installé
-sur le Bureau, dans le menu Démarrer et à la racine du dépôt. Le Bureau
-Windows de ce compte est `C:\Users\BQ6757\OneDrive - ENGIE\Desktop`.
+Après installation du raccourci, double-cliquer sur l'icône **NYX** du Bureau.
+Le script d'installation crée ce lien sur le Bureau, dans le menu Démarrer et à
+la racine du dépôt. Le Bureau Windows du poste de travail décrit ici est
+`C:\Users\BQ6757\OneDrive - ENGIE\Desktop`.
 NYX ouvre sa propre fenêtre, sans barre d'adresse ni fenêtre PowerShell.
 Aucune commande n'est nécessaire au quotidien. Pour un accès supplémentaire,
 vous pouvez épingler le raccourci à la barre des tâches depuis son menu contextuel.
@@ -25,6 +26,20 @@ avec `NYX.pyw` ; il ne dépend pas de l'association Windows des fichiers Python.
 Le lanceur démarre le backend local si nécessaire, attend qu'il réponde, puis
 ouvre une fenêtre d'application Edge, ou Chrome si Edge n'est pas disponible.
 Son profil dédié se trouve dans `runs/.experiment_console/desktop_browser`.
+Après un nouveau clone ou un changement de chemin, exécuter
+`Install-ChronosDesktop.ps1` sur le poste concerné pour recréer les raccourcis :
+un raccourci `NYX.lnk` enregistré sur un autre poste contient des chemins
+Windows non portables. Pour un clone propre sur l'ordinateur du travail :
+
+```powershell
+Set-Location -LiteralPath 'C:\Users\BQ6757\chronos2_v1'
+$nyxPython = (Get-Content -LiteralPath 'config\experiment_console.json' -Raw | ConvertFrom-Json).python_executable
+& $nyxPython -m pip install -r requirements_console.txt -r requirements_nyx_regional_cpu.txt
+& .\Install-ChronosDesktop.ps1
+```
+
+Le chemin du Python dans `config/experiment_console.json` doit exister sur ce
+poste. Ouvrir ensuite NYX depuis le nouveau raccourci.
 
 Fermer la fenêtre laisse le backend et les calculs actifs. Un nouveau double clic
 rouvre NYX et redémarre le backend s'il s'est arrêté. Un backend déjà présent
@@ -133,6 +148,28 @@ comme la commande. La console ne force ni nouveau calcul ni lecture exclusive
 des caches. Le code de sortie du batch décide de son statut : un rapport existant
 ou partiel ne transforme pas un échec en succès.
 
+## Modèle régional CPU
+
+Dans **Modèles régionaux**, cliquer d'abord sur **Évaluer la recette CPU**.
+Cette opération actualise Saturn, rejoue le backtest et produit un reçu dans
+le dossier du lancement. Le reçu et les scores de confirmation par pays restent
+consultables même si les critères échouent. La prévision reste verrouillée jusqu'à ce que les
+critères du backtest valident la recette ; aucun score des anciens modèles GPU
+n'est attribué à cette nouvelle recette.
+
+Si le précontrôle signale une dépendance absente, installer
+`requirements_nyx_regional_cpu.txt` dans le Python indiqué par
+`config/experiment_console.json`, puis rouvrir NYX. Le calcul utilise CatBoost
+sur CPU. Le précontrôle ne contacte pas Saturn : l'accès au réseau du travail
+est vérifié pendant l'évaluation et chaque prévision.
+
+Une fois la recette validée, choisir la date de livraison et FR, DE, BE ou NL,
+puis cliquer sur **Lancer ce pays**. Le modèle synchronise Saturn et se
+réentraîne avant la prévision. Le suivi et les liens CSV/HTML apparaissent dans
+**Derniers lancements**, sous le dossier isolé
+`runs/.experiment_console/executions/<id>/outputs/zones/<PAYS>/`. Ces sorties
+restent distinctes des publications NuclearKalman de la page **Résultats**.
+
 Les publications suivies sont exclusivement :
 
 - `runs/reports/model_storm/CWE_Model_Storm_YYYY-MM-DD.html` ;
@@ -154,10 +191,9 @@ Un environnement de démarrage ayant hérité du proxy bloquant de l'outil de
 développement est détecté avant calcul. Aucun proxy utilisateur n'est supprimé
 ou remplacé : le service doit être démarré dans l'environnement Windows normal.
 
-Les journaux ont été retirés de l'interface : aucun onglet, recherche, filtre ou
-téléchargement de logs n'est proposé, et les fichiers de journal sont masqués dans
-les listes d'artefacts. Le backend conserve `console.log` sur disque pour le
-diagnostic ; cette modification de présentation ne supprime pas la traçabilité.
+Le suivi NuclearKalman n'expose pas de journal ; son backend conserve
+`console.log` sur disque pour le diagnostic. La page **Modèles régionaux**
+affiche le journal du calcul CPU lorsqu'il est en cours ou a échoué.
 
 ## Comprendre l'architecture affichée
 

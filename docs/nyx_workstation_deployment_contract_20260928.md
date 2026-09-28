@@ -1,5 +1,10 @@
 # NYX sur le poste de travail — contrat de déploiement non satisfait
 
+Cette note décrit les limites des modèles GPU historiques avant la nouvelle
+recette CPU. Le sélecteur historique mentionné ci-dessous a été retiré du code
+actif ; voir `docs/nyx_regional_cpu_evaluation_protocol.md` pour la validation
+de la recette actuellement proposée.
+
 Le raccourci NYX ouvre `NYX.pyw` puis `experiment_console`. Son lancement actuel
 exécute `NuclearKalman.ps1`, synchronise les sources Saturn nécessaires à ce
 modèle, puis publie ses rapports. Ce chemin ne produit pas les entrées des

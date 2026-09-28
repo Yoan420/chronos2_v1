@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "protocol": "nyx_regional_cpu_v1",
+  "status": "pending_backtest",
+  "selected": {},
+  "negative_selected": {},
+  "backtest_receipt": "config/nyx_regional_cpu_backtest_receipt.json",
+  "backtest_sha256": null
+}

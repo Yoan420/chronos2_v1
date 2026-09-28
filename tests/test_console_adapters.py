@@ -2,7 +2,9 @@
 from __future__ import annotations
 
 import gzip
+import json
 from pathlib import Path
+import subprocess
 import sys
 
 import pytest
@@ -151,3 +153,61 @@ def test_duplicate_uses_saved_science_after_original_configuration_is_removed(re
     assert duplicate["config"]["data"] == original["config"]["data"]
     assert duplicate["output_dir"] != original["output_dir"]
     assert duplicate["config"]["report"]["filename"] != original["config"]["report"]["filename"]
+
+
+def test_regional_cpu_refuses_unvalidated_recipe_without_writing(registry, monkeypatch):
+    destination = registry.project_root / "console-data" / "regional-blocked"
+    request = {"adapter_id": "nyx_regional_cpu", "parameters": {"delivery_day": "2026-10-01", "country": "BE"}}
+    def blocked(command, **kwargs):
+        assert "--preflight" in command
+        assert command[command.index("--countries") + 1] == "BE"
+        assert kwargs["shell"] is False
+        return subprocess.CompletedProcess(command, 2, stdout=json.dumps({
+            "delivery_day": "2026-10-01", "countries": ["BE"],
+            "output": command[command.index("--output") + 1],
+            "ready": False, "recipe_status": "pending_backtest", "blockers": ["Backtest à valider."]}))
+    monkeypatch.setattr("experiment_console.adapters.subprocess.run", blocked)
+    with pytest.raises(ValueError, match="Backtest à valider"):
+        registry.prepare(request, destination, write=True)
+    assert not destination.exists()
+
+
+def test_regional_cpu_plan_uses_one_country_and_isolated_outputs(registry, monkeypatch):
+    destination = registry.project_root / "console-data" / "regional-ready"
+    request = {"adapter_id": "nyx_regional_cpu", "parameters": {"delivery_day": "2026-10-01", "country": "NL"}}
+    def ready(command, **_kwargs):
+        return subprocess.CompletedProcess(command, 0, stdout=json.dumps({
+            "delivery_day": "2026-10-01", "countries": ["NL"],
+            "output": command[command.index("--output") + 1],
+            "ready": True, "recipe_status": "validated", "blockers": []}))
+    monkeypatch.setattr("experiment_console.adapters.subprocess.run", ready)
+    prepared = registry.prepare(request, destination)
+    assert prepared["command"] == [str(registry.python_executable), "-u",
+                                    str(registry.project_root / "run_nyx_regional_cpu.py"),
+                                    "--delivery-day", "2026-10-01", "--countries", "NL",
+                                    "--output", str(destination / "outputs")]
+    assert prepared["resource_keys"] == ["scientific-cache", "nyx-primary-pipeline"]
+    assert prepared["config"]["source_script_sha256"]
+    assert prepared["countries"] == ["NL"]
+    assert not destination.exists()
+
+
+def test_regional_evaluation_plan_requires_preflight_and_isolates_receipt(registry, monkeypatch):
+    destination = registry.project_root / "console-data" / "regional-evaluation"
+    request = {"adapter_id": "nyx_regional_cpu_backtest"}
+    responses = iter([
+        subprocess.CompletedProcess([], 2, stdout=json.dumps({"operation": "evaluate", "ready": False,
+                            "recipe_status": "pending_backtest", "blockers": ["Module CatBoost absent."]})),
+        subprocess.CompletedProcess([], 0, stdout=json.dumps({"operation": "evaluate", "ready": True,
+                            "recipe_status": "pending_backtest", "blockers": []})),
+    ])
+    monkeypatch.setattr("experiment_console.adapters.subprocess.run", lambda *_args, **_kwargs: next(responses))
+    with pytest.raises(ValueError, match="Module CatBoost absent"):
+        registry.prepare(request, destination, write=True)
+    assert not destination.exists()
+    plan = registry.prepare(request, destination)
+    assert plan["command"] == [str(registry.python_executable), "-u",
+                               str(registry.project_root / "run_nyx_regional_cpu_backtest.py"),
+                               "--evaluate", "--output", str(destination / "outputs")]
+    assert plan["output_dir"] == str(destination / "outputs")
+    assert plan["resource_keys"] == ["scientific-cache", "nyx-primary-pipeline"]

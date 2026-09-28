@@ -2,11 +2,14 @@
 const $ = (s, root=document) => root.querySelector(s);
 const $$ = (s, root=document) => [...root.querySelectorAll(s)];
 const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const state = {route:'',primary:{days:[],warnings:[]},runInfo:null,runRevision:0,boot:null,selectedDay:null,launchDay:null,refreshing:false,loaded:false,launching:false};
+const state = {route:'',primary:{days:[],warnings:[]},runInfo:null,runRevision:0,boot:null,selectedDay:null,launchDay:null,refreshing:false,loaded:false,launching:false,
+  regional:{day:null,country:'FR',preflight:null,checking:false,launching:false,evaluationPreflight:null,evaluationChecking:false,evaluationLaunching:false,
+    runs:[],detail:null,statusDoc:null,receiptDoc:null,logs:null,error:null,pinnedRunId:null,refreshing:false,lastCompletedEvaluationId:null}};
 const warnings = (items, kind='') => items?.length ? `<div class="notice ${kind}">${items.map(esc).join('<br>')}</div>` : '';
 const formatDay = value => value ? new Date(`${value}T12:00:00`).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}) : 'Date indisponible';
 const formatTime = value => value ? new Date(value).toLocaleString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : 'Non disponible';
 const artifactUrl = (file, download=false) => `/api/primary-artifact?path=${encodeURIComponent(file.path)}${download?'&download=1':''}`;
+const runArtifactUrl = (id,path,download=false) => `/api/runs/${encodeURIComponent(id)}/artifact?path=${encodeURIComponent(path)}${download?'&download=1':''}`;
 const statusLabels = {queued:'En attente',starting:'Démarrage',running:'Calcul en cours',succeeded:'Calcul terminé',failed:'Calcul échoué',cancelling:'Arrêt demandé',cancelled:'Calcul arrêté',interrupted:'Calcul interrompu'};
 function toast(message){const target=$('#toast');target.textContent=message;target.hidden=false;clearTimeout(toast.timer);toast.timer=setTimeout(()=>target.hidden=true,8000);}
 async function api(path, body, retry=true, extraHeaders={}){
@@ -16,7 +19,7 @@ async function api(path, body, retry=true, extraHeaders={}){
   let value;
   try{value=await response.json();}catch{throw Error('Réponse illisible du serveur local.');}
   if(response.status===403&&body!==undefined&&retry&&value.error?.startsWith('Session expirée')){state.boot=await api('/api/bootstrap');return api(path,body,false,extraHeaders);}
-  if(!response.ok)throw Error(value.error||`Erreur ${response.status}`);
+  if(!response.ok){const error=Error(value.error||`Erreur ${response.status}`);error.httpStatus=response.status;throw error;}
   return value;
 }
 function connection(ok){const target=$('#connection');target.className=`connection ${ok?'':'offline'}`;target.textContent=ok?'À jour · suivi automatique':'Connexion perdue · nouvelle tentative automatique';}
@@ -150,21 +153,205 @@ function handleReportNavigation(event){
   }
   if(!day.cwe){state.reportFocus=null;$('#delivery-day')?.focus();}
 }
+function regionalSelection(){return `${state.regional.day}|${state.regional.country}`;}
+function regionalActive(){return state.regional.runs.some(run=>['queued','starting','running','cancelling'].includes(run.status));}
+function renderRegional(){
+  const main=$('#main');
+  const regional=state.regional;
+  if(!main.nyxRegional){
+    main.innerHTML=pageHead('NYX / MODÈLES RÉGIONAUX','Prévisions par pays','Prix horaire et probabilité de prix négatif avec réentraînement CPU.')+
+      `<section class="panel padded regional-panel" aria-label="Évaluation de la recette CPU"><div class="section-heading"><div><div class="eyebrow">VALIDATION</div><h2>Évaluer la recette CPU</h2></div></div><p>Synchronise Saturn, rejoue les origines historiques et produit un reçu. Si les critères passent, les prévisions par pays deviennent disponibles.</p><button id="regional-evaluate" data-regional-evaluate disabled>▷ Évaluer la recette CPU</button><div id="regional-evaluation-check" role="status"></div></section>`+
+      `<section class="panel padded regional-panel" aria-label="Lancement régional"><div class="section-heading"><div><div class="eyebrow">NOUVELLE RECETTE CPU</div><h2>Calculer un pays</h2></div></div><p>Le moteur actualise Saturn et réentraîne le modèle avant chaque prévision. Le lancement sera disponible après validation du backtest.</p><div class="regional-controls"><label>Date de livraison<input id="regional-day" type="date" required value="${esc(regional.day)}"></label><label>Pays<select id="regional-country">${['FR','DE','BE','NL'].map(zone=>`<option value="${zone}" ${zone===regional.country?'selected':''}>${zone}</option>`).join('')}</select></label><button class="primary" id="regional-launch" data-regional-launch disabled>▷ Lancer ce pays</button></div><div id="regional-check" role="status"></div></section><section class="regional-history"><div class="section-heading"><h2>Derniers lancements</h2></div><div id="regional-runs"></div></section><section id="regional-output" aria-label="Sorties du lancement régional"></section>`;
+    main.nyxRegional=true;
+  }
+  renderRegionalStatus();
+}
+function renderRegionalStatus(){
+  if(state.route!=='regional')return;
+  const regional=state.regional;
+  const launch=$('#regional-launch');
+  if(!launch)return;
+  const ready=regional.preflight?.ready===true&&regional.preflight?.recipe_status==='validated';
+  const busy=regional.checking||regional.launching||regional.evaluationLaunching||regionalActive();
+  launch.disabled=!ready||busy;
+  launch.textContent=regional.launching?'Démarrage…':regionalActive()?'◌ Calcul régional en cours':'▷ Lancer ce pays';
+  const blockers=regional.preflight?.blockers||[];
+  $('#regional-check').innerHTML=regional.checking?'<p class="publication-time">Vérification de la recette, des données et du poste…</p>':
+    ready?'<div class="notice info">Précontrôle réussi : recette validée et ressources locales disponibles. La synchronisation Saturn sera lancée pendant le calcul.</div>':
+    warnings(blockers.length?blockers:['Backtest régional non encore validé : lancement indisponible.'],'error');
+  const evaluate=$('#regional-evaluate');
+  if(evaluate){
+    evaluate.disabled=regional.evaluationChecking||regional.evaluationLaunching||regionalActive()||regional.evaluationPreflight?.ready!==true;
+    evaluate.textContent=regional.evaluationLaunching?'Démarrage…':regionalActive()?'◌ Calcul en cours':'▷ Évaluer la recette CPU';
+    $('#regional-evaluation-check').innerHTML=regional.evaluationChecking?'<p class="publication-time">Vérification du poste pour le backtest…</p>':
+      regional.evaluationPreflight?.ready===true?'<p class="publication-time">Le poste peut lancer le backtest. La disponibilité de Saturn sera vérifiée pendant le calcul.</p>':
+      warnings(regional.evaluationPreflight?.blockers||['Évaluation non disponible.'],'error');
+  }
+  const runs=regional.runs.slice(0,12);
+  $('#regional-runs').innerHTML=runs.length?`<div class="panel table-wrap"><table><thead><tr><th>Type</th><th>Livraison</th><th>Pays</th><th>État</th><th>Demandé</th><th></th></tr></thead><tbody>${runs.map(run=>`<tr><td>${run.adapter_id==='nyx_regional_cpu_backtest'?'Évaluation':'Prévision'}</td><td>${esc(run.delivery_day?formatDay(run.delivery_day):'—')}</td><td>${esc(run.countries?.join(', ')||'—')}</td><td><span class="badge ${esc(run.status)}">${esc(statusLabels[run.status]||run.status)}</span></td><td>${esc(formatTime(run.created_at))}</td><td><button data-regional-run="${esc(run.id)}">Voir les sorties →</button></td></tr>`).join('')}</tbody></table></div>`:empty('Aucun lancement régional','Les calculs de cette nouvelle recette apparaîtront ici.');
+  const detail=regional.detail;
+  if(!detail){$('#regional-output').innerHTML=regional.error?warnings([regional.error],'error'):'';return;}
+  const rawPhase=regional.statusDoc?.phase||regional.statusDoc?.stage||'';
+  const phaseLabels={preflight:'Précontrôle',sync_saturn:'Synchronisation Saturn',saturn_sync:'Synchronisation Saturn',
+    build_features:'Préparation des variables',fit_models:'Réentraînement CPU',publish:'Publication des prévisions',
+    official_benchmark:'Référence officielle EPEX / Storm',weekly_fit:'Rejeu des origines',
+    selection_weekly_fit:'Sélection hebdomadaire',confirmation_daily_fit:'Confirmation quotidienne',
+    selection_sealed:'Sélection des modèles',complete:'Calcul terminé',failed:'Calcul échoué'};
+  const originCount=Number.isInteger(regional.statusDoc?.completed_origins)?` · ${regional.statusDoc.completed_origins} / ${regional.statusDoc.total_origins||173} origines`:'';
+  const phase=rawPhase?`${phaseLabels[rawPhase]||rawPhase}${originCount}`:detail.activity||'';
+  const evaluation=detail.adapter_id==='nyx_regional_cpu_backtest';
+  const files=(detail.artifacts||[]).filter(file=>evaluation?file.path.endsWith('backtest_receipt.json')||file.path.endsWith('.html')||file.path.endsWith('.csv'):
+    /^zones\/(FR|DE|BE|NL)\/forecast_[a-z]{2}_\d{4}-\d{2}-\d{2}_nyx_regional_cpu\.(csv|html)$/.test(file.path));
+  const outputs=(evaluation||detail.status==='succeeded')&&files.length?`<div class="regional-files">${files.map(file=>file.path.endsWith('.html')?`<button data-regional-report="${esc(file.path)}" data-run-id="${esc(detail.id)}">Ouvrir le rapport ↗</button><a href="${esc(runArtifactUrl(detail.id,file.path,true))}" download="${esc(file.name)}">HTML ↓</a>`:`<a href="${esc(runArtifactUrl(detail.id,file.path,true))}" download="${esc(file.name)}">${esc(file.name)} ↓</a>`).join('')}</div>`:detail.status==='succeeded'?'<p class="notice error">Le calcul est terminé, mais aucun résultat consultable n’a été trouvé.</p>':'';
+  const qualification=Array.isArray(regional.statusDoc?.qualification_blockers)?regional.statusDoc.qualification_blockers:[];
+  const qualified=evaluation&&regional.statusDoc?.qualified===true?'<div class="notice info">Backtest qualifié. Le précontrôle des prévisions sera actualisé.</div>':
+    evaluation&&regional.statusDoc?.qualified===false?'<div class="notice error">Les critères du backtest ne sont pas atteints. Les prévisions restent verrouillées.</div>':'';
+  const receipt=regional.receiptDoc;
+  const metric=(value,digits=2)=>typeof value==='number'&&Number.isFinite(value)?new Intl.NumberFormat('fr-FR',{maximumFractionDigits:digits}).format(value):'—';
+  const countryScores=evaluation&&receipt?.countries&&typeof receipt.countries==='object'?['FR','DE','BE','NL'].map(zone=>{
+    const row=receipt.countries[zone];
+    if(!row||typeof row!=='object')return '';
+    return `<tr><td><strong>${zone}</strong></td><td>${esc(row.selected||'—')}</td><td>${esc(metric(row.confirmation?.rmse))}</td><td>${esc(metric(row.confirmation?.storm_rmse))}</td><td>${esc(typeof row.confirmation?.strict_win_rate==='number'?metric(row.confirmation.strict_win_rate*100,1)+' %':'—')}</td><td>${esc(metric(row.negative_confirmation?.brier,4))}</td></tr>`;
+  }).join(''):'';
+  const scores=countryScores?`<div class="regional-scores"><h3>Scores du backtest · confirmation</h3><p class="publication-time">Prix : RMSE en €/MWh face à Storm. Prix négatif : score de Brier (plus bas est meilleur). ${receipt.confirmation_first_day&&receipt.stop_day_exclusive?`Période ${esc(receipt.confirmation_first_day)} au ${esc(receipt.stop_day_exclusive)} exclu.`:''}</p><div class="table-wrap"><table><thead><tr><th>Pays</th><th>Prix retenu</th><th>RMSE NYX</th><th>RMSE Storm</th><th>Heures gagnées</th><th>Brier négatif</th></tr></thead><tbody>${countryScores}</tbody></table></div></div>`:'';
+  $('#regional-output').innerHTML=`<div class="section-heading"><h2>Suivi ${evaluation?'de l’évaluation':'de la prévision'}</h2><span class="secondary">${esc(detail.countries?.join(', ')||'')} ${esc(detail.delivery_day?formatDay(detail.delivery_day):'')}</span></div><div class="panel padded"><div class="primary-run-status"><span class="badge ${esc(detail.status)}">${esc(statusLabels[detail.status]||detail.status)}</span>${phase?`<span class="run-phase">${esc(phase)}</span>`:''}</div>${qualified}${qualification.length?warnings(qualification,'error'):''}${detail.status==='failed'||detail.status==='interrupted'?warnings([regional.statusDoc?.error||detail.activity||'Le calcul a échoué. Consultez le journal ci-dessous.'],'error'):''}${scores}${outputs}<p class="publication-time">Dossier : <code>${esc(detail.output_dir||'')}</code></p>${regional.logs?.available?`<details class="regional-log" ${detail.status==='failed'?'open':''}><summary>Journal du calcul</summary><pre>${esc(regional.logs.text?.slice(-6000)||'')}</pre></details>`:''}</div>`;
+}
+async function checkRegional(){
+  const regional=state.regional;
+  const key=regionalSelection();
+  regional.checking=true;regional.preflight=null;renderRegionalStatus();
+  try{
+    const result=await api(`/api/regional-preflight?delivery_day=${encodeURIComponent(regional.day)}&country=${encodeURIComponent(regional.country)}`);
+    if(key===regionalSelection())regional.preflight=result;
+  }catch(error){if(key===regionalSelection())regional.preflight={ready:false,recipe_status:'unavailable',blockers:[error.message]};}
+  finally{if(key===regionalSelection()){regional.checking=false;renderRegionalStatus();}}
+}
+async function checkRegionalEvaluation(){
+  const regional=state.regional;
+  regional.evaluationChecking=true;regional.evaluationPreflight=null;renderRegionalStatus();
+  try{regional.evaluationPreflight=await api('/api/regional-evaluation-preflight');}
+  catch(error){regional.evaluationPreflight={ready:false,blockers:[error.message]};}
+  finally{regional.evaluationChecking=false;renderRegionalStatus();}
+}
+async function refreshRegional(){
+  const regional=state.regional;
+  if(state.route!=='regional'||regional.refreshing)return;
+  regional.refreshing=true;
+  try{
+    const listing=await api('/api/runs');
+    regional.runs=(listing.runs||[]).filter(run=>['nyx_regional_cpu','nyx_regional_cpu_backtest'].includes(run.adapter_id));
+    const completedEvaluation=regional.runs.find(run=>run.adapter_id==='nyx_regional_cpu_backtest'&&['succeeded','failed','interrupted'].includes(run.status));
+    if(completedEvaluation&&completedEvaluation.id!==regional.lastCompletedEvaluationId){
+      regional.lastCompletedEvaluationId=completedEvaluation.id;
+      void checkRegional();
+    }
+    const selected=regional.runs.find(run=>run.id===regional.pinnedRunId)||regional.runs[0];
+    if(selected){
+      const detail=await api(`/api/runs/${encodeURIComponent(selected.id)}`);
+      regional.detail=detail;regional.statusDoc=null;regional.receiptDoc=null;regional.logs=null;
+      if(detail.artifacts?.some(file=>file.path==='status.json')){
+        try{regional.statusDoc=await api(runArtifactUrl(detail.id,'status.json'));}catch{/* The worker may still be writing status.json. */}
+      }
+      if(detail.adapter_id==='nyx_regional_cpu_backtest'&&detail.artifacts?.some(file=>file.path==='results/backtest_receipt.json')){
+        try{regional.receiptDoc=await api(runArtifactUrl(detail.id,'results/backtest_receipt.json'));}catch{/* The backtest may still be writing its receipt. */}
+      }
+      if(['starting','running','failed','interrupted'].includes(detail.status)){
+        try{regional.logs=await api(`/api/runs/${encodeURIComponent(detail.id)}/logs`);}catch{/* Status remains visible. */}
+      }
+    }else regional.detail=null;
+    regional.error=null;
+  }catch(error){regional.error=error.message;}
+  finally{regional.refreshing=false;renderRegionalStatus();}
+}
+async function launchRegional(){
+  const regional=state.regional;
+  if(regional.launching||regional.checking||regionalActive())return;
+  if(!$('#regional-day').reportValidity())return;
+  const deliveryDay=regional.day,country=regional.country;
+  const parsed=new Date(`${deliveryDay}T00:00:00Z`);
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(deliveryDay)||deliveryDay.startsWith('0000')||!Number.isFinite(parsed.valueOf())||parsed.toISOString().slice(0,10)!==deliveryDay){toast('Choisissez une date de livraison valide.');return;}
+  regional.launching=true;renderRegionalStatus();
+  try{
+    await checkRegional();
+    if(regionalSelection()!==`${deliveryDay}|${country}`||regional.preflight?.ready!==true||regional.preflight?.recipe_status!=='validated')throw Error(regional.preflight?.blockers?.join(' ')||'Le précontrôle régional bloque le lancement.');
+    if(!state.boot)state.boot=await api('/api/bootstrap');
+    let intent;try{intent=JSON.parse(sessionStorage.getItem('nyx-regional-intent'));}catch{/* Ignore old session data. */}
+    if(intent?.delivery_day!==deliveryDay||intent?.country!==country||!intent?.key)intent={key:crypto.randomUUID(),delivery_day:deliveryDay,country};
+    if(!intent.plan_id){
+      const plan=await api('/api/preview',{adapter_id:'nyx_regional_cpu',config_id:'regional_cpu_country',model:'regional_price_and_negative_probability',parameters:{delivery_day:deliveryDay,country},name:`NYX régional CPU · ${country} · ${deliveryDay}`});
+      intent.plan_id=plan.id;
+      sessionStorage.setItem('nyx-regional-intent',JSON.stringify(intent));
+    }
+    const accepted=await api('/api/launch',{plan_id:intent.plan_id,idempotency_key:intent.key});
+    sessionStorage.removeItem('nyx-regional-intent');
+    regional.runs=[accepted,...regional.runs.filter(run=>run.id!==accepted.id)];
+    regional.pinnedRunId=accepted.id;regional.detail=accepted;
+    toast('Le calcul régional a été demandé. Son avancement apparaît ici.');
+    await refreshRegional();
+  }catch(error){
+    if([400,404].includes(error.httpStatus))sessionStorage.removeItem('nyx-regional-intent');
+    toast(error.message);regional.error=error.message;
+  }
+  finally{regional.launching=false;renderRegionalStatus();}
+}
+async function launchRegionalEvaluation(){
+  const regional=state.regional;
+  if(regional.evaluationLaunching||regional.evaluationChecking||regionalActive())return;
+  regional.evaluationLaunching=true;renderRegionalStatus();
+  try{
+    await checkRegionalEvaluation();
+    if(regional.evaluationPreflight?.ready!==true)throw Error(regional.evaluationPreflight?.blockers?.join(' ')||'Le précontrôle de l’évaluation bloque le lancement.');
+    if(!state.boot)state.boot=await api('/api/bootstrap');
+    let intent;try{intent=JSON.parse(sessionStorage.getItem('nyx-regional-evaluation-intent'));}catch{/* Ignore old session data. */}
+    if(!intent?.key)intent={key:crypto.randomUUID()};
+    if(!intent.plan_id){
+      const plan=await api('/api/preview',{adapter_id:'nyx_regional_cpu_backtest',config_id:'regional_cpu_evaluation',model:'regional_cpu_backtest',name:'NYX régional CPU · évaluation'});
+      intent.plan_id=plan.id;
+      sessionStorage.setItem('nyx-regional-evaluation-intent',JSON.stringify(intent));
+    }
+    const accepted=await api('/api/launch',{plan_id:intent.plan_id,idempotency_key:intent.key});
+    sessionStorage.removeItem('nyx-regional-evaluation-intent');
+    regional.runs=[accepted,...regional.runs.filter(run=>run.id!==accepted.id)];
+    regional.pinnedRunId=accepted.id;regional.detail=accepted;
+    toast('Le backtest régional a été demandé. Son avancement apparaît ici.');
+    await refreshRegional();
+  }catch(error){
+    if([400,404].includes(error.httpStatus))sessionStorage.removeItem('nyx-regional-evaluation-intent');
+    toast(error.message);regional.error=error.message;
+  }
+  finally{regional.evaluationLaunching=false;renderRegionalStatus();}
+}
+function showRegionalReport(runId,path){
+  const dialog=$('#dialog');
+  dialog.className='report-dialog';
+  dialog.innerHTML=`<div class="section-heading"><h2 id="dialog-title">Rapport régional NYX</h2><button data-close aria-label="Fermer le rapport">Fermer ✕</button></div><iframe class="report-frame" title="Rapport régional NYX" sandbox="allow-scripts" src="${esc(runArtifactUrl(runId,path))}"></iframe>`;
+  if(!dialog.open)dialog.showModal();
+}
 async function route(){
   const raw=location.hash.replace(/^#\/?/,'')||'architecture';
-  state.route=raw==='history'?'publications':['architecture','dashboard','publications'].includes(raw)?raw:'dashboard';
+  state.route=raw==='history'?'publications':['architecture','dashboard','regional','publications'].includes(raw)?raw:'dashboard';
   const atmosphere=$('#page-atmosphere');
   if(atmosphere){
-    atmosphere.hidden=!['dashboard','publications'].includes(state.route);
+    atmosphere.hidden=!['dashboard','regional','publications'].includes(state.route);
     const nodes=$('.ambient-nodes',atmosphere);
     if(nodes&&!nodes.innerHTML)nodes.innerHTML=Array.from({length:18},(_,i)=>`<i style="--x:${(i*37+11)%100}%;--y:${(i*23+9)%100}%;--delay:${-i*.7}s;--duration:${6+i%5}s"></i>`).join('');
   }
   if(raw!==state.route)history.replaceState(null,'',`#${state.route}`);
-  const routeName={architecture:'Accueil',dashboard:'Résultats',publications:'Publications'};
+  const routeName={architecture:'Accueil',dashboard:'Résultats',regional:'Modèles régionaux',publications:'Publications'};
   if(state.route!=='dashboard')$('#main').nyxDashboard=false;
+  if(state.route!=='regional')$('#main').nyxRegional=false;
   $('#breadcrumb').textContent=routeName[state.route];
   $$('[data-nav]').forEach(link=>{const selected=link.dataset.nav===state.route;link.classList.toggle('active',selected);if(selected)link.setAttribute('aria-current','page');else link.removeAttribute('aria-current');});
-  try{if(state.route==='architecture')await renderArchitecture();else if(state.route==='dashboard')renderDashboard();else renderPublications();}
+  try{
+    if(state.route==='architecture')await renderArchitecture();
+    else if(state.route==='dashboard')renderDashboard();
+    else if(state.route==='regional'){
+      if(!state.boot)state.boot=await api('/api/bootstrap');
+      if(!state.regional.day)state.regional.day=state.boot.catalog?.find(item=>item.id==='nyx_regional_cpu')?.parameters?.find(item=>item.name==='delivery_day')?.default||state.runInfo?.defaults?.delivery_day||'';
+      renderRegional();
+      await Promise.allSettled([checkRegional(),checkRegionalEvaluation(),refreshRegional()]);
+    }else renderPublications();
+  }
   catch(error){$('#main').innerHTML=empty('Chargement impossible',error.message);}
 }
 async function refresh(){
@@ -194,16 +381,25 @@ async function refresh(){
     else if(changed&&state.route==='publications')renderPublications();
     else renderRunPanel();
     if(results[0].status==='rejected'&&!state.primary.days.length&&state.route==='dashboard')$('#primary-results-content').innerHTML=warnings(['Résultats temporairement indisponibles. Nouvelle tentative automatique.'],'error');
+    if(state.route==='regional')await refreshRegional();
   }finally{state.refreshing=false;}
 }
 document.addEventListener('click',event=>{
   const go=event.target.closest('[data-go]');if(go){location.hash=go.dataset.go;return;}
   const delivery=event.target.closest('[data-delivery]');if(delivery){state.selectedDay=delivery.dataset.delivery;location.hash='dashboard';return;}
   const report=event.target.closest('[data-report]');if(report){showReport(report.dataset.report,report.dataset.title);return;}
+  const regionalReport=event.target.closest('[data-regional-report]');if(regionalReport){showRegionalReport(regionalReport.dataset.runId,regionalReport.dataset.regionalReport);return;}
+  const regionalRun=event.target.closest('[data-regional-run]');if(regionalRun){state.regional.pinnedRunId=regionalRun.dataset.regionalRun;void refreshRegional();return;}
   if(event.target.closest('[data-close]')){$('#dialog').close();return;}
   if(event.target.closest('[data-launch]'))void launchForecast();
+  if(event.target.closest('[data-regional-launch]'))void launchRegional();
+  if(event.target.closest('[data-regional-evaluate]'))void launchRegionalEvaluation();
 });
-document.addEventListener('change',event=>{if(event.target.id==='delivery-day'){state.selectedDay=event.target.value;renderDashboard();}});
+document.addEventListener('change',event=>{if(event.target.id==='delivery-day'){state.selectedDay=event.target.value;renderDashboard();}
+  if(event.target.id==='regional-day'||event.target.id==='regional-country'){
+    state.regional[event.target.id==='regional-day'?'day':'country']=event.target.value;
+    state.regional.preflight=null;void checkRegional();
+  }});
 document.addEventListener('input',event=>{if(event.target.id==='launch-delivery-day'&&!state.launching&&!state.runInfo?.active)state.launchDay=event.target.value;});
 $('#dialog').addEventListener('close',()=>{$('#dialog').innerHTML='';});
 window.addEventListener('hashchange',()=>void route());

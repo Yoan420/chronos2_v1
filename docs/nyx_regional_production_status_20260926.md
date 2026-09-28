@@ -1,6 +1,9 @@
 # FR/DE/BE/NL — état de préparation pour les prévisions futures
 
-La sélection fixe est implémentée dans `chronos2_hourly/nyx_regional_live_selection.py`.
+Archive de l'état du 26 septembre 2026. Le sélecteur historique a été retiré du
+code de production au profit de la nouvelle recette CPU et de son évaluation
+chronologique décrites dans `docs/nyx_regional_cpu_evaluation_protocol.md`.
+
 La sélection a été mise à jour après les essais du 27 septembre : FR conserve le
 résiduel antérieur ; DE et BE utilisent la moyenne sélective à 2 000 arbres ;
 NL utilise la moyenne complète à 2 000 arbres. Sur les sorties historiques

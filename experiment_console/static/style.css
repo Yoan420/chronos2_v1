@@ -253,3 +253,18 @@ dialog::backdrop { background: #03050bd4; backdrop-filter: blur(5px); }
   .sidebar { border-bottom-color: #765045; }
   .stat-value { font-size: 2rem; }
 }
+.regional-panel { margin-bottom: 30px; }
+.regional-panel > p { color: var(--muted); max-width: 70ch; }
+.regional-controls { display: flex; align-items: end; flex-wrap: wrap; gap: 12px; margin: 20px 0; }
+.regional-controls label { display: grid; gap: 7px; color: var(--muted); font-size: .85rem; }
+.regional-controls input, .regional-controls select { min-width: 155px; padding: 9px 10px; }
+.regional-controls button { min-height: 39px; }
+.regional-controls button:disabled { opacity: .5; cursor: not-allowed; }
+.regional-history, #regional-output { margin-top: 30px; }
+.regional-files { display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0; }
+.regional-files a { display: inline-flex; align-items: center; padding: 7px 11px; border: 1px solid var(--border); color: var(--cyan); text-decoration: none; }
+.regional-scores { margin: 20px 0; }
+.regional-scores h3 { margin-bottom: 4px; }
+.regional-scores .table-wrap { overflow-x: auto; }
+.regional-log { margin-top: 18px; }
+.regional-log pre { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 330px; overflow: auto; padding: 14px; background: #090d12; color: #bbd0ce; }

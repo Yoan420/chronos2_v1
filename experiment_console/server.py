@@ -316,6 +316,18 @@ class Handler(BaseHTTPRequestHandler):
             self.json(build_primary_results(manager.project_root))
         elif path == '/api/primary-run':
             self.json(manager.primary_run_status())
+        elif path == '/api/regional-preflight':
+            if set(query) != {'delivery_day', 'country'} or any(len(values) != 1 for values in query.values()):
+                raise ValueError('Une date de livraison et un pays sont requis pour le précontrôle régional.')
+            # Every managed run gets a fresh output directory. Use the same
+            # contract here so an older CLI run at the default output path
+            # cannot falsely block the app's next delivery.
+            proposed = manager.project_root / 'runs' / 'nyx_regional_cpu' / '_preflight' / secrets.token_hex(12)
+            self.json(manager.registry.regional_preflight(query['delivery_day'][0], query['country'][0], output=proposed))
+        elif path == '/api/regional-evaluation-preflight':
+            if query:
+                raise ValueError('Le précontrôle de l’évaluation n’accepte pas de paramètres.')
+            self.json(manager.registry.regional_evaluation_preflight())
         elif path == '/api/primary-artifact':
             if len(query.get('path', [])) != 1:
                 raise ValueError('Un chemin de résultat principal est requis.')
@@ -341,7 +353,7 @@ class Handler(BaseHTTPRequestHandler):
                     self.server.external_refreshed = time.monotonic()
                 finally:
                     self.server.external_lock.release()
-            fields = {'id', 'name', 'description', 'status', 'reported_status', 'source', 'type', 'model', 'created_at', 'started_at', 'finished_at', 'duration_seconds', 'activity', 'tags', 'note', 'metrics', 'output_dir', 'warnings', 'recovery_warning', 'imported_at'}
+            fields = {'id', 'name', 'description', 'status', 'reported_status', 'source', 'type', 'model', 'adapter_id', 'delivery_day', 'countries', 'created_at', 'started_at', 'finished_at', 'duration_seconds', 'activity', 'tags', 'note', 'metrics', 'output_dir', 'warnings', 'recovery_warning', 'imported_at'}
             rows = []
             for run in manager.list_runs():
                 if run.get('source') == 'managed' and run['status'] == 'succeeded' and 'metrics' not in run:
