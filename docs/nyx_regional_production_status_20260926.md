@@ -1,9 +1,12 @@
-# FR/BE/NL — état de préparation pour les prévisions futures
+# FR/DE/BE/NL — état de préparation pour les prévisions futures
 
 La sélection fixe est implémentée dans `chronos2_hourly/nyx_regional_live_selection.py`.
-Sur les sorties historiques scellées, elle reproduit exactement les 10 944 points
-FR et les 8 760 points BE/NL (égalité bit à bit). Elle n'utilise ni prix réalisé
-de l'heure prédite ni Storm. Aucun pays DE n'est autorisé.
+La sélection a été mise à jour après les essais du 27 septembre : FR conserve le
+résiduel antérieur ; DE et BE utilisent la moyenne sélective à 2 000 arbres ;
+NL utilise la moyenne complète à 2 000 arbres. Sur les sorties historiques
+scellées, elle reproduit exactement les 10 944 points FR et les 8 760 points
+DE/BE/NL (égalité bit à bit). Elle n'utilise ni prix réalisé de l'heure prédite
+ni Storm. Le choix DE ne bat pas Storm en RMSE.
 
 Cette pièce ne produit pas encore de prévision autonome dans NYX. Les trois
 points exigent les experts et la référence suivants pour chaque livraison :
@@ -11,8 +14,8 @@ points exigent les experts et la référence suivants pour chaque livraison :
 | Pays | Entrées | Règle |
 |---|---|---|
 | FR | résiduel pooled original, référence | résiduel si désaccord >= 20 EUR/MWh, sinon référence |
-| BE | résiduel compact JAO, absolu exchange JAO, référence | moyenne 50/50 si désaccord >= 20, sinon référence |
-| NL | résiduel compact JAO, absolu exchange JAO, référence | moyenne 50/50 sur toutes les heures |
+| DE, BE | résiduel et absolu à 2 000 arbres, référence | moyenne 50/50 si désaccord >= 20, sinon référence |
+| NL | résiduel et absolu à 2 000 arbres, référence | moyenne 50/50 sur toutes les heures |
 
 Le replay annuel employait CatBoost GPU et des caches de variables sous
 `runs/experiments/nyx_improvement_to20260923`, absents du dépôt Git. La

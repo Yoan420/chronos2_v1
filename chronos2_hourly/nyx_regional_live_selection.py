@@ -1,4 +1,4 @@
-"""Fixed country routing for the audited FR/BE/NL RMSE candidates.
+"""Fixed country routing for the best audited annual RMSE candidates.
 
 This only combines already produced expert forecasts. It does not train models,
 obtain covariates, or claim that a CPU retrain has the historical GPU scores.
@@ -11,8 +11,9 @@ import pandas as pd
 
 VARIANTS = {
     "FR": "residual__disagreement20__w1p0",
-    "BE": "jao_refresh_mean_disagreement20",
-    "NL": "jao_refresh_mean_all",
+    "DE": "boosting_2000_mean_disagreement20",
+    "BE": "boosting_2000_mean_disagreement20",
+    "NL": "boosting_2000_mean_all",
 }
 
 
@@ -39,13 +40,13 @@ def select_country(zone: str, points: pd.DataFrame) -> pd.Series:
         reference = points["reference"].to_numpy(dtype=float)
         residual = points["residual"].to_numpy(dtype=float)
         selected = np.where(np.abs(residual - reference) >= 20., residual, reference)
-    elif zone in ("BE", "NL"):
-        _check(points, ("reference", "compact", "exchange_absolute"))
+    elif zone in ("DE", "BE", "NL"):
+        _check(points, ("reference", "residual_2000", "absolute_2000"))
         reference = points["reference"].to_numpy(dtype=float)
-        mean = (points["compact"].to_numpy(dtype=float)
-                + points["exchange_absolute"].to_numpy(dtype=float)) / 2.
+        mean = (points["residual_2000"].to_numpy(dtype=float)
+                + points["absolute_2000"].to_numpy(dtype=float)) / 2.
         selected = (np.where(np.abs(mean - reference) >= 20., mean, reference)
-                    if zone == "BE" else mean)
+                    if zone in ("DE", "BE") else mean)
     else:
-        raise ValueError("Only the audited FR, BE and NL selections are supported")
+        raise ValueError("Only the audited FR, DE, BE and NL selections are supported")
     return pd.Series(selected, index=points.index, name="nyx_regional_rmse_point")
