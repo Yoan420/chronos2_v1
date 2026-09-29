@@ -19,6 +19,8 @@ from typing import Callable
 import numpy as np
 import pandas as pd
 
+from experiment_console.security import redact_text
+
 from chronos2_modular.saturn import create_saturn_client, fetch_saturn_series_from_client
 from .nyx_annual_live_preflight import ROOT, SOURCE_PROTOCOL, sha256, validate_source_receipt
 from .nyx_local_io import publish_verified_immutable_copy
@@ -36,6 +38,19 @@ ALIASES = CORE_ALIASES + ("fr_wind_generation_fcst", "be_wind_generation_fcst")
 DEFAULT_CACHE = ROOT / "data/pit/nyx_annual_saturn"
 WARMUP_DAYS = 834
 TARGET_CONTEXT_HOURS = 479 * 24 + 2  # 469 baseline/reference days + price lags and DST.
+
+
+class SaturnSourceError(RuntimeError):
+    """Context for one failed day; the original exception remains its cause."""
+
+    def __init__(self, day, phase, error, *, alias=None, series=None):
+        self.day, self.phase, self.alias, self.series = day, phase, alias, series
+        context = f"Saturn {day} / {phase}"
+        if alias:
+            context += f" / {alias}"
+        if series:
+            context += f" ({series})"
+        super().__init__(f"{context}: {type(error).__name__}: {redact_text(str(error))}")
 
 
 def require(ok, message):
@@ -105,7 +120,9 @@ def _numeric(series, expected, label):
     series = series.copy()
     series.index = series.index.tz_convert("UTC")
     values = pd.to_numeric(series.reindex(expected), errors="coerce").to_numpy(float)
-    require(np.isfinite(values).all(), f"{label}: {int((~np.isfinite(values)).sum())} missing/nonfinite hours at its cutoff")
+    missing = ~np.isfinite(values)
+    first = ", ".join(stamp.isoformat() for stamp in expected[missing][:5])
+    require(not missing.any(), f"{label}: {int(missing.sum())} missing/nonfinite hours at its cutoff; first UTC: {first}")
     return values
 
 
@@ -143,11 +160,14 @@ def capture_day(client, day: str, cache: Path = DEFAULT_CACHE, *, now_utc=None):
     expected = grid(day)
     values, repair_evidence = {}, {}
     for alias, spec in contract.items():
-        series = fetch_saturn_series_from_client(client, spec["series"],
-            expected[0] - pd.Timedelta(hours=8), expected[-1] + pd.Timedelta(hours=8), "UTC",
-            revision_date=cutoff(day), naive_timezone=spec["naive_timezone"],
-            incomplete_dst_policy=spec["dst_policy"], nocache=True)
-        values[alias] = _numeric(series, expected, alias)
+        try:
+            series = fetch_saturn_series_from_client(client, spec["series"],
+                expected[0] - pd.Timedelta(hours=8), expected[-1] + pd.Timedelta(hours=8), "UTC",
+                revision_date=cutoff(day), naive_timezone=spec["naive_timezone"],
+                incomplete_dst_policy=spec["dst_policy"], nocache=True)
+            values[alias] = _numeric(series, expected, alias)
+        except Exception as error:
+            raise SaturnSourceError(day, "forecast_profile", error, alias=alias, series=spec["series"]) from error
         # Saturn's normalizer explicitly records duplicated autumn folds.
         repair_evidence[alias] = {"policy": spec["dst_policy"],
                                   "normalizer_attrs": json.loads(json.dumps(series.attrs, default=str))}
@@ -156,9 +176,12 @@ def capture_day(client, day: str, cache: Path = DEFAULT_CACHE, *, now_utc=None):
                             expected[0], freq="h", inclusive="left", name="timestamp_utc")
     targets = {}
     for zone in ZONES:
-        series = fetch_saturn_series_from_client(client, SERIES[zone], history[0], history[-1], "UTC",
-            revision_date=cutoff(day), naive_timezone="UTC", incomplete_dst_policy="raise", nocache=True)
-        targets[zone] = _numeric(series, history, f"{zone} target")
+        try:
+            series = fetch_saturn_series_from_client(client, SERIES[zone], history[0], history[-1], "UTC",
+                revision_date=cutoff(day), naive_timezone="UTC", incomplete_dst_policy="raise", nocache=True)
+            targets[zone] = _numeric(series, history, f"{zone} target")
+        except Exception as error:
+            raise SaturnSourceError(day, "target_history", error, alias=f"{zone}_target", series=SERIES[zone]) from error
     prices = pd.DataFrame(targets, index=history)
     receipt = {"protocol": PROTOCOL, "delivery_day": day, "state": "COMPLETE",
         "forecast_origin_utc": cutoff(day).isoformat(), "series": contract,
@@ -210,10 +233,12 @@ def sync(delivery_day: str, *, first_day: str | None = None, cache: Path = DEFAU
                 d = pending[future]
                 try:
                     results[d] = future.result()
-                except Exception:
+                except Exception as error:
                     for remaining in pending:
                         remaining.cancel()
-                    raise
+                    if isinstance(error, SaturnSourceError):
+                        raise
+                    raise SaturnSourceError(d, "daily_capture", error) from error
                 if len(results) % 10 == 0 or len(results) == len(days):
                     print(f"Saturn: {len(results)}/{len(days)} daily states verified", flush=True)
     return results

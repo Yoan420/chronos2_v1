@@ -150,6 +150,50 @@ que la qualification complète n'est pas obtenue. Les erreurs de source et
 l'erreur d'activation donnent la raison précise. Le statut du dernier calcul
 se trouve dans `runs/nyx_annual_cpu_live/YYYY-MM-DD.pipeline.json`.
 
+Le lanceur `NYXAnnualCPU.ps1` conserve automatiquement la sortie complète et
+les erreurs dans `runs/logs/nyx_annual_cpu/YYYY-MM-DD/`. Chaque tentative a son
+propre journal `.log` et son diagnostic `.diagnostic.json`. Leurs chemins sont
+affichés à la fin. Transmettre ce diagnostic permet d'identifier l'action, la
+livraison et les sources en erreur ; le seul message « code 2 » ne suffit pas.
+La commande `-Action inspect` signale une qualification absente comme un état
+de diagnostic attendu, sans la présenter comme une panne du calcul.
+
+Pour une erreur survenue avant cette amélioration du lanceur, lire les derniers
+fichiers disponibles, sans relancer le calcul :
+
+```powershell
+Get-ChildItem .\runs\nyx_annual_cpu_live -Filter *.pipeline.json | Sort-Object LastWriteTime -Descending | Select-Object -First 1 | Get-Content
+Get-Content .\runs\live\nyx_annual_cpu\daily_capture_log.jsonl -Tail 1
+```
+
+Vérifier les dates et l'action de ces fichiers : ils peuvent concerner une
+tentative antérieure si le programme s'est arrêté avant de créer son statut.
+
+### Saturn renvoie une réponse vide pour les anciens prix FR
+
+Le journal du 29 septembre a identifié une requête vide pour
+`power.price.da.fr.bzn.hourly.entsoe.utc.cdh.eurmwh` : historique du 24 février
+2023 au 17 juin 2024, demandé dans l'état Saturn du **17 juin 2024 à 06:00 UTC**.
+Cette requête sert au premier jour de préparation, le 18 juin 2024. La réussite
+de la collecte des prix à la coupure actuelle ne prouve pas la disponibilité de
+cet ancien état.
+
+Après la mise à jour Git, exécuter sur le poste ayant accès à Saturn :
+
+```powershell
+& .\.venv-annual\Scripts\python.exe .\diagnose_nyx_annual_saturn_targets.py --delivery-day 2026-09-30 --failed-day 2024-06-18 --zone FR
+```
+
+Le diagnostic compare les réponses pour l'ancien état, un intervalle plus court,
+l'état actuel et la série officielle alternative déjà référencée dans le code.
+Il enregistre un rapport JSON et affiche son chemin. Transmettre ce fichier.
+Il ne modifie pas les caches de données et ne lance aucun entraînement.
+
+Une concordance entre l'alternative ancienne et les prix actuels est seulement
+un contrôle de compatibilité. Elle n'autorise pas automatiquement l'utilisation
+de cette alternative et ne qualifie pas une prévision. La réponse vide reste
+bloquante tant que la disponibilité des prix nécessaires n'est pas établie.
+
 Pour lire la provenance dans les fichiers de diagnostic :
 
 - `training_snapshot_max_retrieved_at_utc` indique la dernière récupération

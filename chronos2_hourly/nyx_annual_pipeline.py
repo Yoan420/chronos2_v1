@@ -12,12 +12,17 @@ import importlib.util
 import json
 import os
 from pathlib import Path
+import re
 import subprocess
 import sys
 import time
 from uuid import uuid4
 
 import pandas as pd
+
+from experiment_console.error_summary import FailureSummary
+from experiment_console.processes import WindowsJob, stop_tree
+from experiment_console.security import redact, redact_text
 
 from .nyx_annual_live_preflight import ROOT, delivery_grid
 from .process_lock import exclusive_process_lock
@@ -28,6 +33,91 @@ ARCHIVE_GROUPS = ("jao_initial", "public_hydro", "lagged_exchange")
 MODULES = ("numpy", "pandas", "pyarrow", "catboost", "sklearn", "torch", "chronos",
            "huggingface_hub", "httpx", "requests", "tshistory_lite", "holidays", "pykalman")
 HISTORY_MODULES = ("numpy", "pandas", "pyarrow", "httpx", "requests")
+
+
+def _source_failure(line):
+    """Keep the current collector's detailed JSON failure, not just its exit code."""
+    try:
+        value = json.loads(line)
+    except (TypeError, ValueError):
+        return None
+    if not isinstance(value, dict):
+        return None
+    errors = []
+    for name, item in value.get("sources", {}).items() if isinstance(value.get("sources"), dict) else ():
+        if isinstance(item, dict) and item.get("error"):
+            errors.append(f"{name}: {redact_text(str(item['error']))}")
+    if not errors and value.get("error"):
+        name = value.get("source", value.get("name", "Source"))
+        errors.append(f"{name}: {redact_text(str(value['error']))}")
+    if not errors and value.get("state") == "INCOMPLETE":
+        errors.append(f"{value.get('source', 'Source')}: INCOMPLETE; "
+                      f"jours manquants: {value.get('missing_days', 'non precises')}")
+    # Redact BEFORE truncation so credentials cannot lose their context.
+    return redact_text("; ".join(errors))[:2000] if errors else None
+
+
+def _safe_source_line(line):
+    try:
+        value = json.loads(line)
+    except (TypeError, ValueError):
+        match = re.match(r"^([\w.]*(?:Error|Exception):\s*)(.*)$", line, re.S)
+        return match[1] + redact_text(match[2]) if match else redact_text(line)
+    return json.dumps(redact(value), ensure_ascii=False) + "\n"
+
+
+def _execute_source(command):
+    """Stream a source process and retain its failure in the pipeline status."""
+    import psutil
+    process, job = None, None
+    failure, source_failure = FailureSummary(), None
+    try:
+        job = WindowsJob()
+        flags = (subprocess.CREATE_NO_WINDOW | 0x00000004) if os.name == "nt" else 0
+        env = os.environ.copy()
+        env.update(PYTHONUNBUFFERED="1", PYTHONIOENCODING="utf-8")
+        process = subprocess.Popen(command, cwd=ROOT, shell=False, stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env,
+            creationflags=flags, start_new_session=os.name != "nt")
+        job.assign(process)
+        if os.name == "nt":
+            psutil.Process(process.pid).resume()
+        private = False
+        while True:
+            raw = process.stdout.readline(65537)
+            if not raw:
+                break
+            decoded = raw.decode("utf-8", errors="replace")
+            if "-----BEGIN " in decoded and "PRIVATE KEY-----" in decoded:
+                private = True
+            if len(raw) > 65536:
+                while raw and not raw.endswith(b"\n"):
+                    raw = process.stdout.readline(65537)
+                print("[NYX] Ligne trop longue masquee.", flush=True)
+                continue
+            if private:
+                if "-----END " in decoded and "PRIVATE KEY-----" in decoded:
+                    private = False
+                continue
+            line = _safe_source_line(decoded)
+            print(line, end="", flush=True)
+            source_failure = _source_failure(decoded) or source_failure
+            failure.feed(line)
+        code = process.wait()
+        return code, source_failure or failure.message
+    except BaseException:
+        if process is not None:
+            if job is not None:
+                stop_tree(process, job)
+            if process.poll() is None:
+                process.kill()
+            process.wait(timeout=5)
+        raise
+    finally:
+        if process is not None and process.stdout is not None:
+            process.stdout.close()
+        if job is not None:
+            job.close()
 
 
 def _write(path, payload):
@@ -149,11 +239,13 @@ def run(day, *, action="forecast", bundle=None, output=None, runner=None, cache_
     def publish():
         state["updated_at_utc"] = pd.Timestamp.now(tz="UTC").isoformat()
         _write(status_path, state)
+    source_failures = {}
     def execute(script, args):
         command = [sys.executable, "-u", str(ROOT / script), *args]
         print(json.dumps({"stage_command": command}, ensure_ascii=False), flush=True)
-        return subprocess.run(command, cwd=ROOT, shell=False, stdin=subprocess.DEVNULL,
-                              creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0)).returncode
+        code, reason = _execute_source(command)
+        source_failures[script] = reason
+        return code
     runner = runner or execute
     def step(name, callback):
         item = {"name": name, "state": "RUNNING"}
@@ -163,13 +255,15 @@ def run(day, *, action="forecast", bundle=None, output=None, runner=None, cache_
             callback()
             item["state"] = "COMPLETE"
         except Exception as error:
-            item.update(state="ERROR", error=f"{type(error).__name__}: {error}")
+            item.update(state="ERROR", error=f"{type(error).__name__}: {redact_text(str(error))}")
         publish()
         print(json.dumps(item, ensure_ascii=False), flush=True)
         return item["state"] == "COMPLETE"
     def cli(script, args):
         code = runner(script, args)
         if code != 0:
+            if source_failures.get(script):
+                raise RuntimeError(f"{script}: {source_failures[script]} (code {code})")
             raise RuntimeError(f"{script} exited with {code}; see preceding source error")
     def blocked():
         state["state"] = "BLOCKED"
