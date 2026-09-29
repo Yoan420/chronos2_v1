@@ -122,10 +122,13 @@ def build_cpu_reference_bundle(bundle, delivery_day, *, baselines, base_features
     if any(set(mapping) != set(ZONES) for mapping in required_maps):
         raise ValueError("All four countries are required by the paired reference")
     upstream_hash, verified, publication_verified = _upstream(root, delivery_day, require_verified_sources)
-    from .nyx_annual_saturn_source import target_history_contract
+    from .nyx_annual_saturn_source import target_history_contract, profile_history_contract
     target_contract = target_history_contract(root)
+    profile_contract = profile_history_contract(root)
     target_identity = ({"target_history_policy": target_contract["target_history_policy"]}
                        if target_contract else {})
+    if profile_contract:
+        target_identity["profile_history_policy"] = profile_contract["profile_history_policy"]
     for zone in ZONES:
         for label, mapping in zip(("baseline", "HGB base", "HGB augmented", "Test2"), required_maps):
             frame = mapping[zone]
@@ -150,7 +153,7 @@ def build_cpu_reference_bundle(bundle, delivery_day, *, baselines, base_features
             snapshots = (target_snapshots_by_day(str(fit_date)) if callable(target_snapshots_by_day)
                          else target_snapshots_by_day[str(fit_date)])
             if set(snapshots) != set(ZONES):
-                raise ValueError("Four origin-specific training label snapshots required")
+                raise ValueError("Four bounded internal training label histories required")
             hgb, test2, records = {}, {}, []
             for zone in ZONES:
                 labels = snapshots[zone].reindex(available)
@@ -200,7 +203,8 @@ def build_cpu_reference_bundle(bundle, delivery_day, *, baselines, base_features
                 hashes[relative] = sha256(path)
                 hashes[str(path.with_suffix(".json").relative_to(root)).replace("\\", "/")] = sha256(path.with_suffix(".json"))
                 records.append(fitted.audit)
-            # A later day's physical forecast profile never enters an earlier fit.
+            # Inner delivery origins are logical replay dates. Any recovered
+            # historical profiles are declared and bounded by the outer cutoff.
             for score_date in pd.date_range(str(fit_date), str(min(day, fit_date + timedelta(days=6))), freq="D").date:
                 index = _grid(score_date, score_date + timedelta(days=1))
                 source_cutoff = pd.Timestamp(f"{score_date - timedelta(days=1)} 08:00", tz="Europe/Paris").tz_convert("UTC")
@@ -227,7 +231,7 @@ def build_cpu_reference_bundle(bundle, delivery_day, *, baselines, base_features
                     forecasts[zone].append(frame)
             relative = f"reference_runs/{fit_date}.json"
             write_json(root / relative, {"protocol": PROTOCOL, "origin_day": str(fit_date),
-                                        **target_contract,
+                                        **target_contract, **profile_contract,
                                         "trained_on_cpu": True, "future_labels_used": False,
                                         "training_price_sha256": {z: frame_digest(snapshots[z].reindex(train)) for z in ZONES},
                                         "model_audits": records, "implementation_sha256": codes,
@@ -276,7 +280,7 @@ def build_cpu_reference_bundle(bundle, delivery_day, *, baselines, base_features
                    "provider_publication_timestamp_verified": publication_verified, "training_window_complete": True,
                    "artifact_sha256": hashes,
                    "producer": {"protocol": PROTOCOL, "device": "cpu", "zones": list(ZONES),
-                                **target_contract,
+                                **target_contract, **profile_contract,
                                 "baseline_receipt_sha256": upstream_hash, "implementation_sha256": codes,
                                 "code_config_hash_policy": TEXT_HASH_POLICY,
                                 "weekly_anchor": WEEKLY_ANCHOR, "first_oof_origin": str(first_origin),
@@ -299,7 +303,9 @@ def build_from_bundle(bundle, delivery_day, **kwargs):
 
 def validate_cpu_reference_source(bundle, delivery_day):
     """Bind fitted weekly models to their declared source and replay policies."""
-    from .nyx_annual_saturn_source import load_target_snapshots, target_history_contract
+    from .nyx_annual_saturn_source import (
+        load_target_snapshots, target_history_contract, profile_history_contract, PROFILE_HISTORY_FIELDS,
+    )
     root = Path(bundle).resolve()
     path = root / "source_receipts/scarcity_confirmed_pair.json"
     receipt = json.loads(path.read_text(encoding="utf-8"))
@@ -307,8 +313,11 @@ def validate_cpu_reference_source(bundle, delivery_day):
     validate_source_receipt(receipt, group="scarcity_confirmed_pair", day=delivery_day, bundle=root, cutoff=cutoff)
     upstream_hash, _, publication_verified = _upstream(root, delivery_day, True)
     target_contract = target_history_contract(root)
+    profile_contract = profile_history_contract(root)
     target_identity = ({"target_history_policy": target_contract["target_history_policy"]}
                        if target_contract else {})
+    if profile_contract:
+        target_identity["profile_history_policy"] = profile_contract["profile_history_policy"]
     day = pd.Timestamp(delivery_day).date()
     origin = week_origin(day)
     first_origin = week_origin(origin - timedelta(days=90))
@@ -318,14 +327,15 @@ def validate_cpu_reference_source(bundle, delivery_day):
     origins = [str(d) for d in pd.date_range(str(first_origin), str(origin), freq="7D").date]
     producer = receipt.get("producer", {})
     expected_producer = {"protocol": PROTOCOL, "device": "cpu", "zones": list(ZONES),
-                         **target_contract,
+                         **target_contract, **profile_contract,
                          "baseline_receipt_sha256": upstream_hash, "implementation_sha256": codes,
                          "code_config_hash_policy": TEXT_HASH_POLICY,
                          "weekly_anchor": WEEKLY_ANCHOR, "first_oof_origin": str(first_origin),
                          "current_origin": str(origin), "training_days": 365, "prior_days": 90,
                          "future_labels_used": False, "storm_used_as_input": False,
                          "weekly_run_receipts": [f"reference_runs/{d}.json" for d in origins]}
-    if producer != expected_producer:
+    if (producer != expected_producer
+            or (profile_contract and producer.get("profile_origin_snapshot_verified") is not False)):
         raise ValueError("CPU reference producer protocol, baseline, code or chronology differs")
     def bound_frame(relative):
         if relative not in receipt["artifact_sha256"]:
@@ -358,7 +368,9 @@ def validate_cpu_reference_source(bundle, delivery_day):
         run = json.loads((root / run_path).read_text())
         if (run.get("protocol") != PROTOCOL or run.get("origin_day") != date
                 or {key: run[key] for key in ("target_history_policy", "target_revision_utc",
-                    "target_origin_snapshot_verified", "target_future_labels_used") if key in run} != target_contract
+                    "target_origin_snapshot_verified", "target_future_labels_used", *PROFILE_HISTORY_FIELDS)
+                    if key in run} != {**target_contract, **profile_contract}
+                or (profile_contract and run.get("profile_origin_snapshot_verified") is not False)
                 or run.get("trained_on_cpu") is not True or run.get("future_labels_used") is not False
                 or run.get("implementation_sha256") != codes or len(run.get("model_audits", [])) != 14
                 or run.get("code_config_hash_policy") != TEXT_HASH_POLICY
@@ -399,7 +411,7 @@ def validate_cpu_reference_source(bundle, delivery_day):
                                        origin_day=str(origin), zone=zone)
         relative = f"reference_policies/{zone}.json"
         if relative not in receipt["artifact_sha256"] or json.loads((root / relative).read_text()) != policy:
-            raise ValueError("Prior90 policy differs from the own-origin OOF and observed history")
+            raise ValueError("Prior90 policy differs from the declared internal OOF and observed history")
         active = apply_prior90_daily(oof.loc[current], policy, forecast_issued_at_utc=cutoff)
         signals = bound_frame(f"reference_signals/{zone}.parquet")
         expected_signals = oof.loc[current, ["ensemble__q50", "nyx__q50", "test2__q50", "spike_probability"]].copy()
@@ -411,7 +423,7 @@ def validate_cpu_reference_source(bundle, delivery_day):
         if not reference.index.equals(current) or not np.array_equal(reference.reference.to_numpy(), result.scarcity_confirmed_pair.to_numpy()):
             raise ValueError("Published reference differs from the fitted prior90 paired formula")
     return {"protocol": PROTOCOL, "receipt_sha256": sha256(path), "weekly_origins_verified": len(origins),
-            **target_contract,
+            **target_contract, **profile_contract,
             "cpu_model_artifacts_verified": checked, "prior90_recomputed": True,
             "provider_publication_timestamp_verified": publication_verified}
 

@@ -1,8 +1,10 @@
 """Daily as-of Saturn inputs for the annual CPU pipeline.
 
-Forecast profiles retain their historical civil cutoffs. Training prices for
-an outer forecast use the canonical snapshot at that outer forecast's cutoff;
-inner reconstruction windows never receive prices for their delivery day.
+Forecast profiles use their historical civil cutoffs where available. After
+bounded retries, a historical day may be reconstructed at the outer fit cutoff;
+the live delivery day keeps its own cutoff. Logical origins and real profile
+revisions are recorded separately. Canonical training prices use the outer
+cutoff; inner windows never receive prices for their delivery day.
 Legacy packets with per-origin price snapshots remain readable.
 The immutable cache is resumable and does not read production residual banks.
 Saturn revision_date evidence is recorded separately from provider publication
@@ -17,6 +19,7 @@ import json
 import os
 from pathlib import Path
 import tempfile
+import time
 from typing import Callable
 
 import numpy as np
@@ -31,7 +34,11 @@ from .process_lock import exclusive_process_lock
 
 PROTOCOL = "nyx_annual_saturn_daily_v1"
 PROFILE_PROTOCOL = "nyx_annual_saturn_profiles_daily_v2"
+PROFILE_RECOVERY_PROTOCOL = "nyx_annual_saturn_profiles_current_fit_v1"
 PROFILE_NORMALIZATION_POLICY = "historical_saturn_profiles_with_audited_nl_spring_v1"
+PROFILE_HISTORY_POLICY = "own_origin_with_current_fit_recovery_v1"
+PROFILE_HISTORY_FIELDS = ("profile_history_policy", "profile_revision_ceiling_utc",
+                          "profile_origin_snapshot_verified")
 TARGET_PROTOCOL = "nyx_annual_saturn_current_fit_targets_v1"
 TARGET_HISTORY_POLICY = "current_fit_origin_reconstruction_v1"
 TARGET_HISTORY_FIELDS = ("target_history_policy", "target_revision_utc",
@@ -231,7 +238,7 @@ def target_grid(first_profile_day, delivery_day):
     return pd.date_range(first, end, freq="h", inclusive="left", name="timestamp_utc")
 
 
-def _nl_spring_profile(series, day, expected):
+def _nl_spring_profile(series, day, expected, *, query_revision=None):
     from materialize_saturn_kalman_fuel import RESIDUAL_LOAD_SERIES, _repair_nl_spring_dst_hour
     spec = next(item for item in RESIDUAL_LOAD_SERIES if item.alias == "nl_residual_load_fcst")
     selected = series.loc[(series.index >= expected[0]) & (series.index <= expected[-1])].copy()
@@ -247,11 +254,11 @@ def _nl_spring_profile(series, day, expected):
                        "donor_hours_utc": [donor.isoformat() for donor in donors],
                        "donor_values_gw": [float(values.loc[donor]) for donor in donors],
                        "repaired_value_gw": float(values.loc[stamp]),
-                       "forecast_origin_utc": cutoff(day).isoformat()})
+                       "forecast_origin_utc": (cutoff(day) if query_revision is None else pd.Timestamp(query_revision)).isoformat()})
     return repaired, ledger
 
 
-def _verify_profile_normalization(frame, receipt, day):
+def _verify_profile_normalization(frame, receipt, day, *, query_revision=None):
     from materialize_saturn_kalman_fuel import NL_SPRING_DST_REPAIR_POLICY
     require(receipt.get("profile_normalization_policy") == PROFILE_NORMALIZATION_POLICY,
             "Saturn profile normalization policy differs")
@@ -270,18 +277,61 @@ def _verify_profile_normalization(frame, receipt, day):
             and tuple(stamps.tz_convert("Europe/Amsterdam").strftime("%H:%M")) == ("04:00", "06:00"),
             "Saturn NL spring repair hours differ")
     raw = frame["nl_residual_load_fcst"].drop(stamps)
-    reconstructed, ledger = _nl_spring_profile(raw, day, expected)
+    reconstructed, ledger = _nl_spring_profile(raw, day, expected, query_revision=query_revision)
     require(entries == ledger, "Saturn NL spring repair ledger differs from same-vintage donors")
     require(np.array_equal(_numeric(reconstructed, expected, "nl_residual_load_fcst"),
                            frame["nl_residual_load_fcst"].to_numpy(float)),
             "Saturn NL spring repaired values differ from historical normalization")
 
 
-def verify_profile_day(directory: Path, day: str):
+def _profile_contract(day):
+    return {"profile_history_policy": PROFILE_HISTORY_POLICY,
+            "profile_revision_ceiling_utc": cutoff(day).isoformat(),
+            "profile_origin_snapshot_verified": False}
+
+
+def _check_profile_contract(receipt, day):
+    if receipt.get("profile_history_policy") is None:
+        require(not any(key in receipt for key in PROFILE_HISTORY_FIELDS)
+                and "logical_forecast_origins" not in receipt
+                and "source_artifacts/saturn/profile_revisions.parquet" not in receipt.get("artifact_sha256", {}),
+                "Incomplete or downgraded Saturn profile history metadata")
+        return {}
+    expected = _profile_contract(day)
+    require(all(receipt.get(key) == value for key, value in expected.items())
+            and receipt.get("profile_origin_snapshot_verified") is False
+            and receipt.get("logical_forecast_origins") is True,
+            "Saturn profile history policy or revision ceiling differs")
+    return expected
+
+
+def _profile_revision(receipt, day, outer_day=None):
+    if receipt.get("protocol") == PROFILE_PROTOCOL:
+        require(receipt.get("forecast_origin_utc") == cutoff(day).isoformat()
+                and receipt.get("profile_revision_utc", cutoff(day).isoformat()) == cutoff(day).isoformat()
+                and receipt.get("profile_origin_snapshot_verified", True) is True
+                and "outer_delivery_day" not in receipt, "Saturn strict profile origin changed")
+        return cutoff(day)
+    require(receipt.get("protocol") == PROFILE_RECOVERY_PROTOCOL and outer_day is not None
+            and date.fromisoformat(day) < date.fromisoformat(outer_day),
+            "Saturn current-fit profile recovery is forbidden for the live delivery day")
+    revision = cutoff(outer_day)
+    require(receipt.get("outer_delivery_day") == outer_day
+            and receipt.get("forecast_origin_utc") == revision.isoformat()
+            and receipt.get("profile_revision_utc") == revision.isoformat()
+            and receipt.get("logical_forecast_origin_utc") == cutoff(day).isoformat()
+            and receipt.get("profile_history_policy") == PROFILE_HISTORY_POLICY
+            and receipt.get("profile_revision_ceiling_utc") == revision.isoformat()
+            and receipt.get("profile_origin_snapshot_verified") is False,
+            "Saturn recovered profile revision or logical origin changed")
+    return revision
+
+
+def verify_profile_day(directory: Path, day: str, *, outer_day=None):
     directory = Path(directory)
     receipt = json.loads((directory / "receipt.json").read_text(encoding="utf-8"))
-    require(receipt.get("protocol") == PROFILE_PROTOCOL and receipt.get("delivery_day") == day
-            and receipt.get("forecast_origin_utc") == cutoff(day).isoformat()
+    revision = _profile_revision(receipt, day, outer_day)
+    require(receipt.get("delivery_day") == day
             and receipt.get("state") == "COMPLETE" and receipt.get("series") == specs(),
             "Saturn profile cache contract changed")
     require(set(receipt.get("artifact_sha256", {})) == {"covariates.parquet"},
@@ -291,37 +341,44 @@ def verify_profile_day(directory: Path, day: str):
     frame = pd.read_parquet(directory / "covariates.parquet")
     require(frame.index.equals(grid(day)) and tuple(frame.columns) == ALIASES
             and np.isfinite(frame.to_numpy(float)).all(), "Invalid Saturn daily forecast grid")
-    _verify_profile_normalization(frame, receipt, day)
-    require(pd.Timestamp(receipt["retrieved_at_utc"]).tz_convert("UTC") >= cutoff(day),
+    _verify_profile_normalization(frame, receipt, day, query_revision=revision)
+    require(pd.Timestamp(receipt["retrieved_at_utc"]).tz_convert("UTC") >= revision,
             "Saturn profile cutoff had not occurred at retrieval")
     return frame, receipt
 
 
-def capture_profile_day(client, day: str, cache: Path = DEFAULT_CACHE, *, now_utc=None):
-    directory = Path(cache) / "profiles_v2" / day
+def capture_profile_day(client, day: str, cache: Path = DEFAULT_CACHE, *, now_utc=None,
+                        outer_day=None, own_origin_failure=None):
+    if outer_day is not None:
+        require(date.fromisoformat(day) < date.fromisoformat(outer_day),
+                "Saturn current-fit profile recovery is forbidden for the live delivery day")
+    directory = (Path(cache) / "profiles_current_fit_v1" / outer_day / day if outer_day is not None
+                 else Path(cache) / "profiles_v2" / day)
+    revision = cutoff(outer_day or day)
     if (directory / "receipt.json").is_file():
-        return verify_profile_day(directory, day)[1]
+        return verify_profile_day(directory, day, outer_day=outer_day)[1]
     now = pd.Timestamp.now(tz="UTC") if now_utc is None else pd.Timestamp(now_utc)
-    require(now.tzinfo is not None and now >= cutoff(day), "Saturn D-1 08:00 cutoff not reached")
+    require(now.tzinfo is not None and now >= revision, "Saturn D-1 08:00 cutoff not reached")
     from materialize_saturn_kalman_fuel import NL_SPRING_DST_REPAIR_POLICY
     expected, contract, values, evidence, spring_ledger = grid(day), specs(), {}, {}, []
     for alias, spec in contract.items():
         try:
             series = fetch_saturn_series_from_client(client, spec["series"],
                 expected[0] - pd.Timedelta(hours=8), expected[-1] + pd.Timedelta(hours=8), "UTC",
-                revision_date=cutoff(day), naive_timezone=spec["naive_timezone"],
+                revision_date=revision, naive_timezone=spec["naive_timezone"],
                 incomplete_dst_policy=spec["dst_policy"], nocache=True)
             selected = series
             if alias == "nl_residual_load_fcst":
-                selected, spring_ledger = _nl_spring_profile(series, day, expected)
+                selected, spring_ledger = _nl_spring_profile(series, day, expected, query_revision=revision)
             values[alias] = _numeric(selected, expected, alias)
         except Exception as error:
-            raise SaturnSourceError(day, "forecast_profile", error, alias=alias, series=spec["series"]) from error
+            phase = "current_fit_profile_recovery" if outer_day is not None else "forecast_profile"
+            raise SaturnSourceError(day, phase, error, alias=alias, series=spec["series"]) from error
         evidence[alias] = {"policy": spec["dst_policy"],
                            "normalizer_attrs": json.loads(json.dumps(series.attrs, default=str))}
     _parquet(directory / "covariates.parquet", pd.DataFrame(values, index=expected))
-    receipt = {"protocol": PROFILE_PROTOCOL, "delivery_day": day, "state": "COMPLETE",
-        "forecast_origin_utc": cutoff(day).isoformat(), "series": contract,
+    receipt = {"protocol": PROFILE_RECOVERY_PROTOCOL if outer_day is not None else PROFILE_PROTOCOL,
+        "delivery_day": day, "state": "COMPLETE", "forecast_origin_utc": revision.isoformat(), "series": contract,
         "retrieved_at_utc": (pd.Timestamp.now(tz="UTC") if now_utc is None else now).isoformat(),
         "publication_verified": False, "provider_publication_timestamp_verified": False,
         "availability_basis": "Forecast profiles queried at their own delivery D-1 08:00 revision_date",
@@ -330,8 +387,13 @@ def capture_profile_day(client, day: str, cache: Path = DEFAULT_CACHE, *, now_ut
                               "entries": spring_ledger},
         "dst_evidence": evidence, "collector_code_sha256": sha256(Path(__file__)),
         "artifact_sha256": {"covariates.parquet": sha256(directory / "covariates.parquet")}}
+    if outer_day is not None:
+        receipt.update(**_profile_contract(outer_day), outer_delivery_day=outer_day,
+            profile_revision_utc=revision.isoformat(), logical_forecast_origin_utc=cutoff(day).isoformat(),
+            own_origin_failure=redact_text(str(own_origin_failure or "Historical origin unavailable after bounded retries")),
+            availability_basis="Complete historical forecast profile reconstructed at the outer fit cutoff; not an original historical origin snapshot")
     _immutable(directory / "receipt.json", _encoded(receipt))
-    verify_profile_day(directory, day)
+    verify_profile_day(directory, day, outer_day=outer_day)
     return receipt
 
 
@@ -391,6 +453,59 @@ def capture_target_snapshot(client, delivery_day: str, first_profile_day: str,
     return receipt
 
 
+def _profile_cache_directory(cache, day, outer_day):
+    strict = Path(cache) / "profiles_v2" / day
+    if (strict / "receipt.json").is_file():
+        # A damaged strict cache must never be hidden by a recovery packet.
+        verify_profile_day(strict, day)
+        return strict
+    recovery = Path(cache) / "profiles_current_fit_v1" / outer_day / day
+    if day < outer_day and (recovery / "receipt.json").is_file():
+        verify_profile_day(recovery, day, outer_day=outer_day)
+        return recovery
+    return None
+
+
+def _sync_profile_day(day, delivery_day, cache, client_factory):
+    existing = _profile_cache_directory(cache, day, delivery_day)
+    if existing is not None:
+        return verify_profile_day(existing, day, outer_day=delivery_day)[1]
+
+    def attempts(outer_day=None, reason=None):
+        revision = cutoff(outer_day or day)
+        for attempt in range(1, 4):
+            client = None
+            try:
+                client = client_factory()
+                return capture_profile_day(client, day, cache, outer_day=outer_day, own_origin_failure=reason)
+            except SaturnSourceError as error:
+                print(json.dumps({"source": "saturn", "event": "profile_retry", "profile_day": day,
+                    "attempt": attempt, "max_attempts": 3, "revision_utc": revision.isoformat(),
+                    "error": redact_text(str(error))}, ensure_ascii=False), flush=True)
+                if attempt == 3:
+                    detail = RuntimeError(f"3 attempts at revision {revision.isoformat()} failed: {redact_text(str(error))}")
+                    raise SaturnSourceError(day, error.phase, detail, alias=error.alias, series=error.series) from error
+            finally:
+                session = getattr(client, "session", None)
+                if session is not None:
+                    try:
+                        session.close()
+                    except Exception as error:
+                        print(f"Saturn session close: {redact_text(str(error))}", flush=True)
+            time.sleep(2 ** (attempt - 1))
+
+    try:
+        return attempts()
+    except SaturnSourceError as error:
+        if day >= delivery_day:
+            raise  # The forecast's real delivery profile has no later fallback.
+        print(json.dumps({"source": "saturn", "event": "profile_current_fit_recovery", "profile_day": day,
+            "outer_delivery_day": delivery_day, "logical_origin_utc": cutoff(day).isoformat(),
+            "actual_revision_utc": cutoff(delivery_day).isoformat(),
+            "reason": redact_text(str(error))}, ensure_ascii=False), flush=True)
+        return attempts(outer_day=delivery_day, reason=str(error))
+
+
 def sync(delivery_day: str, *, first_day: str | None = None, cache: Path = DEFAULT_CACHE,
          workers: int = 2, client_factory: Callable | None = None):
     from run_nyx_annual_auction_prices_source import load_plan
@@ -409,15 +524,7 @@ def sync(delivery_day: str, *, first_day: str | None = None, cache: Path = DEFAU
             return client
     days = [x.date().isoformat() for x in pd.date_range(first, last, freq="D")]
     def one(day):
-        if (profiles / day / "receipt.json").exists():
-            return verify_profile_day(profiles / day, day)[1]
-        client = client_factory()
-        try:
-            return capture_profile_day(client, day, cache)
-        finally:
-            session = getattr(client, "session", None)
-            if session is not None:
-                session.close()
+        return _sync_profile_day(day, delivery_day, cache, client_factory)
     results = {}
     with exclusive_process_lock(profiles / "sync.lock"):
         _immutable(profiles / "plan.json", _encoded({"protocol": PROFILE_PROTOCOL, "first_delivery_day": first.isoformat()}))
@@ -472,16 +579,28 @@ def source_start(cache: Path, delivery_day: str, first_day: str | None = None, *
 
 def publish(bundle: Path, delivery_day: str, *, first_day: str | None = None,
             cache: Path = DEFAULT_CACHE):
+    bundle = Path(bundle).resolve()
+    path = bundle / "source_receipts/saturn.json"
+    if path.is_file():
+        existing = json.loads(path.read_text(encoding="utf-8"))
+        if existing.get("target_history_policy") is not None:
+            verify_current_fit_source(bundle, delivery_day, existing)
+        else:
+            from .nyx_annual_source_validation import _saturn
+            _saturn(bundle, delivery_day, existing)
+        validate_source_receipt(existing, group="saturn", day=delivery_day, bundle=bundle, cutoff=cutoff(delivery_day))
+        return path
     last = date.fromisoformat(delivery_day)
     profiles = Path(cache) / "profiles_v2"
     first = source_start(profiles, delivery_day, first_day, plan_protocol=PROFILE_PROTOCOL)
     require(first <= last - timedelta(days=365), "Saturn training history too short")
     frames, daily, hashes = [], {}, {}
-    bundle = Path(bundle).resolve()
     for stamp in pd.date_range(first, last, freq="D"):
         day = stamp.date().isoformat()
-        directory = profiles / day
-        cov, receipt = verify_profile_day(directory, day)
+        directory = _profile_cache_directory(cache, day, delivery_day)
+        require(directory is not None, f"Saturn profile cache missing for {day} at outer delivery {delivery_day}")
+        cov, receipt = verify_profile_day(directory, day, outer_day=delivery_day)
+        actual_revision = _profile_revision(receipt, day, delivery_day)
         frames.append(cov)
         for name in ("covariates.parquet", "receipt.json"):
             relative = f"source_artifacts/saturn/days/{day}/{name}"
@@ -489,6 +608,9 @@ def publish(bundle: Path, delivery_day: str, *, first_day: str | None = None,
             publish_verified_immutable_copy(directory / name, bundle / relative, digest)
             hashes[relative] = digest
         daily[day] = {"forecast_origin_utc": receipt["forecast_origin_utc"],
+                      "logical_forecast_origin_utc": cutoff(day).isoformat(),
+                      "profile_revision_utc": actual_revision.isoformat(),
+                      "profile_origin_snapshot_verified": receipt["protocol"] == PROFILE_PROTOCOL,
                       "covariates_sha256": receipt["artifact_sha256"]["covariates.parquet"],
                       "publication_verified": False,
                       "receipt_path": f"source_artifacts/saturn/days/{day}/receipt.json"}
@@ -500,6 +622,11 @@ def publish(bundle: Path, delivery_day: str, *, first_day: str | None = None,
     origin_path = "source_artifacts/saturn/origins.parquet"
     _parquet(bundle / origin_path, origins)
     hashes[origin_path] = sha256(bundle / origin_path)
+    revisions = pd.DatetimeIndex(pd.to_datetime([daily[str(d)]["profile_revision_utc"]
+        for d in combined.index.tz_convert("Europe/Paris").date], utc=True))
+    revision_path = "source_artifacts/saturn/profile_revisions.parquet"
+    _parquet(bundle / revision_path, pd.DataFrame({alias: revisions for alias in ALIASES}, index=combined.index))
+    hashes[revision_path] = sha256(bundle / revision_path)
     target_directory = Path(cache) / "targets_current_fit_v1" / delivery_day
     _, target_receipt = verify_target_snapshot(target_directory, delivery_day, first.isoformat())
     for name in ("prices.parquet", "receipt.json"):
@@ -515,15 +642,15 @@ def publish(bundle: Path, delivery_day: str, *, first_day: str | None = None,
         "state": "COMPLETE", "asof_cutoff_verified": True, "training_window_complete": True,
         "asof_state_utc": cutoff(delivery_day).isoformat(), "daily_vintages": daily,
         "first_delivery_day": first.isoformat(), "last_delivery_day": delivery_day,
-        "availability_basis": "Each forecast profile uses its historical revision_date; training prices use the outer forecast revision_date",
+        "availability_basis": "Historical profiles use their own revision_date where available, otherwise the outer fit revision_date; live delivery and training prices use the outer forecast cutoff",
         **_target_contract(delivery_day), "targets_snapshot": target_snapshot,
+        **_profile_contract(delivery_day), "logical_forecast_origins": True,
         "provider_publication_timestamp_verified": False,
         "historical_publication_vintages_certified": False,
         "publication_vintage_limit": "Query-as-of is not certified original provider insertion time",
         "artifact_sha256": hashes, "series": specs(), "collector_code_sha256": sha256(Path(__file__))}
     verify_current_fit_source(bundle, delivery_day, receipt)
     validate_source_receipt(receipt, group="saturn", day=delivery_day, bundle=bundle, cutoff=cutoff(delivery_day))
-    path = bundle / "source_receipts/saturn.json"
     _immutable(path, _encoded(receipt))
     return path
 
@@ -563,12 +690,25 @@ def target_history_contract(bundle):
     return _current_targets(bundle, receipt)[1]
 
 
+def profile_history_contract(bundle):
+    bundle = Path(bundle)
+    receipt = json.loads((bundle / "source_receipts/saturn.json").read_text(encoding="utf-8"))
+    contract = _check_profile_contract(receipt, receipt.get("delivery_day"))
+    if not contract:
+        require(not (bundle / "source_artifacts/saturn/profile_revisions.parquet").exists(),
+                "Downgraded Saturn profile revision evidence")
+        return {}
+    verify_current_fit_source(bundle, receipt["delivery_day"], receipt)
+    return contract
+
+
 def verify_current_fit_source(bundle, day, receipt):
     """Independently bind raw profiles and the outer target snapshot to this run."""
     bundle = Path(bundle)
     require(receipt.get("delivery_day") == day and receipt.get("last_delivery_day") == day,
             "Saturn current-fit outer delivery day differs")
     prices, contract = _current_targets(bundle, receipt)
+    profile_contract = _check_profile_contract(receipt, day)
     first, last = date.fromisoformat(receipt["first_delivery_day"]), date.fromisoformat(day)
     days = [stamp.date().isoformat() for stamp in pd.date_range(first, last, freq="D")]
     require(set(receipt.get("daily_vintages", {})) == set(days) and first <= last - timedelta(days=365)
@@ -576,18 +716,33 @@ def verify_current_fit_source(bundle, day, receipt):
     frames = []
     expected_artifacts = {"source_artifacts/saturn/covariates.parquet", "source_artifacts/saturn/origins.parquet",
                           "source_artifacts/saturn/targets/prices.parquet", "source_artifacts/saturn/targets/receipt.json"}
+    revisions = []
     for origin in days:
         prefix = f"source_artifacts/saturn/days/{origin}"
         for name in ("receipt.json", "covariates.parquet"):
             _bound(bundle, receipt, f"{prefix}/{name}")
             expected_artifacts.add(f"{prefix}/{name}")
-        covariates, raw = verify_profile_day(bundle / prefix, origin)
+        covariates, raw = verify_profile_day(bundle / prefix, origin, outer_day=day if profile_contract else None)
+        revision = _profile_revision(raw, origin, day if profile_contract else None)
         declared = receipt["daily_vintages"][origin]
         require(declared.get("forecast_origin_utc") == raw["forecast_origin_utc"]
                 and declared.get("covariates_sha256") == raw["artifact_sha256"]["covariates.parquet"]
                 and declared.get("receipt_path") == f"{prefix}/receipt.json"
                 and "prices_sha256" not in declared, f"Saturn profile declaration differs: {origin}")
+        if profile_contract:
+            require(declared.get("logical_forecast_origin_utc") == cutoff(origin).isoformat()
+                    and declared.get("profile_revision_utc") == revision.isoformat()
+                    and declared.get("profile_origin_snapshot_verified") is (raw["protocol"] == PROFILE_PROTOCOL)
+                    and revision <= cutoff(day), f"Saturn actual profile revision declaration differs: {origin}")
+        else:
+            require(raw["protocol"] == PROFILE_PROTOCOL, "Unlabelled historical profile recovery")
         frames.append(covariates)
+        revisions.extend([revision] * len(covariates))
+    revision_path = "source_artifacts/saturn/profile_revisions.parquet"
+    if profile_contract:
+        expected_artifacts.add(revision_path)
+    else:
+        require(not (bundle / revision_path).exists(), "Downgraded Saturn profile revision evidence")
     require(set(receipt.get("artifact_sha256", {})) == expected_artifacts, "Saturn current-fit source inventory differs")
     combined = pd.concat(frames)
     stored = pd.read_parquet(_bound(bundle, receipt, "source_artifacts/saturn/covariates.parquet"))
@@ -596,9 +751,13 @@ def verify_current_fit_source(bundle, day, receipt):
         for d in combined.index.tz_convert("Europe/Paris").date]}, index=combined.index)
     stored = pd.read_parquet(_bound(bundle, receipt, "source_artifacts/saturn/origins.parquet"))
     require(stored.equals(origins), "Saturn combined origin grid differs from raw profiles")
+    if profile_contract:
+        actual = pd.DataFrame({alias: pd.DatetimeIndex(revisions) for alias in ALIASES}, index=combined.index)
+        stored = pd.read_parquet(_bound(bundle, receipt, revision_path))
+        require(stored.equals(actual), "Saturn actual profile revisions differ from raw receipts")
     latest = prices.loc[target_grid(day, day)]
     return combined, latest, {"daily_states_verified": len(days), "provider_first_publication_certified": False,
-                              "asof_cutoff_verified": True, **contract}
+                              "asof_cutoff_verified": True, **contract, **profile_contract}
 
 
 def load_target_snapshots(bundle: Path):

@@ -32,6 +32,22 @@ def test_native_stderr_warning_does_not_fail_a_successful_source(capsys):
     assert "données reçues" in console and "warning only" in console
 
 
+def test_recovered_profile_retry_logs_do_not_fail_successful_source(capsys, tmp_path, monkeypatch):
+    retry = {"source": "saturn", "event": "profile_retry", "profile_day": "2024-08-16",
+             "error": "historical profile empty"}
+    complete = {"state": "COMPLETE", "source_group": "saturn",
+                "profile_history_policy": "own_origin_with_current_fit_recovery_v1"}
+    script = "print(" + repr(json.dumps(retry)) + "); print(" + repr(json.dumps(complete)) + ")"
+    (tmp_path / "run_nyx_annual_daily_capture.py").write_text(script, encoding="utf-8")
+    monkeypatch.setattr(pipeline, "ROOT", tmp_path)
+    monkeypatch.setattr(pipeline, "source_commands", lambda *a: [])
+    state = pipeline.run("2026-09-30", action="capture", output=tmp_path / "result")
+    assert state["state"] == "CAPTURED"
+    assert state["stages"] == [{"name": "capture_public_sources", "state": "COMPLETE"}]
+    output = capsys.readouterr().out
+    assert "profile_retry" in output and "COMPLETE" in output
+
+
 def test_source_traceback_is_preserved_but_secret_is_redacted(capsys):
     code, reason = pipeline._execute_source([sys.executable, "-c",
         "raise ValueError('network failed api_key=example-secret')"])

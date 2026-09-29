@@ -77,7 +77,7 @@ def build_feature_matrices(delivery_day: str, *, prices, nyx_quantiles,
                            hydro_hourly=None, exchange_features=None,
                            exchange_hourly=None, feature_index=None,
                            reference_index=None, price_snapshots=None,
-                           price_history_contract=None) -> BuiltFeatures:
+                           price_history_contract=None, profile_history_contract=None) -> BuiltFeatures:
     """Pure, date-independent assembly of 292 -> 334 -> 449 -> 503 -> 123.
 
     ``covariates`` includes the preceding 365 days needed for Test2's causal
@@ -89,12 +89,17 @@ def build_feature_matrices(delivery_day: str, *, prices, nyx_quantiles,
     """
     full, current, _ = gate.delivery_grid(delivery_day)
     price_history_contract = dict(price_history_contract or {})
+    profile_history_contract = dict(profile_history_contract or {})
     if price_history_contract:
         expected_contract = {"target_history_policy": gate.TARGET_HISTORY_POLICY,
             "target_revision_utc": gate.delivery_grid(delivery_day)[2].isoformat(),
             "target_origin_snapshot_verified": False, "target_future_labels_used": False}
         require(price_history_contract == expected_contract and price_snapshots is not None,
                 "Current-fit price history must bind the outer cutoff and bounded internal windows")
+    if profile_history_contract:
+        require(set(profile_history_contract) == set(gate.PROFILE_HISTORY_FIELDS),
+                "Recovered profile history must bind its outer cutoff without certifying old revisions")
+        gate.validate_profile_history_contract(profile_history_contract, gate.delivery_grid(delivery_day)[2])
     index = full if feature_index is None else feature_index
     schema = gate.load_schema()
     zones = set(gate.ZONES)
@@ -124,8 +129,9 @@ def build_feature_matrices(delivery_day: str, *, prices, nyx_quantiles,
             and ref_index.isin(source.index).all()
             and np.isfinite(source.to_numpy(dtype=float)).all(),
             "Complete finite UTC covariates required")
-    # A forecast origin applies to every known source row. Earlier covariates
-    # retain their own daily as-of origin; no current vintage is backdated here.
+    # These are logical replay origins, used by the causal lag arithmetic.
+    # The source receipt separately binds real profile revision timestamps;
+    # recovered historical profiles never claim a vintage at this inner date.
     origins = {zone: forecast_origins[zone].copy() for zone in gate.ZONES}
     for zone in gate.ZONES:
         require(source.index.isin(origins[zone].index).all(),
@@ -137,6 +143,7 @@ def build_feature_matrices(delivery_day: str, *, prices, nyx_quantiles,
     pairs, pair_audits = {}, {}
     for pair in test2.PAIRS:
         values, audit = test2.build_pair_features({zone: source for zone in pair}, pair)
+        audit.update(profile_history_contract)
         pairs.update(values)
         pair_audits["_".join(pair)] = audit
     test2_out = {zone: pairs[zone].loc[ref_index].copy() for zone in gate.ZONES}
@@ -185,12 +192,14 @@ def build_feature_matrices(delivery_day: str, *, prices, nyx_quantiles,
         price_audit["per_origin_price_snapshots_verified"] = price_snapshots is not None and not price_history_contract
         price_audit["internal_price_windows_verified"] = price_snapshots is not None
         price_audit.update(price_history_contract)
+        price_audit.update(profile_history_contract)
         price_audit["revised_price_days_rebuilt"] = [str(value) for value in revised_days]
         require(list(frame.columns) == schema["families"][POOLED]["columns"][zone][:292],
                 f"{zone}: base292 recipe changed")
         additional, extra_audit = build_additional_features(zone=zone,
             delivery_index=ref_index, nyx_forecasts=nyx_quantiles,
             forecast_origins=origins, fuel=fuel)
+        extra_audit.update(profile_history_contract)
         base[zone] = frame
         augmented[zone] = pd.concat([frame, additional], axis=1)
         require(list(augmented[zone]) == schema["families"][POOLED]["columns"][zone][:334],
@@ -237,7 +246,8 @@ def build_feature_matrices(delivery_day: str, *, prices, nyx_quantiles,
     for zone in gate.ZONES:
         common = augmented[zone].loc[index]
         calendar, cal_audit = build_pooled_calendar_features(zone=zone, delivery_index=index)
-        profiles, profiles_audit = build_forecast_profile_features(common)
+        profiles, profiles_audit = build_forecast_profile_features(
+            common, **({"profile_history_contract": profile_history_contract} if profile_history_contract else {}))
         # Assemble both branches explicitly. Only the JAO block differs.
         before, after = [common, calendar, hydro], [profiles]
         pooled = pd.concat([*before, original, *after], axis=1)
@@ -248,6 +258,7 @@ def build_feature_matrices(delivery_day: str, *, prices, nyx_quantiles,
         country_audits[zone].update(calendar=cal_audit, profiles=profiles_audit)
     return BuiltFeatures(features, base, augmented, test2_out,
         {"protocol": PROTOCOL, "delivery_day": delivery_day,
+         **profile_history_contract,
          "future_labels_used": False, "storm_used_as_model_input": False,
          "jao_branches_built_independently": True, "hydro": hydro_audit,
          "exchange": exchange_audit, "test2": pair_audits, "countries": country_audits})
@@ -304,7 +315,7 @@ def materialize_features(bundle: Path, delivery_day: str) -> BuiltFeatures:
     ``seal_bundle`` is deliberately separate to avoid circular source receipts.
     """
     bundle = Path(bundle).resolve()
-    from .nyx_annual_saturn_source import load_target_snapshots, target_history_contract
+    from .nyx_annual_saturn_source import load_target_snapshots, target_history_contract, profile_history_contract
     groups = tuple(group for group in gate.SOURCE_GROUPS if group != "scarcity_confirmed_pair")
     receipts, artifacts = source_graph(bundle, delivery_day, groups, allow_training_bootstrap=True)
 
@@ -313,8 +324,8 @@ def materialize_features(bundle: Path, delivery_day: str) -> BuiltFeatures:
         return pd.read_parquet(bundle / relative)
 
     covariates = read("source_artifacts/saturn/covariates.parquet")
-    # The Saturn collector records origins separately, not inferred from a
-    # feature delivery timestamp or backdated from the current run.
+    # Logical origins drive feature arithmetic. The source verifier binds real
+    # profile revisions separately, including any declared current-fit recovery.
     source_origins = read("source_artifacts/saturn/origins.parquet")
     require("forecast_origin_utc" in source_origins, "Saturn origin column missing")
     quantiles, origins = {}, {}
@@ -355,7 +366,8 @@ def materialize_features(bundle: Path, delivery_day: str) -> BuiltFeatures:
                          for name in thermal.SOURCES},
         exchange_features=read("source_artifacts/lagged_exchange/features.parquet"),
         price_snapshots=load_target_snapshots(bundle),
-        price_history_contract=target_history_contract(bundle))
+        price_history_contract=target_history_contract(bundle),
+        profile_history_contract=profile_history_contract(bundle))
     require(source_graph(bundle, delivery_day, groups, allow_training_bootstrap=True) == (receipts, artifacts),
             "Source snapshots changed while building features")
     for family, countries in built.features.items():

@@ -137,6 +137,31 @@ def test_current_fit_features_keep_past_only_windows_and_declare_outer_vintage()
             price_history_contract={**contract, "target_revision_utc": "2026-10-25T09:00:00+00:00"})
 
 
+def test_recovered_profiles_declare_actual_source_policy_without_relabelling_logical_origins():
+    day, sources = inputs()
+    contract = {"profile_history_policy": "own_origin_with_current_fit_recovery_v1",
+                "profile_revision_ceiling_utc": builder.gate.delivery_grid(day)[2].isoformat(),
+                "profile_origin_snapshot_verified": False}
+    strict = builder.build_feature_matrices(day, **sources)
+    recovered = builder.build_feature_matrices(day, **sources, profile_history_contract=contract)
+    assert {key: recovered.audits[key] for key in contract} == contract
+    for zone in builder.gate.ZONES:
+        pd.testing.assert_frame_equal(strict.base292[zone], recovered.base292[zone])
+        for name in ("price", "additional", "profiles"):
+            audit = recovered.audits["countries"][zone][name]
+            assert {key: audit[key] for key in contract} == contract
+        profile_audit = recovered.audits["countries"][zone]["profiles"]
+        assert "each delivery day's own" not in profile_audit["source"]
+    for change in ({"profile_origin_snapshot_verified": True},
+                   {"profile_revision_ceiling_utc": "2026-10-25T09:00:00+00:00"}):
+        with pytest.raises(ValueError, match="[Pp]rofile"):
+            builder.build_feature_matrices(day, **sources, profile_history_contract={**contract, **change})
+    # Source revision recovery does not relax the inner lag-arithmetic clock.
+    sources["forecast_origins"]["FR"].iloc[-1] += pd.Timedelta(hours=1)
+    with pytest.raises(ValueError, match="origin exceeds"):
+        builder.build_feature_matrices(day, **sources, profile_history_contract=contract)
+
+
 @pytest.mark.skipif(not Path("runs/experiments/nyx_local_365_to20260923/inputs/covariates.parquet").exists(),
                     reason="Optional archived research inputs are not distributed in Git")
 def test_local_archives_match_all_twelve_historical_feature_matrices():

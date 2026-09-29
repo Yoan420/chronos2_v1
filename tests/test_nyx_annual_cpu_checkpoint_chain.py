@@ -33,7 +33,7 @@ def replay(tmp_path, monkeypatch):
     first = pd.Timestamp("2026-01-01").date()
     second = first + timedelta(days=1)
     cache = tmp_path / "cache"
-    calls, contracts = [], {}
+    calls, contracts, profile_contracts = [], {}, {}
 
     # The warmup must still precede a Kalman score, but two inner days suffice
     # to test a dependency crossing a persisted checkpoint boundary.
@@ -44,6 +44,7 @@ def replay(tmp_path, monkeypatch):
     monkeypatch.setattr(producer, "_sources", lambda *_:
                         ({"saturn": "a" * 64, "auction_prices": "b" * 64}, False, False))
     monkeypatch.setattr(saturn, "target_history_contract", lambda bundle: contracts[bundle.name])
+    monkeypatch.setattr(saturn, "profile_history_contract", lambda bundle: profile_contracts[bundle.name])
     monkeypatch.setattr(producer, "_configuration", lambda *_: ({}, {}))
     monkeypatch.setattr(producer, "build_pair_interaction", lambda *_: (None, {}))
 
@@ -80,7 +81,7 @@ def replay(tmp_path, monkeypatch):
         "device": "cpu", "dtype": "torch.float32",
         "files": {"config.json": "a" * 64, "model.safetensors": "b" * 64}})
 
-    def run(name, outer_day="2026-01-04"):
+    def run(name, outer_day="2026-01-04", profile_recovery=False):
         bundle = tmp_path / name
         day = pd.Timestamp(outer_day).date()
         index = producer._grid(first, day + timedelta(days=1))
@@ -91,6 +92,10 @@ def replay(tmp_path, monkeypatch):
             "target_revision_utc": saturn.cutoff(outer_day).isoformat(),
             "target_origin_snapshot_verified": False,
             "target_future_labels_used": False}
+        profile_contracts[name] = ({
+            "profile_history_policy": "own_origin_with_current_fit_recovery_v1",
+            "profile_revision_ceiling_utc": saturn.cutoff(outer_day).isoformat(),
+            "profile_origin_snapshot_verified": False} if profile_recovery else {})
 
         def snapshots(inner_day):
             stop = pd.Timestamp(inner_day, tz="Europe/Paris").tz_convert("UTC")
@@ -164,3 +169,23 @@ def test_identical_inner_computations_are_reused_at_later_outer_cutoff(replay):
             assert after == before
             assert "target_revision_utc" not in after["identity"]
             assert after["identity"]["target_history_policy"] == saturn.TARGET_HISTORY_POLICY
+
+
+def test_profile_recovery_policy_is_bound_but_identical_later_inputs_can_reuse_cache(replay):
+    strict = replay.run("strict")
+    replay.calls.clear()
+    recovered = replay.run("recovered", profile_recovery=True)
+    assert replay.calls
+    _, strict_first = replay.checkpoint(strict, replay.first)
+    _, recovered_first = replay.checkpoint(recovered, replay.first)
+    assert "profile_history_policy" not in strict_first["identity"]
+    assert recovered_first["identity"]["profile_history_policy"] == "own_origin_with_current_fit_recovery_v1"
+    assert recovered_first["identity"]["covariates_sha256"] == strict_first["identity"]["covariates_sha256"]
+    replay.calls.clear()
+    later = replay.run("later", outer_day="2026-01-05", profile_recovery=True)
+    assert replay.calls == []
+    for day in (replay.first, replay.second):
+        _, before = replay.checkpoint(recovered, day)
+        _, after = replay.checkpoint(later, day)
+        assert after == before
+        assert "profile_revision_ceiling_utc" not in after["identity"]

@@ -219,6 +219,37 @@ Pour lire la provenance dans les fichiers de diagnostic :
 - `current_fit_snapshot_v1` identifie la politique qui conserve les observations
   historiques disponibles pour l'entraînement courant, avec leurs dates réelles.
 
+### Profils Saturn historiques vides
+
+Le diagnostic du 29 septembre identifie aussi un profil de charge résiduelle FR
+vide pour le **16 août 2024**, demandé à la coupure du 15 août à 08:00 Paris.
+Les archives personnelles ne contiennent pas non plus ce profil pour les 16 et
+17 août. Cela ne démontre pas sa disponibilité dans une version Saturn ultérieure.
+
+La collecte réessaie désormais trois fois la même journée, avec une connexion
+neuve à chaque tentative. Si le profil historique reste indisponible, elle
+demande les **14 séries de cette journée** dans l'état Saturn à la coupure de
+la livraison préparée. Elle exige toujours une grille horaire complète. Si
+cette récupération échoue aussi, le calcul reste bloqué avec le détail de la
+source manquante. Le profil de la journée réellement prévue n'admet pas cette
+substitution : il reste obligatoire à sa propre coupure.
+
+Les journées strictes déjà complètes sont réutilisées. Les profils récupérés
+sont conservés séparément dans
+`data/pit/nyx_annual_saturn/profiles_current_fit_v1/<livraison>/<jour_historique>`.
+Le lot enregistre leurs révisions réelles dans `profile_revisions.parquet` ;
+`origins.parquet` contient les origines logiques des calculs internes.
+La politique `own_origin_with_current_fit_recovery_v1` et son plafond
+`profile_revision_ceiling_utc` suivent les modèles et l'évaluation.
+`profile_origin_snapshot_verified: false` indique explicitement que cette
+recette ne certifie pas toutes les anciennes versions quotidiennes.
+
+Après la mise à jour de la branche, reprendre avec la même commande `prepare`
+ci-dessus. Une relance conserve les journées complètes. La qualification doit
+évaluer cette politique sur la chaîne CPU complète, avec la coupure propre à
+chaque livraison évaluée. Une qualification portant sur une autre politique
+de profils ne peut pas activer celle-ci.
+
 ## Ce qui reste nécessaire avant une prévision qualifiée
 
 La récupération des historiques permet de préparer un entraînement futur.

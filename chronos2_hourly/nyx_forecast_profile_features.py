@@ -1,7 +1,8 @@
-"""Physical forecast shapes from one delivery day's already-known profiles.
+"""Physical forecast shapes from one delivery day's supplied profiles.
 
-Daily aggregates use only forecasts sharing that delivery day's D-1 origin.
-Ramps never borrow a following day's newer forecast vintage. FR residual load
+Daily aggregates use only forecasts sharing one supplied daily snapshot.
+The caller binds actual source revisions, including current-fit recovery.
+Ramps never borrow a following day's forecast profile. FR residual load
 already nets wind, solar and run-of-river; only nuclear is deducted here.
 """
 import numpy as np
@@ -10,7 +11,12 @@ import pandas as pd
 from .nyx_local_squared_price_model import frame_hash
 
 
-def build_forecast_profile_features(features):
+def build_forecast_profile_features(features, *, profile_history_contract=None):
+    contract = dict(profile_history_contract or {})
+    if contract:
+        from .nyx_annual_live_preflight import validate_profile_history_contract
+        # The source and bundle validators bind this ceiling to the outer run.
+        validate_profile_history_contract(contract, pd.Timestamp(contract.get("profile_revision_ceiling_utc")))
     index = features.index
     if (not isinstance(index, pd.DatetimeIndex) or str(index.tz) != "UTC" or index.hasnans
             or not index.is_unique or not index.is_monotonic_increasing or not index.equals(index.floor("h"))):
@@ -73,7 +79,10 @@ def build_forecast_profile_features(features):
         frame[name+"__available"] = frame[name].notna().astype(float)
     return frame, {"protocol": "nyx_known_forecast_daily_profiles_v1", "value_features": 31,
         "total_features": 62, "feature_sha256": frame_hash(frame), "source_sha256": frame_hash(features),
-        "source": "Immutable forecast features at each delivery day's own D-1 08h origin",
+        "source": ("Daily forecast snapshots; historical recovery uses the outer forecast cutoff; "
+                   "internal origins are logical reconstruction origins" if contract else
+                   "Immutable forecast features at each delivery day's own D-1 08h origin"),
+        **contract,
         "ramps_cross_civil_day": False, "hours_are_physical": True,
         "run_of_river_deducted_again": False, "Storm_used_as_input": False,
         "generation_observations_used": False, "daily_aggregates_require_all_supplied_rows_finite": True,

@@ -24,7 +24,8 @@ from chronos2_hourly import nyx_annual_cpu_live as live
 from chronos2_hourly.nyx_annual_live_preflight import (
     MATERIALIZER_CODE, delivery_grid, inspect_bundle, sha256,
     TARGET_HISTORY_POLICY, LEGACY_TARGET_HISTORY_POLICY, TARGET_HISTORY_FIELDS,
-    validate_target_history_contract,
+    PROFILE_HISTORY_POLICY, LEGACY_PROFILE_HISTORY_POLICY, PROFILE_HISTORY_FIELDS,
+    validate_target_history_contract, validate_profile_history_contract,
 )
 from chronos2_hourly.nyx_annual_nyx_quantiles_gate import validate_nyx_quantiles_source
 from chronos2_hourly.nyx_local_io import promote_directory_retry, replace_retry
@@ -112,19 +113,26 @@ def _source_packet(bundle: Path, day: str) -> dict:
     from chronos2_hourly.nyx_annual_source_validation import validate_source_packet
     from chronos2_hourly.nyx_annual_cpu_baseline import validate_cpu_baseline_evidence
     from chronos2_hourly.nyx_annual_cpu_reference_builder import validate_cpu_reference_source
-    from chronos2_hourly.nyx_annual_saturn_source import target_history_contract
+    from chronos2_hourly.nyx_annual_saturn_source import (
+        target_history_contract, profile_history_contract,
+    )
     sources = validate_source_packet(bundle, day)
     live.require(sources.get("passed") is True
         and sources.get("source_snapshot_asof_verified") is True,
         f"{day}: independently checked raw source evidence required")
     contract = target_history_contract(bundle)
     validate_target_history_contract(contract, delivery_grid(day)[2])
+    profiles = profile_history_contract(bundle)
+    validate_profile_history_contract(profiles, delivery_grid(day)[2])
     baseline = validate_cpu_baseline_evidence(bundle, day)
     reference = validate_cpu_reference_source(bundle, day)
     for label, producer in (("baseline", baseline), ("reference", reference)):
         declared = {key: producer[key] for key in TARGET_HISTORY_FIELDS if key in producer}
         live.require(declared == contract, f"{day}: {label} target history contract differs from its source")
-    return {"sources": sources, "baseline": baseline, "reference": reference, **contract}
+        declared_profiles = {key: producer[key] for key in PROFILE_HISTORY_FIELDS if key in producer}
+        live.require(declared_profiles == profiles,
+                     f"{day}: {label} profile history contract differs from its source")
+    return {"sources": sources, "baseline": baseline, "reference": reference, **contract, **profiles}
 
 
 def _target_policy(record: dict) -> str:
@@ -132,6 +140,14 @@ def _target_policy(record: dict) -> str:
     policy = record.get("target_history_policy", LEGACY_TARGET_HISTORY_POLICY)
     live.require(policy in (LEGACY_TARGET_HISTORY_POLICY, TARGET_HISTORY_POLICY),
                  "Unsupported evaluation target history policy")
+    return policy
+
+
+def _profile_policy(record: dict) -> str:
+    """Keep profile recovery a separately evaluated recipe choice."""
+    policy = record.get("profile_history_policy", LEGACY_PROFILE_HISTORY_POLICY)
+    live.require(policy in (LEGACY_PROFILE_HISTORY_POLICY, PROFILE_HISTORY_POLICY),
+                 "Unsupported evaluation profile history policy")
     return policy
 
 
@@ -162,7 +178,7 @@ def prepare_plan(*, root: Path, bundles: Path, comparisons: Path, output: Path,
     """Freeze causal inputs and implementation before any evaluation fitting."""
     live.require(not output.exists(), "Evaluation directory already exists")
     days = _days(first, stop)
-    entries, chronos_pin, target_policy = {}, None, None
+    entries, chronos_pin, target_policy, profile_policy = {}, None, None, None
     # Read-only preflight of every requested day before spending CPU time.
     for day in days:
         bundle = bundles / day
@@ -176,6 +192,10 @@ def prepare_plan(*, root: Path, bundles: Path, comparisons: Path, output: Path,
         live.require(target_policy is None or target_policy == daily_policy,
                      f"{day}: target history policies differ across evaluation days")
         target_policy = daily_policy
+        daily_profile_policy = _profile_policy(packet)
+        live.require(profile_policy is None or profile_policy == daily_profile_policy,
+                     f"{day}: profile history policies differ across evaluation days")
+        profile_policy = daily_profile_policy
         live.require(chronos_pin is None or chronos_pin == daily_pin,
                      f"{day}: Chronos model weights differ from other evaluation days")
         chronos_pin = daily_pin
@@ -198,6 +218,7 @@ def prepare_plan(*, root: Path, bundles: Path, comparisons: Path, output: Path,
         "runtime_versions": _versions(), "compositions": live.COMPOSITIONS,
         **chronos_pin,
         "target_history_policy": target_policy,
+        "profile_history_policy": profile_policy,
         "de_exception": DE_EXCEPTION, "price_threads": live.PRICE_THREADS,
         "negative_threads": live.NEGATIVE_THREADS,
         "frequency": "daily_retraining", "production_qualification_days": EVALUATION_DAYS}
@@ -210,6 +231,7 @@ def _plan(root: Path, output: Path) -> dict:
     plan = _read(output / "plan.json")
     _chronos_pin(plan)
     _target_policy(plan)
+    _profile_policy(plan)
     live.require(plan.get("protocol") == PLAN_PROTOCOL
         and plan.get("delivery_days") == _days(plan["first_delivery_day"], plan["stop_day_exclusive"])
         and plan.get("countries") == list(live.COUNTRIES)
@@ -237,6 +259,8 @@ def _bundle(plan: dict, day: str) -> Path:
     packet = _source_packet(bundle, day)
     live.require(_target_policy(packet) == _target_policy(plan),
                  f"{day}: target history policy differs from the frozen evaluation plan")
+    live.require(_profile_policy(packet) == _profile_policy(plan),
+                 f"{day}: profile history policy differs from the frozen evaluation plan")
     live.require(_chronos_pin(packet["baseline"]) == _chronos_pin(plan),
                  f"{day}: CPU Chronos weights differ from the frozen evaluation plan")
     return bundle
@@ -409,6 +433,7 @@ def score_plan(*, root: Path, output: Path) -> dict:
         "runtime_versions": plan["runtime_versions"],
         **_chronos_pin(plan),
         "target_history_policy": _target_policy(plan),
+        "profile_history_policy": _profile_policy(plan),
         "evidence_sha256": {"evaluation_plan": digest, "prediction_receipts": receipt_hashes,
                             "official_comparisons": comparison_hashes,
                             "official_comparisons_receipt": comparison_receipt["sha256"]},
@@ -420,6 +445,7 @@ def score_plan(*, root: Path, output: Path) -> dict:
 def verify_receipt(receipt: dict, *, root: Path) -> None:
     """Portable activation checks for a previously evaluated full-chain receipt."""
     _target_policy(receipt)
+    _profile_policy(receipt)
     days = _days(receipt["first_delivery_day"],
         (date.fromisoformat(receipt["last_delivery_day"]) + timedelta(days=1)).isoformat())
     expected_hours = sum(len(delivery_grid(day)[1]) for day in days)

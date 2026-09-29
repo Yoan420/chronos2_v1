@@ -106,7 +106,8 @@ def verify_activation(root: Path = ROOT, manifest_path: Path | None = None) -> d
             "Annual CPU qualification receipt missing or SHA-256 differs")
     receipt = _json(receipt_path)
     from chronos2_hourly.nyx_annual_cpu_full_chain import (
-        PROTOCOL as FULL_CHAIN_PROTOCOL, _chronos_pin, _target_policy, verify_receipt,
+        PROTOCOL as FULL_CHAIN_PROTOCOL, _chronos_pin, _target_policy, _profile_policy,
+        verify_receipt,
     )
     require(receipt.get("protocol") == FULL_CHAIN_PROTOCOL,
             "Production requires a new full-chain CPU evaluation; legacy expert-only scores cannot activate it")
@@ -117,6 +118,7 @@ def verify_activation(root: Path = ROOT, manifest_path: Path | None = None) -> d
             "compositions": COMPOSITIONS.copy(),
             **_chronos_pin(receipt),
             "target_history_policy": _target_policy(receipt),
+            "profile_history_policy": _profile_policy(receipt),
             "de_price_performance_exception_used": not (
                 receipt["price_country_metrics"]["DE"]["rmse"]
                 < receipt["price_country_metrics"]["DE"]["storm_rmse"]
@@ -159,11 +161,15 @@ def preflight(bundle: Path, delivery_day: str, output: Path) -> dict:
     source_report = None
     if input_report and input_report.get("input_bundle_valid") and baseline_report:
         try:
-            from chronos2_hourly.nyx_annual_cpu_full_chain import _chronos_pin, _source_packet, _target_policy
+            from chronos2_hourly.nyx_annual_cpu_full_chain import (
+                _chronos_pin, _source_packet, _target_policy, _profile_policy,
+            )
             source_report = _source_packet(bundle, delivery_day)
             if activation is not None:
                 require(_target_policy(source_report) == _target_policy(activation),
                         "Live target history policy differs from the annually evaluated recipe")
+                require(_profile_policy(source_report) == _profile_policy(activation),
+                        "Live profile history policy differs from the annually evaluated recipe")
                 require(_chronos_pin(source_report["baseline"]) == _chronos_pin(activation),
                         "Live CPU Chronos weights differ from the annually evaluated model")
         except (OSError, ValueError, KeyError, TypeError, ImportError) as error:

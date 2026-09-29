@@ -336,13 +336,16 @@ def build_cpu_baseline_bundle(bundle, delivery_day, *, targets: Mapping[str, pd.
     if not needed.isin(covariates.index).all() or not np.isfinite(covariates.loc[needed, list(RAW_ALIASES)].to_numpy(float)).all():
         raise ValueError("Missing raw forecast history for the CPU baseline warmup")
     source_hashes, verified, publication_verified = _sources(bundle, delivery_day, require_verified_sources)
-    from .nyx_annual_saturn_source import target_history_contract
+    from .nyx_annual_saturn_source import target_history_contract, profile_history_contract
     target_contract = target_history_contract(bundle)
+    profile_contract = profile_history_contract(bundle)
     # Numeric hashes already bind every price/covariate actually consumed.
     # Bind the policy too, while allowing identical computations to be reused
     # at a later outer cutoff; that cutoff is bound by this run's source graph.
     target_identity = ({"target_history_policy": target_contract["target_history_policy"]}
                        if target_contract else {})
+    if profile_contract:
+        target_identity["profile_history_policy"] = profile_contract["profile_history_policy"]
     source_path = bundle / "source_artifacts/saturn/covariates.parquet"
     if not source_path.is_file() or frame_digest(pd.read_parquet(source_path)) != frame_digest(covariates):
         raise ValueError("In-memory covariates differ from the bound Saturn source")
@@ -356,7 +359,7 @@ def build_cpu_baseline_bundle(bundle, delivery_day, *, targets: Mapping[str, pd.
                ("torch", "chronos-forecasting", "numpy", "pandas", "catboost", "pykalman", "scipy", "holidays")}
     code = {relative: sha256_text(ROOT / relative) for relative in CODE_FILES}
     configurations = {z: _configuration(z, threads) for z in ZONES}
-    # Interactions depend only on previously frozen forecast profiles.
+    # The bound profile snapshot is fixed before any internal reconstruction.
     interactions = {z: build_pair_interaction(covariates.loc[needed], z, residual.ZONE_TIMEZONES[z])[0] for z in ZONES}
     raw_parts, corrected_parts, baseline_parts = ({z: [] for z in ZONES} for _ in range(3))
     prior_state = {z: INITIAL_STATE_SHA256 for z in ZONES}
@@ -366,7 +369,7 @@ def build_cpu_baseline_bundle(bundle, delivery_day, *, targets: Mapping[str, pd.
             snapshots = (target_snapshots_by_day(str(date)) if callable(target_snapshots_by_day)
                          else target_snapshots_by_day[str(date)])
             if set(snapshots) != set(ZONES):
-                raise ValueError(f"{date}: all four origin-specific price snapshots required")
+                raise ValueError(f"{date}: all four bounded internal price histories required")
             plan = build_delivery_plan(date, timezone="Europe/Paris")
             past_index = _grid(max(raw_first, date - timedelta(days=365)), date)
             for zone in ZONES:
@@ -375,7 +378,7 @@ def build_cpu_baseline_bundle(bundle, delivery_day, *, targets: Mapping[str, pd.
                 # Even if the supplier exposes target-day prices, they are discarded.
                 labels = labels.loc[labels.index < plan.delivery_start_utc].copy()
                 if len(past_index) and not np.isfinite(labels.reindex(past_index).to_numpy(float)).all():
-                    raise ValueError(f"{zone}/{date}: incomplete as-of training prices")
+                    raise ValueError(f"{zone}/{date}: incomplete earlier training prices")
                 configuration, config_hash = configurations[zone]
                 identity = {"protocol": PRODUCER_PROTOCOL, "zone": zone, "day": str(date),
                             **target_identity,
@@ -475,7 +478,7 @@ def build_cpu_baseline_bundle(bundle, delivery_day, *, targets: Mapping[str, pd.
             for stage in ("chronos", "residual", "kalman"):
                 relative = f"baseline_runs/{zone}/{stage}.json"
                 record = {"zone": zone, "delivery_day": delivery_day, "stage": stage, "device": "cpu",
-                          **target_contract,
+                          **target_contract, **profile_contract,
                           "source_asof_cutoff_utc": cutoff.isoformat(), "complete": True,
                           "recipe": EXPECTED_RECIPE[stage], "source_receipts_sha256": source_hashes,
                           "implementation_sha256": code, "runtime": runtime, "daily_runs": all_runs[zone][stage],
@@ -492,7 +495,7 @@ def build_cpu_baseline_bundle(bundle, delivery_day, *, targets: Mapping[str, pd.
                     for name, digest in cp["files"].items():
                         artifact_hashes[str(directory / name).replace("\\", "/")] = digest
             audit = {"protocol": PRODUCER_PROTOCOL, "zone": zone, "delivery_day": delivery_day,
-                     **target_contract,
+                     **target_contract, **profile_contract,
                      "recipe": EXPECTED_RECIPE, "source_asof_cutoff_utc": cutoff.isoformat(),
                      "cpu_retrained": True, "reused_archived_gpu_predictions": False,
                      "cpu_threads": threads,
@@ -512,7 +515,7 @@ def build_cpu_baseline_bundle(bundle, delivery_day, *, targets: Mapping[str, pd.
                    "training_window_complete": True, "artifact_sha256": artifact_hashes,
                    "source_receipts_sha256": source_hashes,
                    "producer": {"protocol": PRODUCER_PROTOCOL, "recipe": EXPECTED_RECIPE, "zones": zones,
-                                **target_contract,
+                                **target_contract, **profile_contract,
                                 "code_config_hash_policy": TEXT_HASH_POLICY}}
         write_json(bundle / "source_receipts/nyx_quantiles.json", receipt)
         return receipt
@@ -537,18 +540,24 @@ def validate_cpu_baseline_evidence(bundle, delivery_day):
     original publication timestamp by passing this validator.
     """
     from .nyx_annual_nyx_quantiles_gate import validate_nyx_quantiles_source
-    from .nyx_annual_saturn_source import load_target_snapshots, target_history_contract
+    from .nyx_annual_saturn_source import (
+        load_target_snapshots, target_history_contract, profile_history_contract, PROFILE_HISTORY_FIELDS,
+    )
     root = Path(bundle).resolve()
     summary = validate_nyx_quantiles_source(root, delivery_day)
     source_hashes, _, publication_verified = _sources(root, delivery_day, True)
     receipt = json.loads((root / "source_receipts/nyx_quantiles.json").read_text(encoding="utf-8"))
     target_contract = target_history_contract(root)
+    profile_contract = profile_history_contract(root)
     target_identity = ({"target_history_policy": target_contract["target_history_policy"]}
                        if target_contract else {})
+    if profile_contract:
+        target_identity["profile_history_policy"] = profile_contract["profile_history_policy"]
     contract_keys = ("target_history_policy", "target_revision_utc",
-                     "target_origin_snapshot_verified", "target_future_labels_used")
+                     "target_origin_snapshot_verified", "target_future_labels_used", *PROFILE_HISTORY_FIELDS)
     def contract_matches(record):
-        return {key: record[key] for key in contract_keys if key in record} == target_contract
+        return ({key: record[key] for key in contract_keys if key in record} == {**target_contract, **profile_contract}
+                and (not profile_contract or record.get("profile_origin_snapshot_verified") is False))
     if (receipt.get("source_receipts_sha256") != source_hashes
             or not contract_matches(receipt.get("producer", {}))
             or receipt.get("producer", {}).get("code_config_hash_policy") != TEXT_HASH_POLICY):
@@ -671,7 +680,7 @@ def validate_cpu_baseline_evidence(bundle, delivery_day):
                 raise ValueError("Unbound assembled CPU baseline curve")
             pd.testing.assert_frame_equal(pd.read_parquet(root / relative), wanted, check_freq=False)
     return {**summary, "cpu_daily_checkpoints_verified": checked,
-            **target_contract,
+            **target_contract, **profile_contract,
             "source_snapshots_bound": True, "runtime_verified": True,
             "chronos_model_identity": shared_model, "chronos_model_sha256": shared_model_hash,
             "provider_publication_timestamp_verified": publication_verified}

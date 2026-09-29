@@ -26,6 +26,10 @@ TARGET_HISTORY_POLICY = "current_fit_origin_reconstruction_v1"
 LEGACY_TARGET_HISTORY_POLICY = "origin_specific_supplier_snapshot_v1"
 TARGET_HISTORY_FIELDS = ("target_history_policy", "target_revision_utc",
                          "target_origin_snapshot_verified", "target_future_labels_used")
+PROFILE_HISTORY_POLICY = "own_origin_with_current_fit_recovery_v1"
+LEGACY_PROFILE_HISTORY_POLICY = "origin_specific_supplier_snapshot_v1"
+PROFILE_HISTORY_FIELDS = ("profile_history_policy", "profile_revision_ceiling_utc",
+                          "profile_origin_snapshot_verified")
 BOOTSTRAP_GROUPS = ("jao_initial", "public_hydro", "lagged_exchange")
 MATERIALIZATION_PROTOCOL = "nyx_annual_cpu_materialization_v1"
 MATERIALIZATION_PATH = "source_receipts/materialization.json"
@@ -206,6 +210,29 @@ def validate_target_history_contract(receipt: dict, cutoff: pd.Timestamp) -> Non
              "Current-fit target history cannot certify old revisions or use future labels")
 
 
+def validate_profile_history_contract(receipt: dict, cutoff: pd.Timestamp) -> None:
+    """Bind historical profile recovery to the outer forecast's available state.
+
+    The raw Saturn gate checks which historical days required recovery and
+    enforces the delivery day's own origin. This declaration never certifies
+    recovered revisions as having existed at their earlier inner origins.
+    """
+    policy = receipt.get("profile_history_policy")
+    if policy is None:
+        _require(not any(key in receipt for key in PROFILE_HISTORY_FIELDS[1:]),
+                 "Profile history revision metadata requires an explicit policy")
+        return
+    _require(policy == PROFILE_HISTORY_POLICY, "Unsupported profile history policy")
+    stamp = receipt.get("profile_revision_ceiling_utc")
+    _require(isinstance(stamp, str), "Profile history revision ceiling is required")
+    ceiling = pd.Timestamp(stamp)
+    _require(not pd.isna(ceiling) and ceiling.tzinfo is not None
+             and ceiling.tz_convert("UTC") == cutoff.tz_convert("UTC"),
+             "Profile history revision ceiling must equal the outer forecast cutoff")
+    _require(receipt.get("profile_origin_snapshot_verified") is False,
+             "Recovered profile history cannot certify old revisions")
+
+
 def validate_source_receipt(receipt: dict, *, group: str, day: str,
                             bundle: Path, cutoff: pd.Timestamp,
                             allow_training_bootstrap: bool = False) -> None:
@@ -213,6 +240,7 @@ def validate_source_receipt(receipt: dict, *, group: str, day: str,
     # That does not make this version available at an earlier forecast origin.
     # Only preparation opts in; evaluation and production keep the strict default.
     validate_target_history_contract(receipt, cutoff)
+    validate_profile_history_contract(receipt, cutoff)
     bootstrap = receipt.get("history_policy") == TRAINING_HISTORY_POLICY
     if receipt.get("history_policy") is not None:
         _require(bootstrap and group in BOOTSTRAP_GROUPS,
@@ -244,7 +272,8 @@ def validate_source_receipt(receipt: dict, *, group: str, day: str,
     asof_state = pd.Timestamp(stamps)
     _require(asof_state.tzinfo is not None and asof_state.tz_convert("UTC") <= cutoff,
              f"{group}: as-of state exceeds D-1 08:00 cutoff")
-    if receipt.get("target_history_policy") == TARGET_HISTORY_POLICY:
+    if (receipt.get("target_history_policy") == TARGET_HISTORY_POLICY
+            or receipt.get("profile_history_policy") == PROFILE_HISTORY_POLICY):
         _require(asof_state.tz_convert("UTC") == cutoff.tz_convert("UTC"),
                  f"{group}: current-fit source state must equal the outer forecast cutoff")
     hashes = receipt.get("artifact_sha256")

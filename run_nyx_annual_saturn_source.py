@@ -1,4 +1,4 @@
-"""Resume historical forecast profiles and outer-cutoff canonical training prices."""
+"""Resume Saturn histories with audited recovery at the outer forecast cutoff."""
 from __future__ import annotations
 import argparse
 import json
@@ -47,7 +47,10 @@ def main(argv=None):
     print(json.dumps({"state": "COMPLETE", "source_group": "saturn", "receipt": str(receipt),
                       "target_history_policy": source.get("target_history_policy"),
                       "target_revision_utc": source.get("target_revision_utc"),
-                      "target_origin_snapshot_verified": source.get("target_origin_snapshot_verified")}))
+                      "target_origin_snapshot_verified": source.get("target_origin_snapshot_verified"),
+                      "profile_history_policy": source.get("profile_history_policy"),
+                      "profile_revision_ceiling_utc": source.get("profile_revision_ceiling_utc"),
+                      "profile_origin_snapshot_verified": source.get("profile_origin_snapshot_verified")}))
     return 0
 
 
