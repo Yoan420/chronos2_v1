@@ -22,6 +22,10 @@ SCHEMA = ROOT / "config/nyx_annual_cpu_ordered_features.json"
 PROTOCOL = "nyx_annual_cpu_live_inputs_v1"
 SOURCE_PROTOCOL = "nyx_annual_cpu_live_source_receipt_v1"
 TRAINING_HISTORY_POLICY = "current_fit_snapshot_v1"
+TARGET_HISTORY_POLICY = "current_fit_origin_reconstruction_v1"
+LEGACY_TARGET_HISTORY_POLICY = "origin_specific_supplier_snapshot_v1"
+TARGET_HISTORY_FIELDS = ("target_history_policy", "target_revision_utc",
+                         "target_origin_snapshot_verified", "target_future_labels_used")
 BOOTSTRAP_GROUPS = ("jao_initial", "public_hydro", "lagged_exchange")
 MATERIALIZATION_PROTOCOL = "nyx_annual_cpu_materialization_v1"
 MATERIALIZATION_PATH = "source_receipts/materialization.json"
@@ -177,12 +181,38 @@ def _inside(bundle: Path, relative: str) -> Path:
     return path
 
 
+def validate_target_history_contract(receipt: dict, cutoff: pd.Timestamp) -> None:
+    """A reconstructed inner origin never certifies its old price revision.
+
+    The price snapshot belongs to the outer delivery day being prepared or
+    evaluated. Downloading that recorded Saturn state later is permitted;
+    moving its revision beyond the outer forecast cutoff is never permitted.
+    """
+    policy = receipt.get("target_history_policy")
+    if policy is None:
+        _require(not any(key in receipt for key in (
+            "target_revision_utc", "target_origin_snapshot_verified")),
+            "Target history revision metadata requires an explicit policy")
+        return  # Existing origin-specific source receipts retain their contract.
+    _require(policy == TARGET_HISTORY_POLICY, "Unsupported target history policy")
+    stamp = receipt.get("target_revision_utc")
+    _require(isinstance(stamp, str), "Current-fit target revision is required")
+    revision = pd.Timestamp(stamp)
+    _require(not pd.isna(revision) and revision.tzinfo is not None
+             and revision.tz_convert("UTC") == cutoff.tz_convert("UTC"),
+             "Current-fit target revision must equal the outer forecast cutoff")
+    _require(receipt.get("target_origin_snapshot_verified") is False
+             and receipt.get("target_future_labels_used") is False,
+             "Current-fit target history cannot certify old revisions or use future labels")
+
+
 def validate_source_receipt(receipt: dict, *, group: str, day: str,
                             bundle: Path, cutoff: pd.Timestamp,
                             allow_training_bootstrap: bool = False) -> None:
     # Preparing today's training history may use a newly downloaded version.
     # That does not make this version available at an earlier forecast origin.
     # Only preparation opts in; evaluation and production keep the strict default.
+    validate_target_history_contract(receipt, cutoff)
     bootstrap = receipt.get("history_policy") == TRAINING_HISTORY_POLICY
     if receipt.get("history_policy") is not None:
         _require(bootstrap and group in BOOTSTRAP_GROUPS,
@@ -214,6 +244,9 @@ def validate_source_receipt(receipt: dict, *, group: str, day: str,
     asof_state = pd.Timestamp(stamps)
     _require(asof_state.tzinfo is not None and asof_state.tz_convert("UTC") <= cutoff,
              f"{group}: as-of state exceeds D-1 08:00 cutoff")
+    if receipt.get("target_history_policy") == TARGET_HISTORY_POLICY:
+        _require(asof_state.tz_convert("UTC") == cutoff.tz_convert("UTC"),
+                 f"{group}: current-fit source state must equal the outer forecast cutoff")
     hashes = receipt.get("artifact_sha256")
     _require(isinstance(hashes, dict) and bool(hashes),
              f"{group}: bound source artifacts required")

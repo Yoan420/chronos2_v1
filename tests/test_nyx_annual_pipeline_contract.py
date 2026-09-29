@@ -169,6 +169,8 @@ def test_saturn_source_to_real_twelve_matrices_and_four_references(tmp_path, mon
         return FastHGB(kwargs["stop_day"]), None, {"test_fixture": True, "future_labels_used": False}
 
     monkeypatch.setattr(reference, "fit_hgb_block", fit_hgb)
+    # This deliberately unqualified arithmetic fixture has no source packet.
+    monkeypatch.setattr(saturn, "target_history_contract", lambda _: {})
     monkeypatch.setattr(reference, "fit_test2_origin", lambda *args, **kwargs: FastTest2())
     monkeypatch.setattr(reference, "predict_saved_block", lambda fit, matrix, nyx:
                         pd.DataFrame({"point": nyx + 2.}, index=nyx.index))

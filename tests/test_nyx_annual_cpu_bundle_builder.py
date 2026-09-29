@@ -111,6 +111,32 @@ def test_revision_snapshots_restore_prices_known_at_each_daily_origin():
     assert built.audits["countries"]["FR"]["price"]["revised_price_days_rebuilt"] == [selected]
 
 
+def test_current_fit_features_keep_past_only_windows_and_declare_outer_vintage():
+    day, sources = inputs()
+    contract = {"target_history_policy": "current_fit_origin_reconstruction_v1",
+                "target_revision_utc": builder.gate.delivery_grid(day)[2].isoformat(),
+                "target_origin_snapshot_verified": False, "target_future_labels_used": False}
+    def snapshot(origin):
+        stop = pd.Timestamp(origin, tz="Europe/Paris").tz_convert("UTC")
+        return {zone: values.loc[values.index < stop] for zone, values in sources["prices"].items()}
+    original = builder.build_feature_matrices(day, **sources, price_snapshots=snapshot,
+                                               price_history_contract=contract)
+    for zone in builder.gate.ZONES:
+        audit = original.audits["countries"][zone]["price"]
+        assert audit["per_origin_price_snapshots_verified"] is False
+        assert audit["target_revision_utc"] == contract["target_revision_utc"]
+    # A changed later historical price cannot influence an earlier day's lags.
+    mutation = pd.Timestamp("2026-10-24", tz="Europe/Paris").tz_convert("UTC")
+    sources["prices"]["FR"].loc[mutation:] = 1e9
+    changed = builder.build_feature_matrices(day, **sources, price_snapshots=snapshot,
+                                              price_history_contract=contract)
+    before = original.base292["FR"].index < mutation
+    pd.testing.assert_frame_equal(original.base292["FR"].loc[before], changed.base292["FR"].loc[before])
+    with pytest.raises(ValueError, match="outer cutoff"):
+        builder.build_feature_matrices(day, **sources, price_snapshots=snapshot,
+            price_history_contract={**contract, "target_revision_utc": "2026-10-25T09:00:00+00:00"})
+
+
 @pytest.mark.skipif(not Path("runs/experiments/nyx_local_365_to20260923/inputs/covariates.parquet").exists(),
                     reason="Optional archived research inputs are not distributed in Git")
 def test_local_archives_match_all_twelve_historical_feature_matrices():

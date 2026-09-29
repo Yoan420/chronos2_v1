@@ -120,8 +120,10 @@ La préparation réalise successivement :
 
 1. Initialisation, assemblage et vérification des historiques JAO, hydro et
    échanges ; contrôle séparé des captures de la journée à prévoir.
-2. Mise à jour Saturn à la date de coupure propre à chaque journée : profils
-   prévus, historiques des prix, combustible et disponibilités thermiques.
+2. Mise à jour Saturn : profils prévus, combustible et disponibilités thermiques
+   à leur coupure quotidienne ; prix historiques dans la version disponible à
+   la coupure de la livraison préparée. Les calculs internes restent limités
+   aux prix antérieurs à leur journée.
 3. Chronos-2 CPU, correcteur résiduel CPU et Kalman pour les quatre pays.
 4. Construction exacte des matrices 449/503 colonnes et projection 123 colonnes.
 5. Réentraînement HGB/Test2, validation chronologique et référence de rareté.
@@ -153,6 +155,13 @@ contrôles passent.
 
 `PREPARED` signifie que les entrées sont préparées ; aucune prévision n'est publiée
 et ce statut ne vaut pas qualification.
+
+La politique de prix `current_fit_origin_reconstruction_v1` utilise, pour un
+entraînement donné, les historiques disponibles à sa coupure. Ses courbes
+internes servent à l'apprentissage et ne certifient pas des prévisions émises
+dans le passé. La qualification complète doit évaluer cette même politique à
+chaque date extérieure ; une qualification de l'ancien régime ne l'active pas.
+Voir aussi [le correctif Saturn et la commande de reprise](nyx_annual_history_bootstrap.md#correctif-des-anciennes-versions-de-prix-saturn).
 Pour imposer une date, ajouter `-DeliveryDay YYYY-MM-DD`.
 
 ## 5. Évaluer toute la chaîne sur le CPU du poste

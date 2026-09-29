@@ -95,7 +95,7 @@ def test_future_failure_adds_failed_day_for_client_creation(monkeypatch, tmp_pat
     with pytest.raises(m.SaturnSourceError) as caught:
         m.sync("2026-09-29", first_day="2026-09-29", cache=tmp_path,
                workers=1, client_factory=client)
-    assert caught.value.day == "2026-09-29" and caught.value.phase == "daily_capture"
+    assert caught.value.day == "2026-09-29" and caught.value.phase == "current_fit_targets"
     assert caught.value.__cause__ is cause and "example-secret" not in str(caught.value)
 
 

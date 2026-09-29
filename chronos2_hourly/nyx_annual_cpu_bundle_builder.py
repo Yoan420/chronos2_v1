@@ -76,7 +76,8 @@ def build_feature_matrices(delivery_day: str, *, prices, nyx_quantiles,
                            jao_refreshed, thermal_sources, hydro_features=None,
                            hydro_hourly=None, exchange_features=None,
                            exchange_hourly=None, feature_index=None,
-                           reference_index=None, price_snapshots=None) -> BuiltFeatures:
+                           reference_index=None, price_snapshots=None,
+                           price_history_contract=None) -> BuiltFeatures:
     """Pure, date-independent assembly of 292 -> 334 -> 449 -> 503 -> 123.
 
     ``covariates`` includes the preceding 365 days needed for Test2's causal
@@ -87,6 +88,13 @@ def build_feature_matrices(delivery_day: str, *, prices, nyx_quantiles,
     or audited hourly frames to execute the exact historical pure arithmetic.
     """
     full, current, _ = gate.delivery_grid(delivery_day)
+    price_history_contract = dict(price_history_contract or {})
+    if price_history_contract:
+        expected_contract = {"target_history_policy": gate.TARGET_HISTORY_POLICY,
+            "target_revision_utc": gate.delivery_grid(delivery_day)[2].isoformat(),
+            "target_origin_snapshot_verified": False, "target_future_labels_used": False}
+        require(price_history_contract == expected_contract and price_snapshots is not None,
+                "Current-fit price history must bind the outer cutoff and bounded internal windows")
     index = full if feature_index is None else feature_index
     schema = gate.load_schema()
     zones = set(gate.ZONES)
@@ -174,7 +182,9 @@ def build_feature_matrices(delivery_day: str, *, prices, nyx_quantiles,
             frame.loc[day_index] = changed
             price_audit["daily_sources"] = [row if row["delivery_day"] != str(origin_day)
                 else changed_audit["daily_sources"][0] for row in price_audit["daily_sources"]]
-        price_audit["per_origin_price_snapshots_verified"] = price_snapshots is not None
+        price_audit["per_origin_price_snapshots_verified"] = price_snapshots is not None and not price_history_contract
+        price_audit["internal_price_windows_verified"] = price_snapshots is not None
+        price_audit.update(price_history_contract)
         price_audit["revised_price_days_rebuilt"] = [str(value) for value in revised_days]
         require(list(frame.columns) == schema["families"][POOLED]["columns"][zone][:292],
                 f"{zone}: base292 recipe changed")
@@ -294,7 +304,7 @@ def materialize_features(bundle: Path, delivery_day: str) -> BuiltFeatures:
     ``seal_bundle`` is deliberately separate to avoid circular source receipts.
     """
     bundle = Path(bundle).resolve()
-    from .nyx_annual_saturn_source import load_target_snapshots
+    from .nyx_annual_saturn_source import load_target_snapshots, target_history_contract
     groups = tuple(group for group in gate.SOURCE_GROUPS if group != "scarcity_confirmed_pair")
     receipts, artifacts = source_graph(bundle, delivery_day, groups, allow_training_bootstrap=True)
 
@@ -344,7 +354,8 @@ def materialize_features(bundle: Path, delivery_day: str) -> BuiltFeatures:
         thermal_sources={name: read(f"source_artifacts/thermal_capacity/{name}.parquet")
                          for name in thermal.SOURCES},
         exchange_features=read("source_artifacts/lagged_exchange/features.parquet"),
-        price_snapshots=load_target_snapshots(bundle))
+        price_snapshots=load_target_snapshots(bundle),
+        price_history_contract=target_history_contract(bundle))
     require(source_graph(bundle, delivery_day, groups, allow_training_bootstrap=True) == (receipts, artifacts),
             "Source snapshots changed while building features")
     for family, countries in built.features.items():

@@ -169,30 +169,45 @@ Get-Content .\runs\live\nyx_annual_cpu\daily_capture_log.jsonl -Tail 1
 Vérifier les dates et l'action de ces fichiers : ils peuvent concerner une
 tentative antérieure si le programme s'est arrêté avant de créer son statut.
 
-### Saturn renvoie une réponse vide pour les anciens prix FR
+### Correctif des anciennes versions de prix Saturn
 
 Le journal du 29 septembre a identifié une requête vide pour
 `power.price.da.fr.bzn.hourly.entsoe.utc.cdh.eurmwh` : historique du 24 février
 2023 au 17 juin 2024, demandé dans l'état Saturn du **17 juin 2024 à 06:00 UTC**.
-Cette requête sert au premier jour de préparation, le 18 juin 2024. La réussite
-de la collecte des prix à la coupure actuelle ne prouve pas la disponibilité de
-cet ancien état.
+Cette requête servait au premier jour de préparation, le 18 juin 2024. Le
+diagnostic du poste a confirmé que les 11 498 heures demandées sont complètes
+dans la version du 29 septembre 2026 à 06:00 UTC. La requête à l'ancienne date
+reste vide, y compris sur 2 048 heures. La série alternative est ambiguë au
+changement d'heure du 29 octobre 2023 et n'est pas utilisée.
 
-Après la mise à jour Git, exécuter sur le poste ayant accès à Saturn :
+La préparation utilise désormais les prix canoniques disponibles à la coupure
+de la livraison préparée. Elle reconstruit ses calculs internes en excluant,
+pour chacun, tous les prix de sa journée et des journées suivantes. Les reçus
+portent `target_history_policy: current_fit_origin_reconstruction_v1` et la
+date réelle de référence Saturn dans `target_revision_utc`. Ils déclarent
+explicitement que les anciennes versions quotidiennes ne sont pas certifiées.
+
+Après la mise à jour Git, reprendre sur le poste ayant accès à Saturn :
 
 ```powershell
-& .\.venv-annual\Scripts\python.exe .\diagnose_nyx_annual_saturn_targets.py --delivery-day 2026-09-30 --failed-day 2024-06-18 --zone FR
+.\NYXAnnualCPU.ps1 -Action prepare -DeliveryDay '2026-09-30'
 ```
 
-Le diagnostic compare les réponses pour l'ancien état, un intervalle plus court,
-l'état actuel et la série officielle alternative déjà référencée dans le code.
-Il enregistre un rapport JSON et affiche son chemin. Transmettre ce fichier.
-Il ne modifie pas les caches de données et ne lance aucun entraînement.
+La collecte vérifie les quatre historiques de prix avant de reprendre les
+profils Saturn. Les nouveaux caches `profiles_v2` et `targets_current_fit_v1`
+sont créés sous `data/pit/nyx_annual_saturn` ; aucun ancien cache n'est supprimé.
+La première collecte et les premiers calculs CPU peuvent être longs. Garder
+PowerShell ouvert et le poste connecté. Une relance réutilise les éléments
+valides. Les calculs déjà produits sont réutilisés seulement lorsque leurs
+entrées et leurs dépendances numériques sont identiques.
 
-Une concordance entre l'alternative ancienne et les prix actuels est seulement
-un contrôle de compatibilité. Elle n'autorise pas automatiquement l'utilisation
-de cette alternative et ne qualifie pas une prévision. La réponse vide reste
-bloquante tant que la disponibilité des prix nécessaires n'est pas établie.
+`PREPARED` confirme la préparation, sans activer la production. Ce régime doit
+être évalué sur la chaîne CPU complète : chaque journée extérieure évaluée
+doit utiliser sa propre date de référence et respecter les contrôles des
+autres sources. Les courbes internes reconstruites ne constituent pas à elles
+seules des prévisions historiques qualifiées. L'activation refuse une politique
+de prix différente de celle évaluée. Les meilleurs scores historiques restent
+conservés dans leurs rapports d'origine.
 
 Pour lire la provenance dans les fichiers de diagnostic :
 

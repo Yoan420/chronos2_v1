@@ -34,8 +34,15 @@ def test_weekly_anchor_and_worst_case_training_support():
     assert (day - first).days == 462
 
 
-def test_reference_runs_own_origin_fits_daily_oof_and_four_outputs(tmp_path, monkeypatch):
+@pytest.mark.parametrize("current_fit", [False, True])
+def test_reference_runs_own_origin_fits_daily_oof_and_four_outputs(tmp_path, monkeypatch, current_fit):
     day = "2026-09-29"
+    from chronos2_hourly import nyx_annual_saturn_source as source
+    contract = ({"target_history_policy": "current_fit_origin_reconstruction_v1",
+                 "target_revision_utc": source.cutoff(day).isoformat(),
+                 "target_origin_snapshot_verified": False, "target_future_labels_used": False}
+                if current_fit else {})
+    monkeypatch.setattr(source, "target_history_contract", lambda _: contract)
     last = pd.Timestamp(day).date()
     index = producer._grid(last - timedelta(days=462), last + timedelta(days=1))
     baseline = {z: pd.DataFrame({"nyx__q50": 50.}, index=index) for z in producer.ZONES}
@@ -78,6 +85,10 @@ def test_reference_runs_own_origin_fits_daily_oof_and_four_outputs(tmp_path, mon
     assert receipt["producer"]["future_labels_used"] is False
     model_path = tmp_path / "reference_models/2026-09-23/FR_hist_residual_400.joblib"
     identity = json.loads(model_path.with_suffix(".json").read_text())["identity"]
+    if current_fit:
+        assert receipt["producer"]["target_revision_utc"] == contract["target_revision_utc"]
+        assert identity["target_history_policy"] == contract["target_history_policy"]
+        assert "target_revision_utc" not in identity  # Exact numeric inputs control cache reuse.
     key = hashlib.sha256(json.dumps(identity, sort_keys=True).encode()).hexdigest()
     cached_model = tmp_path.parent / "_cpu_reference_cache" / key / "fitted.joblib"
     assert os.path.samefile(model_path, cached_model)
@@ -89,12 +100,17 @@ def test_reference_runs_own_origin_fits_daily_oof_and_four_outputs(tmp_path, mon
         assert len(set(oof.index.tz_convert("Europe/Paris").date)) == 98
     # No loader is consulted at later origins to build earlier weekly fits.
     assert snapshot_calls[:-1] == sorted(snapshot_calls[:-1])
-    from chronos2_hourly import nyx_annual_saturn_source as source
     monkeypatch.setattr(source, "load_target_snapshots", lambda _: labels)
     verification = producer.validate_cpu_reference_source(tmp_path, day)
     assert verification["cpu_model_artifacts_verified"] == 196
     assert verification["prior90_recomputed"] is True
     assert receipt["producer"]["code_config_hash_policy"] == producer.TEXT_HASH_POLICY
+    if current_fit:
+        original = contract["target_revision_utc"]
+        contract["target_revision_utc"] = (pd.Timestamp(original) + pd.Timedelta(hours=1)).isoformat()
+        with pytest.raises(ValueError, match="producer protocol"):
+            producer.validate_cpu_reference_source(tmp_path, day)
+        contract["target_revision_utc"] = original
     # A transferred bundle still verifies after Git checks out the same source
     # using different newline bytes. Data/model transport hashes remain strict.
     checkout = tmp_path / "another_checkout"

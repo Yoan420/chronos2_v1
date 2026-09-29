@@ -49,6 +49,13 @@ def _exact(left, right, label):
 
 def _saturn(bundle, day, receipt):
     from . import nyx_annual_saturn_source as source
+    if receipt.get("target_history_policy") == gate.TARGET_HISTORY_POLICY:
+        _, prices, verdict = source.verify_current_fit_source(bundle, day, receipt)
+        gate.validate_target_history_contract(verdict, gate.delivery_grid(day)[2])
+        require(verdict.get("target_history_policy") == gate.TARGET_HISTORY_POLICY
+                and verdict.get("asof_cutoff_verified") is True,
+                "Current-fit Saturn source evidence is incomplete")
+        return verdict, prices
     first = date.fromisoformat(receipt["first_delivery_day"])
     last = date.fromisoformat(day)
     days = [stamp.date().isoformat() for stamp in pd.date_range(first, last, freq="D")]

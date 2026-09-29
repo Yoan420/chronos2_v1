@@ -107,7 +107,9 @@ def build_cpu_reference_bundle(bundle, delivery_day, *, baselines, base_features
     """Build all three HGBs and both Test2 pairs, with past-only weekly OOF.
 
     All feature matrices must cover the baseline's extended 462-day support.
-    Origin-specific price snapshots are mandatory, including policy labels.
+    Price histories are bounded before each internal fit. Their declared
+    policy distinguishes original vintages from reconstruction at this fit's
+    outer cutoff; reconstructed OOF rows do not certify past live performance.
     Saved estimators are checksum-bound; external pickle files are never read.
     """
     root = Path(bundle).resolve()
@@ -120,6 +122,10 @@ def build_cpu_reference_bundle(bundle, delivery_day, *, baselines, base_features
     if any(set(mapping) != set(ZONES) for mapping in required_maps):
         raise ValueError("All four countries are required by the paired reference")
     upstream_hash, verified, publication_verified = _upstream(root, delivery_day, require_verified_sources)
+    from .nyx_annual_saturn_source import target_history_contract
+    target_contract = target_history_contract(root)
+    target_identity = ({"target_history_policy": target_contract["target_history_policy"]}
+                       if target_contract else {})
     for zone in ZONES:
         for label, mapping in zip(("baseline", "HGB base", "HGB augmented", "Test2"), required_maps):
             frame = mapping[zone]
@@ -161,6 +167,7 @@ def build_cpu_reference_bundle(bundle, delivery_day, *, baselines, base_features
                         return replace(fitted, stop_day_exclusive=str(fit_date + timedelta(days=7))), audit
                     relative = f"reference_models/{fit_date}/{zone}_{variant}.joblib"
                     identity = {"protocol": PROTOCOL, "zone": zone, "variant": variant,
+                                **target_identity,
                                 "origin": str(fit_date), "features": frame_digest(matrix.loc[available]),
                                 "training_labels": frame_digest(labels.loc[train]),
                                 "nyx": frame_digest(point), "code": codes, "runtime": runtime,
@@ -183,6 +190,7 @@ def build_cpu_reference_bundle(bundle, delivery_day, *, baselines, base_features
                     return model, model.audit
                 relative = f"reference_models/{fit_date}/Test2_{'_'.join(pair)}.joblib"
                 identity = {"protocol": PROTOCOL, "pair": list(pair), "variant": "test2_120",
+                            **target_identity,
                             "origin": str(fit_date), "features": frame_digest(train_x),
                             "training_residual": frame_digest(pd.Series(train_y)), "code": codes, "runtime": runtime,
                             "code_config_hash_policy": TEXT_HASH_POLICY}
@@ -219,6 +227,7 @@ def build_cpu_reference_bundle(bundle, delivery_day, *, baselines, base_features
                     forecasts[zone].append(frame)
             relative = f"reference_runs/{fit_date}.json"
             write_json(root / relative, {"protocol": PROTOCOL, "origin_day": str(fit_date),
+                                        **target_contract,
                                         "trained_on_cpu": True, "future_labels_used": False,
                                         "training_price_sha256": {z: frame_digest(snapshots[z].reindex(train)) for z in ZONES},
                                         "model_audits": records, "implementation_sha256": codes,
@@ -267,6 +276,7 @@ def build_cpu_reference_bundle(bundle, delivery_day, *, baselines, base_features
                    "provider_publication_timestamp_verified": publication_verified, "training_window_complete": True,
                    "artifact_sha256": hashes,
                    "producer": {"protocol": PROTOCOL, "device": "cpu", "zones": list(ZONES),
+                                **target_contract,
                                 "baseline_receipt_sha256": upstream_hash, "implementation_sha256": codes,
                                 "code_config_hash_policy": TEXT_HASH_POLICY,
                                 "weekly_anchor": WEEKLY_ANCHOR, "first_oof_origin": str(first_origin),
@@ -288,14 +298,17 @@ def build_from_bundle(bundle, delivery_day, **kwargs):
 
 
 def validate_cpu_reference_source(bundle, delivery_day):
-    """Bind all fitted weekly models to their own source snapshots and policies."""
-    from .nyx_annual_saturn_source import load_target_snapshots
+    """Bind fitted weekly models to their declared source and replay policies."""
+    from .nyx_annual_saturn_source import load_target_snapshots, target_history_contract
     root = Path(bundle).resolve()
     path = root / "source_receipts/scarcity_confirmed_pair.json"
     receipt = json.loads(path.read_text(encoding="utf-8"))
     _, current, cutoff = delivery_grid(delivery_day)
     validate_source_receipt(receipt, group="scarcity_confirmed_pair", day=delivery_day, bundle=root, cutoff=cutoff)
     upstream_hash, _, publication_verified = _upstream(root, delivery_day, True)
+    target_contract = target_history_contract(root)
+    target_identity = ({"target_history_policy": target_contract["target_history_policy"]}
+                       if target_contract else {})
     day = pd.Timestamp(delivery_day).date()
     origin = week_origin(day)
     first_origin = week_origin(origin - timedelta(days=90))
@@ -305,6 +318,7 @@ def validate_cpu_reference_source(bundle, delivery_day):
     origins = [str(d) for d in pd.date_range(str(first_origin), str(origin), freq="7D").date]
     producer = receipt.get("producer", {})
     expected_producer = {"protocol": PROTOCOL, "device": "cpu", "zones": list(ZONES),
+                         **target_contract,
                          "baseline_receipt_sha256": upstream_hash, "implementation_sha256": codes,
                          "code_config_hash_policy": TEXT_HASH_POLICY,
                          "weekly_anchor": WEEKLY_ANCHOR, "first_oof_origin": str(first_origin),
@@ -343,6 +357,8 @@ def validate_cpu_reference_source(bundle, delivery_day):
             raise ValueError("Unbound CPU weekly fit audit")
         run = json.loads((root / run_path).read_text())
         if (run.get("protocol") != PROTOCOL or run.get("origin_day") != date
+                or {key: run[key] for key in ("target_history_policy", "target_revision_utc",
+                    "target_origin_snapshot_verified", "target_future_labels_used") if key in run} != target_contract
                 or run.get("trained_on_cpu") is not True or run.get("future_labels_used") is not False
                 or run.get("implementation_sha256") != codes or len(run.get("model_audits", [])) != 14
                 or run.get("code_config_hash_policy") != TEXT_HASH_POLICY
@@ -357,6 +373,7 @@ def validate_cpu_reference_source(bundle, delivery_day):
                 if tuple(matrix.columns) != archived_columns(zone, variant):
                     raise ValueError("Reference HGB trained feature schema differs")
                 identity = {"protocol": PROTOCOL, "zone": zone, "variant": variant,
+                            **target_identity,
                             "origin": date, "features": frame_digest(matrix.loc[available]),
                             "training_labels": frame_digest(labels.loc[train]),
                             "nyx": frame_digest(point), "code": codes, "runtime": runtime,
@@ -367,6 +384,7 @@ def validate_cpu_reference_source(bundle, delivery_day):
             y = np.concatenate([snapshots[z].reindex(train).to_numpy(float)
                                 - baselines[z].loc[train, "nyx__q50"].to_numpy(float) for z in pair])
             identity = {"protocol": PROTOCOL, "pair": list(pair), "variant": "test2_120",
+                        **target_identity,
                         "origin": date, "features": frame_digest(x),
                         "training_residual": frame_digest(pd.Series(y)), "code": codes, "runtime": runtime,
                         "code_config_hash_policy": TEXT_HASH_POLICY}
@@ -393,6 +411,7 @@ def validate_cpu_reference_source(bundle, delivery_day):
         if not reference.index.equals(current) or not np.array_equal(reference.reference.to_numpy(), result.scarcity_confirmed_pair.to_numpy()):
             raise ValueError("Published reference differs from the fitted prior90 paired formula")
     return {"protocol": PROTOCOL, "receipt_sha256": sha256(path), "weekly_origins_verified": len(origins),
+            **target_contract,
             "cpu_model_artifacts_verified": checked, "prior90_recomputed": True,
             "provider_publication_timestamp_verified": publication_verified}
 
