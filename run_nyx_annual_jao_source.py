@@ -13,6 +13,9 @@ from pathlib import Path
 import pandas as pd
 
 from chronos2_hourly.jao_flowbased import JaoCoreClient
+from chronos2_hourly.nyx_annual_jao_history import (
+    DEFAULT_HISTORY, DEFAULT_LEGACY, publish_history,
+)
 from chronos2_hourly.nyx_annual_jao_source import (
     capture_day,
     exclusive_cache_lock,
@@ -34,8 +37,13 @@ def main(argv=None) -> int:
     parser.add_argument("--bundle", type=Path)
     parser.add_argument("--ca-bundle", type=Path,
                         help="Trusted PEM bundle for an enterprise TLS proxy")
-    parser.add_argument("--verify-only", action="store_true",
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--verify-only", action="store_true",
                         help="Use an existing pre-cutoff capture; never call JAO")
+    mode.add_argument("--bootstrap-history", action="store_true",
+                        help="Verify delivery capture and bootstrap historical initial domains")
+    parser.add_argument("--history-cache-root", type=Path, default=DEFAULT_HISTORY)
+    parser.add_argument("--legacy-cache-root", type=Path, default=DEFAULT_LEGACY)
     args = parser.parse_args(argv)
     day = date.fromisoformat(args.delivery_day)
     if day.isoformat() != args.delivery_day:
@@ -44,17 +52,31 @@ def main(argv=None) -> int:
     bundle = (args.bundle or ROOT / "runs/live/nyx_annual_cpu" / day.isoformat()).resolve()
     if bundle == cache or bundle.is_relative_to(cache):
         raise ValueError("JAO bundle must be outside the immutable source cache")
-    with exclusive_cache_lock(cache):
-        if args.verify_only:
+    if args.bootstrap_history:
+        # Live capture is immutable. Hold its legacy lock only for the short
+        # verification, not throughout a potentially long historical download.
+        with exclusive_cache_lock(cache):
             verify_daily_capture(cache, day)
-        else:
-            verify, tls_source = _tls_configuration(
-                argparse.Namespace(insecure=False, ca_bundle=args.ca_bundle))
-            with JaoCoreClient(verify=verify) as client:
-                capture_day(day=day, cache_root=cache, client=client,
-                            now_utc=pd.Timestamp.now(tz="UTC"),
-                            tls_trust_source=tls_source)
-        result = publish_jao_receipt(day=day, cache_root=cache, bundle=bundle)
+        verify, tls_source = _tls_configuration(
+            argparse.Namespace(insecure=False, ca_bundle=args.ca_bundle))
+        with JaoCoreClient(verify=verify, request_interval_seconds=.65,
+                           maximum_retries=4) as client:
+            result = publish_history(day.isoformat(), bundle,
+                live_cache_root=cache, history_cache_root=args.history_cache_root,
+                legacy_cache_root=args.legacy_cache_root, client=client,
+                tls_trust_source=tls_source)
+    else:
+        with exclusive_cache_lock(cache):
+            if args.verify_only:
+                verify_daily_capture(cache, day)
+            else:
+                verify, tls_source = _tls_configuration(
+                    argparse.Namespace(insecure=False, ca_bundle=args.ca_bundle))
+                with JaoCoreClient(verify=verify) as client:
+                    capture_day(day=day, cache_root=cache, client=client,
+                                now_utc=pd.Timestamp.now(tz="UTC"),
+                                tls_trust_source=tls_source)
+            result = publish_jao_receipt(day=day, cache_root=cache, bundle=bundle)
     print(json.dumps({"source": "jao_initial", "delivery_day": day.isoformat(),
                       **result}, ensure_ascii=False))
     return 0 if result["state"] == "COMPLETE" else 2

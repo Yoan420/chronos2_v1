@@ -1,7 +1,7 @@
 <# Lance la chaine annuelle CPU FR DE NL BE depuis le depot courant. #>
 [CmdletBinding()]
 param(
-    [ValidateSet('inspect','capture','prepare','forecast')]
+    [ValidateSet('inspect','capture','bootstrap','prepare','forecast')]
     [string]$Action = 'forecast',
     [ValidatePattern('^$|^\d{4}-\d{2}-\d{2}$')]
     [string]$DeliveryDay = '',

@@ -33,6 +33,8 @@ data/pit/nyx_annual_saturn/
 data/pit/nyx_annual_hydro_captures/
 data/pit/nyx_annual_cpu_live_fuel/
 data/pit/nyx_annual_thermal/
+data/pit/nyx_annual_jao_history/
+data/pit/nyx_annual_public_history/
 
 # Local runs, generated reports and desktop shortcuts are rebuilt on each host.
 tmp/

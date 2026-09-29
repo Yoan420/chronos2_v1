@@ -11,11 +11,11 @@ from chronos2_hourly.nyx_annual_pipeline import inspect, run
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--delivery-day", default=(pd.Timestamp.now(tz="Europe/Paris").date() + timedelta(days=1)).isoformat())
-    parser.add_argument("--action", choices=("inspect", "capture", "prepare", "forecast"), default="forecast")
+    parser.add_argument("--action", choices=("inspect", "capture", "bootstrap", "prepare", "forecast"), default="forecast")
     parser.add_argument("--bundle", type=Path)
     parser.add_argument("--output", type=Path)
     parser.add_argument("--source-cache-root", type=Path,
-                        help="Separate Saturn/fuel/thermal caches for chronological evaluation")
+                        help="Separate Saturn/fuel/thermal and training-history caches for evaluation")
     args = parser.parse_args(argv)
     if args.action == "inspect":
         result = inspect(args.delivery_day, bundle=args.bundle, output=args.output)
@@ -24,7 +24,7 @@ def main(argv=None):
     result = run(args.delivery_day, action=args.action, bundle=args.bundle, output=args.output,
                  cache_root=args.source_cache_root)
     print(json.dumps(result, ensure_ascii=False, default=str))
-    return 0 if result["state"] in ("COMPLETE", "PREPARED", "CAPTURED") else 2
+    return 0 if result["state"] in ("COMPLETE", "PREPARED", "CAPTURED", "BOOTSTRAPPED") else 2
 
 
 if __name__ == "__main__":

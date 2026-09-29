@@ -268,7 +268,8 @@ def _json(value):
                        allow_nan=False) + "\n").encode("utf-8")
 
 
-def source_graph(bundle: Path, delivery_day: str, groups=gate.SOURCE_GROUPS):
+def source_graph(bundle: Path, delivery_day: str, groups=gate.SOURCE_GROUPS, *,
+                 allow_training_bootstrap=False):
     _, _, cutoff = gate.delivery_grid(delivery_day)
     receipts, artifacts = {}, {}
     for group in groups:
@@ -276,7 +277,8 @@ def source_graph(bundle: Path, delivery_day: str, groups=gate.SOURCE_GROUPS):
         require(path.is_file(), f"{group}: source receipt missing")
         receipt = json.loads(path.read_text(encoding="utf-8"))
         gate.validate_source_receipt(receipt, group=group, day=delivery_day,
-                                     bundle=bundle, cutoff=cutoff)
+                                     bundle=bundle, cutoff=cutoff,
+                                     allow_training_bootstrap=allow_training_bootstrap)
         receipts[group] = gate.sha256(path)
         for name, digest in receipt["artifact_sha256"].items():
             require(name not in artifacts or artifacts[name] == digest,
@@ -294,7 +296,7 @@ def materialize_features(bundle: Path, delivery_day: str) -> BuiltFeatures:
     bundle = Path(bundle).resolve()
     from .nyx_annual_saturn_source import load_target_snapshots
     groups = tuple(group for group in gate.SOURCE_GROUPS if group != "scarcity_confirmed_pair")
-    receipts, artifacts = source_graph(bundle, delivery_day, groups)
+    receipts, artifacts = source_graph(bundle, delivery_day, groups, allow_training_bootstrap=True)
 
     def read(relative):
         require(relative in artifacts, f"Unreceipted feature source: {relative}")
@@ -343,7 +345,7 @@ def materialize_features(bundle: Path, delivery_day: str) -> BuiltFeatures:
                          for name in thermal.SOURCES},
         exchange_features=read("source_artifacts/lagged_exchange/features.parquet"),
         price_snapshots=load_target_snapshots(bundle))
-    require(source_graph(bundle, delivery_day, groups) == (receipts, artifacts),
+    require(source_graph(bundle, delivery_day, groups, allow_training_bootstrap=True) == (receipts, artifacts),
             "Source snapshots changed while building features")
     for family, countries in built.features.items():
         for zone, frame in countries.items():
@@ -359,7 +361,7 @@ def materialize_features(bundle: Path, delivery_day: str) -> BuiltFeatures:
 def seal_bundle(bundle: Path, delivery_day: str) -> dict:
     """Bind verified sources, complete derived matrices and forecast references."""
     bundle = Path(bundle).resolve()
-    receipts, artifacts = source_graph(bundle, delivery_day)
+    receipts, artifacts = source_graph(bundle, delivery_day, allow_training_bootstrap=True)
     full, current, cutoff = gate.delivery_grid(delivery_day)
     schema = gate.load_schema()
     for family in gate.FAMILIES:
@@ -383,8 +385,8 @@ def seal_bundle(bundle: Path, delivery_day: str) -> dict:
         "output_sha256": {name: gate.sha256(bundle / name) for name in gate.materialized_outputs()},
         "transform_code_sha256": {name: gate.sha256(gate.ROOT / name)
                                   for name in gate.MATERIALIZER_CODE}}
-    require(source_graph(bundle, delivery_day) == (receipts, artifacts),
+    require(source_graph(bundle, delivery_day, allow_training_bootstrap=True) == (receipts, artifacts),
             "Sources changed while sealing materialization")
     _write_immutable(bundle / gate.MATERIALIZATION_PATH, _json(manifest))
-    gate.validate_materialization_manifest(bundle, delivery_day)
+    gate.validate_materialization_manifest(bundle, delivery_day, allow_training_bootstrap=True)
     return manifest

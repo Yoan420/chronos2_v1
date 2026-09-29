@@ -138,16 +138,22 @@ def assemble(day, archive=DEFAULT_ARCHIVE, bundle=None):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--action", choices=("capture", "assemble", "verify"), required=True)
+    parser.add_argument("--action", choices=("capture", "assemble", "bootstrap", "verify"), required=True)
     parser.add_argument("--delivery-day", required=True)
     parser.add_argument("--archive", type=Path, default=DEFAULT_ARCHIVE)
     parser.add_argument("--bundle", type=Path)
+    parser.add_argument("--history-archive", type=Path)
     args = parser.parse_args(argv)
     with exclusive_process_lock(args.archive / "hydro_source.lock"):
         if args.action == "capture":
             path = capture(args.delivery_day, args.archive)
         elif args.action == "assemble":
             path = assemble(args.delivery_day, args.archive, args.bundle)
+        elif args.action == "bootstrap":
+            from chronos2_hourly.nyx_annual_public_history import publish_history
+            path = publish_history("public_hydro", args.delivery_day,
+                args.bundle or ROOT / "runs/live/nyx_annual_cpu" / args.delivery_day,
+                archive=args.archive, history_archive=args.history_archive)
         else:
             verify_capture(args.archive / args.delivery_day, args.delivery_day)
             path = args.archive / args.delivery_day / "capture.json"

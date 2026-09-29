@@ -13,13 +13,13 @@ def test_missing_archive_checks_all_public_archives_but_never_starts_saturn(monk
         return 2 if missing in script else 0
     output = tmp_path / "output"
     result = m.run("2026-09-28", action="prepare", bundle=tmp_path / "bundle", output=output, runner=runner)
-    assert calls == ["run_nyx_annual_jao_source.py", "run_nyx_annual_hydro_source.py",
+    assert calls == ["run_nyx_annual_daily_capture.py", "run_nyx_annual_jao_source.py", "run_nyx_annual_hydro_source.py",
                      "run_nyx_annual_exchange_source.py"]
     assert result["state"] == "BLOCKED" and result["forecast_published"] is False
     assert sum(stage["state"] == "ERROR" for stage in result["stages"]) == 1
     assert not output.exists()
     saved = json.loads((tmp_path / "output.pipeline.json").read_text())
-    assert len(saved["stages"]) == 3
+    assert len(saved["stages"]) == 4
 
 
 def test_production_refuses_before_any_network_without_qualification(monkeypatch, tmp_path):
@@ -47,7 +47,7 @@ def test_prepare_calls_every_producer_in_order_and_does_not_publish_forecast(mon
     calls = []
     result = m.run("2026-09-28", action="prepare", bundle=tmp_path / "bundle", output=tmp_path / "out",
                    runner=lambda script, args: calls.append(script) or 0)
-    assert calls == ["run_nyx_annual_jao_source.py", "run_nyx_annual_hydro_source.py",
+    assert calls == ["run_nyx_annual_daily_capture.py", "run_nyx_annual_jao_source.py", "run_nyx_annual_hydro_source.py",
                      "run_nyx_annual_exchange_source.py", "run_nyx_annual_saturn_source.py",
                      "run_nyx_annual_auction_prices_source.py", "run_nyx_annual_fuel_source.py",
                      "run_nyx_annual_thermal_source.py"]
@@ -81,7 +81,8 @@ def test_sealed_day_reuse_requires_revalidation_and_never_rewinds_newer_caches(m
     manifest.write_text("{}")
     monkeypatch.setattr(m, "ROOT", tmp_path)
     calls = []
-    def validate(path, day):
+    def validate(path, day, *, require_asof=True):
+        assert require_asof is False
         calls.append((path, day))
         if not valid:
             raise ValueError("Source artifact changed")
@@ -91,3 +92,62 @@ def test_sealed_day_reuse_requires_revalidation_and_never_rewinds_newer_caches(m
     assert calls == [(bundle, "2026-09-28")]
     assert result["state"] == ("PREPARED" if valid else "BLOCKED")
     assert not result["forecast_published"]
+
+
+def test_missing_delivery_capture_stops_before_history_downloads(monkeypatch, tmp_path):
+    monkeypatch.setattr(m, "ROOT", tmp_path)
+    calls = []
+    result = m.run("2026-09-30", action="bootstrap", bundle=tmp_path / "bundle", output=tmp_path / "out",
+        runner=lambda script, args: calls.append((script, args)) or 1)
+    assert calls == [("run_nyx_annual_daily_capture.py", ["--verify-only", "--delivery-day", "2026-09-30"])]
+    assert result["state"] == "BLOCKED"
+    assert "08 h Paris" in result["remediation"]
+
+
+def test_bootstrap_downloads_history_but_never_starts_saturn_or_models(monkeypatch, tmp_path):
+    monkeypatch.setattr(m, "ROOT", tmp_path)
+    calls = []
+    bundle = tmp_path / "bundle"
+    receipt_dir = bundle / "source_receipts"
+    receipt_dir.mkdir(parents=True)
+    for group in m.ARCHIVE_GROUPS:
+        (receipt_dir / f"{group}.json").write_text(json.dumps({"asof_cutoff_verified": False}))
+    result = m.run("2026-09-30", action="bootstrap", bundle=bundle, output=tmp_path / "out",
+        runner=lambda script, args: calls.append((script, args)) or 0)
+    assert [script for script, _ in calls] == ["run_nyx_annual_daily_capture.py", "run_nyx_annual_jao_source.py",
+        "run_nyx_annual_hydro_source.py", "run_nyx_annual_exchange_source.py"]
+    assert "--bootstrap-history" in calls[1][1]
+    assert calls[2][1][-2:] == ["--action", "bootstrap"]
+    assert result["state"] == "BOOTSTRAPPED" and result["qualification_required"] is True
+    assert result["public_history_before_forecast_cutoff"] is False
+    assert result["forecast_published"] is False
+
+
+def test_morning_capture_refreshes_training_history_before_prepare(monkeypatch, tmp_path):
+    monkeypatch.setattr(m, "ROOT", tmp_path)
+    calls = []
+    result = m.run("2026-09-30", action="capture", bundle=tmp_path / "bundle", output=tmp_path / "out",
+        runner=lambda script, args: calls.append(script) or 0)
+    assert calls == ["run_nyx_annual_daily_capture.py", "run_nyx_annual_jao_source.py",
+                     "run_nyx_annual_hydro_source.py", "run_nyx_annual_exchange_source.py"]
+    assert result["state"] == "CAPTURED" and not result["forecast_published"]
+
+
+def test_new_late_training_snapshot_never_reaches_production_cpu(monkeypatch, tmp_path):
+    from chronos2_hourly import nyx_annual_cpu_live as live
+    from test_nyx_annual_history_policy import receipt
+    monkeypatch.setattr(m, "ROOT", tmp_path)
+    monkeypatch.setattr(live, "verify_activation", lambda: {})
+    bundle = tmp_path / "bundle"
+    folder = bundle / "source_receipts"
+    folder.mkdir(parents=True)
+    for group in m.ARCHIVE_GROUPS:
+        record, _ = receipt(bundle, group=group)
+        (folder / f"{group}.json").write_text(json.dumps(record))
+    calls = []
+    result = m.run("2026-09-30", action="forecast", bundle=bundle, output=tmp_path / "out",
+        runner=lambda script, args: calls.append(script) or 0)
+    assert result["state"] == "BLOCKED" and not result["forecast_published"]
+    assert result["stages"][-1]["name"] == "training_history_cutoff"
+    assert "history downloaded after" in result["stages"][-1]["error"]
+    assert all("saturn" not in script for script in calls)

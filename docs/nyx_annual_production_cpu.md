@@ -7,12 +7,16 @@ baseline Chronos/correcteur/Kalman, référence de rareté, experts prix propres
 aux pays et probabilités de prix négatif. Les modèles sont réentraînés sur CPU.
 Les scores historiques conservés dans NYX restent identifiés comme tels.
 
-**État au 29 septembre 2026 : le logiciel est livré, l'activation de production
-reste verrouillée.** Les captures historiques vérifiées JAO/hydro/échanges
-nécessaires à la qualification complète ne sont pas disponibles dans le dépôt.
-La collecte future ne peut pas reconstituer une ancienne version de ces sources.
-Une commande d'installation réussie ou un rejeu des experts sur des matrices
-historiques ne suffit pas à lever ce verrou.
+**État au 29 septembre 2026 : l'initialisation des historiques publics est
+disponible ; l'activation de production reste verrouillée.** La préparation
+peut récupérer les historiques JAO, hydro et échanges et conserver leur date
+réelle de récupération. Il n'est pas nécessaire d'attendre 366 nouvelles
+captures pour commencer à préparer les données. En revanche, un téléchargement
+effectué aujourd'hui ne prouve pas ce qui était disponible lors d'une ancienne
+prévision. La qualification de la chaîne CPU complète reste nécessaire.
+
+Si le calcul s'arrête sur une archive de septembre 2025 absente, suivre
+[les commandes de mise à jour et d'initialisation](nyx_annual_history_bootstrap.md).
 
 ## 1. Récupérer la branche sur le poste de travail
 
@@ -68,6 +72,10 @@ Get-ScheduledTask -TaskName 'NYX CWE PIT' | Get-ScheduledTaskInfo
 La tâche capture JAO Initial Computation, l'hydro et les échanges à 07:00 Paris,
 puis retente à 07:15, 07:30, 07:45 et 07:55 si nécessaire. Les captures existantes
 sont vérifiées. Les réponses brutes et leur heure réelle sont conservées.
+Après les trois captures, la tâche initialise ou actualise les historiques
+publics afin de les récupérer avant la coupure. Elle ne contacte pas Saturn
+et ne lance pas les entraînements CPU. Le premier téléchargement peut durer
+au-delà de 08:00 ; dans ce cas, il ne qualifie pas les données pour cette coupure.
 Le poste doit être allumé, éveillé, connecté au réseau, avec la session ouverte.
 
 Dans l'app : **Modèles régionaux → Modèles annuels CPU → Vérifier**, puis
@@ -82,17 +90,36 @@ ne sont jamais présentées comme disponibles avant la coupure de 08:00.
 
 ## 4. Préparer les données et modèles
 
-Après 08:00 Paris, la veille de la livraison :
+Une fois les trois captures de la livraison effectuées, les historiques publics
+peuvent aussi être initialisés séparément, avant ou après 08:00 Paris. Cette
+commande s'exécute indépendamment de Saturn et des entraînements :
 
 ```powershell
-.\NYXAnnualCPU.ps1 -Action inspect
+.\NYXAnnualCPU.ps1 -Action bootstrap
+```
+
+Elle vérifie les trois captures de la livraison, puis récupère les 365 jours
+historiques JAO, hydro et échanges nécessaires à
+la fenêtre d'entraînement et réutilise les archives compatibles déjà présentes,
+y compris celles de JAO provenant du dépôt. Les heures réelles de récupération
+et la provenance sont conservées. Cette commande ne reconstitue pas une capture
+de la journée à prévoir qui aurait été manquée avant 08:00 Paris.
+Dans NYX, le bouton correspondant est **Initialiser les historiques**.
+Le statut `BOOTSTRAPPED` confirme seulement l'assemblage des historiques publics.
+
+Après 08:00 Paris, la veille de la livraison, et une fois les captures de cette
+livraison effectuées :
+
+```powershell
+& .\.venv-annual\Scripts\python.exe .\run_nyx_annual_pipeline.py --action inspect
 .\NYXAnnualCPU.ps1 -Action prepare
 ```
 
 Dans NYX, le bouton correspondant est **Préparer les modèles CPU**.
 La préparation réalise successivement :
 
-1. Assemblage et vérification des archives JAO, hydro et échanges.
+1. Initialisation, assemblage et vérification des historiques JAO, hydro et
+   échanges ; contrôle séparé des captures de la journée à prévoir.
 2. Mise à jour Saturn à la date de coupure propre à chaque journée : profils
    prévus, historiques des prix, combustible et disponibilités thermiques.
 3. Chronos-2 CPU, correcteur résiduel CPU et Kalman pour les quatre pays.
@@ -101,8 +128,10 @@ La préparation réalise successivement :
 6. Scellement du lot et de toutes ses preuves.
 
 Le premier démarrage exige **834 jours de covariables Saturn**, 469 jours de
-baselines et **366 captures quotidiennes JAO/hydro/échanges** pour une livraison.
-Il peut prendre beaucoup plus longtemps qu'un calcul quotidien. Les caches
+baselines, **365 jours d'historiques publics** et les captures de la livraison
+à prévoir. Les historiques peuvent être récupérés au démarrage, sous réserve
+de leur disponibilité chez les fournisseurs. Il peut prendre beaucoup plus
+longtemps qu'un calcul quotidien. Les caches
 sont réutilisés ensuite ; une interruption ne supprime pas les étapes terminées.
 Sur le même volume, les archives immuables sont partagées par liens physiques
 pour éviter de recopier chaque jour tout le démarrage historique. Sur un autre
@@ -110,18 +139,35 @@ volume, une copie vérifiée est utilisée ; prévoir davantage d'espace disque.
 Les capacités thermiques ne requièrent ensuite que 13 nouveaux états quotidiens,
 en plus du contrôle global des séries.
 
-Si une archive manque ou est invalide, la commande s'arrête en `BLOCKED` avant
-la collecte Saturn et les entraînements, en indiquant les sources concernées.
+Si une source ne peut pas être récupérée ou vérifiée, ou si une capture de la
+livraison à prévoir manque, la commande s'arrête en `BLOCKED` avant la collecte
+Saturn et les entraînements, en indiquant les sources concernées.
 Les captures quotidiennes restent disponibles séparément.
-`PREPARED` signifie que les entrées sont préparées ; aucune prévision n'est publiée.
+
+Un historique récupéré après la coupure du calcul peut servir à préparer les
+matrices, mais ne rend pas le lot éligible à un backtest ou à une prévision
+qualifiée pour cette coupure. Ce statut est conservé avec la provenance des
+données ; les contrôles de qualification ne sont pas désactivés. Pour une
+coupure future, le cache déjà récupéré peut être utilisable si tous les autres
+contrôles passent.
+
+`PREPARED` signifie que les entrées sont préparées ; aucune prévision n'est publiée
+et ce statut ne vaut pas qualification.
 Pour imposer une date, ajouter `-DeliveryDay YYYY-MM-DD`.
 
 ## 5. Évaluer toute la chaîne sur le CPU du poste
 
-Cette étape nécessite les archives vérifiées pour **chaque** fenêtre quotidienne
-de la période évaluée. Sur une année complète, cela couvre 730 journées de
-captures publiques, fenêtres d'entraînement comprises. Les fichiers historiques
-du PC personnel téléchargés après leurs coupures ne remplacent pas ces preuves.
+Cette étape nécessite des données vérifiées pour **chaque** fenêtre quotidienne
+de la période évaluée. Une année de prévisions avec 365 jours d'entraînement
+couvre 730 journées de données publiques. Ce nombre décrit la couverture de
+données et n'impose pas d'attendre 730 jours pour initialiser un poste.
+
+Pour qu'un score rétrospectif qualifie la production, il faut aussi démontrer
+que les données utilisées étaient disponibles à la coupure de chaque prévision
+évaluée. Un historique révisé téléchargé aujourd'hui peut convenir à un
+entraînement futur ; il ne suffit pas à démontrer cette disponibilité passée.
+La récupération initiale ne fabrique pas ces preuves. Tant qu'elles manquent,
+un rejeu peut servir au diagnostic, mais ne débloque pas l'activation.
 
 Une fois les archives disponibles, cette commande prépare les journées dans
 l'ordre, exporte les comparaisons officielles EPEX/Storm, entraîne les modèles,
@@ -131,8 +177,9 @@ calcule les scores puis demande l'activation si tous les contrôles passent :
 .\Evaluate-NYXAnnualCPU.ps1 -FirstDay 2025-09-24 -StopDayExclusive 2026-09-24 -Activate
 ```
 
-Ces dates correspondent aux rapports annuels ; elles ne rendent pas les archives
-manquantes disponibles. Une autre période de 365 jours consécutifs est possible.
+Ces dates correspondent aux rapports annuels ; elles ne rendent pas les preuves
+de disponibilité historique manquantes disponibles. Une autre période de
+365 jours consécutifs est possible.
 Un essai plus court, sans `-Activate`, sert uniquement au diagnostic.
 Le rejeu complet peut être long : chaque journée réentraîne trois experts prix
 et quatre classifieurs. La même commande reprend les journées déjà scellées.
@@ -173,6 +220,10 @@ HTML et CSV par pays. Leurs fichiers sont dans `runs/nyx_annual_cpu_live/YYYY-MM
 - Sources et preuves : `runs/live/nyx_annual_cpu/YYYY-MM-DD/`.
 - Caches des collecteurs : `data/pit/nyx_annual_*`.
 - Résultats du rejeu complet : `runs/evaluations/annual_cpu_full_chain/evaluation/`.
+
+Le diagnostic peut retourner `ready: false` et un code 2 tant que la chaîne
+n'est pas qualifiée. Cela ne signifie pas à lui seul que l'environnement CPU
+ou Saturn est mal installé. Lire les champs de source et l'erreur d'activation.
 
 Une erreur `residual_bank` ne provient pas du nouveau lanceur annuel : utiliser
 le raccourci **NYX annuel CPU** et son panneau annuel. Pour une erreur de source,

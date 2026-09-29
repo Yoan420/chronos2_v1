@@ -57,6 +57,25 @@ def test_annual_adapter_separates_prepare_from_qualified_forecast(registry, monk
         registry.prepare(request, destination)
 
 
+def test_annual_history_bootstrap_has_its_own_gate_and_no_forecast_bypass(registry, monkeypatch):
+    report = {"can_bootstrap": True, "can_prepare": False, "can_capture": False,
+              "can_request_forecast": False, "activation_error": "Full chain not qualified"}
+    monkeypatch.setattr(registry, "annual_pipeline_preflight", lambda *a, **kw: report)
+    request = {"adapter_id": "nyx_annual_pipeline",
+               "parameters": {"action": "bootstrap", "delivery_day": "2026-09-30"}}
+    destination = registry.project_root / "runs/annual-bootstrap"
+    plan = registry.prepare(request, destination)
+    assert plan["command"][plan["command"].index("--action") + 1] == "bootstrap"
+    assert plan["request"]["parameters"]["action"] == "bootstrap"
+    assert not destination.exists()
+    report["can_bootstrap"] = False
+    with pytest.raises(ValueError, match="Action annuelle indisponible"):
+        registry.prepare(request, destination)
+    request["parameters"]["action"] = "forecast"
+    with pytest.raises(ValueError, match="Full chain not qualified"):
+        registry.prepare(request, destination)
+
+
 def test_preview_is_read_only_and_snapshot_is_exclusive(registry):
     destination = registry.project_root / "console-data" / "run-1"
     request = {"adapter_id": "model_storm_report", "parameters": {"delivery_day": "2026-09-11"}}

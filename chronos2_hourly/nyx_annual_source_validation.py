@@ -103,6 +103,9 @@ def _auction(bundle, day, receipt, latest_prices):
 
 
 def _jao(bundle, day, receipt, full):
+    if receipt.get("history_policy") == gate.TRAINING_HISTORY_POLICY:
+        from .nyx_annual_jao_history import verify_bundle_history
+        return verify_bundle_history(bundle, day, receipt)
     from . import nyx_annual_jao_source as source
     prefix = source.SOURCE_SUBDIR
     ledger = json.loads(_bound(bundle, receipt, f"{prefix}/{source.LEDGER_NAME}").read_text(encoding="utf-8"))
@@ -147,6 +150,9 @@ def _extract_capture_zip(path, target, days, names):
 
 
 def _captured_features(bundle, day, receipt, full, *, group):
+    if receipt.get("history_policy") == gate.TRAINING_HISTORY_POLICY:
+        from .nyx_annual_public_history import verify_bundle_history
+        return verify_bundle_history(bundle, day, receipt)
     if group == "public_hydro":
         import run_nyx_annual_hydro_source as source
         verify, names = source.verify_capture, source.NAMES
@@ -233,10 +239,11 @@ def _fuel(bundle, day, receipt):
     return {"hourly_source_cutoffs_verified": len(frame), "provider_first_publication_certified": False}
 
 
-def validate_source_packet(bundle: Path, delivery_day: str) -> dict:
+def validate_source_packet(bundle: Path, delivery_day: str, *,
+                           allow_training_bootstrap=False) -> dict:
     """Validate all seven raw source groups; derived baseline/reference gates remain separate."""
     bundle = Path(bundle).resolve()
-    before = source_graph(bundle, delivery_day)
+    before = source_graph(bundle, delivery_day, allow_training_bootstrap=allow_training_bootstrap)
     full, _, _ = gate.delivery_grid(delivery_day)
     receipts = {group: _receipt(bundle, group) for group in gate.SOURCE_GROUPS}
     checks = {}
@@ -247,7 +254,14 @@ def validate_source_packet(bundle: Path, delivery_day: str) -> dict:
         checks[group] = _captured_features(bundle, delivery_day, receipts[group], full, group=group)
     checks["thermal_capacity"] = _thermal(bundle, delivery_day, receipts["thermal_capacity"])
     checks["fuel"] = _fuel(bundle, delivery_day, receipts["fuel"])
-    require(source_graph(bundle, delivery_day) == before, "Source packet changed during validation")
+    require(source_graph(bundle, delivery_day, allow_training_bootstrap=allow_training_bootstrap) == before,
+            "Source packet changed during validation")
+    # Reconstructed training snapshots are checked against THIS fit origin,
+    # not relabelled as captures made at every older training row's origin.
+    asof_verified = all(checks[group].get("asof_cutoff_verified") is True
+                        if receipts[group].get("history_policy") == gate.TRAINING_HISTORY_POLICY
+                        else checks[group].get("actual_capture_before_own_cutoff_verified") is True
+                        for group in gate.BOOTSTRAP_GROUPS)
     return {"protocol": PROTOCOL, "delivery_day": delivery_day, "passed": True,
-            "source_snapshot_asof_verified": True, "supplier_first_publication_certified": False,
+            "source_snapshot_asof_verified": asof_verified, "supplier_first_publication_certified": False,
             "source_receipts_sha256": before[0], "checks": checks}

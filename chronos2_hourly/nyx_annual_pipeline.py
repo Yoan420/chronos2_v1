@@ -27,6 +27,7 @@ COUNTRIES = ("FR", "DE", "NL", "BE")
 ARCHIVE_GROUPS = ("jao_initial", "public_hydro", "lagged_exchange")
 MODULES = ("numpy", "pandas", "pyarrow", "catboost", "sklearn", "torch", "chronos",
            "huggingface_hub", "httpx", "requests", "tshistory_lite", "holidays", "pykalman")
+HISTORY_MODULES = ("numpy", "pandas", "pyarrow", "httpx", "requests")
 
 
 def _write(path, payload):
@@ -81,6 +82,7 @@ def inspect(day, *, bundle=None, output=None):
     return {"protocol": PROTOCOL, "delivery_day": day, "countries": list(COUNTRIES),
         "bundle": str(bundle), "output": str(output), "ready": report["ready"],
         "can_prepare": not missing and now >= cutoff,
+        "can_bootstrap": not any(name in missing for name in HISTORY_MODULES),
         "can_request_forecast": not missing and now >= cutoff and activation_error is None,
         "can_capture": (now.tz_convert("Europe/Paris").date() + timedelta(days=1)).isoformat() == day
                        and cutoff - pd.Timedelta(hours=6, minutes=45) <= now < cutoff,
@@ -98,6 +100,8 @@ def source_commands(day, bundle, cache_root=None):
     fuel_cache = Path(cache_root) / "fuel" if cache_root else ROOT / "data/pit/nyx_annual_cpu_live_fuel"
     saturn_args = ["--cache", str(Path(cache_root) / "saturn")] if cache_root else []
     thermal_args = ["--cache", str(Path(cache_root) / "thermal")] if cache_root else []
+    jao_history_args = ["--history-cache-root", str(Path(cache_root) / "jao_history")] if cache_root else []
+    public_history_args = ["--history-archive", str(Path(cache_root) / "public_history")] if cache_root else []
     audit_path = fuel_cache / "market_fuel_features.parquet.audit.json"
     if audit_path.exists():
         audit = json.loads(audit_path.read_text(encoding="utf-8"))
@@ -109,32 +113,33 @@ def source_commands(day, bundle, cache_root=None):
         ("auction_prices", "run_nyx_annual_auction_prices_source.py", [*base, "--history-start-day", start]),
         ("fuel", "run_nyx_annual_fuel_source.py", [*base, "--history-start-day", start, "--cache-dir", str(fuel_cache)]),
         ("thermal_capacity", "run_nyx_annual_thermal_source.py", [*base, *thermal_args]),
-        ("jao_initial", "run_nyx_annual_jao_source.py", [*base, "--verify-only"]),
-        ("public_hydro", "run_nyx_annual_hydro_source.py", [*base, "--action", "assemble"]),
-        ("lagged_exchange", "run_nyx_annual_exchange_source.py", [*base, "--action", "assemble"]),
+        ("jao_initial", "run_nyx_annual_jao_source.py", [*base, "--bootstrap-history", *jao_history_args]),
+        ("public_hydro", "run_nyx_annual_hydro_source.py", [*base, "--action", "bootstrap", *public_history_args]),
+        ("lagged_exchange", "run_nyx_annual_exchange_source.py", [*base, "--action", "bootstrap", *public_history_args]),
     ]
 
 
-def validate_prepared_bundle(bundle, day):
+def validate_prepared_bundle(bundle, day, *, require_asof=True):
     """Revalidate a sealed day without touching newer mutable download caches."""
     from .nyx_annual_live_preflight import inspect_bundle
     from .nyx_annual_source_validation import validate_source_packet
     from .nyx_annual_cpu_baseline import validate_cpu_baseline_evidence
     from .nyx_annual_cpu_reference_builder import validate_cpu_reference_source
-    report = inspect_bundle(bundle, day)
+    report = inspect_bundle(bundle, day, allow_training_bootstrap=not require_asof)
     if report.get("input_bundle_valid") is not True:
         failures = [str(item.get("reason", item)) for item in report["checks"] if not item.get("passed")]
         raise ValueError("Sealed input bundle differs: " + "; ".join(failures[:4]))
-    sources = validate_source_packet(bundle, day)
-    if sources.get("passed") is not True or sources.get("source_snapshot_asof_verified") is not True:
+    sources = validate_source_packet(bundle, day, allow_training_bootstrap=not require_asof)
+    if sources.get("passed") is not True or (require_asof and sources.get("source_snapshot_asof_verified") is not True):
         raise ValueError("Raw source evidence does not verify")
     validate_cpu_baseline_evidence(bundle, day)
     validate_cpu_reference_source(bundle, day)
+    return sources
 
 
 def run(day, *, action="forecast", bundle=None, output=None, runner=None, cache_root=None):
-    if action not in ("capture", "prepare", "forecast"):
-        raise ValueError("Expected capture, prepare or forecast")
+    if action not in ("capture", "bootstrap", "prepare", "forecast"):
+        raise ValueError("Expected capture, bootstrap, prepare or forecast")
     bundle, output = paths(day, bundle, output)
     # Keep logs beside, not inside, the consumer output; it must start empty.
     status_path = output.parent / (output.name + ".pipeline.json")
@@ -170,15 +175,30 @@ def run(day, *, action="forecast", bundle=None, output=None, runner=None, cache_
         state["state"] = "BLOCKED"
         publish()
         return state
+    def public_history_status():
+        state["qualification_required"] = True
+        receipts = [bundle / f"source_receipts/{group}.json" for group in ARCHIVE_GROUPS]
+        if all(path.is_file() for path in receipts):
+            state["public_history_before_forecast_cutoff"] = all(
+                json.loads(path.read_text(encoding="utf-8")).get("asof_cutoff_verified") is True
+                for path in receipts)
     with exclusive_process_lock(ROOT / "runs/live/nyx_annual_cpu/pipeline.lock"):
         publish()
         if action == "capture":
             ok = step("capture_public_sources", lambda: cli("run_nyx_annual_daily_capture.py", ["--delivery-day", day]))
+            if ok:
+                # Refresh yesterday's training observations while still before
+                # 08:00. Waiting for prepare would make each new snapshot late.
+                for name, script, args in source_commands(day, bundle, cache_root):
+                    if name in ARCHIVE_GROUPS:
+                        step(name, lambda script=script, args=args: cli(script, args))
+                ok = all(item["state"] == "COMPLETE" for item in state["stages"])
+                public_history_status()
             state["state"] = "CAPTURED" if ok else "BLOCKED"
             publish()
             return state
         _, _, cutoff = delivery_grid(day)
-        if pd.Timestamp.now(tz="UTC") < cutoff:
+        if action != "bootstrap" and pd.Timestamp.now(tz="UTC") < cutoff:
             state["stages"].append({"name": "cutoff", "state": "ERROR", "error": "Wait until D-1 08:00 Paris; capture public sources before then"})
             return blocked()
         if action == "forecast":
@@ -187,13 +207,20 @@ def run(day, *, action="forecast", bundle=None, output=None, runner=None, cache_
                 return blocked()
         from .nyx_annual_live_preflight import MATERIALIZATION_PATH
         if (bundle / MATERIALIZATION_PATH).is_file():
-            if not step("verified_existing_bundle", lambda: validate_prepared_bundle(bundle, day)):
+            if not step("verified_existing_bundle", lambda: validate_prepared_bundle(
+                    bundle, day, require_asof=action == "forecast")):
                 return blocked()
         else:
             commands = source_commands(day, bundle, cache_root)
-            # These are local, strict archive validators/assemblers. Check all
-            # three before the 834-day Saturn bootstrap or any model fitting.
-            # Capturing tomorrow's public data remains a separate action.
+            # Historical training snapshots can be downloaded now. The delivery
+            # day's predictors still need genuine pre-cutoff captures. Check all
+            # three current captures before downloading a year of training data.
+            if not step("delivery_captures", lambda: cli("run_nyx_annual_daily_capture.py",
+                    ["--verify-only", "--delivery-day", day])):
+                state["remediation"] = ("Capture du jour de livraison manquante ou invalide. "
+                    "Consulter les trois sources ci-dessus. Une capture apres 08 h Paris "
+                    "ne peut pas remplacer celle du matin ; programmer la prochaine collecte.")
+                return blocked()
             phases = ([command for command in commands if command[0] in ARCHIVE_GROUPS],
                       [command for command in commands if command[0] not in ARCHIVE_GROUPS])
             for phase in phases:
@@ -201,6 +228,19 @@ def run(day, *, action="forecast", bundle=None, output=None, runner=None, cache_
                     step(name, lambda script=script, args=args: cli(script, args))
                 if any(item["state"] == "ERROR" for item in state["stages"]):
                     return blocked()
+                if action == "bootstrap":
+                    state["state"] = "BOOTSTRAPPED"
+                    public_history_status()
+                    publish()
+                    return state
+                if action == "forecast" and phase is phases[0]:
+                    from .nyx_annual_live_preflight import validate_source_receipt
+                    def check_training_cutoff():
+                        for group in ARCHIVE_GROUPS:
+                            receipt = json.loads((bundle / f"source_receipts/{group}.json").read_text(encoding="utf-8"))
+                            validate_source_receipt(receipt, group=group, day=day, bundle=bundle, cutoff=cutoff)
+                    if not step("training_history_cutoff", check_training_cutoff):
+                        return blocked()
             from .nyx_annual_cpu_baseline import build_from_bundle as baseline
             from .nyx_annual_cpu_bundle_builder import materialize_features, seal_bundle
             from .nyx_annual_cpu_reference_builder import build_from_bundle as reference
@@ -212,8 +252,9 @@ def run(day, *, action="forecast", bundle=None, output=None, runner=None, cache_
             ):
                 if not step(name, callback):
                     return blocked()
-        if action == "prepare":
-            state["state"] = "PREPARED"
+        if action in ("prepare", "bootstrap"):
+            state["state"] = "PREPARED" if action == "prepare" else "BOOTSTRAPPED"
+            public_history_status()
             publish()
             return state
         from run_nyx_annual_cpu_live import run as forecast

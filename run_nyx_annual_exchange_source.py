@@ -83,14 +83,14 @@ def _params(zone: str, first: pd.Timestamp, stop: pd.Timestamp) -> dict:
 
 def _response(raw: bytes, zone: str, first: pd.Timestamp,
               stop: pd.Timestamp, cutoff: pd.Timestamp,
-              retrieved: pd.Timestamp) -> tuple[dict, dict]:
+              retrieved: pd.Timestamp, *, require_generated_before_retrieval: bool = True) -> tuple[dict, dict]:
     try:
         obj = json.loads(raw)
     except (UnicodeDecodeError, json.JSONDecodeError) as error:
         raise ValueError(f"{zone}: invalid Energy-Charts JSON") from error
     require(isinstance(obj, dict), f"{zone}: response must be an object")
     generated = _utc(obj.get("generated_at"), f"{zone} generated_at")
-    require(generated <= retrieved <= cutoff,
+    require(retrieved <= cutoff and (not require_generated_before_retrieval or generated <= retrieved),
             f"{zone}: response was not captured before D-1 08:00")
     available_from = _utc(obj.get("available_from"), f"{zone} available_from")
     available_until = _utc(obj.get("available_until"), f"{zone} available_until")
@@ -336,15 +336,21 @@ def assemble(day: str, archive: Path = DEFAULT_ARCHIVE,
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--action", choices=("capture", "assemble"), required=True)
+    parser.add_argument("--action", choices=("capture", "assemble", "bootstrap"), required=True)
     parser.add_argument("--delivery-day", required=True)
     parser.add_argument("--archive", type=Path, default=DEFAULT_ARCHIVE)
     parser.add_argument("--bundle", type=Path)
+    parser.add_argument("--history-archive", type=Path)
     args = parser.parse_args(argv)
     day = _day(args.delivery_day).isoformat()
     with exclusive_process_lock(args.archive.resolve() / "exchange_source.lock"):
         if args.action == "capture":
             output = capture(day, args.archive)
+        elif args.action == "bootstrap":
+            from chronos2_hourly.nyx_annual_public_history import publish_history
+            output = publish_history("lagged_exchange", day,
+                args.bundle or ROOT / "runs/live/nyx_annual_cpu" / day,
+                archive=args.archive, history_archive=args.history_archive)
         else:
             output = assemble(day, args.archive, args.bundle)
     print(json.dumps({"state": "COMPLETE", "action": args.action,

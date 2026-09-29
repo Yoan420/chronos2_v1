@@ -13,7 +13,7 @@ $NyxPrincipal = New-ScheduledTaskPrincipal -UserId ([Security.Principal.WindowsI
 $NyxSettings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -MultipleInstances IgnoreNew -ExecutionTimeLimit (New-TimeSpan -Hours 12)
 $NyxCapture = New-ScheduledTaskAction -Execute $NyxPythonw -Argument ('"' + $NyxRunner + '" --action capture') -WorkingDirectory $PSScriptRoot
 $NyxTriggers = @(foreach ($NyxMinute in 0,15,30,45,55) { New-ScheduledTaskTrigger -Daily -At ([datetime]::Today.AddHours(7).AddMinutes($NyxMinute)) })
-Register-ScheduledTask -TaskName 'NYX CWE PIT' -Action $NyxCapture -Trigger $NyxTriggers -Settings $NyxSettings -Principal $NyxPrincipal -Description 'Capture JAO, hydro et echanges avant 08h Paris' -Force
+Register-ScheduledTask -TaskName 'NYX CWE PIT' -Action $NyxCapture -Trigger $NyxTriggers -Settings $NyxSettings -Principal $NyxPrincipal -Description 'Capture JAO, hydro, echanges et actualise leurs historiques avant 08h Paris' -Force
 if ($EnableQualifiedForecast) {
     Push-Location -LiteralPath $PSScriptRoot
     try { & $NyxPython -c "from chronos2_hourly.nyx_annual_cpu_live import verify_activation; verify_activation(); print('Qualification complete valide')" }

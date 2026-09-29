@@ -271,9 +271,9 @@ class AdapterRegistry:
             {"id": "nyx_annual_pipeline", "label": "NYX annuel CWE · FR / DE / NL / BE", "type": "forecast",
              "models": ["annual_price_and_negative_probability"],
              "configs": [{"id": "annual_cpu_four_countries", "label": "Quatre modèles annuels CPU"}],
-             "description": "Collecte les sources, reconstruit les variables et réentraîne les quatre modèles annuels CPU. La publication exige une qualification complète.",
+             "description": "Initialise les historiques publics, actualise Saturn et réentraîne les quatre modèles annuels CPU. La publication exige une qualification complète.",
              "parameters": [_field("delivery_day", "Date de livraison", "date", tomorrow),
-                            _field("action", "Action", "select", "prepare", options=["capture", "prepare", "forecast"])]},
+                            _field("action", "Action", "select", "prepare", options=["capture", "bootstrap", "prepare", "forecast"])]},
             {"id": "model_storm_report", "label": "Rapport Model / Storm", "type": "report",
              "models": ["Model / Storm"], "configs": local,
              "description": "Assemble les prévisions et prix locaux vérifiés, puis actualise uniquement la métrique VPS Saturn du rapport; aucun modèle n'est relancé.",
@@ -528,14 +528,14 @@ class AdapterRegistry:
         elif aid == "nyx_annual_pipeline":
             delivery_day, action = params["delivery_day"], params["action"]
             report = self.annual_pipeline_preflight(delivery_day, output=output)
-            gate = {"prepare": "can_prepare", "capture": "can_capture", "forecast": "can_request_forecast"}[action]
+            gate = {"prepare": "can_prepare", "bootstrap": "can_bootstrap", "capture": "can_capture", "forecast": "can_request_forecast"}[action]
             if report.get(gate) is not True:
                 details = report.get("activation_error") if action == "forecast" else None
                 raise ValueError("Action annuelle indisponible : " + (details or "; ".join(report.get("missing_modules", [])) or "Vérifiez l'heure de coupure et les données."))
             command += ["--action", action, "--delivery-day", delivery_day, "--output", str(output)]
             effective["source_script_sha256"] = hashlib.sha256((self.project_root / SCRIPTS[aid]).read_bytes()).hexdigest()
             resources = ["scientific-cache", "nyx-primary-pipeline", "nyx-annual-pipeline"]
-            warnings += ["Les captures et la préparation ne publient aucune prévision."] if action != "forecast" else ["La qualification et les sources seront revérifiées avant toute publication."]
+            warnings += ["Les captures, l'initialisation des historiques et la préparation ne publient aucune prévision."] if action != "forecast" else ["La qualification et les sources seront revérifiées avant toute publication."]
         elif aid == "nyx_regional_cpu":
             country, delivery_day = params["country"], params["delivery_day"]
             preflight = self.regional_preflight(delivery_day, country, output=output)

@@ -21,6 +21,8 @@ ROOT = Path(__file__).resolve().parents[1]
 SCHEMA = ROOT / "config/nyx_annual_cpu_ordered_features.json"
 PROTOCOL = "nyx_annual_cpu_live_inputs_v1"
 SOURCE_PROTOCOL = "nyx_annual_cpu_live_source_receipt_v1"
+TRAINING_HISTORY_POLICY = "current_fit_snapshot_v1"
+BOOTSTRAP_GROUPS = ("jao_initial", "public_hydro", "lagged_exchange")
 MATERIALIZATION_PROTOCOL = "nyx_annual_cpu_materialization_v1"
 MATERIALIZATION_PATH = "source_receipts/materialization.json"
 MATERIALIZER_CODE = tuple("chronos2_hourly/" + name for name in (
@@ -176,12 +178,35 @@ def _inside(bundle: Path, relative: str) -> Path:
 
 
 def validate_source_receipt(receipt: dict, *, group: str, day: str,
-                            bundle: Path, cutoff: pd.Timestamp) -> None:
+                            bundle: Path, cutoff: pd.Timestamp,
+                            allow_training_bootstrap: bool = False) -> None:
+    # Preparing today's training history may use a newly downloaded version.
+    # That does not make this version available at an earlier forecast origin.
+    # Only preparation opts in; evaluation and production keep the strict default.
+    bootstrap = receipt.get("history_policy") == TRAINING_HISTORY_POLICY
+    if receipt.get("history_policy") is not None:
+        _require(bootstrap and group in BOOTSTRAP_GROUPS,
+                 f"{group}: unsupported training history policy")
+    if bootstrap:
+        stamp = receipt.get("training_snapshot_max_retrieved_at_utc")
+        _require(isinstance(stamp, str), f"{group}: actual training retrieval time required")
+        retrieved = pd.Timestamp(stamp)
+        _require(not pd.isna(retrieved) and retrieved.tzinfo is not None,
+                 f"{group}: invalid training retrieval time")
+        timely = bool(retrieved <= cutoff)
+        _require(receipt.get("delivery_snapshot_pre_cutoff_verified") is True
+                 and receipt.get("origin_snapshot_capture_verified") is False
+                 and receipt.get("asof_cutoff_verified") is timely,
+                 f"{group}: training history/cutoff declaration differs")
+        _require(timely or allow_training_bootstrap,
+                 f"{group}: training history downloaded after this forecast cutoff; "
+                 "preparation is possible, but this bundle cannot qualify that forecast")
     _require(receipt.get("protocol") == SOURCE_PROTOCOL
              and receipt.get("source_group") == group
              and receipt.get("delivery_day") == day
              and receipt.get("state") == "COMPLETE"
-             and receipt.get("asof_cutoff_verified") is True
+             and (receipt.get("asof_cutoff_verified") is True
+                  or (bootstrap and allow_training_bootstrap))
              and receipt.get("training_window_complete") is True,
              f"{group}: prospective source receipt incomplete")
     stamps = receipt.get("asof_state_utc")
@@ -211,7 +236,8 @@ def materialized_outputs() -> tuple[str, ...]:
 
 def validate_materialization_manifest(bundle: Path, delivery_day: str, *,
                                       schema_path: Path = SCHEMA,
-                                      code_root: Path = ROOT) -> dict:
+                                      code_root: Path = ROOT,
+                                      allow_training_bootstrap: bool = False) -> dict:
     """Bind derived inputs to the source snapshots and exact transformation code.
 
     This checks a hash graph and producer declarations. It cannot independently
@@ -243,7 +269,8 @@ def validate_materialization_manifest(bundle: Path, delivery_day: str, *,
         _require(receipt_path.is_file(), f"{group}: source receipt missing")
         receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
         validate_source_receipt(receipt, group=group, day=delivery_day,
-                                bundle=bundle, cutoff=cutoff)
+                                bundle=bundle, cutoff=cutoff,
+                                allow_training_bootstrap=allow_training_bootstrap)
         expected_receipts[group] = sha256(receipt_path)
         for relative, digest in receipt["artifact_sha256"].items():
             _require(relative != MATERIALIZATION_PATH,
@@ -289,7 +316,8 @@ def validate_materialization_manifest(bundle: Path, delivery_day: str, *,
 
 
 def inspect_bundle(bundle: Path, delivery_day: str,
-                   schema_path: Path = SCHEMA) -> dict:
+                   schema_path: Path = SCHEMA, *,
+                   allow_training_bootstrap: bool = False) -> dict:
     """Inspect a future bundle; return all failures without changing files."""
     full, current, cutoff = delivery_grid(delivery_day)
     schema = load_schema(schema_path)
@@ -316,7 +344,8 @@ def inspect_bundle(bundle: Path, delivery_day: str,
             _require(path.is_file(), f"Missing live source receipt: {relative}")
             validate_source_receipt(json.loads(path.read_text(encoding="utf-8")),
                                     group=group, day=delivery_day, bundle=bundle,
-                                    cutoff=cutoff)
+                                    cutoff=cutoff,
+                                    allow_training_bootstrap=allow_training_bootstrap)
 
         check(f"source/{group}", source_action)
 
@@ -346,7 +375,8 @@ def inspect_bundle(bundle: Path, delivery_day: str,
         check(f"reference/{zone}", reference_action)
     check("materialization/feature_bundle", lambda:
           validate_materialization_manifest(bundle, delivery_day,
-                                            schema_path=schema_path))
+                                            schema_path=schema_path,
+                                            allow_training_bootstrap=allow_training_bootstrap))
     return {"protocol": PROTOCOL, "delivery_day": delivery_day,
             "bundle": str(bundle), "input_bundle_valid": all(c["passed"] for c in checks),
             "checks": checks,

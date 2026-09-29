@@ -13,7 +13,7 @@ async function main(){
     return elements.get(id);
   };
   let gate={delivery_day:'2026-10-01',countries:['FR','DE','NL','BE'],
-    can_capture:false,can_prepare:true,can_request_forecast:false,ready:false,
+    can_capture:false,can_bootstrap:true,can_prepare:false,can_request_forecast:false,ready:false,
     activation_error:'Qualification complète absente',source_states:{saturn:'MISSING'}};
   let runs=[], lastParameters;
   const context=vm.createContext({document:{querySelector:element,querySelectorAll:()=>[],addEventListener(){}},
@@ -46,12 +46,29 @@ async function main(){
   const run=code=>vm.runInContext(code,context);
   run("state.route='regional';state.regional.day='2026-10-01';renderRegional()");
   assert.ok(element('#main').innerHTML.includes('FR / DE / NL / BE'));
+  assert.ok(element('#main').innerHTML.includes('Initialiser les historiques'));
   await run('checkAnnualPipeline()');
-  assert.equal(element('#annual-prepare').disabled,false);
+  assert.equal(element('#annual-bootstrap').disabled,false);
+  assert.equal(element('#annual-prepare').disabled,true);
   assert.equal(element('#annual-capture').disabled,true);
   assert.equal(element('#annual-forecast').disabled,true);
   await run("launchAnnualPipeline('forecast')");
   assert.equal(calls.filter(c=>c.path==='/api/preview').length,0);
+  await run("launchAnnualPipeline('bootstrap')");
+  assert.deepEqual(lastParameters,{delivery_day:'2026-10-01',action:'bootstrap'});
+  assert.equal(element('#annual-bootstrap').disabled,true,'active history work locks new jobs');
+  assert.ok(element('#regional-runs').innerHTML.includes('Initialisation des historiques'));
+  runs[0].status='succeeded';await run('refreshRegional()');
+  assert.ok(element('#regional-output').innerHTML.includes('Historiques publics initialisés'));
+  assert.ok(!element('#regional-output').innerHTML.includes('aucun résultat consultable'));
+  assert.equal(element('#annual-forecast').disabled,true,'bootstrap cannot qualify a forecast');
+  gate={...gate,can_prepare:true,can_bootstrap:false};
+  await run('checkAnnualPipeline()');
+  assert.equal(element('#annual-prepare').disabled,false);
+  assert.equal(element('#annual-bootstrap').disabled,true);
+  const bootstrapPreviews=calls.filter(c=>c.path==='/api/preview').length;
+  await run("launchAnnualPipeline('bootstrap')");
+  assert.equal(calls.filter(c=>c.path==='/api/preview').length,bootstrapPreviews,'bootstrap respects its own gate');
   await run("launchAnnualPipeline('prepare')");
   assert.deepEqual(lastParameters,{delivery_day:'2026-10-01',action:'prepare'});
   assert.equal(element('#annual-prepare').disabled,true,'active work locks new jobs');
