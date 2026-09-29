@@ -23,7 +23,7 @@ def execute(database, run_id):
     reader = None
     started = time.monotonic()
     stage = {'line': 'Démarrage du processus'}
-    primary = run.get('adapter_id', run.get('request', {}).get('adapter_id')) == 'primary_nuclear_kalman'
+    primary = run.get('adapter_id', run.get('request', {}).get('adapter_id')) in {'primary_nuclear_kalman', 'solarwind_interaction40'}
     failure = FailureSummary()
     log_path = Path(run['run_dir']) / 'console.log'
     try:

@@ -26,6 +26,9 @@ async function main() {
   let postBehavior = async () => ({run:{id:'new-run',status:'queued'},already_active:false});
   let failRunInfo=false;
   let runInfoGate=null;
+  let solarwindInfo={available:true,defaults:{delivery_day:'2026-09-12'},active:null,latest:null};
+  let solarwindFailure=false;
+  let solarwindGate=null;
   const context = vm.createContext({
     document:{querySelector:element,querySelectorAll:selector=>selector==='iframe[data-cwe-report]'?frames:[],addEventListener(type,callback){(listeners[type]??=[]).push(callback);}},
     window:{addEventListener(){}}, navigator:{},
@@ -36,6 +39,11 @@ async function main() {
     renderArchitecture:async()=>{},
     fetch:async(path,options)=>{
       calls.push({path,options});
+      if(path.startsWith('/api/solarwind-')&&options.method!=='POST'){
+        if(solarwindFailure)throw Error('Module facultatif indisponible');
+        const value=path==='/api/solarwind-results'?{days:[],warnings:[]}:solarwindGate?await solarwindGate:solarwindInfo;
+        return {ok:true,status:200,json:async()=>value};
+      }
       if(failRunInfo&&path==='/api/primary-run'&&options.method!=='POST')throw Error('Suivi indisponible');
       if(runInfoGate&&path==='/api/primary-run'&&options.method!=='POST'){
         const pending=runInfoGate;runInfoGate=null;
@@ -208,6 +216,46 @@ async function main() {
   evaluate("state.selectedDay='2026-09-12'; renderDashboard()");
   assert.ok(!element('#primary-results-content').innerHTML.includes('<img src=x'));
   assert.ok(element('#primary-results-content').innerHTML.includes('&lt;img'));
-  console.log('NYX frontend contracts passed: publications, navigation, failed status, launch intent, double click, escaping.');
+  // The optional engine is never fetched or posted before explicit selection.
+  assert.equal(evaluate('state.launchModel'),'nuclear');
+  assert.ok(!calls.some(call=>call.path.startsWith('/api/solarwind-')));
+  assert.ok(element('#primary-run-panel').innerHTML.includes('SolarWind interaction ±40'));
+  evaluate("state.runInfo={available:true,active:null,latest:null};state.launchModel='solarwind';state.solarwindRunInfo=null");
+  await evaluate('refreshSolarwind()');
+  evaluate("state.launchDay='2026-09-30'");
+  storage.set('nyx-launch-intent',JSON.stringify({key:'nuclear-unchanged',delivery_day:'2026-09-30'}));
+  await evaluate('launchForecast()');
+  const solarPost=calls.filter(call=>call.options.method==='POST').at(-1);
+  assert.equal(solarPost.path,'/api/solarwind-run');
+  assert.equal(solarPost.options.body,'{"delivery_day":"2026-09-30"}');
+  assert.notEqual(solarPost.options.headers['Idempotency-Key'],'nuclear-unchanged');
+  assert.equal(JSON.parse(storage.get('nyx-launch-intent')).key,'nuclear-unchanged');
+  assert.equal(evaluate('state.solarwindRunInfo.active.id'),'new-run');
+  assert.equal(evaluate('state.runInfo.active'),null);
+
+  // A SolarWind failure leaves the default engine usable and does not erase its reports.
+  solarwindFailure=true;
+  await evaluate('refreshSolarwind()');
+  assert.equal(evaluate('state.solarwindRunInfo.available'),false);
+  assert.equal(element('#launch-forecast').disabled,true);
+  for(const listener of listeners.change)listener({target:{id:'launch-model',value:'nuclear'}});
+  assert.equal(element('#launch-forecast').disabled,false);
+  await evaluate('launchForecast()');
+  assert.equal(calls.filter(call=>call.options.method==='POST').at(-1).path,'/api/primary-run');
+  assert.ok(element('#primary-results-content').innerHTML.includes('Rapport global CWE'));
+  assert.equal(evaluate("artifactUrl({path:'solarwind_interaction40/2026-09-30/index.html'})"),'/api/solarwind-artifact?path=solarwind_interaction40%2F2026-09-30%2Findex.html');
+
+  // A stale optional GET cannot unlock an accepted SolarWind run.
+  solarwindFailure=false;
+  evaluate("state.launchModel='solarwind';state.solarwindRunInfo={available:true,active:null,latest:null}");
+  let releaseSolarwind;
+  solarwindGate=new Promise(resolve=>{releaseSolarwind=resolve;});
+  const solarPoll=evaluate('refreshSolarwind()');
+  await new Promise(resolve=>setImmediate(resolve));
+  await evaluate('launchForecast()');
+  releaseSolarwind(solarwindInfo);
+  await solarPoll;
+  assert.equal(evaluate('state.solarwindRunInfo.active.id'),'new-run');
+  console.log('NYX frontend contracts passed, including opt-in SolarWind, isolated failure, separate intents and stale polls.');
 }
 main().catch(error=>{console.error(error);process.exitCode=1;});

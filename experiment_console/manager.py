@@ -22,10 +22,15 @@ from .store import Store, now
 ACTIVE = {'starting', 'running', 'cancelling'}
 TERMINAL = {'succeeded', 'failed', 'cancelled', 'interrupted', 'unknown'}
 PRIMARY_ADAPTER = 'primary_nuclear_kalman'
+SOLARWIND_ADAPTER = 'solarwind_interaction40'
 
 
 class PrimaryRunConflict(ValueError):
     """A retry or active run belongs to a different delivery-date choice."""
+
+
+class SolarWindRunConflict(ValueError):
+    """A SolarWind retry or active run belongs to another delivery date."""
 
 
 class Manager:
@@ -291,6 +296,18 @@ class Manager:
                 return self.store.update(run_id, status='cancelled', cancel_requested=True, finished_at=now(), activity='Annulé dans la file d’attente')
             return self.store.update(run_id, cancel_requested=True, status='cancelling', activity='Arrêt demandé au superviseur')
 
+    @staticmethod
+    def _is_solarwind(run):
+        return run.get('source') == 'managed' and run.get('adapter_id', run.get('request', {}).get('adapter_id')) == SOLARWIND_ADAPTER
+
+    def solarwind_run_status(self):
+        from .solarwind_runs import status
+        return status(self)
+
+    def launch_solarwind_run(self, idempotency_key=None, *, delivery_day):
+        from .solarwind_runs import launch
+        return launch(self, idempotency_key, delivery_day=delivery_day)
+
     def reconcile(self):
         for run in self.store.list():
             if run.get('source') != 'managed' or run['status'] not in ACTIVE:
@@ -323,6 +340,15 @@ class Manager:
                     continue
                 if held.intersection(run.get('resource_keys', [])):
                     continue
+                if self._is_solarwind(run):
+                    try:
+                        environment_error = self._primary_environment_error()
+                        if environment_error:
+                            raise ValueError(environment_error)
+                        self.registry.validate_solarwind_sources(run)
+                    except Exception as exc:
+                        self.store.update(run['id'], status='failed', finished_at=now(), activity=str(redact(str(exc))))
+                        continue
                 if self._is_primary(run):
                     try:
                         environment_error = self._primary_environment_error()

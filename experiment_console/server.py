@@ -22,7 +22,7 @@ import webbrowser
 import yaml
 
 from .artifacts import inspect_run, list_artifacts, compare_scopes, read_forecast
-from .manager import Manager, PrimaryRunConflict
+from .manager import Manager, PrimaryRunConflict, SolarWindRunConflict
 from .primary_results import build_primary_results, read_primary_artifact
 from .security import MASK, is_secret_key, redact, redact_text
 
@@ -312,10 +312,27 @@ class Handler(BaseHTTPRequestHandler):
             # browser; pipeline credentials above still pass through redaction.
             bootstrap['token'] = self.server.token
             self.json(bootstrap, sanitize=False)
+        elif path == '/api/solarwind-results':
+            from .solarwind_results import build_solarwind_results
+            self.json(build_solarwind_results(manager.project_root))
+        elif path == '/api/solarwind-artifact':
+            from .solarwind_results import read_solarwind_artifact
+            if len(query.get('path', [])) != 1:
+                raise ValueError('Un chemin de résultat SolarWind est requis.')
+            target, body = read_solarwind_artifact(manager.project_root, query['path'][0], MAX_EXPORT_BYTES)
+            suffix = target.suffix.lower()
+            body = sanitized_artifact_text(body.decode('utf-8-sig', errors='replace'), suffix).encode('utf-8')
+            if len(body) > MAX_EXPORT_BYTES:
+                raise ValueError('Le résultat assaini dépasse la limite de 64 Mo.')
+            self.send_bytes(body, ('text/html' if suffix == '.html' else 'text/csv') + '; charset=utf-8',
+                            attachment=target.name if query.get('download') == ['1'] else None,
+                            report=suffix == '.html')
         elif path == '/api/primary-results':
             self.json(build_primary_results(manager.project_root))
         elif path == '/api/primary-run':
             self.json(manager.primary_run_status())
+        elif path == '/api/solarwind-run':
+            self.json(manager.solarwind_run_status())
         elif path == '/api/primary-artifact':
             if len(query.get('path', [])) != 1:
                 raise ValueError('Un chemin de résultat principal est requis.')
@@ -458,6 +475,12 @@ class Handler(BaseHTTPRequestHandler):
                     from .adapters import validate_primary_delivery_day
                     delivery_day = validate_primary_delivery_day(body['delivery_day'])
                 self.json(manager.launch_primary_run(self.headers.get('Idempotency-Key'), delivery_day=delivery_day), 202)
+            elif self.path == '/api/solarwind-run':
+                if set(body) != {'delivery_day'}:
+                    raise ValueError('Choisissez uniquement une date de livraison pour SolarWind interaction ±40.')
+                from .adapters import validate_primary_delivery_day
+                delivery_day = validate_primary_delivery_day(body['delivery_day'])
+                self.json(manager.launch_solarwind_run(self.headers.get('Idempotency-Key'), delivery_day=delivery_day), 202)
             elif self.path == '/api/preview':
                 self.json(manager.preview(body))
             elif self.path == '/api/launch':
@@ -500,7 +523,7 @@ class Handler(BaseHTTPRequestHandler):
                 raise ValueError('Route inconnue.')
         except PermissionError as exc:
             self.json({'error': str(exc)}, 403)
-        except PrimaryRunConflict as exc:
+        except (PrimaryRunConflict, SolarWindRunConflict) as exc:
             self.json({'error': str(exc)}, 409)
         except (ValueError, KeyError, TypeError, IndexError) as exc:
             self.json({'error': str(exc)}, 400)

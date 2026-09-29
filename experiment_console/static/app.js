@@ -3,10 +3,12 @@ const $ = (s, root=document) => root.querySelector(s);
 const $$ = (s, root=document) => [...root.querySelectorAll(s)];
 const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const state = {route:'',primary:{days:[],warnings:[]},runInfo:null,runRevision:0,boot:null,selectedDay:null,launchDay:null,refreshing:false,loaded:false,launching:false};
+Object.assign(state,{launchModel:'nuclear',solarwindRunInfo:null,solarwindRevision:0,solarwindResults:{days:[],warnings:[]},solarwindRefreshing:false});
+const selectedRunInfo = () => state.launchModel==='solarwind'?state.solarwindRunInfo:state.runInfo;
 const warnings = (items, kind='') => items?.length ? `<div class="notice ${kind}">${items.map(esc).join('<br>')}</div>` : '';
 const formatDay = value => value ? new Date(`${value}T12:00:00`).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}) : 'Date indisponible';
 const formatTime = value => value ? new Date(value).toLocaleString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : 'Non disponible';
-const artifactUrl = (file, download=false) => `/api/primary-artifact?path=${encodeURIComponent(file.path)}${download?'&download=1':''}`;
+const artifactUrl = (file, download=false) => `/api/${file.path.startsWith('solarwind_interaction40/')?'solarwind':'primary'}-artifact?path=${encodeURIComponent(file.path)}${download?'&download=1':''}`;
 const statusLabels = {queued:'En attente',starting:'Démarrage',running:'Calcul en cours',succeeded:'Calcul terminé',failed:'Calcul échoué',cancelling:'Arrêt demandé',cancelled:'Calcul arrêté',interrupted:'Calcul interrompu'};
 function toast(message){const target=$('#toast');target.textContent=message;target.hidden=false;clearTimeout(toast.timer);toast.timer=setTimeout(()=>target.hidden=true,8000);}
 async function api(path, body, retry=true, extraHeaders={}){
@@ -59,8 +61,8 @@ function renderPublications(){
 }
 function renderRunPanel(){
   const panel=$('#primary-run-panel');if(!panel)return;
-  const info=state.runInfo;
-  const signature=JSON.stringify([info,state.launching]);
+  const info=selectedRunInfo();
+  const signature=JSON.stringify([info,state.launching,state.launchModel,state.solarwindResults]);
   if(panel.nyxSignature===signature)return;
   panel.nyxSignature=signature;
   if(!info){
@@ -73,9 +75,13 @@ function renderRunPanel(){
   if(state.launchDay===null)state.launchDay=info.defaults?.delivery_day||'';
   // Keep the date control mounted while progress polls update the status.
   if(!panel.nyxReady){
-    panel.innerHTML=`<div class="run-launch-panel"><div class="run-launch-intro"><div><div class="eyebrow">NOUVELLE PRÉVISION</div><h2>Calculer avec NYX</h2><p>Actualise les sources, calcule les prévisions BE, DE, FR et NL, puis publie les rapports.</p></div><div class="run-launch-actions"><label class="launch-date-picker" for="launch-delivery-day">Date de livraison à prévoir<input type="date" id="launch-delivery-day" required value="${esc(state.launchDay)}"></label><button id="launch-forecast" class="primary launch-forecast" data-launch>▷ Lancer la prévision</button></div></div><div id="run-launch-status"></div></div>`;
+    panel.innerHTML=`<div class="run-launch-panel"><div class="run-launch-intro"><div><div class="eyebrow">NOUVELLE PRÉVISION</div><h2>Calculer avec NYX</h2><p id="launch-model-description">Actualise les sources, calcule les prévisions BE, DE, FR et NL, puis publie les rapports.</p></div><div class="run-launch-actions"><label class="launch-date-picker" for="launch-model">Modèle<select id="launch-model"><option value="nuclear">NYX actuel · BE, DE, FR, NL</option><option value="solarwind">SolarWind interaction ±40 · DE, NL</option></select></label><label class="launch-date-picker" for="launch-delivery-day">Date de livraison à prévoir<input type="date" id="launch-delivery-day" required value="${esc(state.launchDay)}"></label><button id="launch-forecast" class="primary launch-forecast" data-launch>▷ Lancer la prévision</button></div></div><div id="run-launch-status"></div><div id="solarwind-results"></div></div>`;
     panel.nyxReady=true;
   }
+  $('#launch-model').value=state.launchModel;
+  $('#launch-model').disabled=state.launching;
+  $('#launch-model-description').textContent=state.launchModel==='solarwind'?'Éolien et solaire explicites, interaction dans CatBoost plafonnée à ±40 €/MWh, puis Kalman. Allemagne et Pays-Bas. Le premier calcul reconstruit l’historique et peut être long.':'Actualise les sources, calcule les prévisions BE, DE, FR et NL, puis publie les rapports.';
+  renderSolarwindResults();
   $('#launch-delivery-day').disabled=busy||info.available===false;
   const button=$('#launch-forecast');
   button.disabled=busy||info.available===false;
@@ -94,7 +100,8 @@ function renderProgress(run){
   return `<div class="run-progress ${esc(run.status)}"><div class="run-progress-caption"><span>${esc(caption)}</span>${known?`<strong>${esc(percent)} %</strong>`:''}</div><div class="run-progress-track ${known?'':'indeterminate'}" role="progressbar" aria-label="Avancement de la prévision NYX" aria-valuemin="0" aria-valuemax="100" ${known?`aria-valuenow="${percent}" aria-valuetext="${esc(caption)}"`:''}><span class="run-progress-fill" ${known?`style="width:${percent}%"`:''}></span></div>${progress.steps?.length?`<ol class="run-progress-steps">${progress.steps.map(step=>`<li class="${esc(step.status)}" ${step.status==='running'?'aria-current="step"':''}><span class="step-indicator" aria-hidden="true">${step.status==='complete'?'✓':step.status==='failed'?'!':step.status==='running'?'◌':'·'}</span><span><strong>${esc(step.zone||step.label||step.name)}</strong><small>${esc(stepLabels[step.status]||step.status)}</small></span></li>`).join('')}</ol>`:''}</div>`;
 }
 async function launchForecast(){
-  if(!state.runInfo||state.launching||state.runInfo.active||state.runInfo.available===false)return;
+  const info=selectedRunInfo(),solarwind=state.launchModel==='solarwind';
+  if(!info||state.launching||info.active||info.available===false)return;
   const dateInput=$('#launch-delivery-day');
   if(dateInput&&!dateInput.reportValidity())return;
   const deliveryDay=state.launchDay;
@@ -104,17 +111,37 @@ async function launchForecast(){
   try{
     if(!state.boot)state.boot=await api('/api/bootstrap');
     let previous;
-    try{previous=JSON.parse(sessionStorage.getItem('nyx-launch-intent'));}catch{/* Old clients stored only a key. */}
+    const storageKey=solarwind?'nyx-solarwind-launch-intent':'nyx-launch-intent';
+    try{previous=JSON.parse(sessionStorage.getItem(storageKey));}catch{/* Old clients stored only a key. */}
     const intent=previous?.delivery_day===deliveryDay&&typeof previous.key==='string'&&previous.key?previous.key:crypto.randomUUID();
-    sessionStorage.setItem('nyx-launch-intent',JSON.stringify({key:intent,delivery_day:deliveryDay}));
-    const accepted=await api('/api/primary-run',{delivery_day:deliveryDay},true,{'Idempotency-Key':intent});
+    sessionStorage.setItem(storageKey,JSON.stringify({key:intent,delivery_day:deliveryDay}));
+    const accepted=await api(solarwind?'/api/solarwind-run':'/api/primary-run',{delivery_day:deliveryDay},true,{'Idempotency-Key':intent});
     const active=['queued','starting','running','cancelling'].includes(accepted.run.status);
-    state.runRevision++;
-    state.runInfo={...state.runInfo,latest:accepted.run,active:active?accepted.run:null};
-    sessionStorage.removeItem('nyx-launch-intent');
-    toast('La prévision NYX a été demandée. Son avancement apparaît ici.');
+    if(solarwind){state.solarwindRevision++;state.solarwindRunInfo={...state.solarwindRunInfo,latest:accepted.run,active:active?accepted.run:null};}
+    else{state.runRevision++;state.runInfo={...state.runInfo,latest:accepted.run,active:active?accepted.run:null};}
+    sessionStorage.removeItem(storageKey);
+    toast(`La prévision ${solarwind?'SolarWind interaction ±40':'NYX'} a été demandée. Son avancement apparaît ici.`);
   }catch(error){toast(error.message);}
   finally{state.launching=false;renderRunPanel();}
+}
+function renderSolarwindResults(){
+  const target=$('#solarwind-results');if(!target)return;
+  target.hidden=state.launchModel!=='solarwind';
+  if(target.hidden)return;
+  const results=state.solarwindResults;
+  target.innerHTML=`<h3>Résultats SolarWind interaction ±40</h3>${warnings(results.warnings)}${results.days.length?results.days.map(day=>`<div class="solarwind-publication"><strong>${esc(formatDay(day.date))}</strong><div class="actions">${day.report?reportActions(day.report,'SolarWind interaction ±40 · '+formatDay(day.date)):''}${(day.zones||[]).map(zone=>`<a class="primary-download" href="${esc(artifactUrl(zone.csv,true))}" download="${esc(zone.csv.name)}">${esc(zone.zone)} · CSV ↓</a>`).join('')}</div></div>`).join(''):'<p class="muted">Les rapports DE/NL apparaîtront ici après un calcul réussi. Les résultats du modèle actuel restent disponibles ci-dessous.</p>'}`;
+}
+async function refreshSolarwind(){
+  if(state.solarwindRefreshing)return;
+  state.solarwindRefreshing=true;
+  const revision=state.solarwindRevision;
+  try{
+    const results=await Promise.allSettled([api('/api/solarwind-run'),api('/api/solarwind-results')]);
+    if(revision===state.solarwindRevision)state.solarwindRunInfo=results[0].status==='fulfilled'?results[0].value:{available:false,warning:'SolarWind temporairement indisponible. Le modèle NYX actuel reste accessible.',active:null,latest:null};
+    if(results[1].status==='fulfilled')state.solarwindResults=results[1].value;
+    else state.solarwindResults={...state.solarwindResults,warnings:['Les résultats SolarWind ne sont pas accessibles pour le moment.']};
+    renderRunPanel();
+  }finally{state.solarwindRefreshing=false;}
 }
 function showReport(path,title){
   const dialog=$('#dialog');
@@ -203,12 +230,22 @@ document.addEventListener('click',event=>{
   if(event.target.closest('[data-close]')){$('#dialog').close();return;}
   if(event.target.closest('[data-launch]'))void launchForecast();
 });
-document.addEventListener('change',event=>{if(event.target.id==='delivery-day'){state.selectedDay=event.target.value;renderDashboard();}});
-document.addEventListener('input',event=>{if(event.target.id==='launch-delivery-day'&&!state.launching&&!state.runInfo?.active)state.launchDay=event.target.value;});
+document.addEventListener('change',event=>{
+  if(event.target.id==='delivery-day'){state.selectedDay=event.target.value;renderDashboard();}
+  if(event.target.id==='launch-model'&&!state.launching&&['nuclear','solarwind'].includes(event.target.value)){
+    state.launchModel=event.target.value;
+    if(state.launchModel==='solarwind'){
+      if(!state.solarwindRunInfo)state.solarwindRunInfo={available:false,warning:'Connexion au calcul SolarWind…',active:null,latest:null};
+      void refreshSolarwind();
+    }
+    renderRunPanel();
+  }
+});
+document.addEventListener('input',event=>{if(event.target.id==='launch-delivery-day'&&!state.launching&&!selectedRunInfo()?.active)state.launchDay=event.target.value;});
 $('#dialog').addEventListener('close',()=>{$('#dialog').innerHTML='';});
 window.addEventListener('hashchange',()=>void route());
 window.addEventListener('message',handleReportNavigation);
 document.addEventListener('visibilitychange',()=>$('#page-atmosphere')?.classList.toggle('suspended',document.hidden));
 if(navigator.modelContext?.registerTool){navigator.modelContext.registerTool({name:'list_primary_results',description:'Liste les publications principales NYX par date, sans les expériences.',inputSchema:{type:'object',properties:{},additionalProperties:false},execute:async()=>({content:[{type:'text',text:JSON.stringify(state.primary)}]})});}
 void refresh();
-setInterval(()=>void refresh(),5000);
+setInterval(()=>{void refresh();if(state.launchModel==='solarwind')void refreshSolarwind();},5000);

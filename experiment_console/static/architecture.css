@@ -133,9 +133,12 @@
 .run-launch-intro h2 { margin-top:10px;font-size:1.2rem; }
 .run-launch-intro p { color:var(--muted);font-size:.85rem;line-height:1.65;margin:10px 0 0;max-width:610px; }
 .launch-forecast { flex-shrink:0;min-height:46px; }
-.run-launch-actions { display:grid;gap:12px;flex:0 0 250px; }
+.run-launch-actions { display:grid;gap:12px;flex:0 0 300px; }
 .launch-date-picker { display:grid;gap:8px;font-size:.75rem;color:var(--muted); }
-.launch-date-picker input { width:100%;min-width:0;min-height:46px;box-sizing:border-box;padding:10px 13px;color:var(--accent);background:#111319;border:1px solid #745334;color-scheme:dark;font:inherit;font-size:1rem; }
+.launch-date-picker input, .launch-date-picker select { width:100%;min-width:0;min-height:46px;box-sizing:border-box;padding:10px 13px;color:var(--accent);background:#111319;border:1px solid #745334;color-scheme:dark;font:inherit;font-size:.9rem; }
+.launch-date-picker select:focus-visible { outline:2px solid var(--cyan);outline-offset:3px; }
+#solarwind-results { margin-top:24px;padding-top:18px;border-top:1px solid #745334; }
+.solarwind-publication { display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:14px 0; }
 .launch-date-picker input:focus-visible { outline:2px solid var(--cyan);outline-offset:3px; }
 .launch-date-picker input:disabled { opacity:.55;cursor:wait; }
 @media(max-width:1000px) { .run-launch-actions { flex-basis:auto;grid-template-columns:minmax(190px,250px) auto;align-items:end; } }

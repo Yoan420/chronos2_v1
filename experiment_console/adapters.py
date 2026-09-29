@@ -232,6 +232,18 @@ class AdapterRegistry:
             if hashlib.sha256(source.read_bytes()).hexdigest() != expected:
                 raise ValueError('Une source de NuclearKalman.ps1 a changé pendant l’attente. Relancez depuis NYX.')
 
+    def solarwind_defaults(self, delivery_day=None):
+        from .solarwind_runs import defaults
+        return defaults(self, delivery_day)
+
+    def prepare_solarwind_run(self, run_directory, write=False, *, delivery_day):
+        from .solarwind_runs import prepare
+        return prepare(self, run_directory, write=write, delivery_day=delivery_day)
+
+    def validate_solarwind_sources(self, run):
+        from .solarwind_runs import validate_sources
+        validate_sources(self, run)
+
     def _configs(self) -> list[dict]:
         results = []
         # Only the actual standalone hourly contracts are offered. Live orchestration

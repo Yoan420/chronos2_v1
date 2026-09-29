@@ -13,6 +13,11 @@ Installation, lancement et périmètre des résultats :
 [guide de la console](README_EXPERIMENT_CONSOLE.md).
 L'application de prévision existante reste accessible avec `Forecast.ps1 -Action App`.
 
+Dans NYX, le sélecteur **Modèle** propose aussi **SolarWind interaction ±40**
+pour DE/NL. Le modèle nucléaire BE/DE/FR/NL reste sélectionné par défaut.
+Cette option possède son lancement et ses résultats séparés :
+[guide SolarWind dans NYX](docs/nyx_solarwind_option.md).
+
 Ce dépôt contient la chaîne nécessaire aux forecasts actuels pour la France,
 l’Allemagne, la Belgique, les Pays-Bas et l’Espagne.
 

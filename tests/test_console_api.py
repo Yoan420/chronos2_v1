@@ -53,6 +53,32 @@ def post(api, path, body):
     return api.client.post(path, json=body, headers=api.headers)
 
 
+def test_solarwind_publications_stay_separate_and_verified(api):
+    import hashlib
+    folder = api.project / 'runs/solarwind_interaction40/2026-09-30'
+    folder.mkdir(parents=True)
+    files = {'index.html': '<html><h1>SolarWind</h1></html>',
+             'forecast_de.csv': 'timestamp,q50\na,1\n', 'forecast_nl.csv': 'timestamp,q50\na,2\n'}
+    hashes = {}
+    for name, content in files.items():
+        (folder / name).write_bytes(content.encode())
+        hashes[name] = hashlib.sha256(content.encode()).hexdigest()
+    (folder / 'manifest.json').write_text(json.dumps({'model':'solarwind_interaction40',
+        'delivery_day':'2026-09-30','status':'COMPLETE','files':hashes}))
+    result = api.client.get('/api/solarwind-results')
+    assert result.status_code == 200
+    assert len(result.json()['days']) == 1
+    assert api.client.get('/api/primary-results').json()['days'] == []
+    path = result.json()['days'][0]['report']['path']
+    report = api.client.get('/api/solarwind-artifact', params={'path':path})
+    assert report.status_code == 200
+    assert 'sandbox' in report.headers['content-security-policy']
+    assert api.client.get('/api/primary-artifact', params={'path':path}).status_code == 404
+    (folder / 'index.html').write_text('changed')
+    assert api.client.get('/api/solarwind-artifact', params={'path':path}).status_code == 404
+    assert api.client.get('/api/solarwind-results').json()['days'] == []
+
+
 def archive(api, name="fixture archive", **files):
     path = api.project / "runs" / "history" / name
     path.mkdir(parents=True)
