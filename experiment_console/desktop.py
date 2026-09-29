@@ -27,7 +27,7 @@ class BackendBusy(DesktopError):
 
 
 class DesktopSettings:
-    def __init__(self, settings_path=None):
+    def __init__(self, settings_path=None, *, require_pythonw=True):
         self.root = Path(__file__).resolve().parents[1]
         self.path = Path(settings_path or self.root / 'config' / 'experiment_console.json').resolve()
         settings = json.loads(self.path.read_text(encoding='utf-8-sig'))
@@ -36,7 +36,7 @@ class DesktopSettings:
             raise DesktopError(f'L’environnement Python configuré est introuvable.\nConfiguration : {self.path}')
         self.python = self.python.resolve()
         self.pythonw = self.python.with_name('pythonw.exe')
-        if not self.pythonw.is_file():
+        if require_pythonw and not self.pythonw.is_file():
             raise DesktopError(f'Le lanceur Windows Python est introuvable :\n{self.pythonw}')
         self.state = Path(settings.get('state_root', 'runs/.experiment_console'))
         if not self.state.is_absolute():
@@ -89,6 +89,8 @@ def backend_ready(settings, timeout=2.0):
         if _port_available(settings):
             return False
         raise BackendBusy('Le service local met trop de temps à répondre. Patientez puis réessayez.') from exc
+    except (ConnectionResetError, ConnectionAbortedError) as exc:
+        raise BackendBusy('Le service local redémarre. Patientez puis réessayez.') from exc
     except (ValueError, UnicodeError) as exc:
         raise DesktopError('Une autre application utilise le port local de NYX.') from exc
     if not isinstance(data, dict):

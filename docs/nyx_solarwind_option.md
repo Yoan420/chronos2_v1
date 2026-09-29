@@ -7,6 +7,16 @@ Dans **Résultats → Calculer avec NYX**, le champ **Modèle** propose :
 - **SolarWind interaction ±40 · DE, NL** : variante séparée, sélectionnée
   explicitement pour la date de livraison choisie.
 
+Après avoir récupéré la mise à jour de `main`, exécuter dans PowerShell :
+
+```powershell
+& .\Start-ExperimentConsole.ps1 -Restart
+```
+
+Cette commande recharge le backend déjà ouvert, uniquement sans calcul actif
+ni en attente. Fermer la fenêtre NYX ne suffit pas à arrêter son backend.
+Sans `-Restart`, le lanceur réutilise le serveur existant.
+
 SolarWind conserve Chronos-2, le correcteur CatBoost et le Kalman. Les quatre
 prévisions solaires FR/DE/BE/NL et les deux prévisions éoliennes DE/NL sont
 des entrées explicites. L'interaction faible vent × faible solaire × forte

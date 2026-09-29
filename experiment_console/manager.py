@@ -33,6 +33,10 @@ class SolarWindRunConflict(ValueError):
     """A SolarWind retry or active run belongs to another delivery date."""
 
 
+class BackendAlreadyRunning(ValueError):
+    """Another backend owns this state directory; never bypass its lock."""
+
+
 class Manager:
     def __init__(self, project_root, state_root, python_executable, max_concurrency=1, registry=None, start_scheduler=True):
         self.project_root = Path(project_root).resolve()
@@ -49,7 +53,7 @@ class Manager:
         try:
             self._instance_lock.acquire(timeout=0)
         except Timeout as exc:
-            raise ValueError('Une console utilise déjà ce dossier de métadonnées.') from exc
+            raise BackendAlreadyRunning('Une console utilise déjà ce dossier de métadonnées.') from exc
         self._lock = threading.RLock()
         self._stop = threading.Event()
         self._children = {}

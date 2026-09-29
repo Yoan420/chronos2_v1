@@ -1,14 +1,23 @@
 <#
 .SYNOPSIS
-Demarre la console locale persistante sans lancer de calcul.
+Demarre ou retrouve la console locale persistante sans lancer de calcul.
+
+.DESCRIPTION
+Reutilise une instance du meme depot, du meme dossier d'etat et du meme Python.
+-Restart recharge le serveur apres une mise a jour, uniquement sans calcul actif
+ni en attente. Aucun processus de calcul ni fichier de verrou n'est supprime.
 #>
 [CmdletBinding()]
 param(
-    [string]$Settings = (Join-Path $PSScriptRoot 'config\experiment_console.json'),
+    [string]$Settings = '',
     [ValidateRange(1024, 65535)][int]$Port = 8765,
-    [switch]$NoOpen
+    [switch]$NoOpen,
+    [switch]$Restart
 )
 $ErrorActionPreference = 'Stop'
+if ([string]::IsNullOrWhiteSpace($Settings)) {
+    $Settings = Join-Path $PSScriptRoot 'config\experiment_console.json'
+}
 $ResolvedSettings = (Resolve-Path -LiteralPath $Settings).Path
 $ConsoleSettings = Get-Content -LiteralPath $ResolvedSettings -Raw | ConvertFrom-Json
 $ConsolePython = [string]$ConsoleSettings.python_executable
@@ -18,8 +27,9 @@ if (-not [System.IO.Path]::IsPathRooted($ConsolePython) -or -not (Test-Path -Lit
 if (-not $PSBoundParameters.ContainsKey('Port') -and $ConsoleSettings.port) {
     $Port = [int]$ConsoleSettings.port
 }
-$ConsoleArguments = @('-m', 'experiment_console.server', '--settings', $ResolvedSettings, '--port', [string]$Port)
+$ConsoleArguments = @('-m', 'experiment_console.launcher', '--settings', $ResolvedSettings, '--port', [string]$Port)
 if (-not $NoOpen) { $ConsoleArguments += '--open' }
+if ($Restart) { $ConsoleArguments += '--restart' }
 Push-Location -LiteralPath $PSScriptRoot
 try {
     & $ConsolePython @ConsoleArguments

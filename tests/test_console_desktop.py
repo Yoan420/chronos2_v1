@@ -43,6 +43,22 @@ def bootstrap(settings):
             "python_executable": str(settings.python), "catalog": []}
 
 
+def test_console_settings_can_use_python_without_pythonw(configured):
+    configured.settings.pythonw.unlink()
+    with pytest.raises(desktop.DesktopError, match='lanceur Windows Python'):
+        desktop.DesktopSettings(configured.path)
+    assert desktop.DesktopSettings(configured.path, require_pythonw=False).python == configured.settings.python
+
+
+@pytest.mark.parametrize('error', [ConnectionResetError, ConnectionAbortedError])
+def test_connection_closed_during_restart_is_busy(configured, monkeypatch, error):
+    def interrupted_request(*args, **kwargs):
+        raise error('Explicit interrupted probe fixture')
+    monkeypatch.setattr(desktop, 'build_opener', lambda *args: SimpleNamespace(open=interrupted_request))
+    with pytest.raises(desktop.BackendBusy):
+        desktop.backend_ready(configured.settings)
+
+
 def use_free_port(settings):
     with socket.socket() as reservation:
         reservation.bind(("127.0.0.1", 0))

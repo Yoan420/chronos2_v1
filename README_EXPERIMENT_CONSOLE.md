@@ -53,8 +53,10 @@ Depuis n'importe quel dossier :
 La commande utilise l'interpréteur explicite de
 `config/experiment_console.json`, actuellement celui de `Forecast.ps1` :
 `C:\Users\BQ6757\venvs\pricefm311\Scripts\python.exe`.
-Elle ouvre le navigateur après la liaison du serveur à
-**http://127.0.0.1:8765**. La fenêtre PowerShell héberge le serveur.
+Elle ouvre le navigateur sur **http://127.0.0.1:8765** et réutilise le serveur
+déjà présent après vérification du dépôt, du dossier d'état et du Python.
+Lorsqu'elle démarre un nouveau serveur, la fenêtre PowerShell l'héberge et
+doit rester ouverte. Une nouvelle invocation ne crée pas un deuxième serveur.
 
 `Install-ChronosDesktop.ps1` conserve son nom technique et crée les trois
 raccourcis **NYX**. La migration a été exécutée sur ce poste : les trois liens
@@ -91,10 +93,18 @@ Options du lanceur :
 & 'C:\Users\BQ6757\chronos2_v1\Start-ExperimentConsole.ps1' -NoOpen
 & 'C:\Users\BQ6757\chronos2_v1\Start-ExperimentConsole.ps1' -Port 8766
 & 'C:\Users\BQ6757\chronos2_v1\Start-ExperimentConsole.ps1' -Settings 'C:\Users\BQ6757\chronos2_v1\config\experiment_console.json'
+& 'C:\Users\BQ6757\chronos2_v1\Start-ExperimentConsole.ps1' -Restart
 ```
 
 Pour modifier Python, le port ou la concurrence, éditer le fichier JSON puis
 redémarrer le backend. Fermer seulement la fenêtre NYX ne l'arrête pas.
+Après une mise à jour du code, utiliser `Start-ExperimentConsole.ps1 -Restart`
+avec la même configuration pour recharger le serveur. Le redémarrage vérifie
+l'identité du processus et refuse les calculs actifs, en attente ou dont l'état
+est incertain. Il n'arrête que le serveur NYX identifié, sans toucher aux
+processus de calcul ni supprimer `backend.lock`. Un serveur sur un autre port
+ou utilisant une autre configuration doit être arrêté depuis son lancement
+d'origine ; son verrou n'est pas contourné.
 Après changement de l'interpréteur, recréer aussi les raccourcis avec le script
 d'installation. `max_concurrency` vaut **1** par défaut (1 à 8).
 `state_root` doit rester dans le dépôt pour les adaptateurs actuels ; la valeur

@@ -540,12 +540,12 @@ def announce(message):
             pass
 
 
-def main():
+def main(argv=None):
     parser = argparse.ArgumentParser(description='Console locale des expériences Chronos')
     parser.add_argument('--settings', default=str(Path(__file__).resolve().parents[1] / 'config' / 'experiment_console.json'))
     parser.add_argument('--port', type=int)
     parser.add_argument('--open', action='store_true', help='Ouvrir le navigateur après la création du serveur local.')
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     settings_path = Path(args.settings).resolve()
     settings = json.loads(settings_path.read_text(encoding='utf-8-sig'))
     root = Path(__file__).resolve().parents[1]
