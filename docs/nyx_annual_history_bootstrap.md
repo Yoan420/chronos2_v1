@@ -277,6 +277,42 @@ chaque livraison évaluée. Une qualification portant sur une autre politique
 de profils ne peut pas activer celle-ci, y compris la précédente récupération
 de journées entières `own_origin_with_current_fit_recovery_v1`.
 
+### Heure manquante dans le vent NL au printemps
+
+Le diagnostic `prepare_20260929T114549Z_5b609248` s'arrête sur
+`nl_wind_generation_fcst` au **30 mars 2025 à 02:00 UTC**, soit 04:00 aux
+Pays-Bas. Cette heure physique existe dans la journée de 23 heures. Les
+nouveaux essais à la coupure actuelle ne la rétablissent pas.
+
+La recette historique `solar_wind_v1`, utilisée par les rapports annuels,
+traite déjà ce trou précis avec la politique
+`nl_ecmwf_spring_2025_2026`. Ce traitement avait été omis dans le collecteur
+annuel CPU. Il est maintenant raccordé avec les mêmes limites :
+
+- Seulement `nl_wind_generation_fcst`, à **02:00 UTC le 30 mars 2025 ou le
+  29 mars 2026**, et seulement si cette heure est la seule absente.
+- Une valeur native finie reste prioritaire.
+- La composante Saturn
+  `power.nrjscan.nl.prod.total.wind.mw.ecmwf_avg.pointconnect.6h.cache`
+  est demandée à la **même coupure propre J-1 08:00 locale**, soit 07:00 UTC
+  pour ces deux journées ; la conversion est MW × 0,001 vers GW.
+- Aucun recours à cette substitution lors d'une demande à la coupure
+  actuelle du réentraînement. Aucun autre trou n'est interpolé ou rempli.
+- La série composante, l'heure, la coupure, les unités et la valeur sont
+  conservées dans les preuves de substitution et revérifiées à la reprise.
+
+Les tests rejouent les deux journées avec les valeurs des archives suivies
+dans Git : la courbe reconstituée retrouve exactement leurs 23 valeurs.
+Ils simulent les réponses Saturn ; la collecte réelle doit être relancée
+sur le poste ayant accès au service. Une composante absente ou invalide
+reste bloquante.
+
+Après mise à jour de la branche, relancer la même commande `prepare` sans
+supprimer les caches. Les journées et séries déjà validées sont conservées.
+Ce raccordement ne vaut pas qualification CPU et ne modifie pas les scores
+historiques. Le nouveau code de collecte est lié aux empreintes de la
+qualification complète.
+
 ## Ce qui reste nécessaire avant une prévision qualifiée
 
 La récupération des historiques permet de préparer un entraînement futur.

@@ -128,6 +128,9 @@ La préparation réalise successivement :
    à leur journée. Une archive NL auditée du dépôt peut servir de dernier
    secours historique si ses dates précèdent la coupure du calcul.
    Les révisions réelles et les reprises sont tracées par série.
+   Pour les deux heures de vent NL manquantes au printemps 2025/2026, la
+   substitution ECMWF de la recette historique est appliquée uniquement
+   à la même coupure propre, avec conversion MW/GW et preuve conservée.
 3. Chronos-2 CPU, correcteur résiduel CPU et Kalman pour les quatre pays.
 4. Construction exacte des matrices 449/503 colonnes et projection 123 colonnes.
 5. Réentraînement HGB/Test2, validation chronologique et référence de rareté.

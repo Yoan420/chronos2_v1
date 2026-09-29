@@ -290,6 +290,24 @@ def _verify_profile_normalization(frame, receipt, day, *, query_revision=None):
             "Saturn NL spring repaired values differ from historical normalization")
 
 
+def _wind_audit(substitutions):
+    from .nyx_annual_wind_source import POLICY
+    return {"source_substitutions": substitutions, "source_substitution_count": len(substitutions),
+            "wind_gap_policy": POLICY if substitutions else None}
+
+
+def _verify_profile_wind(frame, receipt, day, revision):
+    from .nyx_annual_wind_source import verify_nl_wind_substitutions
+    substitutions = receipt.get("source_substitutions", [])
+    require(isinstance(substitutions, list), "Saturn wind substitution audit differs")
+    expected = _wind_audit(substitutions)
+    if any(key in receipt for key in expected):
+        require(type(receipt.get("source_substitution_count")) is int
+                and all(key in receipt and receipt[key] == value for key, value in expected.items()),
+                "Saturn wind substitution audit differs")
+    verify_nl_wind_substitutions(frame["nl_wind_generation_fcst"], substitutions, day, revision)
+
+
 def _profile_contract(day, policy=PROFILE_HISTORY_POLICY):
     return {"profile_history_policy": policy,
             "profile_revision_ceiling_utc": cutoff(day).isoformat(),
@@ -393,9 +411,11 @@ def verify_profile_day(directory: Path, day: str, *, outer_day=None):
                     and evidence[alias]["source"] == receipt["alias_sources"][alias],
                     "Saturn per-series evidence revision differs")
         require(receipt.get("dst_evidence") == {a: evidence[a]["dst_evidence"] for a in ALIASES}
-                and receipt.get("spring_dst_repair") == evidence["nl_residual_load_fcst"]["spring_dst_repair"],
+                and receipt.get("spring_dst_repair") == evidence["nl_residual_load_fcst"]["spring_dst_repair"]
+                and receipt.get("source_substitutions", []) == evidence["nl_wind_generation_fcst"].get("source_substitutions", []),
                 "Saturn per-series normalization evidence differs")
     _verify_profile_normalization(frame, receipt, day, query_revision=revisions["nl_residual_load_fcst"])
+    _verify_profile_wind(frame, receipt, day, revisions["nl_wind_generation_fcst"])
     require(pd.Timestamp(receipt["retrieved_at_utc"]).tz_convert("UTC") >= max(revisions.values()),
             "Saturn profile cutoff had not occurred at retrieval")
     return frame, receipt
@@ -414,7 +434,7 @@ def capture_profile_day(client, day: str, cache: Path = DEFAULT_CACHE, *, now_ut
     now = pd.Timestamp.now(tz="UTC") if now_utc is None else pd.Timestamp(now_utc)
     require(now.tzinfo is not None and now >= revision, "Saturn D-1 08:00 cutoff not reached")
     from materialize_saturn_kalman_fuel import NL_SPRING_DST_REPAIR_POLICY
-    expected, contract, values, evidence, spring_ledger = grid(day), specs(), {}, {}, []
+    expected, contract, values, evidence, spring_ledger, substitutions = grid(day), specs(), {}, {}, [], []
     for alias, spec in contract.items():
         try:
             series = fetch_saturn_series_from_client(client, spec["series"],
@@ -424,6 +444,9 @@ def capture_profile_day(client, day: str, cache: Path = DEFAULT_CACHE, *, now_ut
             selected = series
             if alias == "nl_residual_load_fcst":
                 selected, spring_ledger = _nl_spring_profile(series, day, expected, query_revision=revision)
+            elif alias == "nl_wind_generation_fcst":
+                from .nyx_annual_wind_source import normalize_nl_wind_profile
+                selected, substitutions = normalize_nl_wind_profile(client, series, day, expected, revision)
             values[alias] = _numeric(selected, expected, alias)
         except Exception as error:
             phase = "current_fit_profile_recovery" if outer_day is not None else "forecast_profile"
@@ -439,7 +462,7 @@ def capture_profile_day(client, day: str, cache: Path = DEFAULT_CACHE, *, now_ut
         "profile_normalization_policy": PROFILE_NORMALIZATION_POLICY,
         "spring_dst_repair": {"alias": "nl_residual_load_fcst", "policy": NL_SPRING_DST_REPAIR_POLICY,
                               "entries": spring_ledger},
-        "dst_evidence": evidence, "collector_code_sha256": sha256(Path(__file__)),
+        "dst_evidence": evidence, **_wind_audit(substitutions), "collector_code_sha256": sha256(Path(__file__)),
         "artifact_sha256": {"covariates.parquet": sha256(directory / "covariates.parquet")}}
     if outer_day is not None:
         receipt.update(**_profile_contract(outer_day, WHOLE_PROFILE_HISTORY_POLICY), outer_delivery_day=outer_day,
@@ -563,6 +586,12 @@ def _verify_alias_evidence(evidence, values, day, outer_day, alias, directory):
     else:
         require(evidence.get("spring_dst_repair") == _spring_evidence(),
                 "Saturn repair evidence present for another alias")
+    if alias == "nl_wind_generation_fcst":
+        from .nyx_annual_wind_source import verify_nl_wind_substitutions
+        verify_nl_wind_substitutions(pd.Series(values, index=grid(day), name=alias),
+                                    evidence.get("source_substitutions", []), day, revision)
+    else:
+        require(evidence.get("source_substitutions", []) == [], "Wind substitution recorded on another alias")
     if method == "repository_vintage":
         from .nyx_annual_saturn_archive import verify_nl_profile
         require(bool(evidence.get("outer_origin_failure")), "Saturn repository recovery lacks outer failure evidence")
@@ -601,12 +630,21 @@ def _fetch_profile_alias(day, outer_day, alias, revision, client_factory):
                 expected[0] - pd.Timedelta(hours=8), expected[-1] + pd.Timedelta(hours=8), "UTC",
                 revision_date=revision, naive_timezone=spec["naive_timezone"],
                 incomplete_dst_policy=spec["dst_policy"], nocache=True)
-            selected, ledger = series, []
+            selected, ledger, substitutions = series, [], []
             if alias == "nl_residual_load_fcst":
                 selected, ledger = _nl_spring_profile(series, day, expected, query_revision=revision)
+            elif alias == "nl_wind_generation_fcst":
+                from .nyx_annual_wind_source import normalize_nl_wind_profile
+                selected, substitutions = normalize_nl_wind_profile(client, series, day, expected, revision)
+                if substitutions:
+                    print(json.dumps({"source": "saturn", "event": "wind_substitution", "profile_day": day,
+                        "alias": alias, "value_time_utc": substitutions[0]["value_time_utc"],
+                        "revision_utc": revision.isoformat(), "native_series": spec["series"],
+                        "component_series": substitutions[0]["fallback_series"]}), flush=True)
             values = _numeric(selected, expected, alias)
             return values, _alias_evidence(alias, day, outer_day, revision, values,
                 method="own_origin" if revision == cutoff(day) else "outer_revision", spring=ledger,
+                source_substitutions=substitutions,
                 dst={"policy": spec["dst_policy"], "normalizer_attrs": json.loads(json.dumps(series.attrs, default=str))})
         except Exception as error:
             print(json.dumps({"source": "saturn", "event": "profile_retry", "profile_day": day,
@@ -636,6 +674,7 @@ def _seal_own_profile(day, cache, frame, evidence):
         "availability_basis": "Forecast profiles queried at their own delivery D-1 08:00 revision_date",
         "profile_normalization_policy": PROFILE_NORMALIZATION_POLICY,
         "spring_dst_repair": evidence["nl_residual_load_fcst"]["spring_dst_repair"],
+        **_wind_audit(evidence["nl_wind_generation_fcst"].get("source_substitutions", [])),
         "dst_evidence": {a: evidence[a]["dst_evidence"] for a in ALIASES},
         "collector_code_sha256": sha256(Path(__file__)),
         "artifact_sha256": {"covariates.parquet": sha256(directory / "covariates.parquet")}}
@@ -704,6 +743,7 @@ def _sync_profile_day(day, delivery_day, cache, client_factory):
                 proof = _alias_evidence(alias, day, delivery_day, cutoff(delivery_day), value,
                     method="outer_revision", dst=raw["dst_evidence"][alias], retrieved=raw["retrieved_at_utc"],
                     spring=raw["spring_dst_repair"]["entries"] if alias == "nl_residual_load_fcst" else (),
+                    source_substitutions=raw.get("source_substitutions", []) if alias == "nl_wind_generation_fcst" else [],
                     reused_whole_profile_receipt_sha256=sha256(legacy / "receipt.json"))
             proof["own_origin_failure"] = redact_text(str(error))
         except SaturnSourceError as outer_error:
@@ -752,6 +792,7 @@ def _sync_profile_day(day, delivery_day, cache, client_factory):
         "availability_basis": "Complete series selected independently at own origin, outer fit cutoff, or audited NL repository vintage",
         "profile_normalization_policy": PROFILE_NORMALIZATION_POLICY,
         "spring_dst_repair": evidence["nl_residual_load_fcst"]["spring_dst_repair"],
+        **_wind_audit(evidence["nl_wind_generation_fcst"].get("source_substitutions", [])),
         "dst_evidence": {a: evidence[a]["dst_evidence"] for a in ALIASES},
         "collector_code_sha256": sha256(Path(__file__)), "artifact_sha256": artifacts}
     _immutable(directory / "receipt.json", _encoded(receipt))

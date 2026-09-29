@@ -274,7 +274,10 @@ def test_portable_mixed_source_binds_actual_revisions_and_rejects_downgrade(monk
             raise RuntimeError("Missing original FR profile")
         if args[1] == m.specs()["nl_residual_load_fcst"]["series"] and args[2] == m.grid(archived)[0] - pd.Timedelta(hours=8):
             raise RuntimeError("NL unavailable at both queried revisions")
-        return finite(*args, **kwargs)
+        values = finite(*args, **kwargs)
+        if args[1] == m.specs()["nl_wind_generation_fcst"]["series"] and args[2] == m.grid(recovered)[0] - pd.Timedelta(hours=8):
+            return values.drop(pd.Timestamp(recovered + "T02:00:00Z"))
+        return values
     monkeypatch.setattr(m, "fetch_saturn_series_from_client", fetch)
     monkeypatch.setattr(m.time, "sleep", lambda _: None)
     first = (pd.Timestamp(outer).date() - timedelta(days=365)).isoformat()
@@ -283,7 +286,11 @@ def test_portable_mixed_source_binds_actual_revisions_and_rejects_downgrade(monk
     for stamp in pd.date_range(first, outer, freq="D"):
         day = stamp.date().isoformat()
         if day in (recovered, archived):
-            m._sync_profile_day(day, outer, cache, lambda: object())
+            def component(name, **kwargs):
+                from chronos2_hourly.nyx_annual_wind_source import COMPONENT
+                assert name == COMPONENT and kwargs["revision_date"] == m.cutoff(recovered)
+                return pd.Series([4321.], index=pd.DatetimeIndex([kwargs["from_value_date"]]))
+            m._sync_profile_day(day, outer, cache, lambda: SimpleNamespace(get=component))
         else:
             m.capture_profile_day(object(), day, cache, now_utc=m.cutoff(outer))
     path = m.publish(bundle, outer, first_day=first, cache=cache)
@@ -296,6 +303,9 @@ def test_portable_mixed_source_binds_actual_revisions_and_rejects_downgrade(monk
     assert (origin.loc[m.grid(recovered), "forecast_origin_utc"] == m.cutoff(recovered)).all()
     assert (revision.loc[m.grid(recovered), "fr_residual_load_fcst"] == m.cutoff(outer)).all()
     assert (revision.loc[m.grid(recovered), "de_residual_load_fcst"] == m.cutoff(recovered)).all()
+    raw_wind_day = json.loads((bundle / f"source_artifacts/saturn/days/{recovered}/receipt.json").read_text())
+    assert raw_wind_day["source_substitution_count"] == 1
+    assert raw_wind_day["alias_evidence"]["nl_wind_generation_fcst"]["source_substitutions"] == raw_wind_day["source_substitutions"]
     archive_relative = f"source_artifacts/saturn/days/{archived}/nl_repository_vintages.parquet"
     assert (bundle / archive_relative).is_file()
     assert receipt["artifact_sha256"][archive_relative] == m.sha256(bundle / archive_relative)

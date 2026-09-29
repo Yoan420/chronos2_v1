@@ -42,8 +42,9 @@ MATERIALIZER_CODE = tuple("chronos2_hourly/" + name for name in (
     "nyx_thermal_capacity_features.py", "nyx_lagged_exchange_features.py",
     "nyx_live_hybrid.py", "solar_wind_scarcity_regime.py",
     "nyx_annual_feature_projection.py", "nyx_annual_saturn_source.py",
-    "nyx_annual_saturn_archive.py")) + (
-    "run_nyx_annual_thermal_source.py",)
+    "nyx_annual_saturn_archive.py", "nyx_annual_wind_source.py",
+    "solar_wind_sources.py", "solar_cwe_sources.py")) + (
+    "run_nyx_annual_thermal_source.py", "materialize_saturn_kalman_weather.py")
 ZONES = ("FR", "DE", "BE", "NL")
 FAMILIES = {"fr_residual_1000": 449, "cwe_residual_2000": 123,
             "cwe_absolute_2000": 503}
