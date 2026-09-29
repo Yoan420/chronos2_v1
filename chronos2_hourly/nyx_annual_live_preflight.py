@@ -26,7 +26,9 @@ TARGET_HISTORY_POLICY = "current_fit_origin_reconstruction_v1"
 LEGACY_TARGET_HISTORY_POLICY = "origin_specific_supplier_snapshot_v1"
 TARGET_HISTORY_FIELDS = ("target_history_policy", "target_revision_utc",
                          "target_origin_snapshot_verified", "target_future_labels_used")
-PROFILE_HISTORY_POLICY = "own_origin_with_current_fit_recovery_v1"
+WHOLE_PROFILE_HISTORY_POLICY = "own_origin_with_current_fit_recovery_v1"
+PROFILE_HISTORY_POLICY = "own_origin_with_per_series_recovery_v2"
+PROFILE_HISTORY_POLICIES = (WHOLE_PROFILE_HISTORY_POLICY, PROFILE_HISTORY_POLICY)
 LEGACY_PROFILE_HISTORY_POLICY = "origin_specific_supplier_snapshot_v1"
 PROFILE_HISTORY_FIELDS = ("profile_history_policy", "profile_revision_ceiling_utc",
                           "profile_origin_snapshot_verified")
@@ -39,7 +41,8 @@ MATERIALIZER_CODE = tuple("chronos2_hourly/" + name for name in (
     "nyx_fr_hydro_lagged_features.py", "nyx_forecast_profile_features.py",
     "nyx_thermal_capacity_features.py", "nyx_lagged_exchange_features.py",
     "nyx_live_hybrid.py", "solar_wind_scarcity_regime.py",
-    "nyx_annual_feature_projection.py", "nyx_annual_saturn_source.py")) + (
+    "nyx_annual_feature_projection.py", "nyx_annual_saturn_source.py",
+    "nyx_annual_saturn_archive.py")) + (
     "run_nyx_annual_thermal_source.py",)
 ZONES = ("FR", "DE", "BE", "NL")
 FAMILIES = {"fr_residual_1000": 449, "cwe_residual_2000": 123,
@@ -222,7 +225,7 @@ def validate_profile_history_contract(receipt: dict, cutoff: pd.Timestamp) -> No
         _require(not any(key in receipt for key in PROFILE_HISTORY_FIELDS[1:]),
                  "Profile history revision metadata requires an explicit policy")
         return
-    _require(policy == PROFILE_HISTORY_POLICY, "Unsupported profile history policy")
+    _require(policy in PROFILE_HISTORY_POLICIES, "Unsupported profile history policy")
     stamp = receipt.get("profile_revision_ceiling_utc")
     _require(isinstance(stamp, str), "Profile history revision ceiling is required")
     ceiling = pd.Timestamp(stamp)
@@ -273,7 +276,7 @@ def validate_source_receipt(receipt: dict, *, group: str, day: str,
     _require(asof_state.tzinfo is not None and asof_state.tz_convert("UTC") <= cutoff,
              f"{group}: as-of state exceeds D-1 08:00 cutoff")
     if (receipt.get("target_history_policy") == TARGET_HISTORY_POLICY
-            or receipt.get("profile_history_policy") == PROFILE_HISTORY_POLICY):
+            or receipt.get("profile_history_policy") in PROFILE_HISTORY_POLICIES):
         _require(asof_state.tz_convert("UTC") == cutoff.tz_convert("UTC"),
                  f"{group}: current-fit source state must equal the outer forecast cutoff")
     hashes = receipt.get("artifact_sha256")

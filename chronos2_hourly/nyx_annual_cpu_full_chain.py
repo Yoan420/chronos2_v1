@@ -24,7 +24,7 @@ from chronos2_hourly import nyx_annual_cpu_live as live
 from chronos2_hourly.nyx_annual_live_preflight import (
     MATERIALIZER_CODE, delivery_grid, inspect_bundle, sha256,
     TARGET_HISTORY_POLICY, LEGACY_TARGET_HISTORY_POLICY, TARGET_HISTORY_FIELDS,
-    PROFILE_HISTORY_POLICY, LEGACY_PROFILE_HISTORY_POLICY, PROFILE_HISTORY_FIELDS,
+    PROFILE_HISTORY_POLICIES, LEGACY_PROFILE_HISTORY_POLICY, PROFILE_HISTORY_FIELDS,
     validate_target_history_contract, validate_profile_history_contract,
 )
 from chronos2_hourly.nyx_annual_nyx_quantiles_gate import validate_nyx_quantiles_source
@@ -146,7 +146,7 @@ def _target_policy(record: dict) -> str:
 def _profile_policy(record: dict) -> str:
     """Keep profile recovery a separately evaluated recipe choice."""
     policy = record.get("profile_history_policy", LEGACY_PROFILE_HISTORY_POLICY)
-    live.require(policy in (LEGACY_PROFILE_HISTORY_POLICY, PROFILE_HISTORY_POLICY),
+    live.require(policy in (LEGACY_PROFILE_HISTORY_POLICY, *PROFILE_HISTORY_POLICIES),
                  "Unsupported evaluation profile history policy")
     return policy
 

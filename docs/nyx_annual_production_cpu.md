@@ -121,11 +121,13 @@ La préparation réalise successivement :
 1. Initialisation, assemblage et vérification des historiques JAO, hydro et
    échanges ; contrôle séparé des captures de la journée à prévoir.
 2. Mise à jour Saturn : profils prévus à leur coupure quotidienne, avec reprise
-   des journées historiques manquantes dans la version disponible à la coupure
+   des séries historiques manquantes dans la version disponible à la coupure
    de la livraison préparée ; combustible et disponibilités thermiques à leur
    coupure quotidienne. Les prix historiques utilisent la coupure de la
    livraison préparée ; les calculs internes restent limités aux prix antérieurs
-   à leur journée. Les révisions réelles et les reprises sont tracées.
+   à leur journée. Une archive NL auditée du dépôt peut servir de dernier
+   secours historique si ses dates précèdent la coupure du calcul.
+   Les révisions réelles et les reprises sont tracées par série.
 3. Chronos-2 CPU, correcteur résiduel CPU et Kalman pour les quatre pays.
 4. Construction exacte des matrices 449/503 colonnes et projection 123 colonnes.
 5. Réentraînement HGB/Test2, validation chronologique et référence de rareté.
@@ -158,11 +160,12 @@ contrôles passent.
 `PREPARED` signifie que les entrées sont préparées ; aucune prévision n'est publiée
 et ce statut ne vaut pas qualification.
 
-La politique de profils `own_origin_with_current_fit_recovery_v1` conserve les
-anciennes versions complètes et récupère, si possible, les journées historiques
-manquantes à la coupure du calcul actuel. Elle ne remplace jamais le profil du
-jour à prévoir et ne certifie pas les anciennes versions manquantes. Cette
-politique est liée à la qualification CPU et contrôlée lors de l'activation.
+La politique de profils `own_origin_with_per_series_recovery_v2` conserve les
+anciennes séries complètes et récupère seulement celles qui manquent. Chaque
+série conserve une version unique pour toute sa journée, avec sa date réelle.
+Elle ne remplace jamais le profil du jour à prévoir et ne certifie pas les
+anciennes versions manquantes. Cette politique est liée à la qualification CPU
+et contrôlée lors de l'activation ; les politiques précédentes restent distinctes.
 Voir [les détails de reprise Saturn](nyx_annual_history_bootstrap.md).
 
 La politique de prix `current_fit_origin_reconstruction_v1` utilise, pour un

@@ -226,20 +226,46 @@ vide pour le **16 août 2024**, demandé à la coupure du 15 août à 08:00 Pari
 Les archives personnelles ne contiennent pas non plus ce profil pour les 16 et
 17 août. Cela ne démontre pas sa disponibilité dans une version Saturn ultérieure.
 
-La collecte réessaie désormais trois fois la même journée, avec une connexion
-neuve à chaque tentative. Si le profil historique reste indisponible, elle
-demande les **14 séries de cette journée** dans l'état Saturn à la coupure de
-la livraison préparée. Elle exige toujours une grille horaire complète. Si
-cette récupération échoue aussi, le calcul reste bloqué avec le détail de la
-source manquante. Le profil de la journée réellement prévue n'admet pas cette
-substitution : il reste obligatoire à sa propre coupure.
+Le diagnostic suivant, `prepare_20260929T111057Z_7d6550fc`, identifie un autre
+cas : la charge résiduelle NL du **17 août 2024** est vide même dans la version
+du 29 septembre 2026 à 06:00 UTC. La première récupération remplaçait les
+14 séries de la journée dès qu'une seule manquait, sans tester les autres
+à leur origine historique.
 
-Les journées strictes déjà complètes sont réutilisées. Les profils récupérés
+La collecte traite maintenant **chaque série complète séparément**. Elle
+réessaie trois fois son origine historique, puis demande seulement les séries
+manquantes à la coupure de la livraison préparée. Chaque succès est conservé
+pour la reprise. Toutes les heures d'une série proviennent d'une même version ;
+aucune journée n'est complétée en mélangeant des versions heure par heure.
+
+Pour la charge résiduelle NL, un dernier secours vérifié utilise l'archive
+déjà suivie dans Git : `data/pit/vintages/nl_residual_load_fcst.parquet`.
+Elle contient les 24 heures des 16 et 17 août 2024 dans une version commune
+du **5 août 2026 à 12:17 UTC**, récupérée le 10 août 2026. Le fichier est admis
+uniquement si son empreinte correspond à celle auditée. La sélection exige
+une version complète unique, avec dates de snapshot, révision et récupération
+antérieures ou égales à la coupure du calcul. La pièce source est conservée
+avec le paquet pour permettre une vérification indépendante.
+
+Ce secours est réservé à l'historique d'entraînement. Il ne certifie pas une
+disponibilité en août 2024 et ne peut pas être utilisé pour une évaluation dont
+la coupure précède ses dates de disponibilité. Le profil de la journée
+réellement prévue reste obligatoire à sa propre coupure Saturn. Si aucune
+source admissible n'est complète, le calcul indique précisément la série
+manquante et reste bloqué.
+
+Les journées strictes déjà complètes sont réutilisées, y compris pour les
+livraisons suivantes. Les profils récupérés
 sont conservés séparément dans
-`data/pit/nyx_annual_saturn/profiles_current_fit_v1/<livraison>/<jour_historique>`.
-Le lot enregistre leurs révisions réelles dans `profile_revisions.parquet` ;
+`data/pit/nyx_annual_saturn/profiles_per_series_v2/<livraison>/<jour_historique>`.
+Les anciens paquets complets restent lisibles avec leur politique d'origine.
+La copie de secours NL est figée séparément sous
+`data/pit/nyx_annual_saturn/repository_vintages/<empreinte>.parquet` avant
+d'être jointe aux paquets ; une mise à jour du fichier d'origine ne modifie
+donc pas les preuves déjà constituées.
+Le lot enregistre les révisions réelles **par série** dans `profile_revisions.parquet` ;
 `origins.parquet` contient les origines logiques des calculs internes.
-La politique `own_origin_with_current_fit_recovery_v1` et son plafond
+La politique `own_origin_with_per_series_recovery_v2` et son plafond
 `profile_revision_ceiling_utc` suivent les modèles et l'évaluation.
 `profile_origin_snapshot_verified: false` indique explicitement que cette
 recette ne certifie pas toutes les anciennes versions quotidiennes.
@@ -248,7 +274,8 @@ Après la mise à jour de la branche, reprendre avec la même commande `prepare`
 ci-dessus. Une relance conserve les journées complètes. La qualification doit
 évaluer cette politique sur la chaîne CPU complète, avec la coupure propre à
 chaque livraison évaluée. Une qualification portant sur une autre politique
-de profils ne peut pas activer celle-ci.
+de profils ne peut pas activer celle-ci, y compris la précédente récupération
+de journées entières `own_origin_with_current_fit_recovery_v1`.
 
 ## Ce qui reste nécessaire avant une prévision qualifiée
 

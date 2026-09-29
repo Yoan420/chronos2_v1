@@ -1,7 +1,7 @@
 """Daily as-of Saturn inputs for the annual CPU pipeline.
 
-Forecast profiles use their historical civil cutoffs where available. After
-bounded retries, a historical day may be reconstructed at the outer fit cutoff;
+Forecast series use their historical civil cutoffs where available. After
+bounded retries, an unavailable historical series may use the outer fit cutoff;
 the live delivery day keeps its own cutoff. Logical origins and real profile
 revisions are recorded separately. Canonical training prices use the outer
 cutoff; inner windows never receive prices for their delivery day.
@@ -19,6 +19,7 @@ import json
 import os
 from pathlib import Path
 import tempfile
+import threading
 import time
 from typing import Callable
 
@@ -35,8 +36,12 @@ from .process_lock import exclusive_process_lock
 PROTOCOL = "nyx_annual_saturn_daily_v1"
 PROFILE_PROTOCOL = "nyx_annual_saturn_profiles_daily_v2"
 PROFILE_RECOVERY_PROTOCOL = "nyx_annual_saturn_profiles_current_fit_v1"
+PROFILE_SERIES_PROTOCOL = "nyx_annual_saturn_profiles_per_series_v2"
+PROFILE_ALIAS_PROTOCOL = "nyx_annual_saturn_profile_alias_v2"
 PROFILE_NORMALIZATION_POLICY = "historical_saturn_profiles_with_audited_nl_spring_v1"
-PROFILE_HISTORY_POLICY = "own_origin_with_current_fit_recovery_v1"
+WHOLE_PROFILE_HISTORY_POLICY = "own_origin_with_current_fit_recovery_v1"
+PROFILE_HISTORY_POLICY = "own_origin_with_per_series_recovery_v2"
+PROFILE_HISTORY_POLICIES = (WHOLE_PROFILE_HISTORY_POLICY, PROFILE_HISTORY_POLICY)
 PROFILE_HISTORY_FIELDS = ("profile_history_policy", "profile_revision_ceiling_utc",
                           "profile_origin_snapshot_verified")
 TARGET_PROTOCOL = "nyx_annual_saturn_current_fit_targets_v1"
@@ -54,6 +59,7 @@ ALIASES = CORE_ALIASES + ("fr_wind_generation_fcst", "be_wind_generation_fcst")
 DEFAULT_CACHE = ROOT / "data/pit/nyx_annual_saturn"
 WARMUP_DAYS = 834
 TARGET_CONTEXT_HOURS = 479 * 24 + 2  # 469 baseline/reference days + price lags and DST.
+_ARCHIVE_CACHE_LOCK = threading.Lock()
 
 
 class SaturnSourceError(RuntimeError):
@@ -284,8 +290,8 @@ def _verify_profile_normalization(frame, receipt, day, *, query_revision=None):
             "Saturn NL spring repaired values differ from historical normalization")
 
 
-def _profile_contract(day):
-    return {"profile_history_policy": PROFILE_HISTORY_POLICY,
+def _profile_contract(day, policy=PROFILE_HISTORY_POLICY):
+    return {"profile_history_policy": policy,
             "profile_revision_ceiling_utc": cutoff(day).isoformat(),
             "profile_origin_snapshot_verified": False}
 
@@ -297,7 +303,9 @@ def _check_profile_contract(receipt, day):
                 and "source_artifacts/saturn/profile_revisions.parquet" not in receipt.get("artifact_sha256", {}),
                 "Incomplete or downgraded Saturn profile history metadata")
         return {}
-    expected = _profile_contract(day)
+    require(receipt.get("profile_history_policy") in PROFILE_HISTORY_POLICIES,
+            "Unsupported Saturn profile history policy")
+    expected = _profile_contract(day, receipt["profile_history_policy"])
     require(all(receipt.get(key) == value for key, value in expected.items())
             and receipt.get("profile_origin_snapshot_verified") is False
             and receipt.get("logical_forecast_origins") is True,
@@ -320,29 +328,75 @@ def _profile_revision(receipt, day, outer_day=None):
             and receipt.get("forecast_origin_utc") == revision.isoformat()
             and receipt.get("profile_revision_utc") == revision.isoformat()
             and receipt.get("logical_forecast_origin_utc") == cutoff(day).isoformat()
-            and receipt.get("profile_history_policy") == PROFILE_HISTORY_POLICY
+            and receipt.get("profile_history_policy") == WHOLE_PROFILE_HISTORY_POLICY
             and receipt.get("profile_revision_ceiling_utc") == revision.isoformat()
             and receipt.get("profile_origin_snapshot_verified") is False,
             "Saturn recovered profile revision or logical origin changed")
     return revision
 
 
+def _profile_revisions(receipt, day, outer_day=None):
+    if receipt.get("protocol") != PROFILE_SERIES_PROTOCOL:
+        return dict.fromkeys(ALIASES, _profile_revision(receipt, day, outer_day))
+    require(outer_day is not None and day <= outer_day
+            and receipt.get("outer_delivery_day") == outer_day
+            and receipt.get("logical_forecast_origin_utc") == cutoff(day).isoformat()
+            and "forecast_origin_utc" not in receipt and "profile_revision_utc" not in receipt,
+            "Saturn per-series logical origin or outer delivery differs")
+    require(all(receipt.get(k) == v for k, v in _profile_contract(outer_day).items())
+            and receipt.get("profile_origin_snapshot_verified") is False,
+            "Saturn per-series profile policy differs")
+    aliases = receipt.get("alias_revisions_utc", {})
+    origins = receipt.get("alias_origins_verified", {})
+    sources = receipt.get("alias_sources", {})
+    require(set(aliases) == set(ALIASES) and set(origins) == set(ALIASES) and set(sources) == set(ALIASES),
+            "Saturn per-series revision aliases differ")
+    revisions = {a: pd.Timestamp(aliases[a]) for a in ALIASES}
+    for alias, revision in revisions.items():
+        method = sources[alias]
+        require(revision.tzinfo is not None and revision <= cutoff(outer_day)
+                and ((method == "own_origin" and revision == cutoff(day))
+                     or (method == "outer_revision" and day < outer_day and revision == cutoff(outer_day))
+                     or (method == "repository_vintage" and alias == "nl_residual_load_fcst" and day < outer_day)),
+                "Saturn per-series revision or recovery source differs")
+    require(all(origins[a] is (sources[a] == "own_origin") for a in ALIASES),
+            "Saturn per-series historical origin claim differs")
+    require(receipt.get("profile_revision_max_utc") == max(revisions.values()).isoformat(),
+            "Saturn per-series maximum revision differs")
+    return revisions
+
+
 def verify_profile_day(directory: Path, day: str, *, outer_day=None):
     directory = Path(directory)
     receipt = json.loads((directory / "receipt.json").read_text(encoding="utf-8"))
-    revision = _profile_revision(receipt, day, outer_day)
+    revisions = _profile_revisions(receipt, day, outer_day)
     require(receipt.get("delivery_day") == day
             and receipt.get("state") == "COMPLETE" and receipt.get("series") == specs(),
             "Saturn profile cache contract changed")
-    require(set(receipt.get("artifact_sha256", {})) == {"covariates.parquet"},
+    artifacts = {"covariates.parquet"}
+    if receipt.get("alias_sources", {}).get("nl_residual_load_fcst") == "repository_vintage":
+        artifacts.add("nl_repository_vintages.parquet")
+    require(set(receipt.get("artifact_sha256", {})) == artifacts,
             "Saturn profile artifact inventory differs")
-    require(sha256(directory / "covariates.parquet") == receipt["artifact_sha256"]["covariates.parquet"],
-            f"Saturn profile {day}: modified covariates.parquet")
+    for name in artifacts:
+        require(sha256(directory / name) == receipt["artifact_sha256"][name],
+                f"Saturn profile {day}: modified {name}")
     frame = pd.read_parquet(directory / "covariates.parquet")
     require(frame.index.equals(grid(day)) and tuple(frame.columns) == ALIASES
             and np.isfinite(frame.to_numpy(float)).all(), "Invalid Saturn daily forecast grid")
-    _verify_profile_normalization(frame, receipt, day, query_revision=revision)
-    require(pd.Timestamp(receipt["retrieved_at_utc"]).tz_convert("UTC") >= revision,
+    if receipt["protocol"] == PROFILE_SERIES_PROTOCOL:
+        evidence = receipt.get("alias_evidence", {})
+        require(set(evidence) == set(ALIASES), "Saturn per-series evidence aliases differ")
+        for alias in ALIASES:
+            _verify_alias_evidence(evidence[alias], frame[alias].to_numpy(float), day, outer_day, alias, directory)
+            require(evidence[alias]["revision_utc"] == revisions[alias].isoformat()
+                    and evidence[alias]["source"] == receipt["alias_sources"][alias],
+                    "Saturn per-series evidence revision differs")
+        require(receipt.get("dst_evidence") == {a: evidence[a]["dst_evidence"] for a in ALIASES}
+                and receipt.get("spring_dst_repair") == evidence["nl_residual_load_fcst"]["spring_dst_repair"],
+                "Saturn per-series normalization evidence differs")
+    _verify_profile_normalization(frame, receipt, day, query_revision=revisions["nl_residual_load_fcst"])
+    require(pd.Timestamp(receipt["retrieved_at_utc"]).tz_convert("UTC") >= max(revisions.values()),
             "Saturn profile cutoff had not occurred at retrieval")
     return frame, receipt
 
@@ -388,7 +442,7 @@ def capture_profile_day(client, day: str, cache: Path = DEFAULT_CACHE, *, now_ut
         "dst_evidence": evidence, "collector_code_sha256": sha256(Path(__file__)),
         "artifact_sha256": {"covariates.parquet": sha256(directory / "covariates.parquet")}}
     if outer_day is not None:
-        receipt.update(**_profile_contract(outer_day), outer_delivery_day=outer_day,
+        receipt.update(**_profile_contract(outer_day, WHOLE_PROFILE_HISTORY_POLICY), outer_delivery_day=outer_day,
             profile_revision_utc=revision.isoformat(), logical_forecast_origin_utc=cutoff(day).isoformat(),
             own_origin_failure=redact_text(str(own_origin_failure or "Historical origin unavailable after bounded retries")),
             availability_basis="Complete historical forecast profile reconstructed at the outer fit cutoff; not an original historical origin snapshot")
@@ -459,51 +513,250 @@ def _profile_cache_directory(cache, day, outer_day):
         # A damaged strict cache must never be hidden by a recovery packet.
         verify_profile_day(strict, day)
         return strict
-    recovery = Path(cache) / "profiles_current_fit_v1" / outer_day / day
-    if day < outer_day and (recovery / "receipt.json").is_file():
+    recovery = Path(cache) / "profiles_per_series_v2" / outer_day / day
+    if (recovery / "receipt.json").is_file():
         verify_profile_day(recovery, day, outer_day=outer_day)
         return recovery
     return None
+
+
+def _values_digest(values, day):
+    digest = hashlib.sha256(grid(day).asi8.astype("<i8").tobytes())
+    digest.update(np.asarray(values, dtype="<f8").tobytes())
+    return digest.hexdigest()
+
+
+def _spring_evidence(entries=()):
+    from materialize_saturn_kalman_fuel import NL_SPRING_DST_REPAIR_POLICY
+    return {"alias": "nl_residual_load_fcst", "policy": NL_SPRING_DST_REPAIR_POLICY,
+            "entries": list(entries)}
+
+
+def _verify_alias_evidence(evidence, values, day, outer_day, alias, directory):
+    require(evidence.get("protocol") == PROFILE_ALIAS_PROTOCOL
+            and evidence.get("delivery_day") == day and evidence.get("outer_delivery_day") == outer_day
+            and evidence.get("alias") == alias and evidence.get("series") == specs()[alias]
+            and evidence.get("logical_forecast_origin_utc") == cutoff(day).isoformat(),
+            "Saturn partial series contract differs")
+    revision = pd.Timestamp(evidence["revision_utc"])
+    method = evidence.get("source")
+    require(revision.tzinfo is not None and revision <= cutoff(outer_day)
+            and ((method == "own_origin" and revision == cutoff(day))
+                 or (method == "outer_revision" and day < outer_day and revision == cutoff(outer_day))
+                 or (method == "repository_vintage" and alias == "nl_residual_load_fcst" and day < outer_day)),
+            "Saturn partial series revision or source differs")
+    require(evidence.get("origin_snapshot_verified") is (method == "own_origin")
+            and pd.Timestamp(evidence["retrieved_at_utc"]).tz_convert("UTC") >= revision,
+            "Saturn partial series origin or retrieval differs")
+    require(np.asarray(values).shape == (len(grid(day)),) and np.isfinite(values).all()
+            and evidence.get("values_sha256") == _values_digest(values, day),
+            "Saturn partial series values changed or incomplete")
+    require(evidence.get("dst_evidence", {}).get("policy") == specs()[alias]["dst_policy"],
+            "Saturn partial series normalization policy differs")
+    if method != "own_origin":
+        require(isinstance(evidence.get("own_origin_failure"), str) and bool(evidence["own_origin_failure"]),
+                "Saturn series recovery lacks own-origin failure evidence")
+    if alias == "nl_residual_load_fcst":
+        frame = pd.DataFrame({alias: values}, index=grid(day))
+        _verify_profile_normalization(frame, {"profile_normalization_policy": PROFILE_NORMALIZATION_POLICY,
+            "spring_dst_repair": evidence.get("spring_dst_repair")}, day, query_revision=revision)
+    else:
+        require(evidence.get("spring_dst_repair") == _spring_evidence(),
+                "Saturn repair evidence present for another alias")
+    if method == "repository_vintage":
+        from .nyx_annual_saturn_archive import verify_nl_profile
+        require(bool(evidence.get("outer_origin_failure")), "Saturn repository recovery lacks outer failure evidence")
+        archive = evidence.get("repository_evidence", {})
+        require(evidence["revision_utc"] == archive.get("snapshot_time_utc"),
+                "Saturn repository snapshot revision differs")
+        verify_nl_profile(pd.Series(values, index=grid(day), name=alias), archive, day, outer_day,
+                          archive_path=Path(directory) / "nl_repository_vintages.parquet")
+
+
+def _save_alias(directory, alias, values, evidence, day, outer_day):
+    _verify_alias_evidence(evidence, values, day, outer_day, alias, directory)
+    _immutable(directory / "series" / f"{alias}.json",
+               _encoded({"values": np.asarray(values, dtype=float).tolist(), "evidence": evidence}))
+    return np.asarray(values, dtype=float), evidence
+
+
+def _alias_evidence(alias, day, outer_day, revision, values, *, method, dst, spring=(),
+                    retrieved=None, **extra):
+    return {"protocol": PROFILE_ALIAS_PROTOCOL, "delivery_day": day, "outer_delivery_day": outer_day,
+        "alias": alias, "series": specs()[alias], "source": method,
+        "revision_utc": pd.Timestamp(revision).isoformat(), "logical_forecast_origin_utc": cutoff(day).isoformat(),
+        "origin_snapshot_verified": method == "own_origin", "values_sha256": _values_digest(values, day),
+        "retrieved_at_utc": (pd.Timestamp.now(tz="UTC") if retrieved is None else pd.Timestamp(retrieved)).isoformat(),
+        "dst_evidence": dst, "spring_dst_repair": _spring_evidence(spring), **extra}
+
+
+def _fetch_profile_alias(day, outer_day, alias, revision, client_factory):
+    expected, spec = grid(day), specs()[alias]
+    phase = "forecast_profile" if revision == cutoff(day) else "current_fit_profile_recovery"
+    for attempt in range(1, 4):
+        client = None
+        try:
+            client = client_factory()
+            series = fetch_saturn_series_from_client(client, spec["series"],
+                expected[0] - pd.Timedelta(hours=8), expected[-1] + pd.Timedelta(hours=8), "UTC",
+                revision_date=revision, naive_timezone=spec["naive_timezone"],
+                incomplete_dst_policy=spec["dst_policy"], nocache=True)
+            selected, ledger = series, []
+            if alias == "nl_residual_load_fcst":
+                selected, ledger = _nl_spring_profile(series, day, expected, query_revision=revision)
+            values = _numeric(selected, expected, alias)
+            return values, _alias_evidence(alias, day, outer_day, revision, values,
+                method="own_origin" if revision == cutoff(day) else "outer_revision", spring=ledger,
+                dst={"policy": spec["dst_policy"], "normalizer_attrs": json.loads(json.dumps(series.attrs, default=str))})
+        except Exception as error:
+            print(json.dumps({"source": "saturn", "event": "profile_retry", "profile_day": day,
+                "alias": alias, "attempt": attempt, "max_attempts": 3, "revision_utc": revision.isoformat(),
+                "error": redact_text(str(error))}, ensure_ascii=False), flush=True)
+            if attempt == 3:
+                detail = RuntimeError(f"3 attempts at revision {revision.isoformat()} failed: {redact_text(str(error))}")
+                raise SaturnSourceError(day, phase, detail, alias=alias, series=spec["series"]) from error
+        finally:
+            session = getattr(client, "session", None)
+            if session is not None:
+                try:
+                    session.close()
+                except Exception as error:
+                    print(f"Saturn session close: {redact_text(str(error))}", flush=True)
+        time.sleep(2 ** (attempt - 1))
+
+
+def _seal_own_profile(day, cache, frame, evidence):
+    """Keep complete historical origins reusable for every subsequent outer fit."""
+    directory = Path(cache) / "profiles_v2" / day
+    _parquet(directory / "covariates.parquet", frame)
+    receipt = {"protocol": PROFILE_PROTOCOL, "delivery_day": day, "state": "COMPLETE",
+        "forecast_origin_utc": cutoff(day).isoformat(), "series": specs(),
+        "retrieved_at_utc": max(pd.Timestamp(e["retrieved_at_utc"]) for e in evidence.values()).isoformat(),
+        "publication_verified": False, "provider_publication_timestamp_verified": False,
+        "availability_basis": "Forecast profiles queried at their own delivery D-1 08:00 revision_date",
+        "profile_normalization_policy": PROFILE_NORMALIZATION_POLICY,
+        "spring_dst_repair": evidence["nl_residual_load_fcst"]["spring_dst_repair"],
+        "dst_evidence": {a: evidence[a]["dst_evidence"] for a in ALIASES},
+        "collector_code_sha256": sha256(Path(__file__)),
+        "artifact_sha256": {"covariates.parquet": sha256(directory / "covariates.parquet")}}
+    _immutable(directory / "receipt.json", _encoded(receipt))
+    verify_profile_day(directory, day)
+    return receipt
+
+
+def _repository_archive_path(cache):
+    from .nyx_annual_saturn_archive import DEFAULT_ARCHIVE, PINNED_ARCHIVE_SHA256
+    path = Path(cache) / "repository_vintages" / f"{PINNED_ARCHIVE_SHA256}.parquet"
+    # The source sync owns the process lock; this lock also serializes its workers.
+    with _ARCHIVE_CACHE_LOCK:
+        if not path.is_file():
+            try:
+                raw = DEFAULT_ARCHIVE.read_bytes()
+            except OSError as error:
+                raise ValueError("Pinned NL repository archive is unavailable") from error
+            require(hashlib.sha256(raw).hexdigest() == PINNED_ARCHIVE_SHA256,
+                    "Pinned NL repository archive changed")
+            _immutable(path, raw)  # A byte copy: the tracked archive may later be refreshed.
+        require(sha256(path) == PINNED_ARCHIVE_SHA256, "Pinned NL repository cache changed")
+    return path
 
 
 def _sync_profile_day(day, delivery_day, cache, client_factory):
     existing = _profile_cache_directory(cache, day, delivery_day)
     if existing is not None:
         return verify_profile_day(existing, day, outer_day=delivery_day)[1]
-
-    def attempts(outer_day=None, reason=None):
-        revision = cutoff(outer_day or day)
-        for attempt in range(1, 4):
-            client = None
-            try:
-                client = client_factory()
-                return capture_profile_day(client, day, cache, outer_day=outer_day, own_origin_failure=reason)
-            except SaturnSourceError as error:
-                print(json.dumps({"source": "saturn", "event": "profile_retry", "profile_day": day,
-                    "attempt": attempt, "max_attempts": 3, "revision_utc": revision.isoformat(),
-                    "error": redact_text(str(error))}, ensure_ascii=False), flush=True)
-                if attempt == 3:
-                    detail = RuntimeError(f"3 attempts at revision {revision.isoformat()} failed: {redact_text(str(error))}")
-                    raise SaturnSourceError(day, error.phase, detail, alias=error.alias, series=error.series) from error
-            finally:
-                session = getattr(client, "session", None)
-                if session is not None:
-                    try:
-                        session.close()
-                    except Exception as error:
-                        print(f"Saturn session close: {redact_text(str(error))}", flush=True)
-            time.sleep(2 ** (attempt - 1))
-
-    try:
-        return attempts()
-    except SaturnSourceError as error:
+    directory = Path(cache) / "profiles_per_series_v2" / delivery_day / day
+    require(day <= delivery_day and pd.Timestamp.now(tz="UTC") >= cutoff(delivery_day),
+            "Saturn profile or outer cutoff is in the future")
+    values, evidence, missing = {}, {}, {}
+    # Complete each own-origin request independently: one absent FR series must
+    # not prevent us from asking Saturn for the valid historical NL series.
+    for alias in ALIASES:
+        partial = directory / "series" / f"{alias}.json"
+        if partial.is_file():
+            item = json.loads(partial.read_text(encoding="utf-8"))
+            value, proof = np.asarray(item["values"], dtype=float), item["evidence"]
+            _verify_alias_evidence(proof, value, day, delivery_day, alias, directory)
+            values[alias], evidence[alias] = value, proof
+            continue
+        try:
+            value, proof = _fetch_profile_alias(day, delivery_day, alias, cutoff(day), client_factory)
+        except SaturnSourceError as error:
+            missing[alias] = error
+            continue
+        values[alias], evidence[alias] = _save_alias(directory, alias, value, proof, day, delivery_day)
+    legacy = Path(cache) / "profiles_current_fit_v1" / delivery_day / day
+    old = verify_profile_day(legacy, day, outer_day=delivery_day) if missing and (legacy / "receipt.json").is_file() else None
+    failures = []
+    for alias, error in missing.items():
         if day >= delivery_day:
-            raise  # The forecast's real delivery profile has no later fallback.
+            failures.append(error)
+            continue
         print(json.dumps({"source": "saturn", "event": "profile_current_fit_recovery", "profile_day": day,
-            "outer_delivery_day": delivery_day, "logical_origin_utc": cutoff(day).isoformat(),
-            "actual_revision_utc": cutoff(delivery_day).isoformat(),
-            "reason": redact_text(str(error))}, ensure_ascii=False), flush=True)
-        return attempts(outer_day=delivery_day, reason=str(error))
+            "alias": alias, "outer_delivery_day": delivery_day, "logical_origin_utc": cutoff(day).isoformat(),
+            "actual_revision_utc": cutoff(delivery_day).isoformat(), "reason": redact_text(str(error))}), flush=True)
+        try:
+            if old is None:
+                value, proof = _fetch_profile_alias(day, delivery_day, alias, cutoff(delivery_day), client_factory)
+            else:
+                frame, raw = old
+                value = frame[alias].to_numpy(float)
+                proof = _alias_evidence(alias, day, delivery_day, cutoff(delivery_day), value,
+                    method="outer_revision", dst=raw["dst_evidence"][alias], retrieved=raw["retrieved_at_utc"],
+                    spring=raw["spring_dst_repair"]["entries"] if alias == "nl_residual_load_fcst" else (),
+                    reused_whole_profile_receipt_sha256=sha256(legacy / "receipt.json"))
+            proof["own_origin_failure"] = redact_text(str(error))
+        except SaturnSourceError as outer_error:
+            if alias != "nl_residual_load_fcst":
+                failures.append(outer_error)
+                continue
+            from .nyx_annual_saturn_archive import recover_nl_profile
+            try:
+                archive_path = _repository_archive_path(cache)
+                series, archive = recover_nl_profile(day, delivery_day, archive_path=archive_path)
+            except ValueError as archive_error:
+                combined = RuntimeError(f"{redact_text(str(outer_error))}; repository vintage unavailable: {redact_text(str(archive_error))}")
+                failures.append(SaturnSourceError(day, "current_fit_profile_recovery", combined,
+                                                 alias=alias, series=specs()[alias]["series"]))
+                continue
+            publish_verified_immutable_copy(archive_path, directory / "nl_repository_vintages.parquet", archive["archive_sha256"])
+            value = _numeric(series, grid(day), alias)
+            proof = _alias_evidence(alias, day, delivery_day, pd.Timestamp(archive["snapshot_time_utc"]), value,
+                method="repository_vintage", dst={"policy": specs()[alias]["dst_policy"], "normalizer_attrs": {}},
+                repository_evidence=archive, own_origin_failure=redact_text(str(error)),
+                outer_origin_failure=redact_text(str(outer_error)))
+            print(json.dumps({"source": "saturn", "event": "profile_repository_recovery", "profile_day": day,
+                "alias": alias, "actual_revision_utc": archive["snapshot_time_utc"],
+                "outer_cutoff_utc": cutoff(delivery_day).isoformat()}), flush=True)
+        values[alias], evidence[alias] = _save_alias(directory, alias, value, proof, day, delivery_day)
+    if failures:
+        first = failures[0]
+        detail = RuntimeError(f"{len(failures)} series unavailable: {', '.join(e.alias for e in failures)}; {redact_text(str(first))}")
+        raise SaturnSourceError(day, first.phase, detail, alias=first.alias, series=first.series) from first
+    frame = pd.DataFrame({a: values[a] for a in ALIASES}, index=grid(day))
+    if all(e["source"] == "own_origin" for e in evidence.values()):
+        return _seal_own_profile(day, cache, frame, evidence)
+    _parquet(directory / "covariates.parquet", frame)
+    revisions = {a: evidence[a]["revision_utc"] for a in ALIASES}
+    artifacts = {"covariates.parquet": sha256(directory / "covariates.parquet")}
+    if evidence["nl_residual_load_fcst"]["source"] == "repository_vintage":
+        artifacts["nl_repository_vintages.parquet"] = sha256(directory / "nl_repository_vintages.parquet")
+    receipt = {"protocol": PROFILE_SERIES_PROTOCOL, "delivery_day": day, "outer_delivery_day": delivery_day,
+        "state": "COMPLETE", "series": specs(), **_profile_contract(delivery_day),
+        "logical_forecast_origin_utc": cutoff(day).isoformat(), "alias_revisions_utc": revisions,
+        "alias_sources": {a: evidence[a]["source"] for a in ALIASES},
+        "alias_origins_verified": {a: evidence[a]["origin_snapshot_verified"] for a in ALIASES},
+        "profile_revision_max_utc": max(pd.Timestamp(r) for r in revisions.values()).isoformat(),
+        "alias_evidence": evidence, "retrieved_at_utc": max(pd.Timestamp(e["retrieved_at_utc"]) for e in evidence.values()).isoformat(),
+        "publication_verified": False, "provider_publication_timestamp_verified": False,
+        "availability_basis": "Complete series selected independently at own origin, outer fit cutoff, or audited NL repository vintage",
+        "profile_normalization_policy": PROFILE_NORMALIZATION_POLICY,
+        "spring_dst_repair": evidence["nl_residual_load_fcst"]["spring_dst_repair"],
+        "dst_evidence": {a: evidence[a]["dst_evidence"] for a in ALIASES},
+        "collector_code_sha256": sha256(Path(__file__)), "artifact_sha256": artifacts}
+    _immutable(directory / "receipt.json", _encoded(receipt))
+    verify_profile_day(directory, day, outer_day=delivery_day)
+    return receipt
 
 
 def sync(delivery_day: str, *, first_day: str | None = None, cache: Path = DEFAULT_CACHE,
@@ -594,23 +847,27 @@ def publish(bundle: Path, delivery_day: str, *, first_day: str | None = None,
     profiles = Path(cache) / "profiles_v2"
     first = source_start(profiles, delivery_day, first_day, plan_protocol=PROFILE_PROTOCOL)
     require(first <= last - timedelta(days=365), "Saturn training history too short")
-    frames, daily, hashes = [], {}, {}
+    frames, daily, hashes, revision_frames = [], {}, {}, []
     for stamp in pd.date_range(first, last, freq="D"):
         day = stamp.date().isoformat()
         directory = _profile_cache_directory(cache, day, delivery_day)
         require(directory is not None, f"Saturn profile cache missing for {day} at outer delivery {delivery_day}")
         cov, receipt = verify_profile_day(directory, day, outer_day=delivery_day)
-        actual_revision = _profile_revision(receipt, day, delivery_day)
+        actual_revisions = _profile_revisions(receipt, day, delivery_day)
         frames.append(cov)
-        for name in ("covariates.parquet", "receipt.json"):
+        revision_frames.append(pd.DataFrame({a: actual_revisions[a] for a in ALIASES}, index=cov.index))
+        for name in (*receipt["artifact_sha256"], "receipt.json"):
             relative = f"source_artifacts/saturn/days/{day}/{name}"
             digest = sha256(directory / name)
             publish_verified_immutable_copy(directory / name, bundle / relative, digest)
             hashes[relative] = digest
-        daily[day] = {"forecast_origin_utc": receipt["forecast_origin_utc"],
-                      "logical_forecast_origin_utc": cutoff(day).isoformat(),
-                      "profile_revision_utc": actual_revision.isoformat(),
-                      "profile_origin_snapshot_verified": receipt["protocol"] == PROFILE_PROTOCOL,
+        sources = (receipt["alias_sources"] if receipt["protocol"] == PROFILE_SERIES_PROTOCOL
+                   else dict.fromkeys(ALIASES, "own_origin"))
+        daily[day] = {"logical_forecast_origin_utc": cutoff(day).isoformat(),
+                      "alias_revisions_utc": {a: r.isoformat() for a, r in actual_revisions.items()},
+                      "alias_sources": sources,
+                      "alias_origins_verified": {a: sources[a] == "own_origin" for a in ALIASES},
+                      "profile_revision_max_utc": max(actual_revisions.values()).isoformat(),
                       "covariates_sha256": receipt["artifact_sha256"]["covariates.parquet"],
                       "publication_verified": False,
                       "receipt_path": f"source_artifacts/saturn/days/{day}/receipt.json"}
@@ -622,10 +879,8 @@ def publish(bundle: Path, delivery_day: str, *, first_day: str | None = None,
     origin_path = "source_artifacts/saturn/origins.parquet"
     _parquet(bundle / origin_path, origins)
     hashes[origin_path] = sha256(bundle / origin_path)
-    revisions = pd.DatetimeIndex(pd.to_datetime([daily[str(d)]["profile_revision_utc"]
-        for d in combined.index.tz_convert("Europe/Paris").date], utc=True))
     revision_path = "source_artifacts/saturn/profile_revisions.parquet"
-    _parquet(bundle / revision_path, pd.DataFrame({alias: revisions for alias in ALIASES}, index=combined.index))
+    _parquet(bundle / revision_path, pd.concat(revision_frames))
     hashes[revision_path] = sha256(bundle / revision_path)
     target_directory = Path(cache) / "targets_current_fit_v1" / delivery_day
     _, target_receipt = verify_target_snapshot(target_directory, delivery_day, first.isoformat())
@@ -642,7 +897,7 @@ def publish(bundle: Path, delivery_day: str, *, first_day: str | None = None,
         "state": "COMPLETE", "asof_cutoff_verified": True, "training_window_complete": True,
         "asof_state_utc": cutoff(delivery_day).isoformat(), "daily_vintages": daily,
         "first_delivery_day": first.isoformat(), "last_delivery_day": delivery_day,
-        "availability_basis": "Historical profiles use their own revision_date where available, otherwise the outer fit revision_date; live delivery and training prices use the outer forecast cutoff",
+        "availability_basis": "Each historical series uses its own revision_date, otherwise the outer fit revision_date or an audited NL repository vintage; live delivery remains at its own origin",
         **_target_contract(delivery_day), "targets_snapshot": target_snapshot,
         **_profile_contract(delivery_day), "logical_forecast_origins": True,
         "provider_publication_timestamp_verified": False,
@@ -716,28 +971,48 @@ def verify_current_fit_source(bundle, day, receipt):
     frames = []
     expected_artifacts = {"source_artifacts/saturn/covariates.parquet", "source_artifacts/saturn/origins.parquet",
                           "source_artifacts/saturn/targets/prices.parquet", "source_artifacts/saturn/targets/receipt.json"}
-    revisions = []
+    revision_frames = []
     for origin in days:
         prefix = f"source_artifacts/saturn/days/{origin}"
         for name in ("receipt.json", "covariates.parquet"):
             _bound(bundle, receipt, f"{prefix}/{name}")
             expected_artifacts.add(f"{prefix}/{name}")
         covariates, raw = verify_profile_day(bundle / prefix, origin, outer_day=day if profile_contract else None)
-        revision = _profile_revision(raw, origin, day if profile_contract else None)
+        actual_revisions = _profile_revisions(raw, origin, day if profile_contract else None)
+        for name in raw["artifact_sha256"]:
+            _bound(bundle, receipt, f"{prefix}/{name}")
+            expected_artifacts.add(f"{prefix}/{name}")
         declared = receipt["daily_vintages"][origin]
-        require(declared.get("forecast_origin_utc") == raw["forecast_origin_utc"]
-                and declared.get("covariates_sha256") == raw["artifact_sha256"]["covariates.parquet"]
+        require(declared.get("covariates_sha256") == raw["artifact_sha256"]["covariates.parquet"]
                 and declared.get("receipt_path") == f"{prefix}/receipt.json"
                 and "prices_sha256" not in declared, f"Saturn profile declaration differs: {origin}")
-        if profile_contract:
+        if profile_contract.get("profile_history_policy") == PROFILE_HISTORY_POLICY:
+            require(raw["protocol"] in (PROFILE_PROTOCOL, PROFILE_SERIES_PROTOCOL),
+                    "Whole-day profile recovery cannot bypass per-series own-origin requests")
+            sources = (raw["alias_sources"] if raw["protocol"] == PROFILE_SERIES_PROTOCOL
+                       else dict.fromkeys(ALIASES, "own_origin"))
             require(declared.get("logical_forecast_origin_utc") == cutoff(origin).isoformat()
+                    and declared.get("alias_revisions_utc") == {a: r.isoformat() for a, r in actual_revisions.items()}
+                    and declared.get("alias_sources") == sources
+                    and declared.get("alias_origins_verified") == {a: sources[a] == "own_origin" for a in ALIASES}
+                    and declared.get("profile_revision_max_utc") == max(actual_revisions.values()).isoformat()
+                    and "forecast_origin_utc" not in declared and "profile_revision_utc" not in declared,
+                    f"Saturn per-series revision declaration differs: {origin}")
+        elif profile_contract:
+            require(raw["protocol"] != PROFILE_SERIES_PROTOCOL,
+                    "Per-series profile recovery cannot use the old whole-day policy")
+            revision = _profile_revision(raw, origin, day)
+            require(declared.get("logical_forecast_origin_utc") == cutoff(origin).isoformat()
+                    and declared.get("forecast_origin_utc") == raw["forecast_origin_utc"]
                     and declared.get("profile_revision_utc") == revision.isoformat()
                     and declared.get("profile_origin_snapshot_verified") is (raw["protocol"] == PROFILE_PROTOCOL)
                     and revision <= cutoff(day), f"Saturn actual profile revision declaration differs: {origin}")
         else:
             require(raw["protocol"] == PROFILE_PROTOCOL, "Unlabelled historical profile recovery")
+            require(declared.get("forecast_origin_utc") == raw["forecast_origin_utc"],
+                    "Saturn strict profile declaration differs")
         frames.append(covariates)
-        revisions.extend([revision] * len(covariates))
+        revision_frames.append(pd.DataFrame({a: actual_revisions[a] for a in ALIASES}, index=covariates.index))
     revision_path = "source_artifacts/saturn/profile_revisions.parquet"
     if profile_contract:
         expected_artifacts.add(revision_path)
@@ -752,7 +1027,7 @@ def verify_current_fit_source(bundle, day, receipt):
     stored = pd.read_parquet(_bound(bundle, receipt, "source_artifacts/saturn/origins.parquet"))
     require(stored.equals(origins), "Saturn combined origin grid differs from raw profiles")
     if profile_contract:
-        actual = pd.DataFrame({alias: pd.DatetimeIndex(revisions) for alias in ALIASES}, index=combined.index)
+        actual = pd.concat(revision_frames)
         stored = pd.read_parquet(_bound(bundle, receipt, revision_path))
         require(stored.equals(actual), "Saturn actual profile revisions differ from raw receipts")
     latest = prices.loc[target_grid(day, day)]
